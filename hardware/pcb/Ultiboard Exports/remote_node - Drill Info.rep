@@ -1,0 +1,21 @@
+ULTIBOARD DRILL REPORT
+
+Design: remote_node
+
+DRILL FILE SETTINGS
+Excellon 2, Absolute, Inch, 2.4 
+
+
+DEFINITION COPPER LAYERS
+Copper Top
+Copper Bottom
+
+
+--------------------------------------------------------------------
+
+DRILLFILE                                    LAMINATION
+remote_node - Copper Top-Copper Bottom.drl   Copper Top .. Copper Bottom
+
+TOOL     SIZE   TYPE  COUNT
+   1   0.0595    PTH      5
+   2   0.0236    PTH     20
