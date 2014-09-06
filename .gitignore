@@ -1,2 +1,10 @@
 *.ms13 (Security copy)
 *.ewprj (Security copy)
+*.log
+hardware/pcb/remote_node@2014-09-05-2213.ewnet
+hardware/pcb/remote_node@2014-09-05-2236.ewnet
+hardware/pcb/remote_node@2014-09-05-2326.ewnet
+hardware/pcb/remote_node@2014-09-05-2327.ewnet
+hardware/pcb/remote_node@2014-09-05-2329.ewnet
+hardware/pcb/remote_node@2014-09-05-2331.ewnet
+hardware/pcb/remote_node@2014-09-06-1157.ewnet
