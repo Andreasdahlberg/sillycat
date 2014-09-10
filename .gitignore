@@ -9,3 +9,12 @@ hardware/pcb/remote_node@2014-09-05-2329.ewnet
 hardware/pcb/remote_node@2014-09-05-2331.ewnet
 hardware/pcb/remote_node@2014-09-06-1157.ewnet
 hardware/pcb/remote_node@2014-09-06-1325.ewnet
+hardware/exterior/standard_components/~$Battery.SLDPRT
+hardware/exterior/standard_components/~$battery_holder_body.SLDPRT
+hardware/exterior/standard_components/~$end_plug.SLDPRT
+hardware/exterior/standard_components/~$end_plug_pin.SLDPRT
+hardware/exterior/standard_components/~$spring.SLDPRT
+hardware/exterior/standard_components/~$spring_pin.SLDPRT
+hardware/exterior/~$battery_assembly.SLDASM
+hardware/exterior/~$casing.SLDPRT
+hardware/exterior/~$casing_lower.SLDPRT
