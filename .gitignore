@@ -18,3 +18,8 @@ hardware/exterior/standard_components/~$spring_pin.SLDPRT
 hardware/exterior/~$battery_assembly.SLDASM
 hardware/exterior/~$casing.SLDPRT
 hardware/exterior/~$casing_lower.SLDPRT
+hardware/exterior/casing_lower_ear.SLDPRT
+hardware/pcb/remote_node@2014-09-11-2049.ewnet
+hardware/pcb/remote_node@2014-09-12-1654.ewnet
+hardware/pcb/remote_node@2014-09-12-1919.ewnet
+hardware/pcb/remote_node_bak.ewprj
