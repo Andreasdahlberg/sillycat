@@ -36,3 +36,14 @@ hardware/pcb/remote_node@2014-09-21-1638.ewnet
 hardware/exterior/~$dht11_body.SLDPRT
 hardware/exterior/~$dht11_pcb.SLDPRT
 hardware/exterior/~$dht_assembly.SLDASM
+hardware/exterior/standard_components/~$1206_led_blue.SLDPRT
+hardware/exterior/standard_components/~$cap1206.SLDPRT
+hardware/exterior/standard_components/~$micro USB.SLDASM
+hardware/exterior/standard_components/~$micro usb.SLDPRT
+hardware/exterior/standard_components/~$micro usb02.SLDPRT
+hardware/exterior/standard_components/~$resistor_1206.SLDPRT
+hardware/exterior/standard_components/~$SMA-angled.SLDPRT
+hardware/exterior/standard_components/~$TQFP-32.SLDPRT
+hardware/exterior/~$board.SLDPRT
+hardware/exterior/~$pcb_assembly.SLDASM
+hardware/exterior/~$rfm69hw.SLDPRT
