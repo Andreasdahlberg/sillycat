@@ -47,3 +47,13 @@ hardware/exterior/standard_components/~$TQFP-32.SLDPRT
 hardware/exterior/~$board.SLDPRT
 hardware/exterior/~$pcb_assembly.SLDASM
 hardware/exterior/~$rfm69hw.SLDPRT
+hardware/exterior/standard_components/~$Antena.SLDASM
+hardware/exterior/~$casing_assembly.SLDASM
+hardware/exterior/~$casing_lower_ear.SLDPRT
+hardware/exterior/~$end_cover_usb.SLDPRT
+hardware/exterior/~$casing_upper.SLDPRT
+hardware/exterior/~$led_diffuser.SLDPRT
+hardware/exterior/~$node_assembly.SLDASM
+hardware/exterior/~$casing_3d_printer_ready.SLDASM
+hardware/exterior/~$end_plug_cover.SLDPRT
+hardware/exterior/~$pcb.SLDPRT
