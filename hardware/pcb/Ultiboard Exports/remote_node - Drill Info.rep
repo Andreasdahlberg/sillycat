@@ -17,7 +17,7 @@ DRILLFILE                                    LAMINATION
 remote_node - Copper Top-Copper Bottom.drl   Copper Top .. Copper Bottom
 
 TOOL     SIZE   TYPE  COUNT
-   1   0.0236    PTH     82
+   1   0.0236    PTH     83
    2   0.0595    PTH      5
    3   0.0400    PTH      2
    4   0.1142   NPTH      1

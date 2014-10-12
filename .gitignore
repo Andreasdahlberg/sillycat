@@ -57,3 +57,5 @@ hardware/exterior/~$node_assembly.SLDASM
 hardware/exterior/~$casing_3d_printer_ready.SLDASM
 hardware/exterior/~$end_plug_cover.SLDPRT
 hardware/exterior/~$pcb.SLDPRT
+hardware/pcb/remote_node@2014-10-02-1819.ewnet
+hardware/pcb/remote_node@2014-10-02-1855.ewnet
