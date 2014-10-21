@@ -59,3 +59,11 @@ hardware/exterior/~$end_plug_cover.SLDPRT
 hardware/exterior/~$pcb.SLDPRT
 hardware/pcb/remote_node@2014-10-02-1819.ewnet
 hardware/pcb/remote_node@2014-10-02-1855.ewnet
+*.d
+*.o
+firmware/sillycat_firmware/Debug/sillycat_firmware.elf
+firmware/sillycat_firmware/Debug/sillycat_firmware.hex
+firmware/sillycat_firmware/Debug/sillycat_firmware.eep
+firmware/sillycat_firmware/Debug/sillycat_firmware.lss
+firmware/sillycat_firmware/Debug/sillycat_firmware.map
+firmware/sillycat_firmware/Debug/sillycat_firmware.srec
