@@ -115,6 +115,18 @@
     <Compile Include="libDebug.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="libLED.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libLED.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libSPI.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libSPI.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libUART.c">
       <SubType>compile</SubType>
     </Compile>

@@ -15,33 +15,36 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define F_CPU 16000000UL // 16 MHz
-
 #include <avr/io.h>
-#include <util/delay.h>
 #include "libDebug.h"
 #include "libLED.h"
 
-#define LIBNAME "Main"
+#define LIBNAME "libLED"
 
-int main(void)
+///
+/// @brief Init the LED library
+///
+/// @param  None
+/// @return None
+///
+void libLED_Init()
 {
-	libDebug_Init();
-	libLED_Init();
-	
-    while(1)
-    {
-        //TODO: Please write your application code 
-		
-		libDebug_PrintString(LIBNAME, "I love silly cats");
-		libLED_Toggle();
-		_delay_ms(10);
-		libLED_Toggle();
-		_delay_ms(150);
-		libLED_Toggle();
-		_delay_ms(10);
-		libLED_Toggle();
-		_delay_ms(1000);
-		
-    }
+	//Set led pin as output and pull it low
+	DDRC |= (1 << STATUS_LED);
+	PORTC &= ~(1 << STATUS_LED); 
+	return;
 }
+
+void libLED_Toggle()
+{
+	PORTC ^= (1 << STATUS_LED);
+	return;
+}
+
+
+
+void libLED_Update()
+{
+	return;
+}
+

@@ -37,6 +37,8 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../libDebug.c \
+../libLED.c \
+../libSPI.c \
 ../libUART.c \
 ../sillycat_firmware.c
 
@@ -49,21 +51,29 @@ ASM_SRCS +=
 
 OBJS +=  \
 libDebug.o \
+libLED.o \
+libSPI.o \
 libUART.o \
 sillycat_firmware.o
 
 OBJS_AS_ARGS +=  \
 libDebug.o \
+libLED.o \
+libSPI.o \
 libUART.o \
 sillycat_firmware.o
 
 C_DEPS +=  \
 libDebug.d \
+libLED.d \
+libSPI.d \
 libUART.d \
 sillycat_firmware.d
 
 C_DEPS_AS_ARGS +=  \
 libDebug.d \
+libLED.d \
+libSPI.d \
 libUART.d \
 sillycat_firmware.d
 
@@ -78,6 +88,10 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 
