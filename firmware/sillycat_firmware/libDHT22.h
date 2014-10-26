@@ -15,43 +15,14 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define F_CPU 8000000UL // 8 MHz
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include "libDebug.h"
-#include "libLED.h"
-#include "libTimer.h"
-#include "libDHT22.h"
+#ifndef LIBDHT22_H_
+#define LIBDHT22_H_
 
-#define LIBNAME "Main"
+void libDHT22_Init(void);
+void libDHT22_Update(void);
 
 
-int main(void)
-{
-	libTimer_Init();
-	libDebug_Init();
-	libLED_Init();
-	libDHT22_Init();		
 
-    while(1)
-    {
-		
-	
-		
-		//libDebug_PrintString(LIBNAME, "I love silly cats");
-		//libDebug_PrintUnsignedInteger(LIBNAME, libTimer_GetSeconds());
-		libLED_Update();
-		libDHT22_Update();
-/*		libLED_Toggle();
-		_delay_ms(10);
-		libLED_Toggle();
-		_delay_ms(150);
-		libLED_Toggle();
-		_delay_ms(10);
-		libLED_Toggle();*/
-		//old_time = system_timer;
-		//_delay_ms(5000);
 
-    }
-}
+#endif /* LIBDHT22_H_ */

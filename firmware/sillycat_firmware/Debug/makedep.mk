@@ -4,6 +4,8 @@
 
 libDebug.c
 
+libDHT22.c
+
 libLED.c
 
 libSPI.c

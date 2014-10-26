@@ -115,6 +115,12 @@
     <Compile Include="libDebug.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="libDHT22.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libDHT22.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libLED.c">
       <SubType>compile</SubType>
     </Compile>
