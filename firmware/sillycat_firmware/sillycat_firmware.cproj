@@ -127,6 +127,12 @@
     <Compile Include="libSPI.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="libTimer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libTimer.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libUART.c">
       <SubType>compile</SubType>
     </Compile>

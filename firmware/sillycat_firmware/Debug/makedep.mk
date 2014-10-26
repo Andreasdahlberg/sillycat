@@ -8,6 +8,8 @@ libLED.c
 
 libSPI.c
 
+libTimer.c
+
 libUART.c
 
 sillycat_firmware.c

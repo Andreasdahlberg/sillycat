@@ -39,6 +39,7 @@ C_SRCS +=  \
 ../libDebug.c \
 ../libLED.c \
 ../libSPI.c \
+../libTimer.c \
 ../libUART.c \
 ../sillycat_firmware.c
 
@@ -53,6 +54,7 @@ OBJS +=  \
 libDebug.o \
 libLED.o \
 libSPI.o \
+libTimer.o \
 libUART.o \
 sillycat_firmware.o
 
@@ -60,6 +62,7 @@ OBJS_AS_ARGS +=  \
 libDebug.o \
 libLED.o \
 libSPI.o \
+libTimer.o \
 libUART.o \
 sillycat_firmware.o
 
@@ -67,6 +70,7 @@ C_DEPS +=  \
 libDebug.d \
 libLED.d \
 libSPI.d \
+libTimer.d \
 libUART.d \
 sillycat_firmware.d
 
@@ -74,6 +78,7 @@ C_DEPS_AS_ARGS +=  \
 libDebug.d \
 libLED.d \
 libSPI.d \
+libTimer.d \
 libUART.d \
 sillycat_firmware.d
 
@@ -88,6 +93,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
