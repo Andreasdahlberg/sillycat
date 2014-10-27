@@ -39,6 +39,7 @@ C_SRCS +=  \
 ../libDebug.c \
 ../libDHT22.c \
 ../libLED.c \
+../libPower.c \
 ../libSPI.c \
 ../libTimer.c \
 ../libUART.c \
@@ -55,6 +56,7 @@ OBJS +=  \
 libDebug.o \
 libDHT22.o \
 libLED.o \
+libPower.o \
 libSPI.o \
 libTimer.o \
 libUART.o \
@@ -64,6 +66,7 @@ OBJS_AS_ARGS +=  \
 libDebug.o \
 libDHT22.o \
 libLED.o \
+libPower.o \
 libSPI.o \
 libTimer.o \
 libUART.o \
@@ -73,6 +76,7 @@ C_DEPS +=  \
 libDebug.d \
 libDHT22.d \
 libLED.d \
+libPower.d \
 libSPI.d \
 libTimer.d \
 libUART.d \
@@ -82,6 +86,7 @@ C_DEPS_AS_ARGS +=  \
 libDebug.d \
 libDHT22.d \
 libLED.d \
+libPower.d \
 libSPI.d \
 libTimer.d \
 libUART.d \
@@ -98,6 +103,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

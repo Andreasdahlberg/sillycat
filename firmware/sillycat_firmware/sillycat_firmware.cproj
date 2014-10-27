@@ -127,6 +127,12 @@
     <Compile Include="libLED.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="libPower.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libPower.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libSPI.c">
       <SubType>compile</SubType>
     </Compile>

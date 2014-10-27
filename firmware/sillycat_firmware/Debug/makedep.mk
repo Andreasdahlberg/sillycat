@@ -8,6 +8,8 @@ libDHT22.c
 
 libLED.c
 
+libPower.c
+
 libSPI.c
 
 libTimer.c
