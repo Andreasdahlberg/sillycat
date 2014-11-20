@@ -19,9 +19,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBPOWER_H_
 #define LIBPOWER_H_
 
+typedef enum power_state_type
+{
+	CHARGING,
+	CHARGER_CONNECTED,
+	BATTERY,
+	LOW_VOLTAGE,
+	CRITICAL_VOLTAGE
+}power_state_type;
+
 void libPower_Init(void);
 void libPower_Update(void);
-
+uint32_t libPower_GetBatteryVoltage(void);
 
 
 #endif /* LIBLED_H_ */
