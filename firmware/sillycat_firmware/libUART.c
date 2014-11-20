@@ -18,8 +18,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libUART.h"
 #include <avr/io.h>
 
-SPI_status 
-
 
 ///
 /// @brief Init UART
