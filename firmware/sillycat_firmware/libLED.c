@@ -18,8 +18,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/io.h>
 #include "libDebug.h"
 #include "libLED.h"
+#include "libTimer.h"
 
 #define LIBNAME "libLED"
+
+
+//uint32_t LED_timer;
+
+void FlashLED();
 
 ///
 /// @brief Init the LED library
@@ -32,6 +38,7 @@ void libLED_Init()
 	//Set led pin as output and pull it low
 	DDRC |= (1 << STATUS_LED);
 	PORTC &= ~(1 << STATUS_LED); 
+	//LED_timer = libTimer_GetMilliseconds();
 	return;
 }
 
@@ -45,6 +52,19 @@ void libLED_Toggle()
 
 void libLED_Update()
 {
+	FlashLED();
 	return;
+}
+
+
+void FlashLED()
+{	
+	static uint32_t flash_timer = 0;
+	
+	if (libTimer_TimeDifference(flash_timer) > 1000)
+	{
+		libLED_Toggle();
+		flash_timer = libTimer_GetMilliseconds();
+	}
 }
 

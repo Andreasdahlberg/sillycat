@@ -21,6 +21,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define STATUS_LED PC5
 
+typedef enum LEDStatus
+{
+	LED_OFF = 0,
+	LED_ON
+}LEDStatus;
+
 void libLED_Init();
 void libLED_Update();
 void libLED_Toggle();
