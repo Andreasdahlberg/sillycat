@@ -23,5 +23,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void libDebug_Init();
 void libDebug_PrintString(char* lib_name, char* message);
+void libDebug_PrintInteger(char* lib_name, int value);
+void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value);
 
 #endif /* LIBDEBUG_H_ */

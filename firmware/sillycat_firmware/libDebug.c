@@ -16,6 +16,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <string.h>
+#include <stdlib.h>
 #include "libDebug.h"
 
 #define LIBNAME "libDebug"
@@ -51,4 +52,36 @@ void libDebug_PrintString(char* lib_name, char* message)
 	//TODO: Add timestamp
 	libUART_SendArray((uint8_t*)"\r\n", 2); 
 	return;
+}
+
+void libDebug_PrintInteger(char* lib_name, int value)
+{
+	char data_buffer[12];
+	
+	itoa(value, data_buffer, 10);
+	
+	libUART_SendByte('<');
+	libUART_SendArray((uint8_t*)lib_name, strlen(lib_name));
+	libUART_SendByte('>');
+	libUART_SendByte(' ');
+	
+	libUART_SendArray((uint8_t*)data_buffer, strlen(data_buffer));
+	//TODO: Add timestamp
+	libUART_SendArray((uint8_t*)"\r\n", 2);
+}
+
+void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value)
+{
+	char data_buffer[12];
+	
+	ultoa(value, data_buffer, 10);
+	
+	libUART_SendByte('<');
+	libUART_SendArray((uint8_t*)lib_name, strlen(lib_name));
+	libUART_SendByte('>');
+	libUART_SendByte(' ');
+	
+	libUART_SendArray((uint8_t*)data_buffer, strlen(data_buffer));
+	//TODO: Add timestamp
+	libUART_SendArray((uint8_t*)"\r\n", 2);
 }
