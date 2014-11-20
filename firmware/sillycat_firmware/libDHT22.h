@@ -19,8 +19,30 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBDHT22_H_
 #define LIBDHT22_H_
 
+typedef enum
+{
+	INVALID = 0,
+	VALID,
+	OUTDATED,
+} data_status;
+
+typedef enum
+{
+	CONTINUES = 1,
+	SINGLE
+}sensor_mode;
+
+typedef struct SensorData
+{
+	float humidity;
+	float temperature;
+	data_status status;
+}SensorData;
+
+
 void libDHT22_Init(void);
 void libDHT22_Update(void);
+SensorData libDHT22_GetSensorReading(void);
 
 
 

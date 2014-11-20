@@ -49,6 +49,8 @@ uint8_t data[6];
 float hum;
 float temp;
 
+SensorData sensor_reading;
+
 void GetPulseTimings(int8_t* timings);
 void RequestReading();
 float ConvertToFloat(uint8_t integral, uint8_t fractional);
@@ -71,73 +73,56 @@ void libDHT22_Init(void)
 
 void libDHT22_Update(void)
 {
-
 	static int8_t timings[TIMINGS_ARRAY_SIZE];
 	
-
 	switch (libDHT22_status)
 	{
-
 		case DHT_POWERUP:
-		//TODO: Add special case for timer rollover
-		if (libTimer_TimeDifference(init_time) > MEASURE_INTERVAL)
-		{
-			libDebug_PrintString(LIBNAME, "DHT22 ready");
-			libDHT22_status = DHT_READING;
-
-			//Init timings with -1
-			memset(timings, -1, (sizeof(int8_t) * TIMINGS_ARRAY_SIZE));
-		}
+			if (libTimer_TimeDifference(init_time) > MEASURE_INTERVAL)
+			{
+				libDebug_PrintString(LIBNAME, "Sensor ready...");
+				memset(timings, -1, (sizeof(int8_t) * TIMINGS_ARRAY_SIZE));
+				libDHT22_status = DHT_READING;
+			}
 		break;
 
 		case DHT_READING:
-		RequestReading();
-		GetPulseTimings(timings);
-		libDHT22_status = DHT_DECODING;
-		break;
+			RequestReading();
+			GetPulseTimings(timings);
+			libDHT22_status = DHT_DECODING;
+			break;
 		
-
 		case DHT_DECODING:
+			DecodeTimings(timings);
 
-		//Decode pulse timings into data
-		DecodeTimings(timings);
+			sensor_reading.humidity = ConvertToFloat(data[0], data[1]);
+			sensor_reading.temperature = ConvertToFloat(data[2], data[3]);
+			sensor_reading.status = IsDataValid();
 
-		
-		//Convert data into humidity
-		hum = ConvertToFloat(data[0], data[1]);
-
-		//Convert data into temperature
-		temp = ConvertToFloat(data[2], data[3]);
-		
-		if (IsDataValid())
-		{
-			libDebug_PrintString(LIBNAME, "Data valid");
-		}
-		else
-		{
-			libDebug_PrintString(LIBNAME, "Data invalid");
-		}
-
-		libDebug_PrintInteger(LIBNAME, (uint32_t)temp);	
-	/*
-		Serial.print("Humidity: ");
-		Serial.println(hum, DEC);
-		Serial.print("Temperatur: ");
-		Serial.println(temp, DEC);
-		*/
-
-		init_time = libTimer_GetMilliseconds();
-		libDHT22_status = DHT_POWERUP;
-		break;
+			init_time = libTimer_GetMilliseconds();
+			libDHT22_status = DHT_POWERUP;
+			break;
 
 		case DHT_UNINITIALIZED:
 		default:
-		libDHT22_Init();
-		return;
+			libDHT22_Init();
+			return;
 	}
-
 }
 
+
+///
+/// @brief Get the latest sensor reading
+///
+/// @param  None
+/// @return SensorData Struct with the sensor readings and its status
+///
+SensorData libDHT22_GetSensorReading(void)
+{
+	SensorData return_data = sensor_reading;
+	sensor_reading.status = OUTDATED;
+	return return_data;
+}
 
 
 //**********************Local functions**********************//
