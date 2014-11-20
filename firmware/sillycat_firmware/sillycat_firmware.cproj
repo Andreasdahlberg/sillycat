@@ -109,6 +109,15 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="common.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libADC.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libADC.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libDebug.c">
       <SubType>compile</SubType>
     </Compile>
