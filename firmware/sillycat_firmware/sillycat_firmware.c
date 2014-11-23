@@ -25,6 +25,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDHT22.h"
 #include "libADC.h"
 #include "libPower.h"
+#include "libSPI.h"
 
 #define LIBNAME "Main"
 #define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
@@ -35,24 +36,28 @@ int main(void)
 {
 
 	libDebug_Init();
-		DEBUG_STR("Init system");
+	DEBUG_STR("Init system");
 	
 	libADC_Init();
 	libPower_Init();  
 	libTimer_Init();
 	libLED_Init();
-	libDHT22_Init();		
+	libDHT22_Init();
+	libSPI_Init();		
+	
+	uint8_t data_buffer[8] = "ABCD";
 	
     while(1)
     {
-		
-	
-		
 		//libDebug_PrintString(LIBNAME, "I love silly cats");
 		//libDebug_PrintUnsignedInteger(LIBNAME, libTimer_GetSeconds());
 		libADC_Update();
 		libPower_Update();
 		libLED_Update();
 		libDHT22_Update();
+		libSPI_Update();
+		libSPI_Write(data_buffer, 4);
+
+	
     }
 }

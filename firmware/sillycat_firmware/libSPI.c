@@ -23,8 +23,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 
 #define LIBNAME "libSPI"
-#define BUFFER_SIZE 48
+#define BUFFER_SIZE 8
 
+#define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
+#define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
+
+
+//TODO: Move defines for SS pins to header?
 #define MEM_SS		PD2
 #define RTC_SS		PD3
 #define RADIO_SS	PB2
@@ -35,32 +40,43 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 uint8_t active_slave;
 SPI_status spi_status;
 
+uint8_t tx_length;
+uint8_t rx_length;
 uint8_t transmit_buffer[BUFFER_SIZE];
 uint8_t receive_buffer[BUFFER_SIZE];
 
+bool TXIsBusy();
 
 
-
+///
+/// @brief Init....
+///
+/// @param  None
+/// @return None
+///
 void libSPI_Init(void)
 {	
 	//Set outputs/inputs
-	DDRD |= ((1 << MEM_SS)|(1 << RTC_SS));
-	PORTD |= ((1 << MEM_SS)|(1 << RTC_SS));
-	DDRB |= ((1 << MOSI)|(1 << RADIO_SS)|(1 << SCK));
+	//DDRD |= ((1 << MEM_SS)|(1 << RTC_SS));
+	//PORTD |= ((1 << MEM_SS)|(1 << RTC_SS));
+	//DDRB |= ((1 << MOSI)|(1 << RADIO_SS)|(1 << SCK));
+	//PORTB |= ((1 << MOSI)|(1 << RADIO_SS));
+	
+	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << RADIO_SS));
 	DDRB &= ~(1 << MISO);
-	PORTB |= ((1 << MOSI)|(1 << RADIO_SS));
+	
+	PORTB |= (1 << MOSI);
 	PORTB &= ~(1 << SCK);
 	
 	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
-	active_slave = RTC_SS;
 	spi_status = IDLE;
 	
-	libDebug_PrintString(LIBNAME, "Init done");
+	DEBUG_STR("Init done");
 	return;
 }
 
 
-void libSPI_Service(void)
+void libSPI_Update(void)
 {
 	static uint8_t byte_counter = 0;
 	
@@ -69,35 +85,38 @@ void libSPI_Service(void)
 		case IDLE:
 			break;
 		
-		case RECEIVE:
+		case READ:
 			break;
 		
-		case RECEIVE_DONE:
+		case READ_DONE:
 			break;
 		
-		case TRANSMIT:
-			
-			if (byte_counter == 0)
+		case WRITE:
+			if (byte_counter < tx_length)
 			{
-				SPDR = transmit_buffer[byte_counter];
-				++byte_counter;
+				if (!TXIsBusy() || byte_counter == 0)
+				{
+					DEBUG_INT(byte_counter);
+					SPDR = transmit_buffer[byte_counter];
+					++byte_counter;
+				}
 			}
-			else if ((SPSR & (1 << SPIF)) > 0)
+			else if (byte_counter == tx_length && !TXIsBusy())
 			{
-				
-			}
-		
-			spi_status = TRANSMIT_DONE;
-	
+				spi_status = WRITE_DONE;
+			}	
 			break;
 		
-		case TRANSMIT_DONE:
-		break;
+		case WRITE_DONE:
+			DEBUG_STR("TX done!");
+			byte_counter = 0;
+			spi_status = IDLE;
+			break;
 		
 		default:
-		libDebug_PrintString(LIBNAME, "Some clever message");
-		libSPI_Init();
-		break;
+			DEBUG_STR("Some clever message");
+			libSPI_Init();
+			break;
 		
 	}
 
@@ -105,39 +124,47 @@ void libSPI_Service(void)
 }
 
 
-uint8_t libSPI_TransmitBytes(const uint8_t* data_bytes, uint8_t length)
+///
+/// @brief Start writing data to the SPI-bus
+///
+/// @param  data_bytes Pointer to buffer with data to write
+/// @param length Length of the data buffer
+/// @return bool Status of the operation
+///
+bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 {
-	int8_t return_status;
+	bool return_status = FALSE;
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE) //NOTE: Length?
 	{
 		memcpy(transmit_buffer, data_bytes, length);
-		spi_status = TRANSMIT;
-		return_status = 1;
+		tx_length = length;
+		spi_status = WRITE;
+		return_status = TRUE;
 	}
-	else
-	{
-		return_status = 0;
-	}
-	return return_status;	
-}
-
-
-uint8_t libSPI_TransmitByte(uint8_t data_byte)
-{
-	int8_t return_status;
-	if (libSPI_GetStatus() == IDLE)
-	{
-		SPDR = data_byte;
-		spi_status = TRANSMIT;
-		return_status = 1;
-	}
-	else
-	{
-		return_status = 0;
-	}
-	
 	return return_status;
 }
+
+///
+/// @brief Start reading data from the SPI-bus
+///
+/// @param  data_bytes Pointer to buffer where the data will be stored
+/// @param  length Length of the expected data
+/// @param  timeout Timeout in ms, time before read is aborted if slave is not respondig //TODO: Fix this description!
+/// @return bool Status of the operation
+///
+bool libSPI_Read(const uint8_t* data_bytes, uint8_t length, uint8_t timeout)
+{
+	bool return_status = FALSE;
+	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE) //NOTE: Length?
+	{
+		memset(receive_buffer, 0, BUFFER_SIZE);
+		rx_length = length;
+		spi_status = READ;
+		return_status = TRUE;
+	}
+	return return_status;
+}
+
 
 SPI_status libSPI_GetStatus(void)
 {
@@ -145,9 +172,26 @@ SPI_status libSPI_GetStatus(void)
 }
 
 
-void libSPI_SetActiveSlave(uint8_t slave_unit)
+bool libSPI_SetActiveSlave(uint8_t port, uint8_t pin)
 {
-	
-	return;
+	bool status = FALSE;
+	if (libSPI_GetStatus() == IDLE)
+	{
+
+		status = TRUE;
+	} 
+	return status;
 }
 
+bool libSPI_SetMode()
+{
+	
+	return TRUE;
+}
+
+//**********************Local functions**********************//
+
+bool TXIsBusy()
+{
+	return ((SPSR & (1<<SPIF)) == 0);
+}
