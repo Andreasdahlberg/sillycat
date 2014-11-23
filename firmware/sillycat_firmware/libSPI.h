@@ -35,9 +35,9 @@ typedef enum SPI_status
 void libSPI_Init(void);
 void libSPI_Update(void);
 SPI_status libSPI_GetStatus(void);
+bool libSPI_SetMode(uint8_t mode)
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length);
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length, uint8_t timeout_ms);
-bool libSPI_SetActiveSlave(uint8_t port, uint8_t pin);
 
 
 #endif /* LIBSPI_H_ */

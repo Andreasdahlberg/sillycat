@@ -28,16 +28,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
 #define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
 
-
-//TODO: Move defines for SS pins to header?
-#define MEM_SS		PD2
-#define RTC_SS		PD3
-#define RADIO_SS	PB2
 #define MOSI		PB3
 #define MISO		PB4
 #define SCK			PB5
 
-uint8_t active_slave;
 SPI_status spi_status;
 
 uint8_t tx_length;
@@ -45,24 +39,19 @@ uint8_t rx_length;
 uint8_t transmit_buffer[BUFFER_SIZE];
 uint8_t receive_buffer[BUFFER_SIZE];
 
-bool TXIsBusy();
+bool SPIBusy();
 
 
 ///
-/// @brief Init....
+/// @brief Init the SPI module
 ///
 /// @param  None
 /// @return None
 ///
 void libSPI_Init(void)
 {	
-	//Set outputs/inputs
-	//DDRD |= ((1 << MEM_SS)|(1 << RTC_SS));
-	//PORTD |= ((1 << MEM_SS)|(1 << RTC_SS));
-	//DDRB |= ((1 << MOSI)|(1 << RADIO_SS)|(1 << SCK));
-	//PORTB |= ((1 << MOSI)|(1 << RADIO_SS));
-	
-	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << RADIO_SS));
+
+	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << PB2));
 	DDRB &= ~(1 << MISO);
 	
 	PORTB |= (1 << MOSI);
@@ -75,7 +64,14 @@ void libSPI_Init(void)
 	return;
 }
 
+//TODO: Implement timeout for read operations, maybe for write also?
 
+///
+/// @brief Update the internal state
+///
+/// @param  None
+/// @return None
+///
 void libSPI_Update(void)
 {
 	static uint8_t byte_counter = 0;
@@ -85,41 +81,54 @@ void libSPI_Update(void)
 		case IDLE:
 			break;
 		
-		case READ:
+		//TODO: Remove the DONE-states?
+		case READ_DONE:
+			byte_counter = 0;
+			spi_status = IDLE;
 			break;
 		
-		case READ_DONE:
+		case READ:
+			if (byte_counter < rx_length)
+			{
+				if (!SPIBusy())
+				{
+					receive_buffer[byte_counter] = SPDR;
+					SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock 
+					++byte_counter;
+				}
+			}
+			else if (byte_counter == tx_length && !SPIBusy())
+			{
+				spi_status = READ_DONE;
+			}
 			break;
 		
 		case WRITE:
 			if (byte_counter < tx_length)
 			{
-				if (!TXIsBusy() || byte_counter == 0)
+				if (!SPIBusy() || byte_counter == 0)
 				{
-					DEBUG_INT(byte_counter);
 					SPDR = transmit_buffer[byte_counter];
 					++byte_counter;
 				}
 			}
-			else if (byte_counter == tx_length && !TXIsBusy())
+			else if (byte_counter == tx_length && !SPIBusy())
 			{
 				spi_status = WRITE_DONE;
 			}	
 			break;
 		
 		case WRITE_DONE:
-			DEBUG_STR("TX done!");
 			byte_counter = 0;
 			spi_status = IDLE;
 			break;
 		
 		default:
-			DEBUG_STR("Some clever message");
+			DEBUG_STR("Fatal error, reinitializing module...");
 			libSPI_Init();
 			break;
 		
 	}
-
 	return;
 }
 
@@ -133,65 +142,93 @@ void libSPI_Update(void)
 ///
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 {
-	bool return_status = FALSE;
-	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE) //NOTE: Length?
+	bool status = FALSE;
+	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
 		memcpy(transmit_buffer, data_bytes, length);
 		tx_length = length;
 		spi_status = WRITE;
-		return_status = TRUE;
+		status = TRUE;
 	}
-	return return_status;
+	return status;
 }
+
+//TODO: Change the behavior of the read function. The first time read is called during a read cycle a SPI read transfer should be
+//      started and false should be returned. The following calls should return false and do nothing until the transfer is complete
+//      and the rx_buffer is ready. Then read should return true.  
 
 ///
 /// @brief Start reading data from the SPI-bus
 ///
 /// @param  data_bytes Pointer to buffer where the data will be stored
 /// @param  length Length of the expected data
-/// @param  timeout Timeout in ms, time before read is aborted if slave is not respondig //TODO: Fix this description!
+/// @param  timeout Timeout in ms, time before read is aborted if slave is not responding //TODO: Fix this description!
 /// @return bool Status of the operation
 ///
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length, uint8_t timeout)
 {
-	bool return_status = FALSE;
-	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE) //NOTE: Length?
+	bool status = FALSE;
+	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
 		memset(receive_buffer, 0, BUFFER_SIZE);
 		rx_length = length;
+		SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock 
 		spi_status = READ;
-		return_status = TRUE;
+		status = TRUE;
 	}
-	return return_status;
+	return status;
 }
 
 
+///
+/// @brief Get the status of the SPI-bus
+///
+/// @param None
+/// @return SPI_status SPI-bus status
+///
 SPI_status libSPI_GetStatus(void)
 {
 	return spi_status;
 }
 
 
-bool libSPI_SetActiveSlave(uint8_t port, uint8_t pin)
+///
+/// @brief Set the SPI transfer mode
+///
+/// @param mode SPI mode, (0-3)
+/// @return bool Status of operation
+///
+bool libSPI_SetMode(uint8_t mode)
 {
-	bool status = FALSE;
-	if (libSPI_GetStatus() == IDLE)
+	//TODO: Implement this function
+	switch (mode)
 	{
-
-		status = TRUE;
-	} 
-	return status;
-}
-
-bool libSPI_SetMode()
-{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		default:
+			break;
+	}
 	
 	return TRUE;
 }
 
+
 //**********************Local functions**********************//
 
-bool TXIsBusy()
+
+///
+/// @brief Check if the SPI-bus is busy
+///
+/// @param None
+/// @return bool Status of SPI-bus
+///
+bool SPIBusy()
 {
 	return ((SPSR & (1<<SPIF)) == 0);
 }
