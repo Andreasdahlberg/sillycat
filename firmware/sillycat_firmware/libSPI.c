@@ -42,6 +42,7 @@ uint8_t receive_buffer[BUFFER_SIZE];
 
 bool SPIBusy();
 
+//TODO: Create functions for changing data order, clock freq and to enable/disable SPI
 
 ///
 /// @brief Init the SPI module
@@ -56,7 +57,10 @@ void libSPI_Init(uint8_t spi_mode)
 	PORTB |= (1 << MOSI);
 	PORTB &= ~(1 << SCK);
 	
-	SPCR = (1<<MSTR)|(1<<SPR0);
+	//SPCR = 0x00;
+	SPCR = (1<<SPR0);
+	
+	libSPI_SetMaster(TRUE);
 	
 	if (libSPI_SetMode(spi_mode) == TRUE)
 	{
@@ -73,7 +77,6 @@ void libSPI_Init(uint8_t spi_mode)
 	return;
 }
 
-//TODO: Implement timeout for read operations, maybe for write also?
 
 ///
 /// @brief Update the internal state
@@ -198,6 +201,26 @@ bool libSPI_Read(const uint8_t* data_bytes, uint8_t length)
 SPI_status libSPI_GetStatus(void)
 {
 	return spi_status;
+}
+
+
+///
+/// @brief Select if master or slave mode
+///
+/// @param bool True if master, else slave  //TODO: Fix this description
+/// @return None
+///
+void libSPI_SetMaster(bool master_value)
+{
+	if (master_value == TRUE)
+	{
+		SPCR |= (1<<MSTR);
+	}
+	else
+	{
+		SPCR &= ~(1<<MSTR);
+	}
+	return;
 }
 
 
