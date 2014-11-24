@@ -90,10 +90,7 @@ void libSPI_Update(void)
 		case IDLE:
 			break;
 		
-		//TODO: Remove the DONE-states?
 		case READ_DONE:
-			byte_counter = 0;
-			spi_status = IDLE;
 			break;
 		
 		case READ:
@@ -108,6 +105,7 @@ void libSPI_Update(void)
 			}
 			else if (byte_counter == tx_length && !SPIBusy())
 			{
+				byte_counter = 0;
 				spi_status = READ_DONE;
 			}
 			break;
@@ -162,28 +160,30 @@ bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 	return status;
 }
 
-//TODO: Change the behavior of the read function. The first time read is called during a read cycle a SPI read transfer should be
-//      started and false should be returned. The following calls should return false and do nothing until the transfer is complete
-//      and the rx_buffer is ready. Then read should return true.  
 
+//TODO: Rewrite function description
 ///
-/// @brief Start reading data from the SPI-bus
+/// @brief Start reading data from the SPI-bus. The first time libSPI_Read() is called a read cycle is started. LibSPI_Read() then returns false until the read cycle
+///        is done and the data in the data buffer is valid. 
 ///
 /// @param  data_bytes Pointer to buffer where the data will be stored
 /// @param  length Length of the expected data
-/// @param  timeout Timeout in ms, time before read is aborted if slave is not responding //TODO: Fix this description!
 /// @return bool Status of the operation
 ///
-bool libSPI_Read(const uint8_t* data_bytes, uint8_t length, uint8_t timeout)
+bool libSPI_Read(const uint8_t* data_bytes, uint8_t length)
 {
 	bool status = FALSE;
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
-		memset(receive_buffer, 0, BUFFER_SIZE);
+		memset(receive_buffer, 0, BUFFER_SIZE); //Clear the receive buffer
 		rx_length = length;
 		SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock 
 		spi_status = READ;
+	}
+	else if (libSPI_GetStatus() == READ_DONE)
+	{
 		status = TRUE;
+		spi_status = IDLE;
 	}
 	return status;
 }
