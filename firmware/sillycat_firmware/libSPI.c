@@ -28,6 +28,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
 #define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
 
+#define SS			PB2
 #define MOSI		PB3
 #define MISO		PB4
 #define SCK			PB5
@@ -48,19 +49,27 @@ bool SPIBusy();
 /// @param  None
 /// @return None
 ///
-void libSPI_Init(void)
+void libSPI_Init(uint8_t spi_mode)
 {	
-
-	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << PB2));
+	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << SS));
 	DDRB &= ~(1 << MISO);
-	
 	PORTB |= (1 << MOSI);
 	PORTB &= ~(1 << SCK);
 	
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
-	spi_status = IDLE;
+	SPCR = (1<<MSTR)|(1<<SPR0);
 	
-	DEBUG_STR("Init done");
+	if (libSPI_SetMode(spi_mode) == TRUE)
+	{
+		SPCR |= (1<<SPE);
+		spi_status = IDLE;
+	
+		DEBUG_STR("Init done");
+	}
+	else
+	{
+		DEBUG_STR("Failed to init SPI, invalid mode");
+		DEBUG_INT(spi_mode);
+	}
 	return;
 }
 
@@ -125,7 +134,7 @@ void libSPI_Update(void)
 		
 		default:
 			DEBUG_STR("Fatal error, reinitializing module...");
-			libSPI_Init();
+			//libSPI_Init();
 			break;
 		
 	}
@@ -200,22 +209,33 @@ SPI_status libSPI_GetStatus(void)
 ///
 bool libSPI_SetMode(uint8_t mode)
 {
-	//TODO: Implement this function
+	bool status = TRUE;
 	switch (mode)
 	{
 		case 0:
+			//Clock low when idle, sample on rising edge
+			SPCR &= ~((1 << CPOL) | (1 << CPHA));
 			break;
 		case 1:
+			//Clock low when idle, sample on falling edge
+			SPCR &= ~(1 << CPOL);
+			SPCR |= (1 << CPHA);
 			break;
 		case 2:
+			//Clock high when idle, sample on rising edge
+			SPCR |= (1 << CPOL);
+			SPCR &= ~(1 << CPHA);
 			break;
 		case 3:
+			//Clock high when idle, sample on falling edge
+			SPCR |= ((1 << CPOL) | (1 << CPHA));
 			break;
 		default:
+			//Invalid mode
+			status = FALSE;
 			break;
 	}
-	
-	return TRUE;
+	return status;
 }
 
 

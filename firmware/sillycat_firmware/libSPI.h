@@ -32,10 +32,10 @@ typedef enum SPI_status
 }SPI_status;
 
 
-void libSPI_Init(void);
+void libSPI_Init(uint8_t spi_mode);
 void libSPI_Update(void);
 SPI_status libSPI_GetStatus(void);
-bool libSPI_SetMode(uint8_t mode)
+bool libSPI_SetMode(uint8_t mode);
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length);
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length, uint8_t timeout_ms);
 

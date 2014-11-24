@@ -43,7 +43,7 @@ int main(void)
 	libTimer_Init();
 	libLED_Init();
 	libDHT22_Init();
-	libSPI_Init();		
+	libSPI_Init(0);		
 	
 	uint8_t data_buffer[8] = "ABCD";
 	
