@@ -21,6 +21,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define LIBNAME "libDebug"
 
+void PrintName(char* lib_name);
+
 ///
 /// @brief Init debug library
 ///
@@ -43,10 +45,7 @@ void libDebug_Init()
 ///
 void libDebug_PrintString(char* lib_name, char* message)
 {
-	libUART_SendByte('<');
-	libUART_SendArray((uint8_t*)lib_name, strlen(lib_name));
-	libUART_SendByte('>');
-	libUART_SendByte(' ');
+	PrintName(lib_name);
 	
 	libUART_SendArray((uint8_t*)message, strlen(message));
 	//TODO: Add timestamp
@@ -57,13 +56,9 @@ void libDebug_PrintString(char* lib_name, char* message)
 void libDebug_PrintInteger(char* lib_name, int value)
 {
 	char data_buffer[12];
-	
 	itoa(value, data_buffer, 10);
 	
-	libUART_SendByte('<');
-	libUART_SendArray((uint8_t*)lib_name, strlen(lib_name));
-	libUART_SendByte('>');
-	libUART_SendByte(' ');
+	PrintName(lib_name);
 	
 	libUART_SendArray((uint8_t*)data_buffer, strlen(data_buffer));
 	//TODO: Add timestamp
@@ -73,15 +68,38 @@ void libDebug_PrintInteger(char* lib_name, int value)
 void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value)
 {
 	char data_buffer[12];
-	
 	ultoa(value, data_buffer, 10);
 	
-	libUART_SendByte('<');
-	libUART_SendArray((uint8_t*)lib_name, strlen(lib_name));
-	libUART_SendByte('>');
-	libUART_SendByte(' ');
+	PrintName(lib_name);
 	
 	libUART_SendArray((uint8_t*)data_buffer, strlen(data_buffer));
 	//TODO: Add timestamp
 	libUART_SendArray((uint8_t*)"\r\n", 2);
+}
+
+
+void libDebug_PrintBoolean(char* lib_name, bool value)
+{	
+	PrintName(lib_name);
+	
+	if (value == TRUE)
+	{
+		libUART_SendArray((uint8_t*)"True", 4);
+	}
+	else
+	{	
+		libUART_SendArray((uint8_t*)"False", 5);
+	}
+	//TODO: Add timestamp
+}
+
+
+//**********************Local functions**********************//
+
+void PrintName(char* lib_name)
+{
+	libUART_SendByte('<');
+	libUART_SendArray((uint8_t*)lib_name, strlen(lib_name));
+	libUART_SendByte('>');
+	libUART_SendByte(' ');	
 }

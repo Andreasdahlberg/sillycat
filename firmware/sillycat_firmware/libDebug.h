@@ -19,11 +19,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBDEBUG_H_
 #define LIBDEBUG_H_
 
+#include "common.h"
 #include "libUART.h"
 
 void libDebug_Init();
 void libDebug_PrintString(char* lib_name, char* message);
 void libDebug_PrintInteger(char* lib_name, int value);
 void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value);
+void libDebug_PrintBoolean(char* lib_name, bool value);
 
 #endif /* LIBDEBUG_H_ */
