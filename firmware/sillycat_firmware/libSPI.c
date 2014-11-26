@@ -39,6 +39,7 @@ uint8_t tx_length;
 uint8_t rx_length;
 uint8_t transmit_buffer[BUFFER_SIZE];
 uint8_t receive_buffer[BUFFER_SIZE];
+bool slave_active;
 
 bool SPIBusy();
 
@@ -74,6 +75,8 @@ void libSPI_Init(uint8_t spi_mode)
 		DEBUG_STR("Failed to init SPI, invalid mode");
 		DEBUG_INT(spi_mode);
 	}
+	
+	slave_active = FALSE;
 	return;
 }
 
@@ -257,6 +260,30 @@ bool libSPI_SetMode(uint8_t mode)
 			//Invalid mode
 			status = FALSE;
 			break;
+	}
+	return status;
+}
+
+//TODO: Fix this description
+///
+/// @brief Set slave to active, this prevents other modules to use the SPI-bus. Keep in mind that there is now control if its the same module...
+///      
+///
+/// @param state True if SPI is active, otherwise False
+/// @return bool Status of operation
+///
+bool SetActiveSlave(bool state)
+{
+	bool status = FALSE;
+	if (slave_active == FALSE)
+	{
+		slave_active = TRUE;
+		status = TRUE;
+	}
+	else if (slave_active == TRUE && state == FALSE)
+	{
+		slave_active = FALSE;
+		status = TRUE;
 	}
 	return status;
 }

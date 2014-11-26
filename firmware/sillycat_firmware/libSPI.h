@@ -37,6 +37,7 @@ void libSPI_Update(void);
 void libSPI_SetMaster(bool master_value);
 SPI_status libSPI_GetStatus(void);
 bool libSPI_SetMode(uint8_t mode);
+bool SetActiveSlave(bool state);
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length);
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length);
 
