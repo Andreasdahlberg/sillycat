@@ -32,6 +32,7 @@ void selectDevice(bool state);
 bool ReadRegister(uint8_t address, uint8_t *register_data);
 bool WriteRegister(uint8_t address, uint8_t register_data);
 bool RegisterAddressValid(uint8_t address);
+bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 
 
 ///
@@ -63,8 +64,12 @@ void libDS3234_Test()
 	
 	
 	libDS3234_GetSeconds(&data);
-	
 	DEBUG_INT(data);
+	
+	ReadRegister(REG_HOUR, &data);
+
+	
+	libDebug_PrintBinary("TEST", data);
 
 }
 
@@ -79,13 +84,72 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 	*temperature += (data >> 6);
 }
 
-void libDS3234_GetSeconds(uint8_t *seconds)
+
+bool libDS3234_GetMonth(uint8_t *month)
 {
-	uint8_t data;
+	bool status = FALSE;
+	uint8_t register_data;
 	
-	ReadRegister(REG_SECONDS, &data);
-	*seconds = ((data & 0xF0)>>4)*10;
-	*seconds += (data & 0x0F);
+	if (ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
+	{
+		*month = BCDToDecimal(register_data & MONTH_MASK);
+		status = TRUE;
+	}
+	return status;
+}
+
+bool libDS3234_GetDate(uint8_t *date)
+{
+	return GetDecimalRegisterValue(REG_DATE, date);
+}
+
+bool libDS3234_GetDay(uint8_t *day)
+{
+	return GetDecimalRegisterValue(REG_DAY, day);
+}
+
+
+bool libDS3234_GetHour(uint8_t *hour)
+{
+	bool status = FALSE;
+
+	
+	return status;
+	
+}
+
+bool libDS3234_GetMinutes(uint8_t *minutes)
+{
+	return GetDecimalRegisterValue(REG_MINUTES, minutes);
+}
+
+bool libDS3234_GetSeconds(uint8_t *seconds)
+{
+	return GetDecimalRegisterValue(REG_SECONDS, seconds);
+}
+
+/// Local functions
+
+///
+/// @brief	Get the value of a register as a decimal value. The register must
+///			contain packed BCD-data.
+///
+///
+/// @param	address Address to register
+/// @param	value Pointer to variable where the value will be stored.
+/// @return bool Status of operation
+///
+bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
+{
+	bool status = FALSE;
+	uint8_t register_data;
+		
+	if (ReadRegister(address, &register_data) == TRUE)
+	{
+		*value = BCDToDecimal(register_data);
+		status = TRUE;
+	}
+	return status;
 }
 
 

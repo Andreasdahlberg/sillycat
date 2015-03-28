@@ -48,11 +48,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define READ_ADDRESS	0x00
 #define WRITE_ADDRESS	0x80
 
+#define MONTH_MASK		0x1F
+
 void libDS3234_Init();
 void libDS3234_Update();
 void libDS3234_Test();
 
 void libDS3234_GetTemperature(uint16_t *temperature);
-void libDS3234_GetSeconds(uint8_t *seconds);
+bool libDS3234_GetDate(uint8_t *date);
+bool libDS3234_GetMinutes(uint8_t *minutes);
+bool libDS3234_GetSeconds(uint8_t *seconds);
 
 #endif /* LIBDS3234_H_ */
