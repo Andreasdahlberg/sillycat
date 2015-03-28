@@ -28,5 +28,6 @@ void libDebug_PrintInteger(char* lib_name, int value);
 void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value);
 void libDebug_PrintBoolean(char* lib_name, bool value);
 void libDebug_PrintHex(char*lib_name, uint8_t value);
+void libDebug_PrintBinary(char* lib_name, uint8_t value);
 
 #endif /* LIBDEBUG_H_ */

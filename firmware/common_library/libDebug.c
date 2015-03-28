@@ -88,6 +88,21 @@ void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value)
 	libUART_SendArray((uint8_t*)"\r\n", 2);
 }
 
+void libDebug_PrintBinary(char* lib_name, uint8_t value)
+{
+	char data_buffer[12];
+	uint8_t index;
+	
+	for (index = 0; index < 8; ++index)
+	{
+		data_buffer[7-index] = ((value >> index) & 0x01) + 0x30;
+	}
+	PrintName(lib_name);
+	libUART_SendArray((uint8_t*)data_buffer, 8);
+	libUART_SendArray((uint8_t*)"\r\n", 2);	
+	return;
+}
+
 
 void libDebug_PrintBoolean(char* lib_name, bool value)
 {	
