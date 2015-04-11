@@ -56,7 +56,7 @@ void libSPI_Init(uint8_t spi_mode)
 {	
 	//Always set SS as output even if not used, otherwise the device can't 
 	//act as master.
-	DDRB = ((1 << MOSI)|(1 << SCK)|(1 << SS));
+	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << SS));
 	DDRB &= ~(1 << MISO);
 
 	//SPCR = 0x00;
