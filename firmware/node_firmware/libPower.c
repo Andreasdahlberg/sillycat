@@ -23,8 +23,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libADC.h"
 
 #define LIBNAME "libPower"
-#define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
-#define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
 
 #define VREF 3300 // mV
 #define R1_RESISTANCE 5600.0
@@ -99,7 +97,7 @@ void libPower_Update()
 		
 		if (libTimer_TimeDifference(update_timer) > 1000)
 		{
-			DEBUG_INT(libPower_GetBatteryVoltage());
+			DEBUG_INT(LIBNAME, libPower_GetBatteryVoltage());
 			update_timer = libTimer_GetMilliseconds();
 		}
 	

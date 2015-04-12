@@ -19,5 +19,3 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 
 #define LIBNAME "libMCP79510"
-#define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
-#define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
