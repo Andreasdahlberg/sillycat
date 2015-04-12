@@ -16,32 +16,26 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef LIBRFM69_H_
+#define LIBRFM69_H_
+
+#define READ_REG	0x7F
+#define WRITE_REG	0x80
+
+void libRFM69_Init();
+void libRFM69_Update();
+void libRFM69_Test();
 
 
-#include <stdint.h>
-
-
-uint8_t BCDToDecimal(uint8_t bcd_data);
-
-
-typedef enum bool
-{	
-	FALSE = 0,
-	TRUE
-}bool;
-
-
-typedef enum function_status
+typedef enum
 {
-	ERROR = 0,
-	SUCCESS,
-	BUSY,
-	TIMEOUT
-}function_status;
+	SLEEP = 0,
+	STANDBY,
+	SYNTHESIZER,
+	TRANSMITTER,
+	RECEIVER
+}libRFM69_mode_type;
 
 
 
-
-#endif /* COMMON_H_ */
+#endif /* LIBRFM69_H_ */

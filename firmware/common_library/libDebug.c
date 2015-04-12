@@ -32,8 +32,10 @@ void PrintName(char* lib_name);
 ///
 void libDebug_Init()
 {
+	#ifdef DEBUG_ENABLE	
 	libUART_Init();
-	libDebug_PrintString(LIBNAME, "Init done");
+	#endif
+	DEBUG_STR(LIBNAME, "Init done");
 }
 
 

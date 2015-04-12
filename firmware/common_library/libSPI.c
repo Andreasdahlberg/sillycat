@@ -25,10 +25,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define LIBNAME "libSPI"
 #define BUFFER_SIZE 8
 
-#define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
-#define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
-#define DEBUG_HEX(num)     libDebug_PrintHex(LIBNAME, num)
-
 #define SS		DDB2
 #define MOSI	DDB3
 #define MISO	DDB4
@@ -57,7 +53,7 @@ void libSPI_Init(uint8_t spi_mode)
 	//Always set SS as output even if not used, otherwise the device can't 
 	//act as master.
 	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << SS));
-	DDRB &= ~(1 << MISO);
+	DDRB &= ~(1 << MISO);	
 
 	//SPCR = 0x00;
 	SPCR = (1<<SPR0);
@@ -69,12 +65,12 @@ void libSPI_Init(uint8_t spi_mode)
 		SPCR |= (1<<SPE);
 		spi_status = IDLE;
 	
-		DEBUG_STR("Init done");
+		DEBUG_STR(LIBNAME, "Init done");
 	}
 	else
 	{
-		DEBUG_STR("Failed to init SPI, invalid mode");
-		DEBUG_INT(spi_mode);
+		DEBUG_STR(LIBNAME, "Failed to init SPI, invalid mode");
+		DEBUG_INT(LIBNAME, spi_mode);
 	}
 	
 	slave_active = FALSE;
@@ -122,7 +118,7 @@ void libSPI_Update(void)
 			{
 				if (!SPIBusy() || byte_counter == 0)
 				{
-					DEBUG_STR("Sending byte");
+					DEBUG_STR(LIBNAME, "Sending byte");
 					SPDR = transmit_buffer[byte_counter];
 					++byte_counter;
 				}
@@ -139,7 +135,7 @@ void libSPI_Update(void)
 			break;
 		
 		default:
-			DEBUG_STR("Fatal error, reinitializing module...");
+			DEBUG_STR(LIBNAME, "Fatal error, reinitializing module...");
 			//libSPI_Init();
 			break;
 		
@@ -180,7 +176,7 @@ bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 {
 	bool status = FALSE;
 	
-	DEBUG_STR("Write started");
+	DEBUG_STR(LIBNAME, "Write started");
 	
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{

@@ -22,8 +22,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 
 #define LIBNAME "libADC"
-#define DEBUG_STR(message) libDebug_PrintString(LIBNAME, message)
-#define DEBUG_INT(num)     libDebug_PrintInteger(LIBNAME, num)
 
 typedef enum ADCState
 {
@@ -48,7 +46,7 @@ void libADC_Init(void)
 	//Enable the ADC and start a conversion
 	ADCSRA |= (1 << ADEN);
 	
-	DEBUG_STR("Init done");
+	DEBUG_STR(LIBNAME, "Init done");
 		
 }
 

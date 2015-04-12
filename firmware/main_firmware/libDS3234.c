@@ -20,17 +20,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "libSPI.h"
 #include "libDS3234.h"
+#include "common.h"
 
 #define LIBNAME "libDS3234"
-#define DEBUG_STR(message)	libDebug_PrintString(LIBNAME, message)
-#define DEBUG_INT(num)		libDebug_PrintInteger(LIBNAME, num)
-#define DEBUG_HEX(num)		libDebug_PrintHex(LIBNAME, num)
-
 #define SS	DDC0
 
-void selectDevice(bool state);
-bool ReadRegister(uint8_t address, uint8_t *register_data);
-bool WriteRegister(uint8_t address, uint8_t register_data);
+static void selectDevice(bool state);
+static bool ReadRegister(uint8_t address, uint8_t *register_data);
+static bool WriteRegister(uint8_t address, uint8_t register_data);
 bool RegisterAddressValid(uint8_t address);
 bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 
@@ -47,7 +44,7 @@ void libDS3234_Init()
 	DDRC |= (1 << SS);
 	selectDevice(FALSE);
 	
-	libDebug_PrintString(LIBNAME, "Init done");
+	DEBUG_STR(LIBNAME, "Init done");
 	return;
 }
 
@@ -64,12 +61,7 @@ void libDS3234_Test()
 	
 	
 	libDS3234_GetSeconds(&data);
-	DEBUG_INT(data);
-	
-	ReadRegister(REG_HOUR, &data);
-
-	
-	libDebug_PrintBinary("TEST", data);
+	DEBUG_INT(LIBNAME, data);
 
 }
 
@@ -153,7 +145,7 @@ bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 }
 
 
-bool WriteRegister(uint8_t address, uint8_t register_data)
+static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
 	bool status = FALSE;
 	
@@ -169,7 +161,7 @@ bool WriteRegister(uint8_t address, uint8_t register_data)
 	return status;
 }
 
-bool ReadRegister(uint8_t address, uint8_t *register_data)
+static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
 	bool status = FALSE;
 	
@@ -190,8 +182,8 @@ bool RegisterAddressValid(uint8_t address)
 	return (address >= REG_SECONDS && address <= REG_SRAM_DATA);
 }
 
-//This function is needed by the RTC interface!
-void selectDevice(bool state)
+
+static void selectDevice(bool state)
 {
 	if (state == TRUE)
 	{

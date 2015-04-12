@@ -52,6 +52,7 @@
       <ToolName>STK500</ToolName>
     </com_atmel_avrdbg_tool_stk500>
     <avrtoolinterface>ISP</avrtoolinterface>
+    <preserveEEPROM>true</preserveEEPROM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -98,6 +99,7 @@
         <avrgcc.compiler.directories.IncludePaths>
           <ListValues>
             <Value>../../common_library</Value>
+            <Value>../fonts</Value>
           </ListValues>
         </avrgcc.compiler.directories.IncludePaths>
         <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
@@ -115,6 +117,10 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\common_library\common.c">
+      <SubType>compile</SubType>
+      <Link>common.c</Link>
+    </Compile>
     <Compile Include="..\common_library\common.h">
       <SubType>compile</SubType>
       <Link>common.h</Link>
@@ -134,6 +140,14 @@
     <Compile Include="..\common_library\libDebug.h">
       <SubType>compile</SubType>
       <Link>libDebug.h</Link>
+    </Compile>
+    <Compile Include="..\common_library\libRFM69.c">
+      <SubType>compile</SubType>
+      <Link>libRFM69.c</Link>
+    </Compile>
+    <Compile Include="..\common_library\libRFM69.h">
+      <SubType>compile</SubType>
+      <Link>libRFM69.h</Link>
     </Compile>
     <Compile Include="..\common_library\libSPI.c">
       <SubType>compile</SubType>
@@ -159,6 +173,22 @@
       <SubType>compile</SubType>
       <Link>libUART.h</Link>
     </Compile>
+    <Compile Include="..\common_library\RFM69Registers.h">
+      <SubType>compile</SubType>
+      <Link>RFM69Registers.h</Link>
+    </Compile>
+    <Compile Include="fonts\bitmap_db.h">
+      <SubType>compile</SubType>
+      <Link>bitmap_db.h</Link>
+    </Compile>
+    <Compile Include="fonts\font_ubuntu_mono.c">
+      <SubType>compile</SubType>
+      <Link>font_ubuntu_mono.c</Link>
+    </Compile>
+    <Compile Include="fonts\font_ubuntu_mono.h">
+      <SubType>compile</SubType>
+      <Link>font_ubuntu_mono.h</Link>
+    </Compile>
     <Compile Include="libDS3234.c">
       <SubType>compile</SubType>
     </Compile>
@@ -169,6 +199,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="libLED.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libNHD223.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libNHD223.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main_firmware.c">
