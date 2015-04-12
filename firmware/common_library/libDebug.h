@@ -26,10 +26,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 	#define DEBUG_STR(name, message)	libDebug_PrintString(name, message)
 	#define DEBUG_INT(name, num)		libDebug_PrintInteger(name, num)
 	#define DEBUG_HEX(name ,num)		libDebug_PrintHex(name, num)
+	#define DEBUG_BOOL(name, value)		libDebug_PrintBoolean(name, value)
+	#define DEBUG_BINARY(name, num)		libDebug_PrintBinary(name, num)
 #else
 	#define DEBUG_STR(name, message)
 	#define DEBUG_INT(name, num)
 	#define DEBUG_HEX(name ,num)
+	#define DEBUG_BOOL(name, value)		
+	#define DEBUG_BINARY(name, num)
 #endif
 
 #include "common.h"
