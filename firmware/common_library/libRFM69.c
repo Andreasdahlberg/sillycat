@@ -25,10 +25,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define LIBNAME "libRFM69"
 #define SS DDB2
 
+#define RFM_MODE_MASK 0x1C
+
 
 static void selectDevice(bool state);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
+
+static char aes_key[17] = "1DUMMYKEYFOOBAR1";
 
 
 void libRFM69_Init()
@@ -36,7 +40,15 @@ void libRFM69_Init()
 	DDRB |= (1 << SS);	
 	selectDevice(FALSE);
 	
+
+	
+	//NOTE: Encryption is disabled during development only!
+	libRFM69_EnableEncryption(FALSE);
+	libRFM69_SetMode(RFM_STANDBY);
+	libRFM69_WaitForModeReady();
+	
 	DEBUG_STR(LIBNAME, "Init done");
+
 	
 }
 
@@ -48,28 +60,75 @@ void libRFM69_Update()
 bool libRFM69_SetMode(libRFM69_mode_type mode)
 {
 	bool status = FALSE;
+	uint8_t register_content;
 	
-	switch (mode)
+	//TODO: Check if mode is valid!
+	
+	if (ReadRegister(REG_OPMODE, &register_content))
 	{
-		case RFM_SLEEP:
-			break;
-		
-		case RFM_STANDBY:
-			break;
-			
-		case RFM_SYNTHESIZER:
-			break;
-			
-		case RFM_TRANSMITTER:
-			break;
-			
-		case RFM_RECEIVER:
-			break;
-			
-
+		register_content = (register_content & ~RFM_MODE_MASK) | (mode << 2);
+		status = WriteRegister(REG_OPMODE, register_content);
 	}
-	
 	return status;
+}
+
+
+void libRFM69_WaitForModeReady()
+{
+	while (!libRFM69_IsModeReady())
+	{
+	}
+}
+
+
+bool libRFM69_IsModeReady()
+{
+	uint8_t register_content;
+	
+	ReadRegister(REG_IRQFLAGS1, &register_content);
+	
+	return (register_content & RF_IRQFLAGS1_MODEREADY) == RF_IRQFLAGS1_MODEREADY;
+}
+
+
+
+void libRFM69_SetCarrierFrequency(uint32_t frequency)
+{
+	WriteRegister(REG_FRFMSB, (frequency >> 16) & 0xFF);
+	WriteRegister(REG_FRFMID, (frequency >> 8) & 0xFF);
+	WriteRegister(REG_FRFLSB, frequency & 0xFF);
+}
+
+void libRFM69_EnableListenMode(bool enable)
+{
+	uint8_t register_content;
+
+	ReadRegister(REG_OPMODE, &register_content);
+	
+	register_content = (register_content & 0xBF) | (uint8_t)enable;
+	WriteRegister(REG_OPMODE, register_content);	
+}
+
+void libRFM69_EnableSequencer(bool enable)
+{
+	uint8_t register_content;
+
+	ReadRegister(REG_OPMODE, &register_content);
+	
+	register_content = (register_content & 0x7F) | ((uint8_t)!enable << 7);
+	WriteRegister(REG_OPMODE, register_content);	
+}
+
+
+
+
+void libRFM69_EnableEncryption(bool enable)
+{
+	uint8_t register_content;
+
+	ReadRegister(REG_PACKETCONFIG2, &register_content);
+	setBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
+	WriteRegister(REG_PACKETCONFIG2, register_content);
 }
 
 void libRFM69_Test()
@@ -78,7 +137,7 @@ void libRFM69_Test()
 	
 	ReadRegister(REG_OPMODE, &data);
 	
-	DEBUG_HEX(LIBNAME, data);
+	DEBUG_HEX(LIBNAME, data);	
 }
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)

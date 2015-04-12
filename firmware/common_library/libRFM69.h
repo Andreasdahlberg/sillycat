@@ -22,20 +22,23 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define READ_REG	0x7F
 #define WRITE_REG	0x80
 
+typedef enum
+{
+	RFM_SLEEP = 0,
+	RFM_STANDBY,
+	RFM_SYNTHESIZER,
+	RFM_TRANSMITTER,
+	RFM_RECEIVER
+}libRFM69_mode_type;
+
 void libRFM69_Init();
 void libRFM69_Update();
 void libRFM69_Test();
-
-
-typedef enum
-{
-	SLEEP = 0,
-	STANDBY,
-	SYNTHESIZER,
-	TRANSMITTER,
-	RECEIVER
-}libRFM69_mode_type;
-
-
+bool libRFM69_SetMode(libRFM69_mode_type mode);
+void libRFM69_EnableEncryption(bool enable);
+bool libRFM69_IsModeReady();
+void libRFM69_WaitForModeReady();
+void libRFM69_SetCarrierFrequency(uint32_t frequency);
+void libRFM69_EnableSequencer(bool enable);
 
 #endif /* LIBRFM69_H_ */
