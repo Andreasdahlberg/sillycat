@@ -22,10 +22,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
-
-uint8_t BCDToDecimal(uint8_t bcd_data);
-
-
 typedef enum bool
 {	
 	FALSE = 0,
@@ -42,6 +38,8 @@ typedef enum function_status
 }function_status;
 
 
+void setBit(uint8_t bit_index, bool state, uint8_t *data);
+uint8_t BCDToDecimal(uint8_t bcd_data);
 
 
 #endif /* COMMON_H_ */

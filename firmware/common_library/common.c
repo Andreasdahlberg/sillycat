@@ -27,3 +27,16 @@ uint8_t BCDToDecimal(uint8_t bcd_data)
 	
 	return data;
 }
+
+void setBit(uint8_t bit_index, bool state, uint8_t *data)
+{
+	if (state == TRUE)
+	{
+		
+		*data |= (1 << bit_index);
+	}
+	else
+	{
+		*data &= ~(1 << bit_index);
+	}
+}
