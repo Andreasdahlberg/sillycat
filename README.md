@@ -1,4 +1,4 @@
 sillycat
 ========
 
-Silly Cat is wireless sensor node
+SillyCat is a home weather station with wireless sensor nodes.
