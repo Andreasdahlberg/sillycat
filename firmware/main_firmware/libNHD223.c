@@ -32,19 +32,29 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REGSELECT	DDC4
 #define CHIPSELECT	DDC5
 
+#define MAX_PAGES 8
+
 typedef enum
 {
 	INPUT = 0,
 	OUTPUT
 } data_direction_type;
 
+typedef struct
+{
+	uint8_t height;
+	uint8_t width;
+	uint8_t pages;
+	
+} display_properties_type;
+
+static bool WriteByte(uint8_t data);
 static void selectDevice(bool state);
 static void enableDataLatch(bool state);
 static void enableCommandMode(bool state);
 static void enableControlPin(bool state, uint8_t pin_index);
 static void enableReset(bool state);
 void setDataDirection(data_direction_type direction);
-
 
 void libNHD223_Init()
 {
@@ -55,62 +65,124 @@ void libNHD223_Init()
 	DDRC |= ((1 << ENABLE) | (1 << RESET) | (1 << READWRITE) |
 			 (1 << REGSELECT) | (1 << CHIPSELECT));
 			 
-	enableReset(TRUE);
-	_delay_us(5);
-	enableReset(FALSE);
-			 
+	libNHD223_ResetDisplay();
+	libNHD223_ClearDisplay();
+	libNHD223_ResetDisplay();
 	selectDevice(FALSE);
 	enableDataLatch(FALSE);
+	
+	libNHD223_SetColumnAddressRange(0, 127);
+	libNHD223_SetPageAddressRange(0, 3);
 }
 
 void libNHD223_Update()
 {
-	libNHD223_WriteByte(0xAF);
-	
-	
 }
 
 
 bool libNHD223_WriteCommand(uint8_t command)
 {
-	
-}
-
-
-bool libNHD223_WriteByte(uint8_t data)
-{
-	setDataDirection(OUTPUT);
-	
 	//Set write mode
 	enableControlPin(FALSE, READWRITE);
 	
-	//Write data
 	enableCommandMode(TRUE);
 	
-	selectDevice(TRUE);
-	PORTD = data;
-		_delay_ms(500);
-	enableDataLatch(TRUE);
-	_delay_ms(50);
-	enableDataLatch(FALSE);
-	selectDevice(FALSE);
+	WriteByte(command);
+	return TRUE;	
+}
+
+
+bool libNHD223_WriteData(uint8_t data)
+{
+	//Set write mode
+	enableControlPin(FALSE, READWRITE);
 	
+	enableCommandMode(FALSE);
+	
+	WriteByte(data);
 	return TRUE;
+}
+
+
+void libNHD223_ResetDisplay()
+{
+	enableReset(TRUE);
+	_delay_us(5);
+	enableReset(FALSE);
+}
+
+
+bool libNHD223_SetPageAddress(uint8_t page_address)
+{
+	bool status = FALSE;
+	
+	if (page_address < MAX_PAGES)
+	{
+		status = libNHD223_WriteCommand(SSD1305_SET_PAGE | page_address);
+	}
+	
+	return status;
+}
+
+bool libNHD223_SetPageAddressRange(uint8_t start_page, uint8_t end_page)
+{
+	bool status = FALSE;
+	
+	//if (start_page <= end_page && end_page < MAX_PAGES)
+	//{
+		libNHD223_WriteCommand(SSD1305_SETSTARTPAGE);
+		libNHD223_WriteCommand(start_page);
+		libNHD223_WriteCommand(end_page);	
+		status = TRUE;		
+	//}
+	return status;
+}
+
+void libNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address)
+{
+		libNHD223_WriteCommand(SSD1305_SETSTARTCOLUMN);
+		libNHD223_WriteCommand(start_address);	
+		libNHD223_WriteCommand(end_address);					
+}
+
+void libNHD223_SetColumnAddress(uint8_t column_address)
+{
+		libNHD223_WriteCommand(SSD1305_SETLOWCOLUMN | (column_address & 0x0F));
+		libNHD223_WriteCommand(SSD1305_SETHIGHCOLUMN | ((column_address >> 4) & 0x0F));
 }
 
 bool libNHD223_ReadByte(uint8_t *data)
 {
-	setDataDirection(INPUT);
 	
-	//Set read mode
+	setDataDirection(INPUT);
+	selectDevice(TRUE);
+	enableCommandMode(FALSE);
 	enableControlPin(TRUE, READWRITE);
 	
-
-	selectDevice(TRUE);
-	*data = PINC;
+	
 	enableDataLatch(TRUE);
 	enableDataLatch(FALSE);
+	enableDataLatch(TRUE);
+	enableDataLatch(FALSE);
+	
+	enableControlPin(FALSE, READWRITE);
 	selectDevice(FALSE);
+	*data = PIND;
+	
+	return TRUE;
+}
+
+bool WriteByte(uint8_t data)
+{
+
+	setDataDirection(OUTPUT);
+	enableDataLatch(TRUE);
+	selectDevice(TRUE);
+
+	PORTD = data;
+	selectDevice(FALSE);
+	enableDataLatch(FALSE);
+	
 	
 	return TRUE;
 }
