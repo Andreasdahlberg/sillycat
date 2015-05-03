@@ -48,6 +48,7 @@ typedef struct
 	
 } display_properties_type;
 
+void ClearDisplay();
 static bool WriteByte(uint8_t data);
 static void selectDevice(bool state);
 static void enableDataLatch(bool state);
@@ -66,7 +67,7 @@ void libNHD223_Init()
 			 (1 << REGSELECT) | (1 << CHIPSELECT));
 			 
 	libNHD223_ResetDisplay();
-	libNHD223_ClearDisplay();
+	ClearDisplay();
 	libNHD223_ResetDisplay();
 	selectDevice(FALSE);
 	enableDataLatch(FALSE);
@@ -170,6 +171,22 @@ bool libNHD223_ReadByte(uint8_t *data)
 	*data = PIND;
 	
 	return TRUE;
+}
+
+void ClearDisplay()
+{
+	uint8_t page;
+	uint8_t column;
+
+	for (page = 0; page < 4; ++page)
+	{
+		libNHD223_SetPageAddress(page);
+
+		for(column = 0; column < 128; ++column)
+		{
+			libNHD223_WriteData(0x00);
+		}
+	}
 }
 
 bool WriteByte(uint8_t data)
