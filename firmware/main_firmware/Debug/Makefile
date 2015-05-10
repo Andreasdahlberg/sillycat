@@ -45,6 +45,8 @@ C_SRCS +=  \
 ../../common_library/libTimer.c \
 ../../common_library/libUART.c \
 ../fonts/font_ubuntu_mono.c \
+../fonts/font_ubuntu_mono_large.c \
+../libDisplay.c \
 ../libDS3234.c \
 ../libLED.c \
 ../libNHD223.c \
@@ -66,6 +68,8 @@ libSPI.o \
 libTimer.o \
 libUART.o \
 font_ubuntu_mono.o \
+font_ubuntu_mono_large.o \
+libDisplay.o \
 libDS3234.o \
 libLED.o \
 libNHD223.o \
@@ -80,6 +84,8 @@ libSPI.o \
 libTimer.o \
 libUART.o \
 font_ubuntu_mono.o \
+font_ubuntu_mono_large.o \
+libDisplay.o \
 libDS3234.o \
 libLED.o \
 libNHD223.o \
@@ -94,6 +100,8 @@ libSPI.d \
 libTimer.d \
 libUART.d \
 font_ubuntu_mono.d \
+font_ubuntu_mono_large.d \
+libDisplay.d \
 libDS3234.d \
 libLED.d \
 libNHD223.d \
@@ -108,6 +116,8 @@ libSPI.d \
 libTimer.d \
 libUART.d \
 font_ubuntu_mono.d \
+font_ubuntu_mono_large.d \
+libDisplay.d \
 libDS3234.d \
 libLED.d \
 libNHD223.d \
@@ -127,6 +137,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 

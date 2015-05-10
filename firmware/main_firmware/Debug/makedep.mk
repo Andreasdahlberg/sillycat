@@ -18,6 +18,10 @@
 
 fonts\font_ubuntu_mono.c
 
+fonts\font_ubuntu_mono_large.c
+
+libDisplay.c
+
 libDS3234.c
 
 libLED.c
