@@ -6,7 +6,7 @@
 #include "font_ubuntu_mono.h"
 
 /* Character bitmaps for Ubuntu Mono 10pt */
-const uint8_t ubuntuMono_10ptBitmaps[] =
+uint8_t ubuntuMono_10ptBitmaps[] =
 {
 	/* @0 '%' (6 pixels wide) */
 	0x00, //
@@ -977,7 +977,7 @@ const uint8_t ubuntuMono_10ptBitmaps[] =
 
 /* Character descriptors for Ubuntu Mono 10pt */
 /* { [Char width in bits], [Offset into ubuntuMono_10ptCharBitmaps in bytes] } */
-const FONT_CHAR_INFO ubuntuMono_10ptDescriptors[] =
+FONT_CHAR_INFO ubuntuMono_10ptDescriptors[] =
 {
 	{6, 0}, 		/* % */
 	{0, 0}, 		/* & */
@@ -1192,9 +1192,10 @@ const FONT_CHAR_INFO ubuntuMono_10ptDescriptors[] =
 };
 
 /* Font information for Ubuntu Mono 10pt */
-const FONT_INFO ubuntuMono_10ptFontInfo =
+FONT_INFO ubuntuMono_10ptFontInfo =
 {
-	2, /*  Character height */
+	1, /*  Character width */
+	12, /*  Character height */
 	'%', /*  Start character */
 	'ö', /*  End character */
 	2, /*  Width, in pixels, of space character */
