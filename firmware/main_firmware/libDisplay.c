@@ -79,26 +79,6 @@ void libDisplay_Reset()
 	libDisplay_Clear();
 }
 
-void libDisplay_TEST()
-{
-	char data_buffer[12];
-	uint16_t value;
-	
-	value = libADC_GetSample();
-	
-
-	ultoa(123, data_buffer, 10);
-
-	//libDisplay_SetFont(&ubuntuMono_36ptFontInfo);
-	
-	libDisplay_SetBrightness((value >> 2));
-	
-
-	libDisplay_ClearVRAM();
-	libDisplay_PrintText(data_buffer, 32, 0);
-	libDisplay_Flush();
-}
-
 
 void libDisplay_SetPixel(uint8_t x, uint8_t y)
 {
