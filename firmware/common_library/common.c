@@ -40,3 +40,10 @@ void setBit(uint8_t bit_index, bool state, uint8_t *data)
 		*data &= ~(1 << bit_index);
 	}
 }
+
+int GetFreeRam()
+{
+	extern int __heap_start, *__brkval;
+	int v;
+	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
