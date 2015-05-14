@@ -41,4 +41,8 @@ typedef struct
 		
 } FONT_INFO;	
 
+
+#include "font_ubuntu_mono.h"
+#include "font_ubuntu_mono_large.h"
+
 #endif /* __BITMAP_DB_H_ */

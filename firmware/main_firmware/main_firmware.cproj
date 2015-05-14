@@ -189,6 +189,20 @@
       <SubType>compile</SubType>
       <Link>font_ubuntu_mono.h</Link>
     </Compile>
+    <Compile Include="fonts\font_ubuntu_mono_large.c">
+      <SubType>compile</SubType>
+      <Link>font_ubuntu_mono_large.c</Link>
+    </Compile>
+    <Compile Include="fonts\font_ubuntu_mono_large.h">
+      <SubType>compile</SubType>
+      <Link>font_ubuntu_mono_large.h</Link>
+    </Compile>
+    <Compile Include="libDisplay.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libDisplay.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libDS3234.c">
       <SubType>compile</SubType>
     </Compile>
@@ -205,6 +219,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="libNHD223.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libUI.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libUI.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main_firmware.c">

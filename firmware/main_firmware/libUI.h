@@ -15,24 +15,17 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBDISPLAY_H_
-#define LIBDISPLAY_H_
+
+#ifndef LIBUI_H_
+#define LIBUI_H_
 
 #include "bitmap_db.h"
 
-void libDisplay_Init();
-void libDisplay_On();
-void libDisplay_Off();
-void libDisplay_Clear();
-void libDisplay_ClearVRAM();
-void libDisplay_Reset();
-void libDisplay_Flush();
-void libDisplay_SetPixel(uint8_t x, uint8_t y);
-void libDisplay_TEST();
-void libDisplay_SetBrightness(uint8_t brightness);
-void libDisplay_SetFont(FONT_INFO *font);
-void libDisplay_PrintText(char *buffer, uint8_t x_pos, uint8_t y_pos);
+void libUI_Update();
+void libUI_SetFont(FONT_INFO *font);
+void libUI_PrintText(char *buffer, uint8_t x_pos, uint8_t y_pos);
+void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end, uint8_t y_end);
+void libUI_DrawRectangle(uint8_t x_start, uint8_t y_start, uint8_t width, uint8_t height);
+void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius);
 
-
-
-#endif /* LIBDISPLAY_H_ */
+#endif /* LIBUI_H_ */

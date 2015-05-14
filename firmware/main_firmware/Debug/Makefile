@@ -50,6 +50,7 @@ C_SRCS +=  \
 ../libDS3234.c \
 ../libLED.c \
 ../libNHD223.c \
+../libUI.c \
 ../main_firmware.c
 
 
@@ -73,6 +74,7 @@ libDisplay.o \
 libDS3234.o \
 libLED.o \
 libNHD223.o \
+libUI.o \
 main_firmware.o
 
 OBJS_AS_ARGS +=  \
@@ -89,6 +91,7 @@ libDisplay.o \
 libDS3234.o \
 libLED.o \
 libNHD223.o \
+libUI.o \
 main_firmware.o
 
 C_DEPS +=  \
@@ -105,6 +108,7 @@ libDisplay.d \
 libDS3234.d \
 libLED.d \
 libNHD223.d \
+libUI.d \
 main_firmware.d
 
 C_DEPS_AS_ARGS +=  \
@@ -121,6 +125,7 @@ libDisplay.d \
 libDS3234.d \
 libLED.d \
 libNHD223.d \
+libUI.d \
 main_firmware.d
 
 OUTPUT_FILE_PATH +=main_firmware.elf
@@ -137,6 +142,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

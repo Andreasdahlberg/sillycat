@@ -3,10 +3,11 @@
 */
 
 #include <stdint.h>
+#include <avr/pgmspace.h>
 #include "font_ubuntu_mono.h"
 
 /* Character bitmaps for Ubuntu Mono 10pt */
-uint8_t ubuntuMono_10ptBitmaps[] =
+const uint8_t ubuntuMono_10ptBitmaps[] PROGMEM =
 {
 	/* @0 '%' (6 pixels wide) */
 	0x00, //
