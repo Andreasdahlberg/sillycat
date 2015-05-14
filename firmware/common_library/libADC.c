@@ -1,3 +1,12 @@
+/**
+ * @file   libADC.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-05-14 (Last edit)
+ * @brief  Implementation of ADC-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,84 +24,224 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include "common.h"
 #include "libADC.h"
 #include "libDebug.h"
 
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
 #define LIBNAME "libADC"
+#define MAX_ADC_INPUTS 9	//Eight external inputs and one internal temperature sensor
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
 
 typedef enum ADCState
 {
-	IDLE = 0,
-	RUNNING,
+	LIBADC_IDLE = 0,
+	LIBADC_NEW_SAMPLE,
+	LIBADC_SAMPLING
 }ADCState;
 
+typedef struct
+{
+	bool active;
+	uint8_t channel_index;
+	uint16_t sample_value;
+}adc_input_type;
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
 
 static ADCState adc_state;
-static uint16_t sample_value = 1023;
+static uint8_t current_input = 0;
+static adc_input_type adc_inputs[MAX_ADC_INPUTS];
 
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
+static void InitInputArray();
+static void SelectInput(uint8_t adc_channel);
 
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+///
+/// @brief Init libADC, all inputs are disabled after init.
+///
+/// @param  None
+/// @return None
+///
 void libADC_Init(void)
 {
 	//Set the prescaler to 128(115 KHz) and enable interupt
 	ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));
 	
-	//Set the reference voltage to AREF, select ADC0
-	ADMUX = (1 << REFS0);
+	//Set the reference voltage to AREF
+	ADMUX = ((1 << REFS0));
 	
-	//Enable the ADC and start a conversion
-	ADCSRA |= (1 << ADEN);
+	InitInputArray();
+	adc_state = LIBADC_IDLE;
 	
-	DEBUG_STR(LIBNAME, "Init done");
-		
+	DEBUG_STR(LIBNAME, "Init done");	
 }
 
+///
+/// @brief Update the internal library state, this selects the next active input and starts sampling.
+///		   Run as fast as possible.
+///
+/// @param  None
+/// @return None
+///
 void libADC_Update(void)
 {
+	if (current_input >= MAX_ADC_INPUTS)
+	{
+		current_input = 0;
+	}
+	
 	switch (adc_state)
 	{
-		case IDLE:
-			//Start a new conversion
-			ADCSRA |= (1 << ADSC);
-			adc_state = RUNNING;
+		case LIBADC_IDLE:
+			//Do nothing when idle
 			break;
-			
-		case RUNNING:
-			if (ADCSRA & (1 << ADIF))
+		
+		//TODO: Increase current_input several times per update until an active input is found, as it is now it can take up to
+		//		eight calls to Update() until an ADC conversion is started, this lowers the sample frequency.
+		case LIBADC_NEW_SAMPLE:
+			if (adc_inputs[current_input].active == TRUE)
 			{
-				sample_value = ADCL;
-				sample_value |= (ADCH << 8);
-				ADCSRA & ~(1 << ADIF);
-				adc_state = IDLE;
+				SelectInput(current_input);
+				//Start a new conversion
+				ADCSRA |= (1 << ADSC);
+				adc_state = LIBADC_SAMPLING;		
+			}
+			else
+			{
+				++current_input;
 			}
 			break;
 			
+		case LIBADC_SAMPLING:
+			//Check if ADC is done
+			if (ADCSRA & (1 << ADIF))
+			{
+				adc_inputs[current_input].sample_value = ADCL;
+				adc_inputs[current_input].sample_value |= (ADCH << 8);
+				ADCSRA & ~(1 << ADIF);
+				adc_state = LIBADC_NEW_SAMPLE;
+				++current_input;
+			}		
+			break;
+			
 		default:
+			DEBUG_STR(LIBNAME, "Unknown State");	
 			break;
 	}
 }
 
-
-uint16_t libADC_GetSample(void)
+///
+/// @brief Enable ADC
+///
+/// @param  mode Select if enable/disable ADC
+/// @return None
+///
+void libADC_Enable(bool mode)
 {
-	return sample_value;
+	if (mode == TRUE)
+	{
+		adc_state = LIBADC_NEW_SAMPLE;
+		ADCSRA |= (1 << ADEN);
+	}
+	else
+	{
+		adc_state = LIBADC_IDLE;
+		ADCSRA &= ~(1 << ADEN);
+	}
+}
+
+///
+/// @brief Enable ADC input. This will enable/disable the selected input and start sampling the input if in
+///		   free running mode.
+///
+/// @param  index Index of input to enable/disable
+/// @param  mode Selects if to enable or disable input
+/// @return ERROR  If index is invalid
+/// @return SUCCESS If index is valid
+///
+function_status libADC_EnableInput(uint8_t index, bool mode)
+{
+	function_status status = ERROR;
+	
+	if (index > 0 && index < MAX_ADC_INPUTS)
+	{
+		adc_inputs[index].active = mode;
+		status = SUCCESS;
+	}
+	return status;
+}
+
+///
+/// @brief Get sample value from the selected input
+///
+/// @param  index Index of input to get sample from
+/// @param  *sample_value Pointer to varibale where the sample will be stored
+/// @return ERROR  If index is invalid or input is disabled
+/// @return SUCCESS If index is valid and input is active
+///
+function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
+{
+	function_status status = ERROR;
+	
+	if (index > 0 && index < MAX_ADC_INPUTS && (adc_inputs[index].active == TRUE))
+	{
+		*sample_value = adc_inputs[index].sample_value;
+		status = SUCCESS;
+	}
+	return status;
 }
 
 
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
-function_status libADC_StartConversion(void)
+static void SelectInput(uint8_t adc_channel)
 {
-	function_status status = BUSY;
-	if (adc_state == IDLE)
-	{
-		ADCSRA |= (1 << ADSC);
-		adc_state = RUNNING;
-	}
+	uint8_t new_admux;
+	new_admux = ADMUX;
 	
-	return status;
+	//Clear MUX-bits
+	new_admux &= 0xF0;
+	
+	//Set new channel
+	new_admux |= adc_channel;
+	ADMUX = new_admux;
+}
+
+
+static void InitInputArray()
+{
+	uint8_t index;
+	
+	for(index = 0; index < MAX_ADC_INPUTS; ++index)
+	{
+		adc_inputs[index].active = FALSE;
+		adc_inputs[index].channel_index = index;
+		adc_inputs[index].sample_value = 0;	
+	}
 }
 
 

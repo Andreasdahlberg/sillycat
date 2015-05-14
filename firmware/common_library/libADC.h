@@ -21,7 +21,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void libADC_Init(void);
 void libADC_Update(void);
-uint16_t libADC_GetSample(void);
-
+void libADC_Enable(bool mode);
+uint8_t libADC_GetCurrentInput();
+function_status libADC_EnableInput(uint8_t index, bool mode);
+function_status libADC_GetSample(uint8_t index, uint16_t *sample_value);
 
 #endif /* LIBADC_H_ */
