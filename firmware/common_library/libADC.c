@@ -90,7 +90,7 @@ void libADC_Init(void)
 	ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));
 	
 	//Set the reference voltage to AREF
-	ADMUX = ((1 << REFS0));
+	ADMUX = 0x00;
 	
 	InitInputArray();
 	adc_state = LIBADC_IDLE;
