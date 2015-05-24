@@ -258,7 +258,7 @@ const uint8_t ubuntuMono_10ptBitmaps[] PROGMEM =
 
 	// @209 '4' (6 pixels wide)
 	0x00, //
-	0x18, //    ##
+	0x08, //     #
 	0x18, //    ##
 	0x28, //   # #
 	0x48, //  #  #
