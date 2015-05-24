@@ -120,6 +120,27 @@ bool libDS3234_GetSeconds(uint8_t *seconds)
 	return GetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
+bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
+{
+	bool status;
+	uint8_t register_value;
+	
+	if(ReadRegister(REG_HOUR, &register_value)== TRUE)
+	{
+		if(hour_mode == LIBDS3234_24HOUR_MODE)
+		{
+			register_value &= ~(1 << HOUR_MODE_BIT);
+			status = WriteRegister(REG_HOUR, register_value);	
+		}
+		else
+		{
+			register_value |= (1 << HOUR_MODE_BIT);
+			status = WriteRegister(REG_HOUR, register_value);
+		}
+	}
+	return status;
+}
+
 /// Local functions
 
 ///

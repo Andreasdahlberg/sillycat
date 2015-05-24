@@ -50,6 +50,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MONTH_MASK		0x1F
 
+#define HOUR_MODE_BIT	0x06
+#define HOUR_AM_PM_BIT	0x05
+
+typedef enum
+{
+	LIBDS3234_12HOUR_MODE= 0,
+	LIBDS3234_24HOUR_MODE		
+}libDS3234_hour_mode_type;
+
 void libDS3234_Init();
 void libDS3234_Update();
 void libDS3234_Test();
