@@ -1,3 +1,12 @@
+/**
+ * @file   libDS3234.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-07-07 (Last edit)
+ * @brief  Implementation of DS3234-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,6 +24,10 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <avr/io.h>
 #include <string.h>
 #include "libDebug.h"
@@ -22,8 +35,24 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDS3234.h"
 #include "common.h"
 
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
 #define LIBNAME "libDS3234"
 #define SS	DDC0
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 static void selectDevice(bool state);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
@@ -32,6 +61,9 @@ bool RegisterAddressValid(uint8_t address);
 bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
 
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 ///
 /// @brief Init the DS3234 RTC
@@ -49,13 +81,18 @@ void libDS3234_Init()
 	return;
 }
 
-
+///
+/// @brief Update the state of the DS3234 library 
+///
+/// @param  None
+/// @return None
+///
 void libDS3234_Update()
 {
-
 	return;
 }
 
+/*
 void libDS3234_Test()
 {
 	uint8_t data;
@@ -65,7 +102,14 @@ void libDS3234_Test()
 	DEBUG_INT(LIBNAME, data);
 
 }
+*/
 
+///
+/// @brief Get the chip-temperature from the DS3234 RTC
+///
+/// @param  *temperature Pointer to variable where the temperature will be stored
+/// @return None
+///
 void libDS3234_GetTemperature(uint16_t *temperature)
 {
 	uint8_t data;
@@ -77,13 +121,19 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 	*temperature += (data >> 6);
 }
 
-
+///
+/// @brief Get the current month
+///
+/// @param  *month Pointer to variable where the month will be stored
+/// @return FALSE  If read of month failed
+/// @return SUCCESS If read of month succeeded
+///
 bool libDS3234_GetMonth(uint8_t *month)
 {
 	bool status = FALSE;
 	uint8_t register_data;
 
-	if (ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
+	if(ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
 	{
 		*month = BCDToDecimal(register_data & MONTH_MASK);
 		status = TRUE;
@@ -91,17 +141,37 @@ bool libDS3234_GetMonth(uint8_t *month)
 	return status;
 }
 
+///
+/// @brief Get the current date
+///
+/// @param  *date Pointer to variable where the date will be stored(1-31)
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
 bool libDS3234_GetDate(uint8_t *date)
 {
 	return GetDecimalRegisterValue(REG_DATE, date);
 }
 
+///
+/// @brief Get the current day in week
+///
+/// @param  *day Pointer to variable where the day will be stored(1-7)
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
 bool libDS3234_GetDay(uint8_t *day)
 {
 	return GetDecimalRegisterValue(REG_DAY, day);
 }
 
-
+///
+/// @brief Get the current hour
+///
+/// @param  *hour Pointer to variable where the hour will be stored
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
 bool libDS3234_GetHour(uint8_t *hour)
 {
 	bool status = FALSE;
@@ -115,6 +185,13 @@ bool libDS3234_GetHour(uint8_t *hour)
 	return status;
 }
 
+///
+/// @brief Get the current minute
+///
+/// @param  *date Pointer to variable where the minute will be stored
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
 bool libDS3234_GetMinutes(uint8_t *minutes)
 {
 	return GetDecimalRegisterValue(REG_MINUTES, minutes);
@@ -125,6 +202,13 @@ bool libDS3234_SetMinutes(uint8_t minutes)
 	return SetDecimalRegisterValue(REG_MINUTES, minutes);
 }
 
+///
+/// @brief Get the current second
+///
+/// @param  *date Pointer to variable where the second will be stored
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
 bool libDS3234_GetSeconds(uint8_t *seconds)
 {
 	return GetDecimalRegisterValue(REG_SECONDS, seconds);
@@ -135,6 +219,13 @@ bool libDS3234_SetSeconds(uint8_t seconds)
 	return SetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
+///
+/// @brief Get the current hour mode, AM or PM
+///
+/// @param  *hour_mode Pointer to variable where the hour mode will be stored
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
 {
 	bool status = FALSE;
@@ -193,7 +284,7 @@ bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 	bool status = FALSE;
 	uint8_t register_data;
 		
-	if (ReadRegister(address, &register_data) == TRUE)
+	if(ReadRegister(address, &register_data) == TRUE)
 	{
 		*value = BCDToDecimal(register_data);
 		status = TRUE;
@@ -222,7 +313,7 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
 	bool status = FALSE;
 	
-	if (RegisterAddressValid(address))
+	if(RegisterAddressValid(address))
 	{
 		selectDevice(TRUE);
 		libSPI_WriteByte(address|WRITE_ADDRESS);
@@ -239,7 +330,7 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
 	bool status = FALSE;
 	
-	if (RegisterAddressValid(address))
+	if(RegisterAddressValid(address))
 	{
 		selectDevice(TRUE);
 		libSPI_WriteByte(address|READ_ADDRESS);
@@ -259,7 +350,7 @@ bool RegisterAddressValid(uint8_t address)
 
 static void selectDevice(bool state)
 {
-	if (state == TRUE)
+	if(state == TRUE)
 	{
 		PORTC &= ~(1 << SS);
 	}
