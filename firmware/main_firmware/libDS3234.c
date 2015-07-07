@@ -130,6 +130,11 @@ bool libDS3234_GetSeconds(uint8_t *seconds)
 	return GetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
+bool libDS3234_SetSeconds(uint8_t seconds)
+{
+	return SetDecimalRegisterValue(REG_SECONDS, seconds);
+}
+
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
 {
 	bool status = FALSE;
