@@ -30,6 +30,7 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 bool RegisterAddressValid(uint8_t address);
 bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
+bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
 
 
 ///
@@ -191,6 +192,22 @@ bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 }
 
 
+bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
+{
+	bool status = FALSE;
+	uint8_t register_data;
+	
+	//Only values smaller then 100 is accepted since a byte
+	//only can hold two-digits of BCD data.
+	if(value < 100)
+	{
+		register_data = (uint8_t)DecimalToBCD(value);
+		status = WriteRegister(address, register_data);		 
+	}
+	return status;
+}
+
+
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
 	bool status = FALSE;
@@ -206,6 +223,7 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 	}
 	return status;
 }
+
 
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
