@@ -81,7 +81,7 @@ bool libDS3234_GetMonth(uint8_t *month)
 {
 	bool status = FALSE;
 	uint8_t register_data;
-	
+
 	if (ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
 	{
 		*month = BCDToDecimal(register_data & MONTH_MASK);
@@ -104,10 +104,14 @@ bool libDS3234_GetDay(uint8_t *day)
 bool libDS3234_GetHour(uint8_t *hour)
 {
 	bool status = FALSE;
+	uint8_t register_data;
 
-	
+	if(ReadRegister(REG_HOUR, &register_data) == TRUE)
+	{
+		*hour = BCDToDecimal(register_data);		
+		status = TRUE;
+	}
 	return status;
-	
 }
 
 bool libDS3234_GetMinutes(uint8_t *minutes)
@@ -120,9 +124,30 @@ bool libDS3234_GetSeconds(uint8_t *seconds)
 	return GetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
+bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
+{
+	bool status = FALSE;
+	uint8_t register_value;
+
+	if(ReadRegister(REG_HOUR, &register_value)== TRUE)
+	{
+		if((register_value & HOUR_MODE_BIT) == 0x00)
+		{
+			*hour_mode = LIBDS3234_24HOUR_MODE;
+			status = TRUE;
+		}		
+		else
+		{
+			*hour_mode = LIBDS3234_12HOUR_MODE;
+			status = TRUE;
+		}
+	}
+	return status;
+}
+
 bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 {
-	bool status;
+	bool status = FALSE;
 	uint8_t register_value;
 	
 	if(ReadRegister(REG_HOUR, &register_value)== TRUE)

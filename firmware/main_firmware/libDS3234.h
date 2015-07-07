@@ -49,6 +49,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define WRITE_ADDRESS	0x80
 
 #define MONTH_MASK		0x1F
+#define HOUR_MASK		0x1F
 
 #define HOUR_MODE_BIT	0x06
 #define HOUR_AM_PM_BIT	0x05
@@ -65,7 +66,9 @@ void libDS3234_Test();
 
 void libDS3234_GetTemperature(uint16_t *temperature);
 bool libDS3234_GetDate(uint8_t *date);
+bool libDS3234_GetHour(uint8_t *hour);
 bool libDS3234_GetMinutes(uint8_t *minutes);
 bool libDS3234_GetSeconds(uint8_t *seconds);
+bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode);
 
 #endif /* LIBDS3234_H_ */
