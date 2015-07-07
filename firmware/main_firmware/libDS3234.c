@@ -92,17 +92,6 @@ void libDS3234_Update()
 	return;
 }
 
-/*
-void libDS3234_Test()
-{
-	uint8_t data;
-	
-	
-	libDS3234_GetSeconds(&data);
-	DEBUG_INT(LIBNAME, data);
-
-}
-*/
 
 ///
 /// @brief Get the chip-temperature from the DS3234 RTC
