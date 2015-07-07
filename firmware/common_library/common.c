@@ -28,6 +28,23 @@ uint8_t BCDToDecimal(uint8_t bcd_data)
 	return data;
 }
 
+uint16_t DecimalToBCD(uint8_t decimal_data)
+{
+	uint16_t data = 0;
+	uint8_t shift = 0;
+	
+	do
+	{
+		data |= (decimal_data % 10) << shift;
+		shift += 4;
+		decimal_data = decimal_data / 10;
+	}
+	while (decimal_data > 0);
+	
+	
+	return data;
+}
+
 void setBit(uint8_t bit_index, bool state, uint8_t *data)
 {
 	if (state == TRUE)

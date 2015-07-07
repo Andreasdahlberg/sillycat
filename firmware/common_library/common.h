@@ -40,6 +40,7 @@ typedef enum function_status
 
 void setBit(uint8_t bit_index, bool state, uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
+uint16_t DecimalToBCD(uint8_t decimal_data);
 int GetFreeRam();
 
 #endif /* COMMON_H_ */
