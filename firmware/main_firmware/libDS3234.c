@@ -120,6 +120,11 @@ bool libDS3234_GetMinutes(uint8_t *minutes)
 	return GetDecimalRegisterValue(REG_MINUTES, minutes);
 }
 
+bool libDS3234_SetMinutes(uint8_t minutes)
+{
+	return SetDecimalRegisterValue(REG_MINUTES, minutes);
+}
+
 bool libDS3234_GetSeconds(uint8_t *seconds)
 {
 	return GetDecimalRegisterValue(REG_SECONDS, seconds);
