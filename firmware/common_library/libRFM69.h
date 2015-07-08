@@ -40,5 +40,7 @@ bool libRFM69_IsModeReady();
 void libRFM69_WaitForModeReady();
 void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
+void libRFM69_GetTemperature(uint8_t *temperature);
+bool libRFM69_SetBitRate(uint32_t bit_rate);
 
 #endif /* LIBRFM69_H_ */

@@ -27,6 +27,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RFM_MODE_MASK 0x1C
 
+#define RFM_FXOSC 32000000 //32MHz
+
 
 static void selectDevice(bool state);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
@@ -46,6 +48,8 @@ void libRFM69_Init()
 	libRFM69_EnableEncryption(FALSE);
 	libRFM69_SetMode(RFM_STANDBY);
 	libRFM69_WaitForModeReady();
+	
+	libRFM69_SetBitRate(4800);
 	
 	DEBUG_STR(LIBNAME, "Init done");
 
@@ -138,6 +142,39 @@ void libRFM69_Test()
 	ReadRegister(REG_OPMODE, &data);
 	
 	DEBUG_HEX(LIBNAME, data);	
+}
+
+void libRFM69_GetTemperature(uint8_t *temperature)
+{
+	uint8_t register_data;
+	
+	//Enter standby mode, temperature can only be read in standby or synthesizer mode
+	libRFM69_SetMode(RFM_STANDBY);
+	libRFM69_WaitForModeReady();
+	
+	WriteRegister(REG_TEMP1, RF_TEMP1_MEAS_START);
+	
+	//Wait for temperature measurement to finish
+	do
+	{
+		ReadRegister(REG_TEMP1, &register_data);
+	}
+	while(register_data & RF_TEMP1_MEAS_RUNNING);		
+	
+	ReadRegister(REG_TEMP2, &register_data);
+	*temperature = register_data;
+}
+
+bool libRFM69_SetBitRate(uint32_t bit_rate)
+{
+	bool status = FALSE;
+	uint16_t bit_rate_value = (uint16_t)(RFM_FXOSC / bit_rate);
+	
+	if(WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8)) == TRUE)
+	{
+		status = WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
+	}
+	return status;
 }
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
