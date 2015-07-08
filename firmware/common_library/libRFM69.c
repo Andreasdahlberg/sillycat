@@ -138,7 +138,7 @@ void libRFM69_EnableEncryption(bool enable)
 	uint8_t register_content;
 
 	ReadRegister(REG_PACKETCONFIG2, &register_content);
-	setBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
+	SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
 	WriteRegister(REG_PACKETCONFIG2, register_content);
 }
 

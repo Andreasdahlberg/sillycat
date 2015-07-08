@@ -41,11 +41,10 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
 	}
 	while (decimal_data > 0);
 	
-	
 	return data;
 }
 
-void setBit(uint8_t bit_index, bool state, uint8_t *data)
+void SetBit(uint8_t bit_index, bool state, uint8_t *data)
 {
 	if (state == TRUE)
 	{
