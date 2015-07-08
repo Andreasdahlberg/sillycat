@@ -31,6 +31,20 @@ typedef enum
 	RFM_RECEIVER
 }libRFM69_mode_type;
 
+typedef enum
+{
+	RFM_PACKET_DATA,
+	RFM_RESERVED,	//Do not use
+	RFM_CONT_SYNC_DATA,
+	RFM_CONT_DATA
+}libRFM69_data_mode_type;
+
+typedef enum
+{
+	RFM_FSK,
+	RFM_OOK
+}libRFM69_modulation_type_type;
+
 void libRFM69_Init();
 void libRFM69_Update();
 void libRFM69_Test();
@@ -42,5 +56,8 @@ void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
 void libRFM69_GetTemperature(uint8_t *temperature);
 bool libRFM69_SetBitRate(uint32_t bit_rate);
+bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
+bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
+bool libRFM69_SetModulationShaping(uint8_t modulation_shaping);
 
 #endif /* LIBRFM69_H_ */

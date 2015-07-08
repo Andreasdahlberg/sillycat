@@ -27,6 +27,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RFM_MODE_MASK 0x1C
 
+#define REG_DATA_MODUL_DATA_MODE_MASK 0x60
+#define REG_DATA_MODUL_MODULATION_TYPE_MASK 0x18
+#define REG_DATA_MODUL_MODULATION_SHAPING_MASK 0x03
+
 #define RFM_FXOSC 32000000 //32MHz
 
 
@@ -50,6 +54,9 @@ void libRFM69_Init()
 	libRFM69_WaitForModeReady();
 	
 	libRFM69_SetBitRate(4800);
+	libRFM69_SetDataMode(RFM_PACKET_DATA);
+	libRFM69_SetModulationType(RFM_FSK);
+	libRFM69_SetModulationShaping(0x00);
 	
 	DEBUG_STR(LIBNAME, "Init done");
 
@@ -176,6 +183,50 @@ bool libRFM69_SetBitRate(uint32_t bit_rate)
 	}
 	return status;
 }
+
+bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if (ReadRegister(REG_DATAMODUL, &register_content) && data_mode != RFM_RESERVED)
+	{
+		register_content = (register_content & ~REG_DATA_MODUL_DATA_MODE_MASK) |
+			(data_mode << 5);
+		status = WriteRegister(REG_DATAMODUL, register_content);
+	}
+	return status;
+}
+
+bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if (ReadRegister(REG_DATAMODUL, &register_content) &&
+		(modulation_type == RFM_FSK || modulation_type == RFM_OOK))
+	{
+		register_content = (register_content & ~REG_DATA_MODUL_MODULATION_TYPE_MASK) |
+			(modulation_type << 3);
+		status = WriteRegister(REG_DATAMODUL, register_content);
+	}
+	return status;
+}
+
+bool libRFM69_SetModulationShaping(uint8_t modulation_shaping)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if (ReadRegister(REG_DATAMODUL, &register_content) && modulation_shaping < 0x4)
+	{
+		register_content = (register_content & ~REG_DATA_MODUL_MODULATION_SHAPING_MASK) | modulation_shaping;
+		status = WriteRegister(REG_DATAMODUL, register_content);
+	}
+	return status;
+}
+
+
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
