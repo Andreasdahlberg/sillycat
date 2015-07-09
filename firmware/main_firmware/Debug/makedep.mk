@@ -28,6 +28,8 @@ libLED.c
 
 libNHD223.c
 
+libSensor.c
+
 libUI.c
 
 main_firmware.c

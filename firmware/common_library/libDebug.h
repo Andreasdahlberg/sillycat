@@ -19,9 +19,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBDEBUG_H_
 #define LIBDEBUG_H_
 
-
-#define DEBUG_ENABLE
-
 #ifdef DEBUG_ENABLE
 	#define DEBUG(...)					libDebug_Print(__VA_ARGS__)
 	#define DEBUG_STR(name, message)	libDebug_PrintString(name, message)
