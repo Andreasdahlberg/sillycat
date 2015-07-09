@@ -23,12 +23,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBUG_ENABLE
 
 #ifdef DEBUG_ENABLE
+	#define DEBUG(...)					libDebug_Print(__VA_ARGS__)
 	#define DEBUG_STR(name, message)	libDebug_PrintString(name, message)
 	#define DEBUG_INT(name, num)		libDebug_PrintInteger(name, num)
 	#define DEBUG_HEX(name ,num)		libDebug_PrintHex(name, num)
 	#define DEBUG_BOOL(name, value)		libDebug_PrintBoolean(name, value)
 	#define DEBUG_BINARY(name, num)		libDebug_PrintBinary(name, num)
 #else
+	#define DEBUG(...)
 	#define DEBUG_STR(name, message)
 	#define DEBUG_INT(name, num)
 	#define DEBUG_HEX(name ,num)
@@ -46,5 +48,7 @@ void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value);
 void libDebug_PrintBoolean(char* lib_name, bool value);
 void libDebug_PrintHex(char*lib_name, uint8_t value);
 void libDebug_PrintBinary(char* lib_name, uint8_t value);
+
+void libDebug_Print(const char* text, ...);
 
 #endif /* LIBDEBUG_H_ */

@@ -18,6 +18,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
+
 #include "libDebug.h"
 
 #define LIBNAME "libDebug"
@@ -38,6 +40,18 @@ void libDebug_Init()
 	DEBUG_STR(LIBNAME, "Init done");
 }
 
+void libDebug_Print(const char* text, ...)
+{
+	va_list args;
+	char buffer[64];
+	
+	va_start(args, text);
+	vsprintf(buffer, text, args);
+	libUART_SendArray((uint8_t*)buffer, strlen(buffer));
+	va_end(args);
+
+	return;
+}
 
 ///
 /// @brief Print debug string
