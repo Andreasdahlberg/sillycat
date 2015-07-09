@@ -25,13 +25,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define LIBNAME "libRFM69"
 #define SS DDB2
 
-#define RFM_MODE_MASK 0x1C
+#define REG_OPMODE_MODE_MASK 0x1C
 
-#define REG_DATA_MODUL_DATA_MODE_MASK 0x60
-#define REG_DATA_MODUL_MODULATION_TYPE_MASK 0x18
-#define REG_DATA_MODUL_MODULATION_SHAPING_MASK 0x03
+#define REG_DATA_MODUL_DATA_MODE_MASK			0x60
+#define REG_DATA_MODUL_MODULATION_TYPE_MASK		0x18
+#define REG_DATA_MODUL_MODULATION_SHAPING_MASK	0x03
+
+#define REG_PA_LEVEL_PA_MASK 0xE0
+#define REG_PA_LEVEL_POUT_MASK 0x1F
 
 #define RFM_FXOSC 32000000 //32MHz
+#define RFM_FSTEP (float)61.03515625 // FSTEP = FXOSC / 2^19
 
 
 static void selectDevice(bool state);
@@ -58,8 +62,20 @@ void libRFM69_Init()
 	libRFM69_SetModulationType(RFM_FSK);
 	libRFM69_SetModulationShaping(0x00);
 	
+	libRFM69_SetFrequencyDeviation(5000);
+	libRFM69_SetCarrierFrequency(868000000);
+	
 	DEBUG_STR(LIBNAME, "Init done");
-
+	
+	
+	
+	DEBUG("Bit rate: %u bps\r\n", libRFM69_GetBitrate());
+	DEBUG("Chip: 0x%02X\r\n", libRFM69_GetChipVersion());
+	DEBUG("PA mode: 0x%02X\r\n", libRFM69_GetPowerAmplifierMode());
+	DEBUG("High power: 0x%02X\r\n", libRFM69_IsHighPowerEnabled());	
+	DEBUG("Output power: %i dBm\r\n", libRFM69_GetOutputPower());	
+	DEBUG("RSSI: %i dBm\r\n", libRFM69_GetRSSI());		
+	
 	
 }
 
@@ -77,7 +93,7 @@ bool libRFM69_SetMode(libRFM69_mode_type mode)
 	
 	if (ReadRegister(REG_OPMODE, &register_content))
 	{
-		register_content = (register_content & ~RFM_MODE_MASK) | (mode << 2);
+		register_content = (register_content & ~REG_OPMODE_MODE_MASK) | (mode << 2);
 		status = WriteRegister(REG_OPMODE, register_content);
 	}
 	return status;
@@ -105,9 +121,14 @@ bool libRFM69_IsModeReady()
 
 void libRFM69_SetCarrierFrequency(uint32_t frequency)
 {
-	WriteRegister(REG_FRFMSB, (frequency >> 16) & 0xFF);
-	WriteRegister(REG_FRFMID, (frequency >> 8) & 0xFF);
-	WriteRegister(REG_FRFLSB, frequency & 0xFF);
+	uint32_t frequency_value = frequency / RFM_FSTEP;
+	
+	DEBUG("Freq: %lu\r\n", frequency);
+	DEBUG("Freq value: 0x%03lX\r\n", frequency_value);
+	
+	WriteRegister(REG_FRFMSB, (frequency_value >> 16) & 0xFF);
+	WriteRegister(REG_FRFMID, (frequency_value >> 8) & 0xFF);
+	WriteRegister(REG_FRFLSB, frequency_value & 0xFF);
 }
 
 void libRFM69_EnableListenMode(bool enable)
@@ -184,6 +205,24 @@ bool libRFM69_SetBitRate(uint32_t bit_rate)
 	return status;
 }
 
+uint32_t libRFM69_GetBitrate()
+{
+	uint16_t bit_rate_value;
+	uint8_t tmp;
+	
+	ReadRegister(REG_BITRATEMSB, &tmp);
+	bit_rate_value = (uint16_t)(tmp << 8);
+	
+	ReadRegister(REG_BITRATELSB, &tmp);
+	bit_rate_value |= tmp;
+	
+	if(bit_rate_value > 0)
+	{
+		return (RFM_FXOSC / bit_rate_value);
+	}
+	return 0;
+}
+
 bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
 {
 	bool status = FALSE;
@@ -224,6 +263,186 @@ bool libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 		status = WriteRegister(REG_DATAMODUL, register_content);
 	}
 	return status;
+}
+
+bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
+{
+	bool status = FALSE;
+	uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation/RFM_FSTEP);
+	
+	DEBUG("Freq deviation: %u\r\n", frequency_deviation);
+	DEBUG("Freq deviation value: 0x%04X\r\n", frequency_deviation_value);
+	
+	if(WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF)))
+	{
+		status = WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
+	}
+	
+	return status;
+}
+
+bool libRFM69_SetPowerAmplifierMode(uint8_t mode)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	DEBUG("PA mode: 0x%02X\r\n", mode);
+	
+	if(mode < 0x04 && mode > 0x01 && ReadRegister(REG_PALEVEL, &register_content))
+	{
+		register_content &= ~REG_PA_LEVEL_PA_MASK;
+		register_content |= (mode << 5);
+		
+		status = WriteRegister(REG_PALEVEL, register_content);
+	}
+	return status;
+}
+
+bool libRFM69_SetPowerLevel(uint8_t power_level)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if(power_level <= 31 && ReadRegister(REG_PALEVEL, &register_content))
+	{
+		register_content &= ~REG_PA_LEVEL_POUT_MASK;
+		register_content |= power_level;
+		
+		status = WriteRegister(REG_PALEVEL, register_content);
+	}
+	return status;
+}
+
+bool libRFM69_IsHighPowerEnabled(void)
+{
+	bool status = FALSE;
+	
+	//Not implemented
+	
+	return status;
+}
+
+
+int8_t libRFM69_GetOutputPower(void)
+{
+	int8_t pout = 0;
+	uint8_t register_content;
+	
+	if(ReadRegister(REG_PALEVEL, &register_content) == TRUE)
+	{	
+		register_content &= REG_PA_LEVEL_POUT_MASK;	
+		
+		switch(libRFM69_GetPowerAmplifierMode())
+		{
+			case RFM_PWR_1:
+			case RFM_PWR_2:
+				pout = -18 + (int8_t)register_content;
+				break;
+			
+			case RFM_PWR_3_4:
+			
+				if(libRFM69_IsHighPowerEnabled() == TRUE)
+				{
+					pout = -11 + (int8_t)register_content;
+				}
+				else
+				{
+					pout = -14 + (int8_t)register_content;				
+				}
+				break;
+				
+			default:
+				break;
+		}
+	}
+	return pout;
+}
+
+uint8_t libRFM69_GetPowerAmplifierMode(void)
+{
+	uint8_t register_content;
+	
+	if(ReadRegister(REG_PALEVEL, &register_content) == TRUE)	
+	{
+		return (register_content >> 5);
+	}
+	return 0;
+}
+
+//Overload Current Protection
+bool libRFM69_EnableOCP(bool enabled)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if(ReadRegister(REG_OCP, &register_content) == TRUE)
+	{
+		SetBit(4, enabled, &register_content);
+		status = WriteRegister(REG_OCP, register_content);
+	}
+	
+	return status;
+}
+
+int8_t libRFM69_GetRSSI(void)
+{
+	int8_t rssi_value = 0;
+	uint8_t register_content;
+	
+	//Start RSSI measurement
+	WriteRegister(REG_RSSICONFIG, 0x01);
+	
+	do
+	{
+		ReadRegister(REG_RSSICONFIG, &register_content);
+	} while (register_content == 0);
+	
+	ReadRegister(REG_RSSIVALUE, &register_content);
+	
+	return (-1 * (int8_t)(register_content >> 1));
+}
+
+bool libRFM69_ClearFIFOOverrun(void)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if(ReadRegister(REG_IRQFLAGS2, &register_content) == TRUE)
+	{
+		SetBit(4, TRUE, &register_content);
+		status = WriteRegister(REG_IRQFLAGS2, register_content);
+	}
+	return status;
+}
+
+
+bool libRFM69_CalibrateRCOscillator(void)
+{
+	//Not implemented
+	return FALSE;
+}
+
+uint8_t libRFM69_GetChipVersion(void)
+{
+	uint8_t register_content;
+	if(ReadRegister(REG_VERSION, &register_content) == TRUE)
+	{		
+		return register_content;
+	}
+	return 0;
+}
+
+void libRFM69_DumpRegisterValues(void)
+{
+	uint8_t register_address;
+	uint8_t register_content;
+	
+	for(register_address = 0; register_address < 0x4F; ++register_address)
+	{
+		ReadRegister(register_address, &register_content);
+		DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", register_address, register_content);
+	}
+	return;
 }
 
 

@@ -45,6 +45,18 @@ typedef enum
 	RFM_OOK
 }libRFM69_modulation_type_type;
 
+#ifdef NODE_ADDRESS
+	#define NODE_ADDRESS 0xAA
+#endif
+
+#ifdef BROADCAST_ADDRESS
+	#define BROADCAST_ADDRESS 0x00
+#endif
+
+#define RFM_PWR_1	0x04 //PA0 output on pin RFIO 
+#define RFM_PWR_2	0x02 //PA1 enabled on pin PA_BOOST
+#define RFM_PWR_3_4	0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
+
 void libRFM69_Init();
 void libRFM69_Update();
 void libRFM69_Test();
@@ -59,5 +71,19 @@ bool libRFM69_SetBitRate(uint32_t bit_rate);
 bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
 bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
 bool libRFM69_SetModulationShaping(uint8_t modulation_shaping);
+bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation);
+bool libRFM69_SetPowerAmplifierMode(uint8_t mode);
+bool libRFM69_CalibrateRCOscillator(void);
+uint32_t libRFM69_GetBitrate();
+uint8_t libRFM69_GetChipVersion(void);
+uint8_t libRFM69_GetPowerAmplifierMode(void);
+int8_t libRFM69_GetOutputPower(void);
+int8_t libRFM69_GetRSSI(void);
+bool libRFM69_EnableOCP(bool enabled);
+bool libRFM69_ClearFIFOOverrun(void);
+
+bool libRFM69_IsHighPowerEnabled(void);
+
+void libRFM69_DumpRegisterValues(void);
 
 #endif /* LIBRFM69_H_ */
