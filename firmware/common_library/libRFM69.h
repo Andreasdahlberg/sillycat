@@ -45,17 +45,23 @@ typedef enum
 	RFM_OOK
 }libRFM69_modulation_type_type;
 
-#ifdef NODE_ADDRESS
+#ifndef NODE_ADDRESS
 	#define NODE_ADDRESS 0xAA
 #endif
 
-#ifdef BROADCAST_ADDRESS
+#ifndef BROADCAST_ADDRESS
 	#define BROADCAST_ADDRESS 0x00
+#endif
+
+#ifdef	NETWORK_MASTER
+	#define NETWORK_ID NODE_ADDRESS
 #endif
 
 #define RFM_PWR_1	0x04 //PA0 output on pin RFIO 
 #define RFM_PWR_2	0x02 //PA1 enabled on pin PA_BOOST
 #define RFM_PWR_3_4	0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
+
+#define MAX_SYNC_WORD_SIZE 7
 
 void libRFM69_Init();
 void libRFM69_Update();
@@ -73,12 +79,20 @@ bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
 bool libRFM69_SetModulationShaping(uint8_t modulation_shaping);
 bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation);
 bool libRFM69_SetPowerAmplifierMode(uint8_t mode);
+bool libRFM69_SetPreambleLength(uint16_t length);
+bool libRFM69_SetSyncWordSize(uint8_t size);
+bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
+bool enableSyncWordGeneration(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
-uint32_t libRFM69_GetBitrate();
+uint32_t libRFM69_GetBitrate(void);
 uint8_t libRFM69_GetChipVersion(void);
 uint8_t libRFM69_GetPowerAmplifierMode(void);
 int8_t libRFM69_GetOutputPower(void);
 int8_t libRFM69_GetRSSI(void);
+uint16_t libRFM69_GetPreambleLength(void);
+uint8_t libRFM69_GetSyncWordSize(void);
+bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
+
 bool libRFM69_EnableOCP(bool enabled);
 bool libRFM69_ClearFIFOOverrun(void);
 

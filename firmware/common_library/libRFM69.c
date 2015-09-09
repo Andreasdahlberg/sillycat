@@ -47,6 +47,9 @@ static char aes_key[17] = "1DUMMYKEYFOOBAR1";
 
 void libRFM69_Init()
 {
+	uint8_t sync_word[8];
+	uint8_t idx;
+	
 	DDRB |= (1 << SS);	
 	selectDevice(FALSE);
 	
@@ -75,7 +78,19 @@ void libRFM69_Init()
 	DEBUG("High power: 0x%02X\r\n", libRFM69_IsHighPowerEnabled());	
 	DEBUG("Output power: %i dBm\r\n", libRFM69_GetOutputPower());	
 	DEBUG("RSSI: %i dBm\r\n", libRFM69_GetRSSI());		
+	DEBUG("Preamble length: %u\r\n", libRFM69_GetPreambleLength());	
+	DEBUG("Sync length: %u\r\n", libRFM69_GetSyncWordSize());	
 	
+	libRFM69_GetSyncWord(sync_word, libRFM69_GetSyncWordSize());
+	DEBUG("Sync word: 0x");
+	for (idx = 0; idx < libRFM69_GetSyncWordSize(); ++idx)
+	{
+		DEBUG("%02X", sync_word[idx]);
+	}
+	DEBUG("\r\n");
+
+				
+
 	
 }
 
@@ -205,7 +220,7 @@ bool libRFM69_SetBitRate(uint32_t bit_rate)
 	return status;
 }
 
-uint32_t libRFM69_GetBitrate()
+uint32_t libRFM69_GetBitrate(void)
 {
 	uint16_t bit_rate_value;
 	uint8_t tmp;
@@ -386,7 +401,6 @@ bool libRFM69_EnableOCP(bool enabled)
 
 int8_t libRFM69_GetRSSI(void)
 {
-	int8_t rssi_value = 0;
 	uint8_t register_content;
 	
 	//Start RSSI measurement
@@ -422,6 +436,120 @@ bool libRFM69_CalibrateRCOscillator(void)
 	return FALSE;
 }
 
+bool libRFM69_SetSyncWordSize(uint8_t size)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if(size <= MAX_SYNC_WORD_SIZE)
+	{
+		if (ReadRegister(REG_SYNCCONFIG, &register_content))
+		{
+			register_content &= ~(MAX_SYNC_WORD_SIZE << 3);
+			register_content |= (size << 3);
+			status = WriteRegister(REG_SYNCCONFIG, register_content);	
+		}
+	}
+	return status;
+}
+
+bool libRFM69_SetPreambleLength(uint16_t length)
+{
+	bool status;
+	
+	status = (WriteRegister(REG_PREAMBLEMSB, (length >> 8)) &&
+			  WriteRegister(REG_PREAMBLELSB, (length & 0xFF)));
+	return status;			  	
+}
+
+uint16_t libRFM69_GetPreambleLength(void)
+{
+	uint16_t length = 0;
+	uint8_t register_content;
+	
+	if (ReadRegister(REG_PREAMBLEMSB, &register_content) == FALSE)
+	{
+		return 0;
+	}
+	
+	length = (uint16_t)(register_content << 8);
+	
+	if (ReadRegister(REG_PREAMBLELSB, &register_content) == FALSE)
+	{
+		return 0;
+	}	
+	
+	length |= register_content;
+	return length;	
+}
+
+uint8_t libRFM69_GetSyncWordSize(void)
+{
+	uint8_t register_content;
+	uint8_t size = 0;
+	
+	if (ReadRegister(REG_SYNCCONFIG, &register_content))
+	{
+		//From RFM69HW datasheet, table 28: sync word size = RegSyncConfig[5:2] + 1
+		size = ((register_content >> 3) & 0x07) + 1;
+	}
+	
+	return size;
+}
+
+bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length)
+{
+	bool status = FALSE;
+	uint8_t sync_word_size;
+	
+	sync_word_size = libRFM69_GetSyncWordSize();
+	
+	if (length == sync_word_size)
+	{
+		uint8_t index;
+		for (index = 0; index < length; ++index)
+		{
+			//Abort if write fails, this can leave an incomplete sync word
+			//so this must be handle by the caller.
+			if (WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]) == FALSE)
+			{
+				break;
+			}
+		}
+		//Check if a complete sync word was written.
+		status = (index == length);
+	}
+	
+	return status;
+}
+
+//TODO: Return number of bytes read?
+bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length)
+{
+	bool status = FALSE;
+	uint8_t sync_word_size;
+	
+	sync_word_size = libRFM69_GetSyncWordSize();
+	
+	if (length <= sync_word_size)
+	{
+		uint8_t index;
+		for (index = 0; index < sync_word_size; ++index)
+		{
+			//Abort if read fails
+			if (ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]) == FALSE)
+			{
+				DEBUG("Failed to read from REG_SYNCVALUE%u", index+1);
+				break;
+			}
+		}
+		//Check if a complete sync word was written.
+		status = (index == sync_word_size);
+	}
+	return status;
+}
+
+
 uint8_t libRFM69_GetChipVersion(void)
 {
 	uint8_t register_content;
@@ -445,6 +573,19 @@ void libRFM69_DumpRegisterValues(void)
 	return;
 }
 
+bool enableSyncWordGeneration(bool enabled)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if(ReadRegister(REG_SYNCCONFIG, &register_content) == TRUE)
+	{
+		SetBit(7, enabled, &register_content);
+		status = WriteRegister(REG_SYNCCONFIG, register_content);
+	}
+	
+	return status;
+}
 
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
@@ -462,7 +603,6 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 }
 
 
-
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
 	bool status = FALSE;
@@ -478,7 +618,6 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 }
 
 
-
 static void selectDevice(bool state)
 {
 	if (state == TRUE)
@@ -490,5 +629,3 @@ static void selectDevice(bool state)
 		PORTB |= (1 << SS);
 	}
 }
-
-

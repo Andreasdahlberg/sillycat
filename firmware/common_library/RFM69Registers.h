@@ -1107,3 +1107,7 @@
 #define RF_DAGC_NORMAL              0x00  // Reset value
 #define RF_DAGC_IMPROVED_LOWBETA1   0x20
 #define RF_DAGC_IMPROVED_LOWBETA0   0x30  // Recommended default
+
+
+
+#define PACKETCONFIG2_BIT_AESON		0x00
