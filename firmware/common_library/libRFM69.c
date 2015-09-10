@@ -510,7 +510,15 @@ bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length)
 		for (index = 0; index < length; ++index)
 		{
 			//Abort if write fails, this can leave an incomplete sync word
-			//so this must be handle by the caller.
+			//so this must be handle by the caller.			
+			
+			//From RFM69HW datasheet, note on page 56: sync word values equal
+			//to 0x00 is forbidden.
+			if (sync_word[index] == 0x00)
+			{
+				break;
+			}
+			
 			if (WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]) == FALSE)
 			{
 				break;
