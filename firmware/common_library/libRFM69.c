@@ -252,7 +252,7 @@ void libRFM69_GetTemperature(uint8_t *temperature)
 	{
 		ReadRegister(REG_TEMP1, &register_data);
 	}
-	while(register_data & RF_TEMP1_MEAS_RUNNING);		
+	while (register_data & RF_TEMP1_MEAS_RUNNING);		
 	
 	ReadRegister(REG_TEMP2, &register_data);
 	*temperature = register_data;
@@ -263,7 +263,7 @@ bool libRFM69_SetBitRate(uint32_t bit_rate)
 	bool status = FALSE;
 	uint16_t bit_rate_value = (uint16_t)(RFM_FXOSC / bit_rate);
 	
-	if(WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8)) == TRUE)
+	if (WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8)) == TRUE)
 	{
 		status = WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
 	}
@@ -281,7 +281,7 @@ uint32_t libRFM69_GetBitrate(void)
 	ReadRegister(REG_BITRATELSB, &tmp);
 	bit_rate_value |= tmp;
 	
-	if(bit_rate_value > 0)
+	if (bit_rate_value > 0)
 	{
 		return (RFM_FXOSC / bit_rate_value);
 	}
@@ -338,7 +338,7 @@ bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
 	DEBUG("Freq deviation: %u\r\n", frequency_deviation);
 	DEBUG("Freq deviation value: 0x%04X\r\n", frequency_deviation_value);
 	
-	if(WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF)))
+	if (WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF)))
 	{
 		status = WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
 	}
@@ -353,7 +353,7 @@ bool libRFM69_SetPowerAmplifierMode(uint8_t mode)
 	
 	DEBUG("PA mode: 0x%02X\r\n", mode);
 	
-	if(mode < 0x04 && mode > 0x01 && ReadRegister(REG_PALEVEL, &register_content))
+	if (mode < 0x04 && mode > 0x01 && ReadRegister(REG_PALEVEL, &register_content))
 	{
 		register_content &= ~REG_PA_LEVEL_PA_MASK;
 		register_content |= (mode << 5);
@@ -368,7 +368,7 @@ bool libRFM69_SetPowerLevel(uint8_t power_level)
 	bool status = FALSE;
 	uint8_t register_content;
 	
-	if(power_level <= 31 && ReadRegister(REG_PALEVEL, &register_content))
+	if (power_level <= 31 && ReadRegister(REG_PALEVEL, &register_content))
 	{
 		register_content &= ~REG_PA_LEVEL_POUT_MASK;
 		register_content |= power_level;
@@ -393,11 +393,11 @@ int8_t libRFM69_GetOutputPower(void)
 	int8_t pout = 0;
 	uint8_t register_content;
 	
-	if(ReadRegister(REG_PALEVEL, &register_content) == TRUE)
+	if (ReadRegister(REG_PALEVEL, &register_content) == TRUE)
 	{	
 		register_content &= REG_PA_LEVEL_POUT_MASK;	
 		
-		switch(libRFM69_GetPowerAmplifierMode())
+		switch (libRFM69_GetPowerAmplifierMode())
 		{
 			case RFM_PWR_1:
 			case RFM_PWR_2:
@@ -406,7 +406,7 @@ int8_t libRFM69_GetOutputPower(void)
 			
 			case RFM_PWR_3_4:
 			
-				if(libRFM69_IsHighPowerEnabled() == TRUE)
+				if (libRFM69_IsHighPowerEnabled() == TRUE)
 				{
 					pout = -11 + (int8_t)register_content;
 				}
@@ -427,7 +427,7 @@ uint8_t libRFM69_GetPowerAmplifierMode(void)
 {
 	uint8_t register_content;
 	
-	if(ReadRegister(REG_PALEVEL, &register_content) == TRUE)	
+	if (ReadRegister(REG_PALEVEL, &register_content) == TRUE)	
 	{
 		return (register_content >> 5);
 	}
@@ -440,7 +440,7 @@ bool libRFM69_EnableOCP(bool enabled)
 	bool status = FALSE;
 	uint8_t register_content;
 	
-	if(ReadRegister(REG_OCP, &register_content) == TRUE)
+	if (ReadRegister(REG_OCP, &register_content) == TRUE)
 	{
 		SetBit(4, enabled, &register_content);
 		status = WriteRegister(REG_OCP, register_content);
@@ -459,7 +459,7 @@ int8_t libRFM69_GetRSSI(void)
 	do
 	{
 		ReadRegister(REG_RSSICONFIG, &register_content);
-	} while (register_content == 0);
+	}while (register_content == 0);
 	
 	ReadRegister(REG_RSSIVALUE, &register_content);
 	
@@ -471,7 +471,7 @@ bool libRFM69_ClearFIFOOverrun(void)
 	bool status = FALSE;
 	uint8_t register_content;
 	
-	if(ReadRegister(REG_IRQFLAGS2, &register_content) == TRUE)
+	if (ReadRegister(REG_IRQFLAGS2, &register_content) == TRUE)
 	{
 		SetBit(4, TRUE, &register_content);
 		status = WriteRegister(REG_IRQFLAGS2, register_content);
@@ -491,7 +491,7 @@ bool libRFM69_SetSyncWordSize(uint8_t size)
 	bool status = FALSE;
 	uint8_t register_content;
 	
-	if(size <= MAX_SYNC_WORD_SIZE)
+	if (size <= MAX_SYNC_WORD_SIZE)
 	{
 		if (ReadRegister(REG_SYNCCONFIG, &register_content))
 		{
@@ -611,7 +611,7 @@ bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length)
 uint8_t libRFM69_GetChipVersion(void)
 {
 	uint8_t register_content;
-	if(ReadRegister(REG_VERSION, &register_content) == TRUE)
+	if (ReadRegister(REG_VERSION, &register_content) == TRUE)
 	{		
 		return register_content;
 	}
@@ -623,7 +623,7 @@ void libRFM69_DumpRegisterValues(void)
 	uint8_t register_address;
 	uint8_t register_content;
 	
-	for(register_address = 0; register_address < 0x4F; ++register_address)
+	for (register_address = 0; register_address < 0x4F; ++register_address)
 	{
 		ReadRegister(register_address, &register_content);
 		DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", register_address, register_content);
@@ -636,7 +636,7 @@ bool libRFM69_EnableSyncWordGeneration(bool enabled)
 	bool status = FALSE;
 	uint8_t register_content;
 	
-	if(ReadRegister(REG_SYNCCONFIG, &register_content) == TRUE)
+	if (ReadRegister(REG_SYNCCONFIG, &register_content) == TRUE)
 	{
 		SetBit(7, enabled, &register_content);
 		status = WriteRegister(REG_SYNCCONFIG, register_content);
