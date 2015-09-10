@@ -677,10 +677,19 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 	return status;
 }
 
+///
+/// @brief Select the RFM69-device on the SPI-bus. SPI-mode will
+///        change when set to true but is not restored when set
+///        to false.
+///
+/// @param  state True for selecting and false for deselecting.
+/// @return None
+///
 static void selectDevice(bool state)
 {
 	if (state == TRUE)
 	{
+		libSPI_SetMode(0);
 		PORTB &= ~(1 << SS);
 	}
 	else
