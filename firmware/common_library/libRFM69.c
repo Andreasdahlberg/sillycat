@@ -1,3 +1,12 @@
+/**
+ * @file   libRFM69.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-09-10 (Last edit)
+ * @brief  Implementation of RFM69HW-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,12 +24,19 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
 
 #include "common.h"
 #include "libRFM69.h"
 #include "libSPI.h"
 #include "libDebug.h"
 #include "RFM69Registers.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 #define LIBNAME "libRFM69"
 #define SS DDB2
@@ -37,14 +53,35 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RFM_FXOSC 32000000 //32MHz
 #define RFM_FSTEP (float)61.03515625 // FSTEP = FXOSC / 2^19
 
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+static char aes_key[17] = "1DUMMYKEYFOOBAR1";
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 static void selectDevice(bool state);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
 
-static char aes_key[17] = "1DUMMYKEYFOOBAR1";
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
-
+///
+/// @brief Init libRFM69 and set default configuration. Prints the current
+///		   configuration.
+///
+/// @param  None
+/// @return None
+///
 void libRFM69_Init()
 {
 	uint8_t sync_word[8];
@@ -52,9 +89,7 @@ void libRFM69_Init()
 	
 	DDRB |= (1 << SS);	
 	selectDevice(FALSE);
-	
-
-	
+		
 	//NOTE: Encryption is disabled during development only!
 	libRFM69_EnableEncryption(FALSE);
 	libRFM69_SetMode(RFM_STANDBY);
@@ -69,8 +104,6 @@ void libRFM69_Init()
 	libRFM69_SetCarrierFrequency(868000000);
 	
 	DEBUG_STR(LIBNAME, "Init done");
-	
-	
 	
 	DEBUG("Bit rate: %u bps\r\n", libRFM69_GetBitrate());
 	DEBUG("Chip: 0x%02X\r\n", libRFM69_GetChipVersion());
@@ -88,12 +121,14 @@ void libRFM69_Init()
 		DEBUG("%02X", sync_word[idx]);
 	}
 	DEBUG("\r\n");
-
-				
-
-	
 }
 
+///
+/// @brief Update the internal state of libRFM69. NOT IMPLEMENTED
+///
+/// @param  None
+/// @return None
+///
 void libRFM69_Update()
 {
 	
@@ -166,9 +201,6 @@ void libRFM69_EnableSequencer(bool enable)
 	WriteRegister(REG_OPMODE, register_content);	
 }
 
-
-
-
 void libRFM69_EnableEncryption(bool enable)
 {
 	uint8_t register_content;
@@ -176,6 +208,24 @@ void libRFM69_EnableEncryption(bool enable)
 	ReadRegister(REG_PACKETCONFIG2, &register_content);
 	SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
 	WriteRegister(REG_PACKETCONFIG2, register_content);
+}
+
+bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
+{
+	bool status = FALSE;
+	uint8_t register_content;
+	
+	if (packet_format == RFM_PACKET_FIXED_LEN ||
+		packet_format == RFM_PACKET_VARIABLE_LEN)
+	{
+		if (ReadRegister(REG_PACKETCONFIG1, &register_content))
+		{
+			SetBit(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
+				&register_content);
+			status = WriteRegister(REG_PACKETCONFIG1, register_content);
+		}
+	}
+	return status;
 }
 
 void libRFM69_Test()
@@ -595,6 +645,9 @@ bool libRFM69_EnableSyncWordGeneration(bool enabled)
 	return status;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
@@ -610,7 +663,6 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 	return status;
 }
 
-
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
 	bool status = FALSE;
@@ -624,7 +676,6 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 	
 	return status;
 }
-
 
 static void selectDevice(bool state)
 {

@@ -1,3 +1,12 @@
+/**
+ * @file   libRFM69.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-09-10 (Last edit)
+ * @brief  Header of RFM69HW-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,6 +24,13 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
 
 #ifndef LIBRFM69_H_
 #define LIBRFM69_H_
@@ -41,6 +57,13 @@ typedef enum
 
 typedef enum
 {
+	RFM_PACKET_FIXED_LEN,
+	RFM_PACKET_VARIABLE_LEN	
+	
+}libRFM69_packet_format_type;
+
+typedef enum
+{
 	RFM_FSK,
 	RFM_OOK
 }libRFM69_modulation_type_type;
@@ -63,6 +86,14 @@ typedef enum
 
 #define MAX_SYNC_WORD_SIZE 7
 
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
 void libRFM69_Init();
 void libRFM69_Update();
 void libRFM69_Test();
@@ -82,6 +113,7 @@ bool libRFM69_SetPowerAmplifierMode(uint8_t mode);
 bool libRFM69_SetPreambleLength(uint16_t length);
 bool libRFM69_SetSyncWordSize(uint8_t size);
 bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
+bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
 bool libRFM69_EnableSyncWordGeneration(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
 uint32_t libRFM69_GetBitrate(void);
