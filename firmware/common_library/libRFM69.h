@@ -82,7 +82,7 @@ bool libRFM69_SetPowerAmplifierMode(uint8_t mode);
 bool libRFM69_SetPreambleLength(uint16_t length);
 bool libRFM69_SetSyncWordSize(uint8_t size);
 bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
-bool enableSyncWordGeneration(bool enabled);
+bool libRFM69_EnableSyncWordGeneration(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
 uint32_t libRFM69_GetBitrate(void);
 uint8_t libRFM69_GetChipVersion(void);

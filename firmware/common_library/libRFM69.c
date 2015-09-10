@@ -581,7 +581,7 @@ void libRFM69_DumpRegisterValues(void)
 	return;
 }
 
-bool enableSyncWordGeneration(bool enabled)
+bool libRFM69_EnableSyncWordGeneration(bool enabled)
 {
 	bool status = FALSE;
 	uint8_t register_content;
