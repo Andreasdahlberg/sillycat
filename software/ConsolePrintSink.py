@@ -25,6 +25,6 @@ class ConsolePrintSink():
 
 	def push(self, stream_data):
 		try:
-			print(stream_data.decode('utf-8').strip())
+			print(stream_data.decode('utf-8').rstrip('\r\n'))
 		except:
 			pass
