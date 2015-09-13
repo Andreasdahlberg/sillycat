@@ -3,7 +3,10 @@
 
 import os
 import sys
-from PyQt4 import QtGui, QtCore, Qt
+try:
+	from PyQt4 import QtGui, QtCore, Qt
+except ImportError:
+	pass
 import time
 import serial
 import math, struct

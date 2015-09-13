@@ -1,6 +1,7 @@
 language: python
 python:
   - 3.4
+install: "pip install -r requirements.txt"
 script:
  - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then python -m unittest discover -s software; fi
 notifications:

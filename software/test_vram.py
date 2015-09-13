@@ -10,8 +10,8 @@ class TestStringFunctions(unittest.TestCase):
     self.assertIsNone(vram.clean_string(text_stream))
     self.assertEqual(vram.clean_string(byte_stream), 'spam and eggs')
 
-  def test_extract_command(self):
-    pass
+  #def test_extract_command(self):
+  #  pass
 
 
 if __name__ == '__main__':
