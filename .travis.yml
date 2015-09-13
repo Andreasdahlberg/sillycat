@@ -2,7 +2,7 @@ language: python
 python:
   - 3.4
 script:
- - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then python -m unittest discover; fi
+ - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then python -m unittest discover -s software; fi
 notifications:
   email: 
     - andreas.dahlberg90@gmail.com
