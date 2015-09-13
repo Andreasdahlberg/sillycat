@@ -1,6 +1,8 @@
 language: python
 python:
-  - "3.4"
-# command to install dependencies
-# command to run tests
-script: python -m unittest
+  - 3.4
+script:
+ - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then python -m unittest discover; fi
+notifications:
+  email: 
+    - andreas.dahlberg90@gmail.com
