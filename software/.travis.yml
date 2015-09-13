@@ -3,4 +3,4 @@ python:
   - "3.4"
 # command to install dependencies
 # command to run tests
-script: vram_test
+script: python -m unittest
