@@ -27,7 +27,7 @@ def bmp(rows, w):
 
 
 
-ser = serial.Serial("COM3", 38400, timeout=2, writeTimeout=0.2)
+ser = serial.Serial("COM3", 38400, timeout=1, writeTimeout=1)
 
 
 
@@ -101,14 +101,29 @@ def CaptureVRAM():
 
 
 
-
+def clean_string(stream_data):
+	try:
+		text = stream_data.decode('utf-8').strip()
+	except:
+		text = None
+	return text
 
 
 def HandleCommand(command):
 	command_map = {'VRAM': CaptureVRAM}
 	command_function = command_map.get(command)
-
 	return command_function()
+
+
+def extract_command(stream_data):
+	try:
+		command_string = clean_string(stream_data)
+		command = command_string.split('<')[1].split('>')[0]
+		command_data = command_string.split('<'+command+'>')[1]
+	except:
+		return None		
+	return command, command_data	
+
 
 class Display(QtGui.QWidget):
 	def __init__(self, parent=None):
@@ -118,7 +133,7 @@ class Display(QtGui.QWidget):
 
 		self.label = QtGui.QLabel(self)
 
-		pixmap = QtGui.QPixmap(os.getcwd() + '/vram.bmp')
+		pixmap = QtGui.QPixmap(os.getcwd() + '/vram_init.bmp')
 		display_pixmap = pixmap.scaled(384, 93)
 		self.label.setPixmap(display_pixmap)
 		self.resize(display_pixmap.width(),display_pixmap.height())
@@ -157,6 +172,7 @@ class Display(QtGui.QWidget):
 
 		p = QtGui.QPainter(display_pixmap)
 		p.setPen(QtGui.QColor(255, 201, 14))
+		#p.setPen(QtGui.QColor(0, 128, 255))	
 		p.drawPixmap(display_pixmap.rect(), mask, mask.rect())
 		p.end()	
 
@@ -172,10 +188,38 @@ class Display(QtGui.QWidget):
 
 
 
+
+
+
+
+
 if __name__ == '__main__':
+	
+	try:
+
+		while 1:
+			data = ser.readline()
+			if data:
+				cmd = extract_command(data)
+
+				if cmd:
+					pass#print(cmd[0])
+				else:
+					print(clean_string(data))
+
+	except KeyboardInterrupt:
+		print('Exiting...')
+	finally:
+		print('Closing connection')
+		ser.close()
+
+
+
+	"""
 	app = QtGui.QApplication(sys.argv)
 	w = Display()
 	w.show()
 	w.start()
 
 	sys.exit(app.exec_())
+	"""	
