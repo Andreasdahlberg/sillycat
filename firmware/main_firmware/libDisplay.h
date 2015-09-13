@@ -31,6 +31,7 @@ void libDisplay_SetPixel(uint8_t x, uint8_t y);
 void libDisplay_SetBrightness(uint8_t brightness);
 void libDisplay_SetFont(FONT_INFO *font);
 void libDisplay_PrintText(char *buffer, uint8_t x_pos, uint8_t y_pos);
+void libDisplay_DumpVRAMToUART(void);
 
 
 
