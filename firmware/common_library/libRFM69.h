@@ -124,11 +124,13 @@ int8_t libRFM69_GetRSSI(void);
 uint16_t libRFM69_GetPreambleLength(void);
 uint8_t libRFM69_GetSyncWordSize(void);
 bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
-
 bool libRFM69_EnableOCP(bool enabled);
 bool libRFM69_ClearFIFOOverrun(void);
-
 bool libRFM69_IsHighPowerEnabled(void);
+bool libRFM69_IsRxReady();
+bool libRFM69_IsTxReady();
+bool libRFM69_IsRSSIThresholdExceeded();
+
 
 void libRFM69_DumpRegisterValues(void);
 

@@ -163,9 +163,34 @@ bool libRFM69_IsModeReady()
 	uint8_t register_content;
 	
 	ReadRegister(REG_IRQFLAGS1, &register_content);
-	
 	return (register_content & RF_IRQFLAGS1_MODEREADY) == RF_IRQFLAGS1_MODEREADY;
 }
+
+bool libRFM69_IsRxReady()
+{
+	uint8_t register_content;
+	
+	ReadRegister(REG_IRQFLAGS1, &register_content);
+	return (register_content & RF_IRQFLAGS1_RXREADY) == RF_IRQFLAGS1_RXREADY;
+}
+
+bool libRFM69_IsTxReady()
+{
+	uint8_t register_content;
+	
+	ReadRegister(REG_IRQFLAGS1, &register_content);
+	return (register_content & RF_IRQFLAGS1_TXREADY) == RF_IRQFLAGS1_TXREADY;
+}
+
+bool libRFM69_IsRSSIThresholdExceeded()
+{
+	uint8_t register_content;
+	
+	ReadRegister(REG_IRQFLAGS1, &register_content);
+	return (register_content & RF_IRQFLAGS1_RSSI) == RF_IRQFLAGS1_RSSI;
+}
+
+
 
 
 
@@ -663,6 +688,7 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 	return status;
 }
 
+//TODO: Add check if address is valid and return status
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
 	bool status = FALSE;
