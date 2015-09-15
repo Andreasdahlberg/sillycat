@@ -20,18 +20,19 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
 import serial
-import threading
+from PyQt4 import QtCore
 
-class SerialInterface(threading.Thread):
+
+class SerialInterface(QtCore.QThread):
+    """Class to listen for serial data"""
     def __init__(self):
-        super(SerialInterface, self).__init__()        
-        self.filter = []
-        self.data_sinks = []
+        """Init interface"""
+        QtCore.QThread.__init__(self)
         self._running = False
 
 
-    def connect(self, port, baudrate, timeout=0.1):
-        """Connect the interface to a serial port"""        
+    def open_port(self, port, baudrate, timeout=0.1):
+        """Connect the interface to a serial port"""
         try:
             self._ser = serial.Serial(port, baudrate, timeout=timeout)
             return True
@@ -41,19 +42,21 @@ class SerialInterface(threading.Thread):
 
 
     def run(self):
+        """Listens for data and emits a signal for every new line"""
         self._running = True
         while self._running == True:
             rx_data = self._ser.readline()
             if rx_data:
-                for sink in self.data_sinks:
-                    sink.push(rx_data)
-
+                self.emit(QtCore.SIGNAL('new_stream(QString)'),
+                                        rx_data.decode('utf-8').rstrip('\r\n'))
         self.exit_cleanup()
 
 
     def stop(self):
+        """Stop listen for new data and kill thread"""
         self._running = False
 
 
     def exit_cleanup(self):
-        self._ser.close() 
+        """Clean up before killing thread, closing serial port"""
+        self._ser.close()
