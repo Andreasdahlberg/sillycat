@@ -72,3 +72,4 @@ hardware/pcb/remote_node@2014-11-09-1326.ewnet
 hardware/pcb/remote_node@2014-11-09-1330.ewnet
 hardware/pcb/Ultiboard Exports/remote_node - Drill Symbols-Copper Top-Copper Bottom.gbr
 hardware/pcb/power_block@2014-11-09-1323.ewnet
+__pycache__
