@@ -177,24 +177,64 @@ void libSPI_Update(void)
 }
 
 
-void libSPI_WriteByte(uint8_t data_byte)
+///
+/// @brief Perform a blocking write of a single byte.
+
+///
+/// @param  data_byte Byte to write
+/// @param  pre_write Pointer to function called before writing
+/// @param  post_write Pointer to function called after writing
+/// @return None
+///
+void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
+                      libSPI_callback_type post_write)
 {
-	SPDR = data_byte;
-	while(!(SPSR & (1<<SPIF)))
-	{	
-	}
-	return;
+    if (pre_write != NULL)
+    {
+        pre_write();
+    }
+    
+    SPDR = data_byte;
+    while(!(SPSR & (1<<SPIF)))
+    {	
+    }
+
+    if (post_write != NULL)
+    {
+        post_write();
+    }
+    return;
 }
 
 
-void libSPI_ReadByte(uint8_t *data_byte)
+///
+/// @brief Perform a blocking read of a single byte.
+
+///
+/// @param  data_byte Pointer to byte where the read byte will be stored
+/// @param  pre_write Pointer to function called before reading
+/// @param  post_write Pointer to function called after reading
+/// @return None
+///
+void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_write,
+                     libSPI_callback_type post_write)
 {
-	SPDR = 0x00; //Dummy data to enable SPI-clock
-	while(!(SPSR & (1<<SPIF)))
-	{
-	}
-	*data_byte = SPDR;
-	return;
+    if (pre_write != NULL)
+    {
+        pre_write();
+    }
+
+    SPDR = 0x00; //Dummy data to enable SPI-clock
+    while(!(SPSR & (1<<SPIF)))
+    {
+    }
+    *data_byte = SPDR;
+
+    if (post_write != NULL)
+    {
+        post_write();
+    }
+    return;
 }
 
 

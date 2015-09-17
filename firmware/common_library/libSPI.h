@@ -52,6 +52,8 @@ typedef enum SPI_status
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+typedef void (*libSPI_callback_type)(void);
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -64,7 +66,10 @@ bool libSPI_SetMode(uint8_t mode);
 bool SetActiveSlave(bool state);
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length);
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length);
-void libSPI_WriteByte(uint8_t data_byte);
-void libSPI_ReadByte(uint8_t *data_byte);
+
+void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
+                      libSPI_callback_type post_write);
+void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_write,
+                     libSPI_callback_type post_write);
 
 #endif /* LIBSPI_H_ */
