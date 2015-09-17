@@ -71,8 +71,8 @@ static char aes_key[17] = "1DUMMYKEYFOOBAR1";
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
 
-void PreCallback(void);
-void PostCallback(void);
+static void PreCallback(void);
+static void PostCallback(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -674,14 +674,14 @@ bool libRFM69_EnableSyncWordGeneration(bool enabled)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void PreCallback(void)
+static void PreCallback(void)
 {
     libSPI_SetMode(SPI_MODE);
     PORTB &= ~(1 << SS); //Pull SS low to select device
     return;
 }
 
-void PostCallback(void)
+static void PostCallback(void)
 {
     PORTB |= (1 << SS); //Pull SS high to release device
     return;
