@@ -101,7 +101,7 @@ void libDisplay_SetBrightness(uint8_t brightness)
 void libDisplay_On()
 {
 	#ifndef DEBUG_ENABLE	
-		libNHD223_WriteCommand(SSD1305_DISPLAYON
+		libNHD223_WriteCommand(SSD1305_DISPLAYON);
 	#endif
 }
 
