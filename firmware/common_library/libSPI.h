@@ -1,3 +1,12 @@
+/**
+ * @file   libSPI.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-09-17 (Last edit)
+ * @brief  Header for SPI-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -18,8 +27,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBSPI_H_
 #define LIBSPI_H_
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <avr/io.h>
 #include "common.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 typedef enum SPI_status
 {
@@ -31,6 +48,13 @@ typedef enum SPI_status
 	
 }SPI_status;
 
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 void libSPI_Init(uint8_t spi_mode);
 void libSPI_Update(void);
@@ -40,9 +64,7 @@ bool libSPI_SetMode(uint8_t mode);
 bool SetActiveSlave(bool state);
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length);
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length);
-
 void libSPI_WriteByte(uint8_t data_byte);
 void libSPI_ReadByte(uint8_t *data_byte);
-
 
 #endif /* LIBSPI_H_ */
