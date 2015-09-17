@@ -40,6 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define LIBNAME "libRFM69"
 #define SS DDB2
+#define SPI_MODE 0
 
 #define REG_OPMODE_MODE_MASK 0x1C
 
@@ -67,9 +68,11 @@ static char aes_key[17] = "1DUMMYKEYFOOBAR1";
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void selectDevice(bool state);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
+
+void PreCallback(void);
+void PostCallback(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -88,7 +91,7 @@ void libRFM69_Init()
 	uint8_t idx;
 	
 	DDRB |= (1 << SS);	
-	selectDevice(FALSE);
+	PORTB |= (1 << SS); //Pull SS high to release device
 		
 	//NOTE: Encryption is disabled during development only!
 	libRFM69_EnableEncryption(FALSE);
@@ -189,9 +192,6 @@ bool libRFM69_IsRSSIThresholdExceeded()
 	ReadRegister(REG_IRQFLAGS1, &register_content);
 	return (register_content & RF_IRQFLAGS1_RSSI) == RF_IRQFLAGS1_RSSI;
 }
-
-
-
 
 
 void libRFM69_SetCarrierFrequency(uint32_t frequency)
@@ -674,17 +674,31 @@ bool libRFM69_EnableSyncWordGeneration(bool enabled)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+void PreCallback(void)
+{
+    DEBUG("libRFM69 PreCallback()\r\n");
+
+    libSPI_SetMode(SPI_MODE);
+    PORTB &= ~(1 << SS); //Pull SS low to select device
+    return;
+}
+
+void PostCallback(void)
+{
+    DEBUG("libRFM69 PostCallback()\r\n");
+
+    PORTB |= (1 << SS); //Pull SS high to release device
+    return;
+}
+
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
 	bool status = FALSE;
 	
-	selectDevice(TRUE);
-	libSPI_WriteByte(address | WRITE_REG);
-	libSPI_WriteByte(register_data);
-	selectDevice(FALSE);
+	libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
+	libSPI_WriteByte(register_data, NULL, &PostCallback);
 		
 	status = TRUE;
-	
 	return status;
 }
 
@@ -693,33 +707,9 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
 	bool status = FALSE;
 
-	selectDevice(TRUE);
-	libSPI_WriteByte(address & READ_REG);
-	libSPI_ReadByte(register_data);
-	selectDevice(FALSE);
+	libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
+	libSPI_ReadByte(register_data, NULL, &PostCallback);
 		
 	status = TRUE;
-	
 	return status;
-}
-
-///
-/// @brief Select the RFM69-device on the SPI-bus. SPI-mode will
-///        change when set to true but is not restored when set
-///        to false.
-///
-/// @param  state True for selecting and false for deselecting.
-/// @return None
-///
-static void selectDevice(bool state)
-{
-	if (state == TRUE)
-	{
-		libSPI_SetMode(0);
-		PORTB &= ~(1 << SS);
-	}
-	else
-	{
-		PORTB |= (1 << SS);
-	}
 }
