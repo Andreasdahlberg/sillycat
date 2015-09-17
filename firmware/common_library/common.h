@@ -21,6 +21,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef enum bool
 {	
