@@ -15,17 +15,21 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LIBDEBUG_H_
 #define LIBDEBUG_H_
 
 #ifdef DEBUG_ENABLE
-	#define DEBUG(...)					libDebug_Print(__VA_ARGS__)
+	#define DEBUG(text, ...)			libDebug_Print(text, ##__VA_ARGS__)
 	#define DEBUG_STR(name, message)	libDebug_PrintString(name, message)
 	#define DEBUG_INT(name, num)		libDebug_PrintInteger(name, num)
 	#define DEBUG_HEX(name ,num)		libDebug_PrintHex(name, num)
 	#define DEBUG_BOOL(name, value)		libDebug_PrintBoolean(name, value)
 	#define DEBUG_BINARY(name, num)		libDebug_PrintBinary(name, num)
+	
+    #define CRITICAL(text, ...)         libDebug_Print("<CRITICAL> %s() " text "\r\n", __func__, ##__VA_ARGS__)
+    #define ERROR(text, ...)            libDebug_Print("<ERROR> %s() " text "\r\n", __func__, ##__VA_ARGS__)
+    #define WARNING(text, ...)          libDebug_Print("<WARNING> %s() " text "\r\n", __func__, ##__VA_ARGS__)
+    #define INFO(text, ...)             libDebug_Print("<INFO> %s() " text "\r\n", __func__, ##__VA_ARGS__)
 #else
 	#define DEBUG(...)
 	#define DEBUG_STR(name, message)
@@ -33,6 +37,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 	#define DEBUG_HEX(name ,num)
 	#define DEBUG_BOOL(name, value)		
 	#define DEBUG_BINARY(name, num)
+
+    #define CRITICAL(text, ...)
+    #define ERROR(text, ...)
+    #define WARNING(text, ...)
+    #define INFO(text, ...)
 #endif
 
 #include "common.h"
