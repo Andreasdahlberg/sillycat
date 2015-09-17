@@ -30,6 +30,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
 #include "common.h"
 #include "libADC.h"
 #include "libSensor.h"
@@ -51,7 +52,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static uint16_t mf52_table[TABLE_LENGTH] = {
+static const uint16_t mf52_table[TABLE_LENGTH] PROGMEM = {
 	54, //-30
 	72, //-25
 	95, //-20
@@ -103,6 +104,7 @@ void libSensor_Init()
 function_status libSensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
 {
 	function_status status = ERROR;
+	uint32_t tmp_value;
 	
 	if(libADC_GetSample(sensor, sensor_value) == SUCCESS)
 	{
@@ -119,7 +121,10 @@ function_status libSensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
 				break;
 	
 			case LIBSENSOR_INTERNAL_TEMPERATURE:
-				//TODO: Convert to temperature, calibrate?
+				tmp_value = *sensor_value;
+				tmp_value *= 3133;
+				tmp_value -= -280277;
+				*sensor_value = (uint16_t)tmp_value / 1000;
 				status = SUCCESS;
 				break;
 	
@@ -140,16 +145,16 @@ uint16_t RawValueToTemperature(uint16_t raw_value)
 	uint8_t index = 0;
 	uint32_t tmp;
 	
-	while(index < TABLE_LENGTH && mf52_table[index] < raw_value)
+	while(index < TABLE_LENGTH && pgm_read_byte(&mf52_table[index]) < raw_value)
 	{
 		++index;
 	}
 	
 	//TODO: Can this be solved in a better way?
 	tmp = 100 * (uint32_t)raw_value;
-	tmp /= mf52_table[index];
+	tmp /= pgm_read_byte(&mf52_table[index]);
 	tmp *= (TABLE_OFFSET + (index * 5));
-	tmp /= 100;
+	tmp /= 10;
 
 	return  (uint16_t)tmp;
 }
