@@ -676,8 +676,6 @@ bool libRFM69_EnableSyncWordGeneration(bool enabled)
 
 void PreCallback(void)
 {
-    DEBUG("libRFM69 PreCallback()\r\n");
-
     libSPI_SetMode(SPI_MODE);
     PORTB &= ~(1 << SS); //Pull SS low to select device
     return;
@@ -685,8 +683,6 @@ void PreCallback(void)
 
 void PostCallback(void)
 {
-    DEBUG("libRFM69 PostCallback()\r\n");
-
     PORTB |= (1 << SS); //Pull SS high to release device
     return;
 }
