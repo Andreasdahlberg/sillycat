@@ -43,7 +43,7 @@ void libDebug_Init()
 void libDebug_Print(const char* text, ...)
 {
 	va_list args;
-	char buffer[64];
+	char buffer[128];
 	
 	va_start(args, text);
 	vsprintf(buffer, text, args);
