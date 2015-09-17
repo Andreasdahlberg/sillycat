@@ -100,7 +100,7 @@ void libRFM69_Test();
 bool libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 bool libRFM69_IsModeReady();
-void libRFM69_WaitForModeReady();
+bool libRFM69_WaitForModeReady();
 void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
 void libRFM69_GetTemperature(uint8_t *temperature);

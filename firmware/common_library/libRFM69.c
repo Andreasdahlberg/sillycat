@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include "libRFM69.h"
 #include "libSPI.h"
+#include "libTimer.h"
 #include "libDebug.h"
 #include "RFM69Registers.h"
 
@@ -53,6 +54,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RFM_FXOSC 32000000 //32MHz
 #define RFM_FSTEP (float)61.03515625 // FSTEP = FXOSC / 2^19
+
+#define WAIT_TIMEOUT_MS 10
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -106,7 +109,7 @@ void libRFM69_Init()
 	libRFM69_SetFrequencyDeviation(5000);
 	libRFM69_SetCarrierFrequency(868000000);
 	
-	DEBUG_STR(LIBNAME, "Init done");
+	INFO("Init done!");
 	
 	DEBUG("Bit rate: %u bps\r\n", libRFM69_GetBitrate());
 	DEBUG("Chip: 0x%02X\r\n", libRFM69_GetChipVersion());
@@ -153,11 +156,21 @@ bool libRFM69_SetMode(libRFM69_mode_type mode)
 }
 
 
-void libRFM69_WaitForModeReady()
+bool libRFM69_WaitForModeReady()
 {
-	while (!libRFM69_IsModeReady())
-	{
-	}
+    bool status = TRUE;
+    uint32_t timeout_timer = libTimer_GetMilliseconds();
+
+    while (!libRFM69_IsModeReady())
+    {
+        if (libTimer_TimeDifference(timeout_timer) > WAIT_TIMEOUT_MS)
+        {
+            ERROR("Timeout!");
+            status = FALSE;
+            break;
+        }
+    }
+    return status;
 }
 
 
@@ -544,6 +557,7 @@ uint16_t libRFM69_GetPreambleLength(void)
 	
 	if (ReadRegister(REG_PREAMBLEMSB, &register_content) == FALSE)
 	{
+        ERROR("Failed to read MSB of preamble");
 		return 0;
 	}
 	
@@ -551,6 +565,7 @@ uint16_t libRFM69_GetPreambleLength(void)
 	
 	if (ReadRegister(REG_PREAMBLELSB, &register_content) == FALSE)
 	{
+        ERROR("Failed to read LSB of preamble");
 		return 0;
 	}	
 	
@@ -591,11 +606,13 @@ bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length)
 			//to 0x00 is forbidden.
 			if (sync_word[index] == 0x00)
 			{
+                WARNING("Sync word value 0x00 is not valid");
 				break;
 			}
 			
 			if (WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]) == FALSE)
 			{
+                ERROR("Failed to write sync word value");
 				break;
 			}
 		}
@@ -622,7 +639,7 @@ bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length)
 			//Abort if read fails
 			if (ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]) == FALSE)
 			{
-				DEBUG("Failed to read from REG_SYNCVALUE%u", index+1);
+				WARNING("Failed to read from REG_SYNCVALUE%u", index+1);
 				break;
 			}
 		}
