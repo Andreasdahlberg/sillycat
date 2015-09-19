@@ -1,7 +1,7 @@
 /**
  * @file   libADC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-05-14 (Last edit)
+ * @date   2015-09-19 (Last edit)
  * @brief  Implementation of ADC-library.
  *
  * Detailed description of file.
@@ -38,7 +38,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define LIBNAME "libADC"
 #define MAX_ADC_INPUTS 9	//Eight external inputs and one internal temperature sensor
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,7 +94,7 @@ void libADC_Init(void)
 	InitInputArray();
 	adc_state = LIBADC_IDLE;
 	
-	DEBUG_STR(LIBNAME, "Init done");	
+	INFO("Init done");	
 }
 
 ///
@@ -147,7 +146,7 @@ void libADC_Update(void)
 			break;
 			
 		default:
-			DEBUG_STR(LIBNAME, "Unknown State");	
+			WARNING("Unknown State");	
 			break;
 	}
 }
@@ -212,7 +211,6 @@ function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 	}
 	return status;
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
