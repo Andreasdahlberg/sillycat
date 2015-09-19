@@ -40,7 +40,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define LIBNAME "libSensor"
 #define TABLE_OFFSET -30
 #define TABLE_LENGTH 29
 
@@ -129,7 +128,7 @@ function_status libSensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
 				break;
 	
 			default:
-				DEBUG_STR(LIBNAME, "Unknown sensor type");				
+				WARNING("Unknown sensor type");				
 				break;
 		}		
 	}
