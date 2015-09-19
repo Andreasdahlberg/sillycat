@@ -1,3 +1,12 @@
+/**
+ * @file   libDebug.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-09-19 (Last edit)
+ * @brief  Header of Debug-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,46 +24,41 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #ifndef LIBDEBUG_H_
 #define LIBDEBUG_H_
 
-#ifdef DEBUG_ENABLE
-	#define DEBUG(text, ...)			libDebug_Print(text, ##__VA_ARGS__)
-	#define DEBUG_STR(name, message)	libDebug_PrintString(name, message)
-	#define DEBUG_INT(name, num)		libDebug_PrintInteger(name, num)
-	#define DEBUG_HEX(name ,num)		libDebug_PrintHex(name, num)
-	#define DEBUG_BOOL(name, value)		libDebug_PrintBoolean(name, value)
-	#define DEBUG_BINARY(name, num)		libDebug_PrintBinary(name, num)
-	
-    #define CRITICAL(text, ...)         libDebug_Print("<CRITICAL> %s() " text "\r\n", __func__, ##__VA_ARGS__)
-    #define ERROR(text, ...)            libDebug_Print("<ERROR> %s() " text "\r\n", __func__, ##__VA_ARGS__)
-    #define WARNING(text, ...)          libDebug_Print("<WARNING> %s() " text "\r\n", __func__, ##__VA_ARGS__)
-    #define INFO(text, ...)             libDebug_Print("<INFO> %s() " text "\r\n", __func__, ##__VA_ARGS__)
-#else
-	#define DEBUG(...)
-	#define DEBUG_STR(name, message)
-	#define DEBUG_INT(name, num)
-	#define DEBUG_HEX(name ,num)
-	#define DEBUG_BOOL(name, value)		
-	#define DEBUG_BINARY(name, num)
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
 
+#include <avr/pgmspace.h>
+#include "common.h"
+#include "libUART.h"
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+#ifdef DEBUG_ENABLE
+    #define DEBUG(text, ...)			libDebug_Print_P(PSTR(text), ##__VA_ARGS__)    
+    #define CRITICAL(text, ...)         libDebug_Print_P(PSTR("<CRITICAL> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+    #define ERROR(text, ...)            libDebug_Print_P(PSTR("<ERROR> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+    #define WARNING(text, ...)          libDebug_Print_P(PSTR("<WARNING> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+    #define INFO(text, ...)             libDebug_Print_P(PSTR("<INFO> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+#else
+    #define DEBUG(...)
     #define CRITICAL(text, ...)
     #define ERROR(text, ...)
     #define WARNING(text, ...)
     #define INFO(text, ...)
 #endif
 
-#include "common.h"
-#include "libUART.h"
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 void libDebug_Init();
-void libDebug_PrintString(char* lib_name, char* message);
-void libDebug_PrintInteger(char* lib_name, int value);
-void libDebug_PrintUnsignedInteger(char* lib_name, uint32_t value);
-void libDebug_PrintBoolean(char* lib_name, bool value);
-void libDebug_PrintHex(char*lib_name, uint8_t value);
-void libDebug_PrintBinary(char* lib_name, uint8_t value);
-
-void libDebug_Print(const char* text, ...);
+void libDebug_Print_P(const char* text, ...);
 
 #endif /* LIBDEBUG_H_ */
