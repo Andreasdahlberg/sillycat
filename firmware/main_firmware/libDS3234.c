@@ -39,7 +39,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define LIBNAME "libDS3234"
 #define SS	DDC0
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,7 +76,7 @@ void libDS3234_Init()
 	DDRC |= (1 << SS);
 	selectDevice(FALSE);
 	
-	DEBUG_STR(LIBNAME, "Init done");
+	INFO("Init done");
 	return;
 }
 
@@ -175,6 +174,18 @@ bool libDS3234_GetHour(uint8_t *hour)
 }
 
 ///
+/// @brief Set the current hour
+///
+/// @param  hour New hour to set
+/// @return FALSE  If set failed
+/// @return SUCCESS If set succeeded
+///
+bool libDS3234_SetHour(uint8_t hour)
+{
+	return SetDecimalRegisterValue(REG_HOUR, hour);
+}
+
+///
 /// @brief Get the current minute
 ///
 /// @param  *date Pointer to variable where the minute will be stored
@@ -209,7 +220,7 @@ bool libDS3234_SetSeconds(uint8_t seconds)
 }
 
 ///
-/// @brief Get the current hour mode, AM or PM
+/// @brief Get the current hour mode, 12 or 24
 ///
 /// @param  *hour_mode Pointer to variable where the hour mode will be stored
 /// @return FALSE  If read failed
@@ -305,8 +316,8 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 	if(RegisterAddressValid(address))
 	{
 		selectDevice(TRUE);
-		libSPI_WriteByte(address|WRITE_ADDRESS);
-		libSPI_WriteByte(register_data);
+		libSPI_WriteByte(address|WRITE_ADDRESS, NULL, NULL);
+		libSPI_WriteByte(register_data, NULL, NULL);
 		selectDevice(FALSE);
 		
 		status = TRUE;
@@ -322,8 +333,8 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 	if(RegisterAddressValid(address))
 	{
 		selectDevice(TRUE);
-		libSPI_WriteByte(address|READ_ADDRESS);
-		libSPI_ReadByte(register_data);
+		libSPI_WriteByte(address|READ_ADDRESS, NULL, NULL);
+		libSPI_ReadByte(register_data, NULL, NULL);
 		selectDevice(FALSE);
 		
 		status = TRUE;

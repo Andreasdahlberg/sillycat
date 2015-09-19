@@ -73,5 +73,6 @@ bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode);
 
 bool libDS3234_SetMinutes(uint8_t minutes);
 bool libDS3234_SetSeconds(uint8_t seconds);
+bool libDS3234_SetHour(uint8_t hour);
 
 #endif /* LIBDS3234_H_ */
