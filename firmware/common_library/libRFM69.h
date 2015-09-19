@@ -27,8 +27,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +96,6 @@ typedef enum
 
 void libRFM69_Init();
 void libRFM69_Update();
-void libRFM69_Test();
 bool libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 bool libRFM69_IsModeReady();
@@ -126,12 +125,18 @@ uint8_t libRFM69_GetSyncWordSize(void);
 bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
 bool libRFM69_EnableOCP(bool enabled);
 bool libRFM69_ClearFIFOOverrun(void);
+bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length);
 bool libRFM69_IsHighPowerEnabled(void);
 bool libRFM69_IsRxReady();
 bool libRFM69_IsTxReady();
 bool libRFM69_IsRSSIThresholdExceeded();
-
-
+bool libRFM69_IsFIFOFull(void);
+bool libRFM69_IsFIFONotEmpty(void);
+bool libRFM69_IsFIFOLevel(void);
+bool libRFM69_IsFIFOOverrun(void);
+bool libRFM69_IsPacketSent(void);
+bool libRFM69_IsPayloadReady(void);
+bool libRFM69_IsCRCOk(void);
 void libRFM69_DumpRegisterValues(void);
 
 #endif /* LIBRFM69_H_ */

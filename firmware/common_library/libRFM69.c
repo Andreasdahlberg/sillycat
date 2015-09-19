@@ -54,12 +54,24 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RFM_FXOSC 32000000 //32MHz
 #define RFM_FSTEP (float)61.03515625 // FSTEP = FXOSC / 2^19
+#define RFM_FIFO_SIZE 66
 
 #define WAIT_TIMEOUT_MS 10
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
+
+typedef enum
+{
+    REG_IRQFLAGS2_BIT_CRCOK = 1,
+    REG_IRQFLAGS2_BIT_PAYLOADREADY,
+    REG_IRQFLAGS2_BIT_PACKETSENT,
+    REG_IRQFLAGS2_BIT_FIFOOVERRUN,
+    REG_IRQFLAGS2_BIT_FIFOLEVEL,
+    REG_IRQFLAGS2_BIT_FIFONOTEMPTY,
+    REG_IRQFLAGS2_BIT_FIFOFULL,
+}irqflags2_bit_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -73,6 +85,7 @@ static char aes_key[17] = "1DUMMYKEYFOOBAR1";
 
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
+static bool IsBitSet(uint8_t address, uint8_t bit);
 
 static void PreCallback(void);
 static void PostCallback(void);
@@ -109,6 +122,7 @@ void libRFM69_Init()
 	libRFM69_SetFrequencyDeviation(5000);
 	libRFM69_SetCarrierFrequency(868000000);
 	
+
 	INFO("Init done!");
 	
 	DEBUG("Bit rate: %u bps\r\n", libRFM69_GetBitrate());
@@ -127,6 +141,16 @@ void libRFM69_Init()
 		DEBUG("%02X", sync_word[idx]);
 	}
 	DEBUG("\r\n");
+    
+    DEBUG("FIFO full: 0x%02X\r\n", libRFM69_IsFIFOFull());
+    DEBUG("FIFO not empty: 0x%02X\r\n", libRFM69_IsFIFONotEmpty());
+    DEBUG("FIFO level: 0x%02X\r\n", libRFM69_IsFIFOLevel());
+    DEBUG("FIFO overrun: 0x%02X\r\n", libRFM69_IsFIFOOverrun());         
+    DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
+    DEBUG("Payload ready: 0x%02X\r\n", libRFM69_IsPayloadReady());
+    DEBUG("CRC ok: 0x%02X\r\n", libRFM69_IsCRCOk());
+                   
+
 }
 
 ///
@@ -138,6 +162,69 @@ void libRFM69_Init()
 void libRFM69_Update()
 {
 	
+}
+
+bool libRFM69_IsFIFOFull(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOFULL);
+}
+
+bool libRFM69_IsFIFONotEmpty(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFONOTEMPTY);
+}
+
+bool libRFM69_IsFIFOLevel(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOLEVEL);
+}
+
+bool libRFM69_IsFIFOOverrun(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOOVERRUN);
+}
+
+bool libRFM69_IsPacketSent(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_PACKETSENT);
+}
+
+bool libRFM69_IsPayloadReady(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_PAYLOADREADY);
+}
+
+bool libRFM69_IsCRCOk(void)
+{
+    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_CRCOK);
+}
+
+bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length)
+{
+    uint8_t index;
+
+    if (length > RFM_FIFO_SIZE)
+    {
+        WARNING("Not enough space in FIFO");
+        return FALSE;
+    }
+
+    for (index = 0; index < length; ++index)
+    {
+        if (libRFM69_IsFIFOFull())
+        {
+            ERROR("FIFO is full");
+            break;
+        }
+        
+        if (!WriteRegister(REG_FIFO, data[index]))
+        {
+            ERROR("Failed write to FIFO");
+            break;
+        }
+    }
+    //If index not is equal to length something went wrong
+    return (index == length);
 }
 
 bool libRFM69_SetMode(libRFM69_mode_type mode)
@@ -264,15 +351,6 @@ bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
 		}
 	}
 	return status;
-}
-
-void libRFM69_Test()
-{
-	uint8_t data = 1;
-	
-	ReadRegister(REG_OPMODE, &data);
-	
-	DEBUG_HEX(LIBNAME, data);	
 }
 
 void libRFM69_GetTemperature(uint8_t *temperature)
@@ -726,3 +804,30 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 	status = TRUE;
 	return status;
 }
+
+///
+/// @brief Check if a bit is set in a register. If something fails this
+//         function will return true!
+///
+/// @param register Register to check in
+/// @param bit Bit to check
+/// @return TRUE if bit is set
+/// @return FALSE if bit is not set
+///
+static bool IsBitSet(uint8_t address, uint8_t bit)
+{
+    uint8_t register_content;
+    bool status = TRUE;
+    
+    if (bit > 7 || address > REG_TEMP2)
+    {
+        WARNING("Register or bit index is invalid");
+        return TRUE;
+    }
+
+    if (ReadRegister(address, &register_content))
+    {
+        status = (bool)(register_content & (1 << bit));
+    }
+    return status;
+}    
