@@ -27,6 +27,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+#define F_CPU 8000000UL // 8 MHz
+#include <util/delay.h>
 
 #include "common.h"
 #include "libRFM69.h"
@@ -78,6 +80,7 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 
 static char aes_key[17] = "1DUMMYKEYFOOBAR1";
+static uint8_t net_id[6] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -103,6 +106,7 @@ static void PostCallback(void);
 ///
 void libRFM69_Init()
 {
+ 
 	uint8_t sync_word[8];
 	uint8_t idx;
 	
@@ -111,6 +115,8 @@ void libRFM69_Init()
 		
 	//NOTE: Encryption is disabled during development only!
 	libRFM69_EnableEncryption(FALSE);
+    libRFM69_EnableSequencer(TRUE);
+    libRFM69_EnableListenMode(FALSE);
 	libRFM69_SetMode(RFM_STANDBY);
 	libRFM69_WaitForModeReady();
 	
@@ -121,10 +127,17 @@ void libRFM69_Init()
 	
 	libRFM69_SetFrequencyDeviation(5000);
 	libRFM69_SetCarrierFrequency(868000000);
-	
-
-	INFO("Init done!");
-	
+    
+    libRFM69_EnableSyncWordGeneration(TRUE);
+    libRFM69_SetFIFOFillCondition(RFM_FIFO_FILL_AUTO);
+    libRFM69_SetSyncWordSize(5);
+    libRFM69_SetSyncWord(net_id, 6);
+    
+    
+    libRFM69_ClearFIFOOverrun();
+    
+    libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
+		
 	DEBUG("Bit rate: %u bps\r\n", libRFM69_GetBitrate());
 	DEBUG("Chip: 0x%02X\r\n", libRFM69_GetChipVersion());
 	DEBUG("PA mode: 0x%02X\r\n", libRFM69_GetPowerAmplifierMode());
@@ -149,7 +162,13 @@ void libRFM69_Init()
     DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
     DEBUG("Payload ready: 0x%02X\r\n", libRFM69_IsPayloadReady());
     DEBUG("CRC ok: 0x%02X\r\n", libRFM69_IsCRCOk());
-                   
+    
+	INFO("Init done!");        
+    
+    libRFM69_DumpRegisterValues();
+    //libRFM69_Send();
+    
+    
 
 }
 
@@ -162,6 +181,40 @@ void libRFM69_Init()
 void libRFM69_Update()
 {
 	
+}
+
+void libRFM69_Send(void)
+{
+    uint8_t test_data[6] = {0x05, 0x11, 0x22, 0x22, 0x33, 0x33};
+    //WriteRegister(REG_FIFOTHRESH, 0x8F);        
+        
+    INFO("Sending...");
+    DEBUG("Change to standby...");
+    libRFM69_SetMode(RFM_STANDBY);
+    libRFM69_WaitForModeReady();
+    DEBUG(" done\r\n");
+    
+
+    
+    libRFM69_WriteToFIFO(test_data, 6);
+    DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
+    DEBUG("Changed to transmitter\r\n");
+    libRFM69_SetMode(RFM_TRANSMITTER);
+    DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
+    
+    while(libRFM69_IsFIFONotEmpty())
+    {
+        DEBUG("FIFO not empty: 0x%02X\r\n", libRFM69_IsFIFONotEmpty());
+        DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
+        DEBUG("Payload ready: 0x%02X\r\n", libRFM69_IsPayloadReady());
+            DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
+        _delay_ms(1000);
+    }
+    DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
+    libRFM69_SetMode(RFM_STANDBY);
+     DEBUG("All done!\r\n");
+    
+    
 }
 
 bool libRFM69_IsFIFOFull(void)
@@ -612,8 +665,10 @@ bool libRFM69_SetSyncWordSize(uint8_t size)
 		if (ReadRegister(REG_SYNCCONFIG, &register_content))
 		{
 			register_content &= ~(MAX_SYNC_WORD_SIZE << 3);
+        
 			register_content |= (size << 3);
 			status = WriteRegister(REG_SYNCCONFIG, register_content);	
+            
 		}
 	}
 	return status;
@@ -765,6 +820,19 @@ bool libRFM69_EnableSyncWordGeneration(bool enabled)
 	return status;
 }
 
+bool libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type fill_condition)
+{
+    bool status = FALSE;
+    uint8_t register_content;
+
+    if (ReadRegister(REG_SYNCCONFIG, &register_content) == TRUE)
+    {
+        SetBit(6, (bool)fill_condition, &register_content);
+        status = WriteRegister(REG_SYNCCONFIG, register_content);
+    }
+    return status;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -827,7 +895,7 @@ static bool IsBitSet(uint8_t address, uint8_t bit)
 
     if (ReadRegister(address, &register_content))
     {
-        status = (bool)(register_content & (1 << bit));
+        status = (register_content & (1 << bit)) > 0;
     }
     return status;
 }    

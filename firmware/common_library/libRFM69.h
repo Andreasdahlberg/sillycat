@@ -68,6 +68,12 @@ typedef enum
 	RFM_OOK
 }libRFM69_modulation_type_type;
 
+typedef enum
+{
+    RFM_FIFO_FILL_AUTO = 0,
+    RFM_FIFO_FILL_MAN    
+}libRFM69_fifo_fill_condition_type;
+
 #ifndef NODE_ADDRESS
 	#define NODE_ADDRESS 0xAA
 #endif
@@ -113,7 +119,9 @@ bool libRFM69_SetPreambleLength(uint16_t length);
 bool libRFM69_SetSyncWordSize(uint8_t size);
 bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
 bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
+bool libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type fill_condition);
 bool libRFM69_EnableSyncWordGeneration(bool enabled);
+void libRFM69_EnableListenMode(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
 uint32_t libRFM69_GetBitrate(void);
 uint8_t libRFM69_GetChipVersion(void);
@@ -138,5 +146,7 @@ bool libRFM69_IsPacketSent(void);
 bool libRFM69_IsPayloadReady(void);
 bool libRFM69_IsCRCOk(void);
 void libRFM69_DumpRegisterValues(void);
+
+void libRFM69_Send(void);
 
 #endif /* LIBRFM69_H_ */
