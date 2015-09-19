@@ -39,7 +39,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define LIBNAME "libSPI"
 #define BUFFER_SIZE 8
 
 #define SS		DDB2
@@ -98,12 +97,11 @@ void libSPI_Init(uint8_t spi_mode)
 		SPCR |= (1<<SPE);
 		spi_status = IDLE;
 	
-		DEBUG_STR(LIBNAME, "Init done");
+		INFO("Init done");
 	}
 	else
 	{
-		DEBUG_STR(LIBNAME, "Failed to init SPI, invalid mode");
-		DEBUG_INT(LIBNAME, spi_mode);
+		ERROR("Failed to init SPI, invalid mode: %u", spi_mode);
 	}
 	
 	slave_active = FALSE;
@@ -151,7 +149,7 @@ void libSPI_Update(void)
 			{
 				if (!SPIBusy() || byte_counter == 0)
 				{
-					DEBUG_STR(LIBNAME, "Sending byte");
+					DEBUG("Sending byte");
 					SPDR = transmit_buffer[byte_counter];
 					++byte_counter;
 				}
@@ -168,7 +166,7 @@ void libSPI_Update(void)
 			break;
 		
 		default:
-			DEBUG_STR(LIBNAME, "Fatal error, reinitializing module...");
+			ERROR("Fatal error, reinitializing module...");
 			//libSPI_Init();
 			break;
 		
@@ -249,7 +247,7 @@ bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 {
 	bool status = FALSE;
 	
-	DEBUG_STR(LIBNAME, "Write started");
+	DEBUG("Write started");
 	
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
@@ -274,8 +272,6 @@ bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length)
 {
 	bool status = FALSE;
-	
-	//DEBUG_STR("Read started");
 	
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
@@ -356,6 +352,7 @@ bool libSPI_SetMode(uint8_t mode)
 			break;
 		default:
 			//Invalid mode
+            WARNING("Invalid SPI-mode");
 			status = FALSE;
 			break;
 	}
