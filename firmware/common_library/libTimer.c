@@ -16,6 +16,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <avr/interrupt.h>
+#include <util/atomic.h>
 
 #define LIBNAME "libTimer"
 #define TIMERMAX 4294967295
@@ -68,7 +69,14 @@ void libTimer_Reset()
 ///
 uint32_t libTimer_GetMilliseconds()
 {
-	return system_timer;
+    uint32_t current_timer;
+    
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        current_timer = system_timer;
+    }
+    
+	return current_timer;
 }
 
 ///
@@ -79,7 +87,7 @@ uint32_t libTimer_GetMilliseconds()
 ///
 uint32_t libTimer_GetSeconds()
 {
-	return (system_timer / 1000);
+	return (libTimer_GetMilliseconds() / 1000);
 }
 
 
