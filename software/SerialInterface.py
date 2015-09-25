@@ -47,8 +47,16 @@ class SerialInterface(QtCore.QThread):
         while self._running == True:
             rx_data = self._ser.readline()
             if rx_data:
-                self.emit(QtCore.SIGNAL('new_stream(QString)'),
-                                        rx_data.decode('utf-8').rstrip('\r\n'))
+                if rx_data[:6] == b'<VRAM>':
+                    rx_data += (self._ser.read(520 - len(rx_data)))
+                    self.emit(QtCore.SIGNAL('new_vram(QByteArray)'),
+                                            rx_data[6:-2])
+                else:
+                    try:
+                        self.emit(QtCore.SIGNAL('new_stream(QString)'),
+                                                rx_data.decode('utf-8').rstrip('\r\n'))
+                    except UnicodeDecodeError:
+                        pass
         self.exit_cleanup()
 
 
