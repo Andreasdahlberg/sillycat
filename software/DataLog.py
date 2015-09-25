@@ -32,7 +32,7 @@ class DataLog():
 
 		log_file = os.path.join(path, self.get_filename())
 		logging.basicConfig(filename=log_file, level=logging.INFO,
-							format='%(asctime)s; <%(levelname)s>	%(message)s')
+							format='%(asctime)s; <%(levelname)s> %(message)s')
 		logging.info('Log started')
 
 
