@@ -4,15 +4,55 @@
 import sys
 import os
 import serial
-from PyQt4 import QtGui, QtCore
-from SerialInterface import *
-
+from collections import deque
 import ctypes
 
-PORT = 'com3'
+
+from PyQt4 import QtGui, QtCore
+from SerialInterface import *
+from DataLog import *
+from DisplayView import DisplayView
+
+
+PORT = 'com5'
 BAUDRATE = 38400
 
+LOG_PATH = 'logs'
 DEV_ICON = os.path.join('icons', 'dev_tool_icon.png')
+
+
+class ConsoleView(QtGui.QPlainTextEdit):
+    def __init__(self):
+        super(ConsoleView, self).__init__()
+        self._stream_buffer = deque()
+        self._paused = False
+
+
+    def pause(self, mode):
+        if mode == False:
+            self._flush_stream_buffer()
+        self._paused = mode
+
+
+    def toogle_pause(self, state):
+        print(not self._paused)
+        self.pause(not self._paused)
+
+
+    def update_console_view(self, text):
+
+
+
+        self._stream_buffer.append(text)
+        if not self._paused:
+            self._flush_stream_buffer()      
+
+
+    def _flush_stream_buffer(self):
+        while len(self._stream_buffer) > 0:
+            self.appendPlainText(self._stream_buffer.pop())
+
+
 
 class DevTool(QtGui.QWidget):
     def __init__(self):
@@ -20,23 +60,46 @@ class DevTool(QtGui.QWidget):
         self.ser = SerialInterface()
         self.initUI()
 
-        self.ser.open_port(PORT, BAUDRATE)
-        self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.update_console_view)
-        self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)        
-        self.ser.start()
+    
+
+        self.log = DataLog(LOG_PATH)
+
+        if self.ser.open_port(PORT, BAUDRATE) == True:
+            self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.console_view.update_console_view)
+            self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
+            self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
+
+            self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)   
+                        
+            self.ser.start()
+        else:
+            self.console_view.setPlainText('Failed to open interface on ' + PORT)
+
 
         
     def initUI(self):
 
-        self.console_view = QtGui.QPlainTextEdit()
+        self.console_view = ConsoleView()
         self.console_view.appendHtml('Waiting for input...')
         #self.console_view.appendPlainText('Foobar')
+
+        self.dv = DisplayView()
+
+
+
+        self.checkbox = QtGui.QCheckBox('Pause')
+        self.checkbox.stateChanged.connect(self.console_view.toogle_pause)
 
 
 
         vbox = QtGui.QVBoxLayout()
+        #vbox.setAlignment(Qt.AlignVCenter)
         #vbox.addStretch(1)
-        vbox.addWidget(self.console_view)     
+        #vbox.addWidget(label)   
+
+        vbox.addWidget(self.checkbox)
+        vbox.addWidget(self.dv)
+        vbox.addWidget(self.console_view)  
 
         self.setLayout(vbox)    
 
@@ -58,13 +121,6 @@ class DevTool(QtGui.QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())  
 
-
-    def update_console_view(self, text):
-        if text.count('fail') > 0:
-            formated_text = '<b>'+text.split('fail')[0]+'<font color="red">'+'fail'+'</font>'+text.split('fail')[1]+'</b>'
-            self.console_view.appendHtml(formated_text)
-        else:
-            self.console_view.appendPlainText(text) 
 
     def print_text(self, text):
         print(text)
