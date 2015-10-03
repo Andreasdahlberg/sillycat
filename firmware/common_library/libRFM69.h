@@ -74,6 +74,12 @@ typedef enum
     RFM_FIFO_FILL_MAN    
 }libRFM69_fifo_fill_condition_type;
 
+typedef enum
+{
+    RFM_TX_START_LEVEL = 0,
+    RFM_TX_START_NOT_EMPTY 
+}libRFM69_tx_start_condition_type;
+
 #ifndef NODE_ADDRESS
 	#define NODE_ADDRESS 0xAA
 #endif
@@ -100,8 +106,9 @@ typedef enum
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libRFM69_Init();
-void libRFM69_Update();
+void libRFM69_Init(void);
+void libRFM69_HWInit(void);
+void libRFM69_Update(void);
 bool libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 bool libRFM69_IsModeReady();
@@ -120,6 +127,8 @@ bool libRFM69_SetSyncWordSize(uint8_t size);
 bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
 bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
 bool libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type fill_condition);
+bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type start_condition);
+uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length);
 bool libRFM69_EnableSyncWordGeneration(bool enabled);
 void libRFM69_EnableListenMode(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
@@ -146,6 +155,8 @@ bool libRFM69_IsPacketSent(void);
 bool libRFM69_IsPayloadReady(void);
 bool libRFM69_IsCRCOk(void);
 void libRFM69_DumpRegisterValues(void);
+bool libRFM69_SetNodeAddress(uint8_t node_address);
+bool libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
 
 void libRFM69_Send(void);
 

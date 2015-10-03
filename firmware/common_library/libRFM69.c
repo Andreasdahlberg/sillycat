@@ -37,6 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "RFM69Registers.h"
 
+
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
@@ -79,8 +80,6 @@ typedef enum
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static char aes_key[17] = "1DUMMYKEYFOOBAR1";
-static uint8_t net_id[6] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -98,79 +97,32 @@ static void PostCallback(void);
 //////////////////////////////////////////////////////////////////////////
 
 ///
-/// @brief Init libRFM69 and set default configuration. Prints the current
-///		   configuration.
+/// @brief Init libRFM69.
 ///
 /// @param  None
 /// @return None
 ///
-void libRFM69_Init()
+void libRFM69_Init(void)
 {
- 
-	uint8_t sync_word[8];
-	uint8_t idx;
-	
-	DDRB |= (1 << SS);	
-	PORTB |= (1 << SS); //Pull SS high to release device
-		
-	//NOTE: Encryption is disabled during development only!
-	libRFM69_EnableEncryption(FALSE);
-    libRFM69_EnableSequencer(TRUE);
-    libRFM69_EnableListenMode(FALSE);
-	libRFM69_SetMode(RFM_STANDBY);
-	libRFM69_WaitForModeReady();
-	
-	libRFM69_SetBitRate(4800);
-	libRFM69_SetDataMode(RFM_PACKET_DATA);
-	libRFM69_SetModulationType(RFM_FSK);
-	libRFM69_SetModulationShaping(0x00);
-	
-	libRFM69_SetFrequencyDeviation(5000);
-	libRFM69_SetCarrierFrequency(868000000);
-    
-    libRFM69_EnableSyncWordGeneration(TRUE);
-    libRFM69_SetFIFOFillCondition(RFM_FIFO_FILL_AUTO);
-    libRFM69_SetSyncWordSize(5);
-    libRFM69_SetSyncWord(net_id, 6);
-    
-    
-    libRFM69_ClearFIFOOverrun();
-    
-    libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
-		
-	DEBUG("Bit rate: %u bps\r\n", libRFM69_GetBitrate());
-	DEBUG("Chip: 0x%02X\r\n", libRFM69_GetChipVersion());
-	DEBUG("PA mode: 0x%02X\r\n", libRFM69_GetPowerAmplifierMode());
-	DEBUG("High power: 0x%02X\r\n", libRFM69_IsHighPowerEnabled());	
-	DEBUG("Output power: %i dBm\r\n", libRFM69_GetOutputPower());	
-	DEBUG("RSSI: %i dBm\r\n", libRFM69_GetRSSI());		
-	DEBUG("Preamble length: %u\r\n", libRFM69_GetPreambleLength());	
-	DEBUG("Sync length: %u\r\n", libRFM69_GetSyncWordSize());	
-	
-	libRFM69_GetSyncWord(sync_word, libRFM69_GetSyncWordSize());
-	DEBUG("Sync word: 0x");
-	for (idx = 0; idx < libRFM69_GetSyncWordSize(); ++idx)
-	{
-		DEBUG("%02X", sync_word[idx]);
-	}
-	DEBUG("\r\n");
-    
-    DEBUG("FIFO full: 0x%02X\r\n", libRFM69_IsFIFOFull());
-    DEBUG("FIFO not empty: 0x%02X\r\n", libRFM69_IsFIFONotEmpty());
-    DEBUG("FIFO level: 0x%02X\r\n", libRFM69_IsFIFOLevel());
-    DEBUG("FIFO overrun: 0x%02X\r\n", libRFM69_IsFIFOOverrun());         
-    DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
-    DEBUG("Payload ready: 0x%02X\r\n", libRFM69_IsPayloadReady());
-    DEBUG("CRC ok: 0x%02X\r\n", libRFM69_IsCRCOk());
-    
-	INFO("Init done!");        
-    
-    libRFM69_DumpRegisterValues();
-    //libRFM69_Send();
-    
-    
-
+    libRFM69_HWInit();
+    return;
 }
+
+
+///
+/// @brief Set the SS pin as output and pull high. This function should
+///        be called as early as possible in a systems with several SPI-devices.
+///
+/// @param  None
+/// @return None
+///
+void libRFM69_HWInit(void)
+{
+	DDRB |= (1 << SS);
+	PORTB |= (1 << SS); //Pull SS high to release device
+    return;
+}
+
 
 ///
 /// @brief Update the internal state of libRFM69. NOT IMPLEMENTED
@@ -178,15 +130,14 @@ void libRFM69_Init()
 /// @param  None
 /// @return None
 ///
-void libRFM69_Update()
+void libRFM69_Update(void)
 {
-	
+	return;
 }
 
 void libRFM69_Send(void)
 {
-    uint8_t test_data[6] = {0x05, 0x11, 0x22, 0x22, 0x33, 0x33};
-    //WriteRegister(REG_FIFOTHRESH, 0x8F);        
+    uint8_t test_data[6] = {0x05, 0x11, 0x22, 0x22, 0x33, 0x33};  
         
     INFO("Sending...");
     DEBUG("Change to standby...");
@@ -252,6 +203,7 @@ bool libRFM69_IsCRCOk(void)
     return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_CRCOK);
 }
 
+//TODO: Return number of bytes written to FIFO.
 bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length)
 {
     uint8_t index;
@@ -278,6 +230,23 @@ bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length)
     }
     //If index not is equal to length something went wrong
     return (index == length);
+}
+
+uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length)
+{
+    uint8_t index = 0;
+    
+    while (libRFM69_IsFIFONotEmpty() && index < max_length)
+    {
+        if (!ReadRegister(REG_FIFO, &data[index]))
+        {
+            ERROR("Failed to read from FIFO");
+            break;
+        }
+        ++index;
+    }
+    
+    return index;
 }
 
 bool libRFM69_SetMode(libRFM69_mode_type mode)
@@ -406,6 +375,23 @@ bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
 	return status;
 }
 
+bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type start_condition)
+{
+    bool status = FALSE;
+    uint8_t register_content;
+    
+    if (start_condition == RFM_TX_START_LEVEL ||
+    start_condition == RFM_TX_START_NOT_EMPTY)
+    {
+        if (ReadRegister(REG_FIFOTHRESH, &register_content))
+        {
+            SetBit(0x07, (bool)start_condition, &register_content);
+            status = WriteRegister(REG_FIFOTHRESH, register_content);
+        }
+    }
+    return status;
+}
+
 void libRFM69_GetTemperature(uint8_t *temperature)
 {
 	uint8_t register_data;
@@ -455,6 +441,16 @@ uint32_t libRFM69_GetBitrate(void)
 		return (RFM_FXOSC / bit_rate_value);
 	}
 	return 0;
+}
+
+bool libRFM69_SetNodeAddress(uint8_t node_address)
+{
+    return WriteRegister(REG_NODEADRS, node_address);
+}
+
+bool libRFM69_SetBroadcastAddress(uint8_t broadcast_address)
+{
+    return WriteRegister(REG_BROADCASTADRS, broadcast_address);
 }
 
 bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
