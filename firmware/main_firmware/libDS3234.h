@@ -1,3 +1,12 @@
+/**
+ * @file   libDS3234.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-10-03 (Last edit)
+ * @brief  Header of DS3234-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,13 +24,19 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LIBDS3234_H_
 #define LIBDS3234_H_
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include "common.h"
 
-//Read registers
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
 #define REG_SECONDS				0x00
 #define REG_MINUTES				0x01
 #define REG_HOUR				0x02
@@ -54,23 +69,29 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define HOUR_MODE_BIT	0x06
 #define HOUR_AM_PM_BIT	0x05
 
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
 typedef enum
 {
-	LIBDS3234_12HOUR_MODE= 0,
-	LIBDS3234_24HOUR_MODE		
+    LIBDS3234_12HOUR_MODE= 0,
+    LIBDS3234_24HOUR_MODE		
 }libDS3234_hour_mode_type;
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 void libDS3234_Init();
 void libDS3234_Update();
 void libDS3234_Test();
-
 void libDS3234_GetTemperature(uint16_t *temperature);
 bool libDS3234_GetDate(uint8_t *date);
 bool libDS3234_GetHour(uint8_t *hour);
 bool libDS3234_GetMinutes(uint8_t *minutes);
 bool libDS3234_GetSeconds(uint8_t *seconds);
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode);
-
 bool libDS3234_SetMinutes(uint8_t minutes);
 bool libDS3234_SetSeconds(uint8_t seconds);
 bool libDS3234_SetHour(uint8_t hour);

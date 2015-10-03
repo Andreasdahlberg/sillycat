@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-07-07 (Last edit)
+ * @date   2015-10-03 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -72,12 +72,12 @@ bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
 ///
 void libDS3234_Init()
 {
-	//Set slave select as output
-	DDRC |= (1 << SS);
-	selectDevice(FALSE);
-	
-	INFO("Init done");
-	return;
+    //Set slave select as output
+    DDRC |= (1 << SS);
+    selectDevice(FALSE);
+    
+    INFO("Init done");
+    return;
 }
 
 ///
@@ -88,7 +88,7 @@ void libDS3234_Init()
 ///
 void libDS3234_Update()
 {
-	return;
+    return;
 }
 
 
@@ -100,13 +100,13 @@ void libDS3234_Update()
 ///
 void libDS3234_GetTemperature(uint16_t *temperature)
 {
-	uint8_t data;
-	
-	ReadRegister(REG_TEMP_MSB, &data);
-	*temperature = data * 100;
-	
-	ReadRegister(REG_TEMP_LSB, &data);
-	*temperature += (data >> 6);
+    uint8_t data;
+    
+    ReadRegister(REG_TEMP_MSB, &data);
+    *temperature = data * 100;
+    
+    ReadRegister(REG_TEMP_LSB, &data);
+    *temperature += (data >> 6);
 }
 
 ///
@@ -118,15 +118,15 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 ///
 bool libDS3234_GetMonth(uint8_t *month)
 {
-	bool status = FALSE;
-	uint8_t register_data;
+    bool status = FALSE;
+    uint8_t register_data;
 
-	if(ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
-	{
-		*month = BCDToDecimal(register_data & MONTH_MASK);
-		status = TRUE;
-	}
-	return status;
+    if(ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
+    {
+        *month = BCDToDecimal(register_data & MONTH_MASK);
+        status = TRUE;
+    }
+    return status;
 }
 
 ///
@@ -138,7 +138,7 @@ bool libDS3234_GetMonth(uint8_t *month)
 ///
 bool libDS3234_GetDate(uint8_t *date)
 {
-	return GetDecimalRegisterValue(REG_DATE, date);
+    return GetDecimalRegisterValue(REG_DATE, date);
 }
 
 ///
@@ -150,7 +150,7 @@ bool libDS3234_GetDate(uint8_t *date)
 ///
 bool libDS3234_GetDay(uint8_t *day)
 {
-	return GetDecimalRegisterValue(REG_DAY, day);
+    return GetDecimalRegisterValue(REG_DAY, day);
 }
 
 ///
@@ -162,15 +162,15 @@ bool libDS3234_GetDay(uint8_t *day)
 ///
 bool libDS3234_GetHour(uint8_t *hour)
 {
-	bool status = FALSE;
-	uint8_t register_data;
+    bool status = FALSE;
+    uint8_t register_data;
 
-	if(ReadRegister(REG_HOUR, &register_data) == TRUE)
-	{
-		*hour = BCDToDecimal(register_data);		
-		status = TRUE;
-	}
-	return status;
+    if(ReadRegister(REG_HOUR, &register_data) == TRUE)
+    {
+        *hour = BCDToDecimal(register_data);		
+        status = TRUE;
+    }
+    return status;
 }
 
 ///
@@ -182,7 +182,7 @@ bool libDS3234_GetHour(uint8_t *hour)
 ///
 bool libDS3234_SetHour(uint8_t hour)
 {
-	return SetDecimalRegisterValue(REG_HOUR, hour);
+    return SetDecimalRegisterValue(REG_HOUR, hour);
 }
 
 ///
@@ -194,12 +194,12 @@ bool libDS3234_SetHour(uint8_t hour)
 ///
 bool libDS3234_GetMinutes(uint8_t *minutes)
 {
-	return GetDecimalRegisterValue(REG_MINUTES, minutes);
+    return GetDecimalRegisterValue(REG_MINUTES, minutes);
 }
 
 bool libDS3234_SetMinutes(uint8_t minutes)
 {
-	return SetDecimalRegisterValue(REG_MINUTES, minutes);
+    return SetDecimalRegisterValue(REG_MINUTES, minutes);
 }
 
 ///
@@ -211,12 +211,12 @@ bool libDS3234_SetMinutes(uint8_t minutes)
 ///
 bool libDS3234_GetSeconds(uint8_t *seconds)
 {
-	return GetDecimalRegisterValue(REG_SECONDS, seconds);
+    return GetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
 bool libDS3234_SetSeconds(uint8_t seconds)
 {
-	return SetDecimalRegisterValue(REG_SECONDS, seconds);
+    return SetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
 ///
@@ -228,44 +228,44 @@ bool libDS3234_SetSeconds(uint8_t seconds)
 ///
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
 {
-	bool status = FALSE;
-	uint8_t register_value;
+    bool status = FALSE;
+    uint8_t register_value;
 
-	if(ReadRegister(REG_HOUR, &register_value)== TRUE)
-	{
-		if((register_value & HOUR_MODE_BIT) == 0x00)
-		{
-			*hour_mode = LIBDS3234_24HOUR_MODE;
-			status = TRUE;
-		}		
-		else
-		{
-			*hour_mode = LIBDS3234_12HOUR_MODE;
-			status = TRUE;
-		}
-	}
-	return status;
+    if(ReadRegister(REG_HOUR, &register_value)== TRUE)
+    {
+        if((register_value & HOUR_MODE_BIT) == 0x00)
+        {
+            *hour_mode = LIBDS3234_24HOUR_MODE;
+            status = TRUE;
+        }		
+        else
+        {
+            *hour_mode = LIBDS3234_12HOUR_MODE;
+            status = TRUE;
+        }
+    }
+    return status;
 }
 
 bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 {
-	bool status = FALSE;
-	uint8_t register_value;
-	
-	if(ReadRegister(REG_HOUR, &register_value)== TRUE)
-	{
-		if(hour_mode == LIBDS3234_24HOUR_MODE)
-		{
-			register_value &= ~(1 << HOUR_MODE_BIT);
-			status = WriteRegister(REG_HOUR, register_value);	
-		}
-		else
-		{
-			register_value |= (1 << HOUR_MODE_BIT);
-			status = WriteRegister(REG_HOUR, register_value);
-		}
-	}
-	return status;
+    bool status = FALSE;
+    uint8_t register_value;
+    
+    if(ReadRegister(REG_HOUR, &register_value)== TRUE)
+    {
+        if(hour_mode == LIBDS3234_24HOUR_MODE)
+        {
+            register_value &= ~(1 << HOUR_MODE_BIT);
+            status = WriteRegister(REG_HOUR, register_value);	
+        }
+        else
+        {
+            register_value |= (1 << HOUR_MODE_BIT);
+            status = WriteRegister(REG_HOUR, register_value);
+        }
+    }
+    return status;
 }
 
 /// Local functions
@@ -281,84 +281,84 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 ///
 bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 {
-	bool status = FALSE;
-	uint8_t register_data;
-		
-	if(ReadRegister(address, &register_data) == TRUE)
-	{
-		*value = BCDToDecimal(register_data);
-		status = TRUE;
-	}
-	return status;
+    bool status = FALSE;
+    uint8_t register_data;
+        
+    if(ReadRegister(address, &register_data) == TRUE)
+    {
+        *value = BCDToDecimal(register_data);
+        status = TRUE;
+    }
+    return status;
 }
 
 
 bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 {
-	bool status = FALSE;
-	uint8_t register_data;
-	
-	//Only values smaller then 100 is accepted since a byte
-	//only can hold two-digits of BCD data.
-	if(value < 100)
-	{
-		register_data = (uint8_t)DecimalToBCD(value);
-		status = WriteRegister(address, register_data);		 
-	}
-	return status;
+    bool status = FALSE;
+    uint8_t register_data;
+    
+    //Only values smaller then 100 is accepted since a byte
+    //only can hold two-digits of BCD data.
+    if(value < 100)
+    {
+        register_data = (uint8_t)DecimalToBCD(value);
+        status = WriteRegister(address, register_data);		 
+    }
+    return status;
 }
 
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
-	bool status = FALSE;
-	
-	if(RegisterAddressValid(address))
-	{
-		selectDevice(TRUE);
-		libSPI_WriteByte(address|WRITE_ADDRESS, NULL, NULL);
-		libSPI_WriteByte(register_data, NULL, NULL);
-		selectDevice(FALSE);
-		
-		status = TRUE;
-	}
-	return status;
+    bool status = FALSE;
+    
+    if(RegisterAddressValid(address))
+    {
+        selectDevice(TRUE);
+        libSPI_WriteByte(address|WRITE_ADDRESS, NULL, NULL);
+        libSPI_WriteByte(register_data, NULL, NULL);
+        selectDevice(FALSE);
+        
+        status = TRUE;
+    }
+    return status;
 }
 
 
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
-	bool status = FALSE;
-	
-	if(RegisterAddressValid(address))
-	{
-		selectDevice(TRUE);
-		libSPI_WriteByte(address|READ_ADDRESS, NULL, NULL);
-		libSPI_ReadByte(register_data, NULL, NULL);
-		selectDevice(FALSE);
-		
-		status = TRUE;
-	}
-	return status;
+    bool status = FALSE;
+    
+    if(RegisterAddressValid(address))
+    {
+        selectDevice(TRUE);
+        libSPI_WriteByte(address|READ_ADDRESS, NULL, NULL);
+        libSPI_ReadByte(register_data, NULL, NULL);
+        selectDevice(FALSE);
+        
+        status = TRUE;
+    }
+    return status;
 }
 
 bool RegisterAddressValid(uint8_t address)
 {
-	return (address <= REG_SRAM_DATA);
+    return (address <= REG_SRAM_DATA);
 }
 
 
 static void selectDevice(bool state)
 {
-	if(state == TRUE)
-	{
+    if(state == TRUE)
+    {
         libSPI_SetMode(1);
-		PORTC &= ~(1 << SS);
-	}
-	else
-	{
-		PORTC |= (1 << SS);
-	}
+        PORTC &= ~(1 << SS);
+    }
+    else
+    {
+        PORTC |= (1 << SS);
+    }
 }
 
 

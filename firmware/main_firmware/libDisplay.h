@@ -1,3 +1,12 @@
+/**
+ * @file   libDisplay.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-10-03 (Last edit)
+ * @brief  Header of display-library.
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -18,7 +27,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBDISPLAY_H_
 #define LIBDISPLAY_H_
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include "bitmap_db.h"
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 void libDisplay_Init();
 void libDisplay_On();
@@ -32,7 +49,5 @@ void libDisplay_SetBrightness(uint8_t brightness);
 void libDisplay_SetFont(FONT_INFO *font);
 void libDisplay_PrintText(char *buffer, uint8_t x_pos, uint8_t y_pos);
 void libDisplay_DumpVRAMToUART(void);
-
-
 
 #endif /* LIBDISPLAY_H_ */
