@@ -56,9 +56,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
-bool RegisterAddressValid(uint8_t address);
-bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
-bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
+static bool RegisterAddressValid(uint8_t address);
+static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
+static bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
 
 static void PreCallback(void);
 static void PostCallback(void);
@@ -284,7 +284,7 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 /// @param	value Pointer to variable where the value will be stored.
 /// @return bool Status of operation
 ///
-bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
+static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 {
     bool status = FALSE;
     uint8_t register_data;
@@ -297,7 +297,7 @@ bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
     return status;
 }
 
-bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
+static bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 {
     bool status = FALSE;
     uint8_t register_data;
@@ -338,7 +338,7 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
     return status;
 }
 
-bool RegisterAddressValid(uint8_t address)
+static bool RegisterAddressValid(uint8_t address)
 {
     return (address <= REG_SRAM_DATA);
 }
