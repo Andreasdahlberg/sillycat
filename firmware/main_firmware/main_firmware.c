@@ -42,9 +42,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libADC.h"
 #include "libSPI.h"
 #include "libDS3234.h"
-#include "libSensor.h"
 #include "libInput.h"
 
+#include "Sensor.h"
 #include "Interface.h"
 #include "Transceiver.h"
 
@@ -83,7 +83,7 @@ int main(void)
     libSPI_Init(1);
     libDS3234_Init();
     libADC_Enable(TRUE);
-    libSensor_Init();
+    Sensor_Init();
     libInput_Init();
     
     Transceiver_Init();
@@ -100,6 +100,6 @@ int main(void)
         Interface_Update();
     }
     
-    CRITICAL("Main loop exit!");
+    CRITICAL("Main loop exit");
     SoftReset();
 }
