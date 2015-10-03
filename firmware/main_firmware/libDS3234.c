@@ -27,13 +27,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-
 #include <avr/io.h>
 #include <string.h>
+
+#include "common.h"
 #include "libDebug.h"
 #include "libSPI.h"
 #include "libDS3234.h"
-#include "common.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -41,6 +41,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define SS	DDC0
 #define SPIMODE 1
+
+#define SRAM_SIZE 256
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -59,6 +61,7 @@ static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool RegisterAddressValid(uint8_t address);
 static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 static bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
+static void DumpRegisterValues(void);
 
 static void PreCallback(void);
 static void PostCallback(void);
@@ -73,14 +76,32 @@ static void PostCallback(void);
 /// @param  None
 /// @return None
 ///
-void libDS3234_Init()
+void libDS3234_Init(void)
+{
+    libDS3234_HWInit();
+    
+    // Clear control register, this makes sure that the oscillator is running
+    // when power is removed.
+    WriteRegister(REG_CONTROL, 0x00);
+    DumpRegisterValues();
+        
+    INFO("Init done");
+    return;
+}
+
+///
+/// @brief Set the SS pin as output and pull high. This function should
+///        be called as early as possible in a systems with several SPI-devices.
+///
+/// @param  None
+/// @return None
+///
+void libDS3234_HWInit(void)
 {
     //Set SS as output
     DDRC |= (1 << SS);
     //Pull SS high to release device
-    PORTC |= (1 << SS);
-    
-    INFO("Init done");
+    PORTC |= (1 << SS);    
     return;
 }
 
@@ -90,7 +111,7 @@ void libDS3234_Init()
 /// @param  None
 /// @return None
 ///
-void libDS3234_Update()
+void libDS3234_Update(void)
 {
     return;
 }
@@ -271,6 +292,62 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
     return status;
 }
 
+///
+/// @brief  Write data to SRAM. The SRAM is powered by the RTC battery so data is
+///         persistent between power cycles.
+///
+/// @param  address Address in flash to write
+/// @param  *data Pointer to data to write
+/// @param  length Number of bytes to write
+/// @return FALSE  If write failed
+/// @return SUCCESS If write succeeded
+///
+bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
+{
+    bool status = FALSE;
+    uint8_t index;
+    
+    if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
+    {
+        WriteRegister(REG_SRAM_ADDRESS, address);
+        for (index = 0; index < length; ++index)
+        {
+            //SRAM address is auto incremented after each write            
+            WriteRegister(REG_SRAM_DATA, data[index]);
+        }
+        status = TRUE;
+    }    
+    return status;
+}
+
+///
+/// @brief  Read data from SRAM. The SRAM is powered by the RTC battery so data is
+///         persistent between power cycles.
+///
+/// @param  address Address in flash to read
+/// @param  *data Pointer to buffer where data will be stored
+/// @param  length Number of bytes to read
+/// @return FALSE  If read failed
+/// @return SUCCESS If read succeeded
+///
+bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
+{
+    bool status = FALSE;
+    uint8_t index;
+    
+    if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
+    {
+        WriteRegister(REG_SRAM_ADDRESS, address);
+        for (index = 0; index < length; ++index)
+        {
+            //SRAM address is auto incremented after each read            
+            ReadRegister(REG_SRAM_DATA, &data[index]);     
+        }
+        status = TRUE;
+    }
+    return status;    
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -353,6 +430,26 @@ static void PreCallback(void)
 static void PostCallback(void)
 {
     PORTC |= (1 << SS); //Pull SS high to release device
+    return;
+}
+
+static void DumpRegisterValues(void)
+{
+    uint8_t reg_addr;
+    uint8_t reg_value;
+    
+    DEBUG("**DS3234 registers**\r\n");
+    for (reg_addr = 0x00; reg_addr <= REG_DISABLE_TEMP; ++ reg_addr)
+    {
+        if (ReadRegister(reg_addr, &reg_value) == TRUE)
+        {
+            DEBUG("Addr: 0x%02X, Value: 0x%02X\r\n", reg_addr, reg_value);
+        } 
+        else
+        {
+            DEBUG("Addr: 0x--, Value: 0x--\r\n");  
+        }                       
+    }
     return;
 }
 

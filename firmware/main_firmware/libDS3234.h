@@ -69,6 +69,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define HOUR_MODE_BIT	0x06
 #define HOUR_AM_PM_BIT	0x05
 
+#define CONREG_EOSC     0x08
+#define CONREG_BBSQW    0x07
+#define CONREG_CONV     0x06
+#define CONREG_RS2      0x05
+#define CONREG_RS1      0x04
+#define CONREG_INTCN    0x03
+#define CONREG_A2IE     0x02
+#define CONREG_A1IE     0x01
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -83,9 +92,9 @@ typedef enum
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libDS3234_Init();
-void libDS3234_Update();
-void libDS3234_Test();
+void libDS3234_Init(void);
+void libDS3234_HWInit(void);
+void libDS3234_Update(void);
 void libDS3234_GetTemperature(uint16_t *temperature);
 bool libDS3234_GetDate(uint8_t *date);
 bool libDS3234_GetHour(uint8_t *hour);
@@ -95,5 +104,7 @@ bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode);
 bool libDS3234_SetMinutes(uint8_t minutes);
 bool libDS3234_SetSeconds(uint8_t seconds);
 bool libDS3234_SetHour(uint8_t hour);
+bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length);
+bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
 
 #endif /* LIBDS3234_H_ */
