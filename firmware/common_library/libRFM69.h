@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-09-10 (Last edit)
+ * @date   2015-10-03 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -40,32 +40,32 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum
 {
-	RFM_SLEEP = 0,
-	RFM_STANDBY,
-	RFM_SYNTHESIZER,
-	RFM_TRANSMITTER,
-	RFM_RECEIVER
+    RFM_SLEEP = 0,
+    RFM_STANDBY,
+    RFM_SYNTHESIZER,
+    RFM_TRANSMITTER,
+    RFM_RECEIVER
 }libRFM69_mode_type;
 
 typedef enum
 {
-	RFM_PACKET_DATA,
-	RFM_RESERVED,	//Do not use
-	RFM_CONT_SYNC_DATA,
-	RFM_CONT_DATA
+    RFM_PACKET_DATA,
+    RFM_RESERVED,	//Do not use
+    RFM_CONT_SYNC_DATA,
+    RFM_CONT_DATA
 }libRFM69_data_mode_type;
 
 typedef enum
 {
-	RFM_PACKET_FIXED_LEN,
-	RFM_PACKET_VARIABLE_LEN	
-	
+    RFM_PACKET_FIXED_LEN,
+    RFM_PACKET_VARIABLE_LEN	
+    
 }libRFM69_packet_format_type;
 
 typedef enum
 {
-	RFM_FSK,
-	RFM_OOK
+    RFM_FSK,
+    RFM_OOK
 }libRFM69_modulation_type_type;
 
 typedef enum
@@ -81,15 +81,15 @@ typedef enum
 }libRFM69_tx_start_condition_type;
 
 #ifndef NODE_ADDRESS
-	#define NODE_ADDRESS 0xAA
+    #define NODE_ADDRESS 0xAA
 #endif
 
 #ifndef BROADCAST_ADDRESS
-	#define BROADCAST_ADDRESS 0x00
+    #define BROADCAST_ADDRESS 0x00
 #endif
 
 #ifdef	NETWORK_MASTER
-	#define NETWORK_ID NODE_ADDRESS
+    #define NETWORK_ID NODE_ADDRESS
 #endif
 
 #define RFM_PWR_1	0x04 //PA0 output on pin RFIO 
