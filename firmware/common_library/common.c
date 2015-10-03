@@ -15,6 +15,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <avr/wdt.h>
+
 #include "common.h"
 
 
@@ -62,4 +64,12 @@ int GetFreeRam()
 	extern int __heap_start, *__brkval;
 	int v;
 	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+}
+
+void SoftReset()  
+ {                   
+    wdt_enable(WDTO_15MS);  
+    while(1)             
+    {                       
+    }                       
 }
