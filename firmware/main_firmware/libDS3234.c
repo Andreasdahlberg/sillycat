@@ -40,6 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define SS	DDC0
+#define SPIMODE 1
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -53,12 +54,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void selectDevice(bool state);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 bool RegisterAddressValid(uint8_t address);
 bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
+
+static void PreCallback(void);
+static void PostCallback(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -72,16 +75,17 @@ bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
 ///
 void libDS3234_Init()
 {
-    //Set slave select as output
+    //Set SS as output
     DDRC |= (1 << SS);
-    selectDevice(FALSE);
+    //Pull SS high to release device
+    PORTC |= (1 << SS);
     
     INFO("Init done");
     return;
 }
 
 ///
-/// @brief Update the state of the DS3234 library 
+/// @brief Update the internal state of libDS3234. NOT IMPLEMENTED
 ///
 /// @param  None
 /// @return None
@@ -90,7 +94,6 @@ void libDS3234_Update()
 {
     return;
 }
-
 
 ///
 /// @brief Get the chip-temperature from the DS3234 RTC
@@ -268,7 +271,9 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
     return status;
 }
 
-/// Local functions
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 ///
 /// @brief	Get the value of a register as a decimal value. The register must
@@ -292,7 +297,6 @@ bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
     return status;
 }
 
-
 bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 {
     bool status = FALSE;
@@ -308,23 +312,18 @@ bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
     return status;
 }
 
-
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
     bool status = FALSE;
     
     if(RegisterAddressValid(address))
     {
-        selectDevice(TRUE);
-        libSPI_WriteByte(address|WRITE_ADDRESS, NULL, NULL);
-        libSPI_WriteByte(register_data, NULL, NULL);
-        selectDevice(FALSE);
-        
+        libSPI_WriteByte(address|WRITE_ADDRESS, &PreCallback, NULL);
+        libSPI_WriteByte(register_data, NULL, &PostCallback);
         status = TRUE;
     }
     return status;
 }
-
 
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
@@ -332,11 +331,8 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
     
     if(RegisterAddressValid(address))
     {
-        selectDevice(TRUE);
-        libSPI_WriteByte(address|READ_ADDRESS, NULL, NULL);
-        libSPI_ReadByte(register_data, NULL, NULL);
-        selectDevice(FALSE);
-        
+        libSPI_WriteByte(address|READ_ADDRESS, &PreCallback, NULL);
+        libSPI_ReadByte(register_data, NULL, &PostCallback);
         status = TRUE;
     }
     return status;
@@ -347,18 +343,17 @@ bool RegisterAddressValid(uint8_t address)
     return (address <= REG_SRAM_DATA);
 }
 
-
-static void selectDevice(bool state)
+static void PreCallback(void)
 {
-    if(state == TRUE)
-    {
-        libSPI_SetMode(1);
-        PORTC &= ~(1 << SS);
-    }
-    else
-    {
-        PORTC |= (1 << SS);
-    }
+    libSPI_SetMode(SPIMODE);
+    PORTC &= ~(1 << SS); //Pull SS low to select device
+    return;
+}
+
+static void PostCallback(void)
+{
+    PORTC |= (1 << SS); //Pull SS high to release device
+    return;
 }
 
 
