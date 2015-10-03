@@ -20,7 +20,7 @@ along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
-#define UBRRn 12		//Baud:38.4k Fosc: 8 MHz Error: 0.2%
+#define UBRRn 1		//Baud:250K, Fosc: 8 MHz, Error: 0%
 
 void libUART_Init(void);
 void libUART_SendByte(uint8_t data);
