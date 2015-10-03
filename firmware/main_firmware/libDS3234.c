@@ -344,7 +344,7 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 
 bool RegisterAddressValid(uint8_t address)
 {
-	return (address >= REG_SECONDS && address <= REG_SRAM_DATA);
+	return (address <= REG_SRAM_DATA);
 }
 
 
@@ -352,6 +352,7 @@ static void selectDevice(bool state)
 {
 	if(state == TRUE)
 	{
+        libSPI_SetMode(1);
 		PORTC &= ~(1 << SS);
 	}
 	else
