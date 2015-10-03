@@ -1,3 +1,12 @@
+/**
+ * @file   main_firmware.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-10-03 (Last edit)
+ * @brief  Implementation of main
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -17,47 +26,80 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define F_CPU 8000000UL // 8 MHz
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include <util/delay.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "libDebug.h"
-#include "libLED.h"
 #include "libTimer.h"
 #include "libADC.h"
 #include "libSPI.h"
 #include "libDS3234.h"
-#include "libRFM69.h"
+#include "libSensor.h"
+#include "libInput.h"
 
+#include "Interface.h"
+#include "Transceiver.h"
 
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
-#define LIBNAME "Main"
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 int main(void)
 {
-	libDebug_Init();
-	DEBUG_STR(LIBNAME, "Init system");
-	
-	//libADC_Init();
-	libTimer_Init();
-	libLED_Init();
-	//TODO: Move the selection of SPI mode to the module using it, mode
-	//		can change during runtime.
-	libSPI_Init(0);
-	libRFM69_Init();
-	//libDS3234_Init();
-	
-
-	
-
-	
-		
-	while(1)
-	{
-		_delay_ms(1000);
-		libRFM69_Test();
-		//libDebug_PrintUnsignedInteger(LIBNAME, libTimer_GetSeconds());
-		//libADC_Update();
-		libLED_Update();
-		//libDHT22_Update();
-		//libSPI_Update();
-	}
+    uint8_t mcu_status = MCUSR;
+    MCUSR = 0;
+    wdt_disable();
+    
+    libDebug_Init();
+    INFO("Main unit started");
+    INFO("Last reset: 0x%02X", mcu_status);
+    
+    libADC_Init();
+    libTimer_Init();		
+    libSPI_Init(1);
+    libDS3234_Init();
+    libADC_Enable(TRUE);
+    libSensor_Init();
+    libInput_Init();
+    
+    Transceiver_Init();
+    Interface_Init();
+    
+    INFO("Start up done");
+ 
+    while(1)
+    {
+        libADC_Update();				
+        libInput_Update();
+        
+        Transceiver_Update();
+        Interface_Update();
+    }
+    
+    CRITICAL("Main loop exit!");
+    SoftReset();
 }
