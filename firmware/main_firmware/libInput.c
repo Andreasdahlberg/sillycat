@@ -1,8 +1,8 @@
 /**
- * @file   <filename>
+ * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-09-10 (Last edit)
- * @brief  Implementation of <name>
+ * @date   2015-10-03 (Last edit)
+ * @brief  Implementation of input module.
  *
  * Detailed description of file.
  */
@@ -30,6 +30,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/interrupt.h> 
 #include <util/atomic.h>
+#include <stdio.h>
 
 #include "common.h"
 #include "libDebug.h"
@@ -48,7 +49,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static libinput_button_event_type button_events;
+static libinput_callback_type left_event_callback;
+static libinput_callback_type right_event_callback;
+static libinput_callback_type push_event_callback;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -58,51 +61,75 @@ static libinput_button_event_type button_events;
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+///
+/// @brief Init pins and reset all event callbacks.
+///
+/// @param  None
+/// @return None
+///
 void libInput_Init(void)
 {
 	//Set pins as inputs
 	DDRB &= ~(1 << DDB0 | 1 << DDB1);  
     
-    button_events.right = 0;
-    button_events.left = 0;
-    button_events.press = 0;
+    //Reset all callbacks
+    right_event_callback = NULL;
+    left_event_callback = NULL;
+    push_event_callback = NULL;        
     
     INFO("Init done");
     return;
 }
 
 
+///
+/// @brief Check for new inputs and trigger events.
+///
+/// @param  None
+/// @return None
+///
 void libInput_Update(void)
 {
     static uint32_t debounce_timer = 0;
-    static uint8_t prev = 1;
-    uint8_t curr;
+    static uint32_t push_timer = 0;
+    static uint32_t disable_push_timer = 0;
+    static uint8_t prev_a = 1;
+    static uint8_t prev_b = 1;    
+    uint8_t curr_a;
+    uint8_t curr_b;
     
-    curr = PINB & (1 << DDB0);
+    curr_a = PINB & (1 << DDB0);
+    curr_b = PINB & (1 << DDB1);
     
     //Check for a falling edge
-    if (prev == 1 && curr == 0)
+    if (prev_a == 1 && curr_a == 0)
     {
         debounce_timer = libTimer_GetMilliseconds();
+        disable_push_timer = debounce_timer;
     }
     
     if (debounce_timer != 0)
     {
         if (libTimer_TimeDifference(debounce_timer) > 2)
         {
-            if (curr == 0)
+            if (curr_a == 0)
             {
                 if (PINB & (1 << DDB1))
                 {   
-                    DEBUG("Right\r\n");
-                    button_events.right += 1;
+                    DEBUG("Right\r\n");                
+                    if (right_event_callback != NULL)
+                    {
+                        right_event_callback();
+                    }                    
                 }
                 else
                 {
-                    button_events.left += 1;
+                    if (left_event_callback != NULL)
+                    {
+                        left_event_callback();
+                    }                    
                     DEBUG("Left\r\n");
-                }                
-                
+                }
                 debounce_timer = 0;
             }
             else
@@ -112,10 +139,58 @@ void libInput_Update(void)
         }
     }    
     
-    prev = curr;
+    if (libTimer_TimeDifference(disable_push_timer) < 350)
+    {
+        push_timer = 0;
+    }
+    
+    if (prev_b && curr_b == 0 && libTimer_TimeDifference(disable_push_timer) > 300)
+    {
+        push_timer = libTimer_GetMilliseconds();
+    }
+  
+    if (push_timer != 0 && libTimer_TimeDifference(disable_push_timer) > 300)
+    {
+        if (libTimer_TimeDifference(push_timer) > 150)
+        { 
+            if (curr_b == 0)
+            {
+                push_event_callback();
+                DEBUG("Push\r\n");
+                push_timer = 0;
+            } 
+            else
+            {
+                push_timer = 0;
+            }                 
+        } 
+             
+    }    
+    
+    prev_b = curr_b;    
+    prev_a = curr_a;
     return;
 }    
 
+///
+/// @brief Set callbacks for input events.
+///
+/// @param  right_event Function to call when rotation to the right is detected,
+///                     NULL if no action is wanted.
+/// @param  left_event Function to call when rotation to the left is detected, 
+///                    NULL if no action is wanted.
+/// @param  push_event Function to call when push is detected, NULL if no action
+///                    is wanted. 
+/// @return None
+///
+void libInput_SetCallbacks(libinput_callback_type right_event,
+                          libinput_callback_type left_event,
+                          libinput_callback_type push_event)
+{   
+    right_event_callback = right_event;
+    left_event_callback = left_event;
+    push_event_callback = push_event;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS

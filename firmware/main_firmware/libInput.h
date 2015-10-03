@@ -1,8 +1,8 @@
 /**
- * @file   <filename>
+ * @file   libInput.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-09-10 (Last edit)
- * @brief  Header of <name>
+ * @date   2015-10-03 (Last edit)
+ * @brief  Header of Input module.
  *
  * Detailed description of file.
  */
@@ -32,12 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    uint8_t right;
-    uint8_t left;
-    uint8_t press;    
-}libinput_button_event_type;
+typedef void (*libinput_callback_type)(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -45,3 +40,9 @@ typedef struct
 
 void libInput_Init(void);
 void libInput_Update(void);
+bool libInput_RightRotation(void);
+bool libInput_LeftRotation(void);
+bool libInput_Push(void);
+void libInput_SetCallbacks(libinput_callback_type right_event,
+                           libinput_callback_type left_event,
+                           libinput_callback_type push_event);
