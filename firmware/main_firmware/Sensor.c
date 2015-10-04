@@ -98,6 +98,9 @@ uint16_t RawValueToTemperature(uint16_t raw_value);
 
 void Sensor_Init()
 {
+    current_alpha = (uint16_t)CALCULATE_ALPHA(1, 300);
+    DEBUG("Smoothing Alpha: %u", current_alpha);
+    
     libADC_EnableInput(SENSOR_EXTERNAL_LIGHT, TRUE);
     libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, TRUE);
     libADC_EnableInput(SENSOR_INTERNAL_TEMPERATURE, TRUE);	
@@ -147,14 +150,14 @@ uint16_t RawValueToTemperature(uint16_t raw_value)
     uint8_t index = 0;
     uint32_t tmp;
     
-    while(index < TABLE_LENGTH && pgm_read_byte(&mf52_table[index]) < raw_value)
+    while(index < TABLE_LENGTH && pgm_read_word(&mf52_table[index]) < raw_value)
     {
         ++index;
     }
     
     //TODO: Can this be solved in a better way?
     tmp = 100 * (uint32_t)raw_value;
-    tmp /= pgm_read_byte(&mf52_table[index]);
+    tmp /= pgm_read_word(&mf52_table[index]);
     tmp *= (TABLE_OFFSET + (index * 5));
     tmp /= 10;
 
