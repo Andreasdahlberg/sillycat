@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-10-11 (Last edit)
  * @brief  Implementation of input module.
  *
  * Detailed description of file.
@@ -28,8 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/interrupt.h> 
-#include <util/atomic.h>
+#define F_CPU 8000000UL // 8 MHz
+
+#include <util/delay.h>
 #include <stdio.h>
 
 #include "common.h"
@@ -57,6 +58,8 @@ static libinput_callback_type push_event_callback;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+void DirectionCheckAndTrigger(void);
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -75,12 +78,11 @@ void libInput_Init(void)
     //Reset all callbacks
     right_event_callback = NULL;
     left_event_callback = NULL;
-    push_event_callback = NULL;        
-    
+    push_event_callback = NULL;
+      
     INFO("Init done");
     return;
 }
-
 
 ///
 /// @brief Check for new inputs and trigger events.
@@ -90,84 +92,22 @@ void libInput_Init(void)
 ///
 void libInput_Update(void)
 {
-    static uint32_t debounce_timer = 0;
-    static uint32_t push_timer = 0;
-    static uint32_t disable_push_timer = 0;
     static uint8_t prev_a = 1;
-    static uint8_t prev_b = 1;    
     uint8_t curr_a;
-    uint8_t curr_b;
-    
+
     curr_a = PINB & (1 << DDB0);
-    curr_b = PINB & (1 << DDB1);
-    
-    //Check for a falling edge
+   
+    //Check for a falling edge on channel A
     if (prev_a == 1 && curr_a == 0)
     {
-        debounce_timer = libTimer_GetMilliseconds();
-        disable_push_timer = debounce_timer;
-    }
-    
-    if (debounce_timer != 0)
-    {
-        if (libTimer_TimeDifference(debounce_timer) > 2)
-        {
-            if (curr_a == 0)
-            {
-                if (PINB & (1 << DDB1))
-                {   
-                    DEBUG("Right\r\n");                
-                    if (right_event_callback != NULL)
-                    {
-                        right_event_callback();
-                    }                    
-                }
-                else
-                {
-                    if (left_event_callback != NULL)
-                    {
-                        left_event_callback();
-                    }                    
-                    DEBUG("Left\r\n");
-                }
-                debounce_timer = 0;
-            }
-            else
-            {
-                debounce_timer = 0;                
-            }                
+        //debounce_timer
+        _delay_us(20);
+        if (!(PINB & (1 << DDB0)))
+        {   
+            DirectionCheckAndTrigger();
         }
-    }    
-    
-    if (libTimer_TimeDifference(disable_push_timer) < 350)
-    {
-        push_timer = 0;
     }
     
-    if (prev_b && curr_b == 0 && libTimer_TimeDifference(disable_push_timer) > 300)
-    {
-        push_timer = libTimer_GetMilliseconds();
-    }
-  
-    if (push_timer != 0 && libTimer_TimeDifference(disable_push_timer) > 300)
-    {
-        if (libTimer_TimeDifference(push_timer) > 150)
-        { 
-            if (curr_b == 0)
-            {
-                push_event_callback();
-                DEBUG("Push\r\n");
-                push_timer = 0;
-            } 
-            else
-            {
-                push_timer = 0;
-            }                 
-        } 
-             
-    }    
-    
-    prev_b = curr_b;    
     prev_a = curr_a;
     return;
 }    
@@ -195,3 +135,24 @@ void libInput_SetCallbacks(libinput_callback_type right_event,
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+void DirectionCheckAndTrigger(void)
+{
+    if (PINB & (1 << DDB1))
+    {
+        DEBUG("Right\r\n");
+        if (right_event_callback != NULL)
+        {
+            right_event_callback();
+        }
+    }
+    else
+    {
+        DEBUG("Left\r\n");
+        if (left_event_callback != NULL)
+        {
+            left_event_callback();
+        }
+    }
+    return;
+}
