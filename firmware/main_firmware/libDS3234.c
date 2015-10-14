@@ -83,7 +83,6 @@ void libDS3234_Init(void)
     // Clear control register, this makes sure that the oscillator is running
     // when power is removed.
     WriteRegister(REG_CONTROL, 0x00);
-    DumpRegisterValues();
         
     INFO("Init done");
     return;
@@ -131,6 +130,8 @@ void libDS3234_GetTemperature(uint16_t *temperature)
     
     ReadRegister(REG_TEMP_LSB, &data);
     *temperature += (data >> 6);
+    
+    return;
 }
 
 ///
@@ -221,6 +222,13 @@ bool libDS3234_GetMinutes(uint8_t *minutes)
     return GetDecimalRegisterValue(REG_MINUTES, minutes);
 }
 
+///
+/// @brief Set the current minute
+///
+/// @param  minutes New minute to set
+/// @return FALSE  If set failed
+/// @return SUCCESS If set succeeded
+///
 bool libDS3234_SetMinutes(uint8_t minutes)
 {
     return SetDecimalRegisterValue(REG_MINUTES, minutes);
@@ -238,6 +246,13 @@ bool libDS3234_GetSeconds(uint8_t *seconds)
     return GetDecimalRegisterValue(REG_SECONDS, seconds);
 }
 
+///
+/// @brief Set the current second
+///
+/// @param  seconds New second to set
+/// @return FALSE  If set failed
+/// @return SUCCESS If set succeeded
+///
 bool libDS3234_SetSeconds(uint8_t seconds)
 {
     return SetDecimalRegisterValue(REG_SECONDS, seconds);
@@ -271,6 +286,13 @@ bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
     return status;
 }
 
+///
+/// @brief Set the current hour mode, 12 or 24
+///
+/// @param  hour_mode The hour mode to set
+/// @return FALSE
+/// @return SUCCESS
+///
 bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 {
     bool status = FALSE;
