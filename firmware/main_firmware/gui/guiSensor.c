@@ -1,8 +1,8 @@
 /**
- * @file   main_firmware.c
+ * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
- * @brief  Implementation of main
+ * @date   2015-10-14 (Last edit)
+ * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
  */
@@ -24,30 +24,18 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define F_CPU 8000000UL // 8 MHz
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/io.h>
-#include <avr/wdt.h>
-#include <util/delay.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 
+#include "common.h"
 #include "libDebug.h"
-#include "libTimer.h"
-#include "libADC.h"
-#include "libSPI.h"
-#include "libDS3234.h"
-#include "libRFM69.h"
-#include "libInput.h"
+#include "libUI.h"
 
 #include "Sensor.h"
 #include "Interface.h"
-#include "Transceiver.h"
 
 #include "guiSensor.h"
 
@@ -63,6 +51,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
+static struct view detailed_temperature_view;
+static struct view temperature_view;
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -71,46 +62,65 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-int main(void)
+void guiSensor_Init(void)
 {
-    uint8_t mcu_status = MCUSR;
-    MCUSR = 0;
-    wdt_disable();
+    temperature_view.draw_function = guiSensor_DrawTemperatureView;
+    temperature_view.child = NULL;
+    temperature_view.prev = NULL;
+    temperature_view.next = NULL;
+    temperature_view.parent = NULL;    
     
-    libDS3234_HWInit();
-    libRFM69_HWInit();    
+    detailed_temperature_view.draw_function = guiSensor_DrawDetailedTemperatureView;
+    detailed_temperature_view.child = NULL;
+    detailed_temperature_view.prev = NULL;
+    detailed_temperature_view.next = NULL;
+    detailed_temperature_view.parent = NULL;
     
-    libDebug_Init();
-    INFO("Main unit started");
-    INFO("Last reset: 0x%02X", mcu_status);
+    Interface_AddView(&temperature_view);
+    Interface_AddView(&detailed_temperature_view);    
     
-    libADC_Init();
-    libTimer_Init();		
-    libSPI_Init(1);
-    libDS3234_Init();
-    libADC_Enable(TRUE);
-    Sensor_Init();
-    libInput_Init();
- 
+    return;
+}
+
+void guiSensor_DrawDetailedTemperatureView(void)
+{
+    sensor_sample_type reading;
+    char text[16];
     
-    Transceiver_Init();
-    Interface_Init();  
+    Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading);
     
-    guiSensor_Init();  
-  
-    INFO("Start up done");
- 
-    while(1)
+    sprintf(text, "max: %uC", reading.max/10);
+    libUI_PrintText(text, 6, 2);
+    
+    sprintf(text, "min: %uC", reading.min/10);
+    libUI_PrintText(text, 70, 2);
+    
+    sprintf(text, "now: %uC", reading.value/10);
+    libUI_PrintText(text, 6, 16);
+    
+    sprintf(text, "avg: %uC", reading.average/10);
+    libUI_PrintText(text, 70, 16);
+    return;
+}
+
+void guiSensor_DrawTemperatureView(void)
+{
+    sensor_sample_type reading;
+    char text[20];
+    
+    if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
     {
-        libADC_Update();				
-        libInput_Update();
-        Sensor_Update();
-        
-        Transceiver_Update();
-        Interface_Update();
-        
+        sprintf(text, "Temperature: %uC", reading.value/10);
+        libUI_PrintText(text, 10,10);
+    }
+    else
+    {
+        libUI_PrintText("Temperature: --", 10,10);
     }
     
-    CRITICAL("Main loop exit");
-    SoftReset();
+    return;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////

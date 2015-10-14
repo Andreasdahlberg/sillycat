@@ -44,13 +44,15 @@ C_SRCS +=  \
 ../../common_library/libSPI.c \
 ../../common_library/libTimer.c \
 ../../common_library/libUART.c \
+../Interface.c \
+../libInput.c \
+../Transceiver.c \
 ../fonts/font_ubuntu_mono.c \
 ../fonts/font_ubuntu_mono_large.c \
 ../libDisplay.c \
 ../libDS3234.c \
-../libLED.c \
 ../libNHD223.c \
-../libSensor.c \
+../Sensor.c \
 ../libUI.c \
 ../main_firmware.c
 
@@ -69,13 +71,15 @@ libRFM69.o \
 libSPI.o \
 libTimer.o \
 libUART.o \
+Interface.o \
+libInput.o \
+Transceiver.o \
 font_ubuntu_mono.o \
 font_ubuntu_mono_large.o \
 libDisplay.o \
 libDS3234.o \
-libLED.o \
 libNHD223.o \
-libSensor.o \
+Sensor.o \
 libUI.o \
 main_firmware.o
 
@@ -87,13 +91,15 @@ libRFM69.o \
 libSPI.o \
 libTimer.o \
 libUART.o \
+Interface.o \
+libInput.o \
+Transceiver.o \
 font_ubuntu_mono.o \
 font_ubuntu_mono_large.o \
 libDisplay.o \
 libDS3234.o \
-libLED.o \
 libNHD223.o \
-libSensor.o \
+Sensor.o \
 libUI.o \
 main_firmware.o
 
@@ -105,13 +111,15 @@ libRFM69.d \
 libSPI.d \
 libTimer.d \
 libUART.d \
+Interface.d \
+libInput.d \
+Transceiver.d \
 font_ubuntu_mono.d \
 font_ubuntu_mono_large.d \
 libDisplay.d \
 libDS3234.d \
-libLED.d \
 libNHD223.d \
-libSensor.d \
+Sensor.d \
 libUI.d \
 main_firmware.d
 
@@ -123,13 +131,15 @@ libRFM69.d \
 libSPI.d \
 libTimer.d \
 libUART.d \
+Interface.d \
+libInput.d \
+Transceiver.d \
 font_ubuntu_mono.d \
 font_ubuntu_mono_large.d \
 libDisplay.d \
 libDS3234.d \
-libLED.d \
 libNHD223.d \
-libSensor.d \
+Sensor.d \
 libUI.d \
 main_firmware.d
 
@@ -180,24 +190,28 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
 ./%.o: ../../common_library/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DSERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"  -I"../../common_library" -I"../fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
-	@echo Finished building: $<
-	
-
-./%.o: ../fonts/%.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DSERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"  -I"../../common_library" -I"../fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DSERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\" -DNODE_ADDRESS=0x01  -I"../../common_library" -I"../fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DSERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"  -I"../../common_library" -I"../fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DSERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\" -DNODE_ADDRESS=0x01  -I"../../common_library" -I"../fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+./%.o: ../fonts/%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DSERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\" -DNODE_ADDRESS=0x01  -I"../../common_library" -I"../fonts"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
