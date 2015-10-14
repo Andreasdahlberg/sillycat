@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-10-14 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -35,6 +35,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include "libADC.h"
 #include "libDebug.h"
+#include "libTimer.h"
+#include "libDS3234.h"
 
 #include "Sensor.h"
 
@@ -42,8 +44,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define TABLE_OFFSET -30
-#define TABLE_LENGTH 29
+#define TABLE_OFFSET    -30
+#define TABLE_LENGTH    29
+
+#define READING_HEADER          0xAA0F
+#define READING_START_ADDRESS   0x00
+#define ADDRESS_OFFSET          0
+
+#define AVERAGE_WINDOW_S    300    //5 min
+#define SAMPLE_FREQUENCY_MS 1000   //1 sec
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -52,6 +61,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+static uint16_t current_alpha;
+static sensor_sample_type sensor_reading;
 
 //TODO: Generate table with better precision
 static const uint16_t mf52_table[TABLE_LENGTH] PROGMEM = {
@@ -96,14 +108,84 @@ uint16_t RawValueToTemperature(uint16_t raw_value);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void Sensor_Init()
+void Sensor_Init(void)
 {
-    current_alpha = (uint16_t)CALCULATE_ALPHA(1, 300);
-    DEBUG("Smoothing Alpha: %u", current_alpha);
+    current_alpha = (uint16_t)CALCULATE_ALPHA(SAMPLE_FREQUENCY_MS / 1000,
+                                              AVERAGE_WINDOW_S);
+    DEBUG("Smoothing alpha: %u", current_alpha);
     
-    libADC_EnableInput(SENSOR_EXTERNAL_LIGHT, TRUE);
     libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, TRUE);
-    libADC_EnableInput(SENSOR_INTERNAL_TEMPERATURE, TRUE);	
+    INFO("Init done");
+}
+
+void Sensor_Update(void)
+{
+    static uint32_t sample_timer = 0;
+    
+    if (libTimer_TimeDifference(sample_timer) > SAMPLE_FREQUENCY_MS)
+    {
+        
+        Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading);
+        Sensor_GetSensorValue(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading.value);
+        
+        if (sensor_reading.header == READING_HEADER)
+        {
+            sensor_reading.average =  exponential_moving_average(sensor_reading.value,
+                                                                 sensor_reading.average,
+                                                                 current_alpha);
+                
+            if (sensor_reading.value > sensor_reading.max)
+            {
+                sensor_reading.max = sensor_reading.value;
+            }
+            else if (sensor_reading.value < sensor_reading.min)
+            {
+                sensor_reading.min = sensor_reading.value;
+            }
+        }
+        else
+        {
+            INFO("No sample found, Address: 0x%02X, Header: 0x%04X\r\n", 0x00,
+                 sensor_reading.header);
+                 
+            sensor_reading.header = READING_HEADER;
+            sensor_reading.max = sensor_reading.value;
+            sensor_reading.min = sensor_reading.value;
+            sensor_reading.average = sensor_reading.value; //NOTE: Is this bad? extreme initial values can mess up the average.
+        }
+        
+        Sensor_SaveReading(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading);          
+                
+        DEBUG("Value: %u, Average: %u, Max: %u, Min: %u\r\n", sensor_reading.value,
+              sensor_reading.average, sensor_reading.max, sensor_reading.min);
+        sample_timer = libTimer_GetMilliseconds();  
+    }
+}
+
+bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading)
+{
+    uint8_t address;
+    
+    address = READING_START_ADDRESS + (ADDRESS_OFFSET + sensor) *
+              sizeof(sensor_sample_type);
+    return libDS3234_WriteToSRAM(address, (uint8_t*)&sensor_reading,
+                                 sizeof(sensor_sample_type));   
+}
+
+bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading)
+{
+    bool status = FALSE;
+    uint8_t address;
+    
+    address = READING_START_ADDRESS + (ADDRESS_OFFSET + sensor) * 
+              sizeof(sensor_sample_type);
+    
+    if (libDS3234_ReadFromSRAM(address, (uint8_t*)reading, sizeof(sensor_sample_type)))
+    {
+        status = (bool)(reading->header == READING_HEADER);
+    }
+    
+    return status;
 }
 
 function_status Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
@@ -160,6 +242,5 @@ uint16_t RawValueToTemperature(uint16_t raw_value)
     tmp /= pgm_read_word(&mf52_table[index]);
     tmp *= (TABLE_OFFSET + (index * 5));
     tmp /= 10;
-
     return  (uint16_t)tmp;
 }

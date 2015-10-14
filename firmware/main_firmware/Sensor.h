@@ -39,11 +39,24 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+//Using packed attribute since the struct will be stored to SRAM
+typedef struct __attribute__((packed))
+{
+    uint16_t header;
+    uint16_t max;
+    uint16_t min;
+    uint16_t value;
+    uint16_t average;
+}sensor_sample_type;
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void Sensor_Init();
+void Sensor_Init(void);
+void Sensor_Update(void);
 function_status Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value);
+bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading);
+bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading);
 
 #endif /* SENSOR_H_ */
