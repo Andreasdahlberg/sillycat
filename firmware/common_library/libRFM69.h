@@ -58,8 +58,8 @@ typedef enum
 typedef enum
 {
     RFM_PACKET_FIXED_LEN,
-    RFM_PACKET_VARIABLE_LEN	
-    
+    RFM_PACKET_VARIABLE_LEN
+
 }libRFM69_packet_format_type;
 
 typedef enum
@@ -71,13 +71,13 @@ typedef enum
 typedef enum
 {
     RFM_FIFO_FILL_AUTO = 0,
-    RFM_FIFO_FILL_MAN    
+    RFM_FIFO_FILL_MAN
 }libRFM69_fifo_fill_condition_type;
 
 typedef enum
 {
     RFM_TX_START_LEVEL = 0,
-    RFM_TX_START_NOT_EMPTY 
+    RFM_TX_START_NOT_EMPTY
 }libRFM69_tx_start_condition_type;
 
 #ifndef NODE_ADDRESS
@@ -92,11 +92,13 @@ typedef enum
     #define NETWORK_ID NODE_ADDRESS
 #endif
 
-#define RFM_PWR_1	0x04 //PA0 output on pin RFIO 
+#define RFM_PWR_1	0x04 //PA0 output on pin RFIO
 #define RFM_PWR_2	0x02 //PA1 enabled on pin PA_BOOST
 #define RFM_PWR_3_4	0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
 
 #define MAX_SYNC_WORD_SIZE 7
+
+#define RFM_FIFO_SIZE 66
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -142,6 +144,7 @@ uint8_t libRFM69_GetSyncWordSize(void);
 bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
 bool libRFM69_EnableOCP(bool enabled);
 bool libRFM69_ClearFIFOOverrun(void);
+bool libRFM69_ClearFIFO(void);
 bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length);
 bool libRFM69_IsHighPowerEnabled(void);
 bool libRFM69_IsRxReady();
