@@ -63,7 +63,6 @@ typedef struct
 //////////////////////////////////////////////////////////////////////////
 
 static ADCState adc_state;
-static uint8_t current_input = 0;
 static adc_input_type adc_inputs[MAX_ADC_INPUTS];
 
 //////////////////////////////////////////////////////////////////////////
@@ -87,14 +86,14 @@ void libADC_Init(void)
 {
 	//Set the prescaler to 128(115 KHz) and enable interupt
 	ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));
-	
+
 	//Set the reference voltage to AREF
 	ADMUX = 0x00;
-	
+
 	InitInputArray();
 	adc_state = LIBADC_IDLE;
-	
-	INFO("Init done");	
+
+	INFO("Init done");
 }
 
 ///
@@ -106,17 +105,19 @@ void libADC_Init(void)
 ///
 void libADC_Update(void)
 {
+    static uint8_t current_input = 0;
+
 	if (current_input >= MAX_ADC_INPUTS)
 	{
 		current_input = 0;
 	}
-	
+
 	switch (adc_state)
 	{
 		case LIBADC_IDLE:
 			//Do nothing when idle
 			break;
-		
+
 		//TODO: Increase current_input several times per update until an active input is found, as it is now it can take up to
 		//		eight calls to Update() until an ADC conversion is started, this lowers the sample frequency.
 		case LIBADC_NEW_SAMPLE:
@@ -125,14 +126,14 @@ void libADC_Update(void)
 				SelectInput(current_input);
 				//Start a new conversion
 				ADCSRA |= (1 << ADSC);
-				adc_state = LIBADC_SAMPLING;		
+				adc_state = LIBADC_SAMPLING;
 			}
 			else
 			{
 				++current_input;
 			}
 			break;
-			
+
 		case LIBADC_SAMPLING:
 			//Check if ADC is done
 			if (ADCSRA & (1 << ADIF))
@@ -142,11 +143,11 @@ void libADC_Update(void)
 				ADCSRA & ~(1 << ADIF);
 				adc_state = LIBADC_NEW_SAMPLE;
 				++current_input;
-			}		
+			}
 			break;
-			
+
 		default:
-			WARNING("Unknown State");	
+			WARNING("Unknown State");
 			break;
 	}
 }
@@ -183,7 +184,7 @@ void libADC_Enable(bool mode)
 function_status libADC_EnableInput(uint8_t index, bool mode)
 {
 	function_status status = ERROR;
-	
+
 	if (index > 0 && index < MAX_ADC_INPUTS)
 	{
 		adc_inputs[index].active = mode;
@@ -203,7 +204,7 @@ function_status libADC_EnableInput(uint8_t index, bool mode)
 function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 {
 	function_status status = ERROR;
-	
+
 	if (index > 0 && index < MAX_ADC_INPUTS && (adc_inputs[index].active == TRUE))
 	{
 		*sample_value = adc_inputs[index].sample_value;
@@ -220,10 +221,10 @@ static void SelectInput(uint8_t adc_channel)
 {
 	uint8_t new_admux;
 	new_admux = ADMUX;
-	
+
 	//Clear MUX-bits
 	new_admux &= 0xF0;
-	
+
 	//Set new channel
 	new_admux |= adc_channel;
 	ADMUX = new_admux;
@@ -233,12 +234,12 @@ static void SelectInput(uint8_t adc_channel)
 static void InitInputArray()
 {
 	uint8_t index;
-	
+
 	for(index = 0; index < MAX_ADC_INPUTS; ++index)
 	{
 		adc_inputs[index].active = FALSE;
 		adc_inputs[index].channel_index = index;
-		adc_inputs[index].sample_value = 0;	
+		adc_inputs[index].sample_value = 0;
 	}
 }
 
