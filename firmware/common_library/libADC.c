@@ -118,19 +118,20 @@ void libADC_Update(void)
 			//Do nothing when idle
 			break;
 
-		//TODO: Increase current_input several times per update until an active input is found, as it is now it can take up to
-		//		eight calls to Update() until an ADC conversion is started, this lowers the sample frequency.
 		case LIBADC_NEW_SAMPLE:
-			if (adc_inputs[current_input].active == TRUE)
+            while (adc_inputs[current_input].active != TRUE &&
+                   current_input < MAX_ADC_INPUTS)
+            {
+                ++current_input;
+            }
+
+			if (adc_inputs[current_input].active == TRUE &&
+                current_input < MAX_ADC_INPUTS)
 			{
 				SelectInput(current_input);
 				//Start a new conversion
 				ADCSRA |= (1 << ADSC);
 				adc_state = LIBADC_SAMPLING;
-			}
-			else
-			{
-				++current_input;
 			}
 			break;
 
