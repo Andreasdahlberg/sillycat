@@ -39,3 +39,4 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void guiSensor_Init(void);
 void guiSensor_DrawDetailedTemperatureView(void);
 void guiSensor_DrawTemperatureView(void);
+void guiSensor_DrawSensorInformation(void);
