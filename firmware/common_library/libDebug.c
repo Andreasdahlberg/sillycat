@@ -63,7 +63,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 ///
 void libDebug_Init()
 {
-	#ifdef DEBUG_ENABLE	
+	#ifdef DEBUG_ENABLE
 	libUART_Init();
 	#endif
 	INFO("Init done");
@@ -73,7 +73,7 @@ void libDebug_Init()
 ///
 /// @brief Print string from FLASH
 ///
-/// @param  text Text to print 
+/// @param  text Text to print
 /// @param  variable number of arguments
 /// @return None
 ///
@@ -82,9 +82,9 @@ void libDebug_Print_P(const char* text, ...)
 	va_list args;
 	char buffer[128];
     char format[64];
-    
+
     strncpy_P(format, text, 64);
-	
+
 	va_start(args, text);
 	vsprintf(buffer, format, args);
 	libUART_SendArray((uint8_t*)buffer, strlen(buffer));

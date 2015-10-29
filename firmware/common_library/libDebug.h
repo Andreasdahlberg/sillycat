@@ -41,7 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_ENABLE
-    #define DEBUG(text, ...)			libDebug_Print_P(PSTR(text), ##__VA_ARGS__)    
+    #define DEBUG(text, ...)			libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
     #define CRITICAL(text, ...)         libDebug_Print_P(PSTR("<CRITICAL> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
     #define ERROR(text, ...)            libDebug_Print_P(PSTR("<ERROR> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
     #define WARNING(text, ...)          libDebug_Print_P(PSTR("<WARNING> %s() " text "\r\n"), __func__, ##__VA_ARGS__)

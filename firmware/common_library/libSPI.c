@@ -81,29 +81,29 @@ bool SPIBusy();
 /// @return None
 ///
 void libSPI_Init(uint8_t spi_mode)
-{	
-	//Always set SS as output even if not used, otherwise the device can't 
+{
+	//Always set SS as output even if not used, otherwise the device can't
 	//act as master.
 	DDRB |= ((1 << MOSI)|(1 << SCK)|(1 << SS));
-	DDRB &= ~(1 << MISO);	
+	DDRB &= ~(1 << MISO);
 
 	//SPCR = 0x00;
 	SPCR = (1<<SPR0);
-	
+
 	libSPI_SetMaster(TRUE);
-	
+
 	if (libSPI_SetMode(spi_mode) == TRUE)
 	{
 		SPCR |= (1<<SPE);
 		spi_status = IDLE;
-	
+
 		INFO("Init done");
 	}
 	else
 	{
 		ERROR("Failed to init SPI, invalid mode: %u", spi_mode);
 	}
-	
+
 	slave_active = FALSE;
 	return;
 }
@@ -118,22 +118,22 @@ void libSPI_Init(uint8_t spi_mode)
 void libSPI_Update(void)
 {
 	static uint8_t byte_counter = 0;
-	
+
 	switch(spi_status)
 	{
 		case IDLE:
 			break;
-		
+
 		case READ_DONE:
 			break;
-		
+
 		case READ:
 			if (byte_counter < rx_length)
 			{
 				if (!SPIBusy())
 				{
 					receive_buffer[byte_counter] = SPDR;
-					SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock 
+					SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock
 					++byte_counter;
 				}
 			}
@@ -143,7 +143,7 @@ void libSPI_Update(void)
 				spi_status = READ_DONE;
 			}
 			break;
-		
+
 		case WRITE:
 			if (byte_counter < tx_length)
 			{
@@ -157,19 +157,19 @@ void libSPI_Update(void)
 			else if (byte_counter == tx_length && !SPIBusy())
 			{
 				spi_status = WRITE_DONE;
-			}	
+			}
 			break;
-		
+
 		case WRITE_DONE:
 			byte_counter = 0;
 			spi_status = IDLE;
 			break;
-		
+
 		default:
 			ERROR("Fatal error, reinitializing module...");
 			//libSPI_Init();
 			break;
-		
+
 	}
 	return;
 }
@@ -191,10 +191,10 @@ void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
     {
         pre_write();
     }
-    
+
     SPDR = data_byte;
     while(!(SPSR & (1<<SPIF)))
-    {	
+    {
     }
 
     if (post_write != NULL)
@@ -246,9 +246,9 @@ void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_write,
 bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 {
 	bool status = FALSE;
-	
+
 	DEBUG("Write started");
-	
+
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
 		memcpy(transmit_buffer, data_bytes, length);
@@ -263,7 +263,7 @@ bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 //TODO: Rewrite function description
 ///
 /// @brief Start reading data from the SPI-bus. The first time libSPI_Read() is called a read cycle is started. LibSPI_Read() then returns false until the read cycle
-///        is done and the data in the data buffer is valid. 
+///        is done and the data in the data buffer is valid.
 ///
 /// @param  data_bytes Pointer to buffer where the data will be stored
 /// @param  length Length of the expected data
@@ -272,12 +272,12 @@ bool libSPI_Write(const uint8_t* data_bytes, uint8_t length)
 bool libSPI_Read(const uint8_t* data_bytes, uint8_t length)
 {
 	bool status = FALSE;
-	
+
 	if (libSPI_GetStatus() == IDLE && length <= BUFFER_SIZE)
 	{
 		memset(receive_buffer, 0, BUFFER_SIZE); //Clear the receive buffer
 		rx_length = length;
-		SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock 
+		SPDR = 0x00; //Put dummy data in the SPI data register to enable SPI clock
 		spi_status = READ;
 	}
 	else if (libSPI_GetStatus() == READ_DONE)
@@ -362,7 +362,7 @@ bool libSPI_SetMode(uint8_t mode)
 //TODO: Fix this description
 ///
 /// @brief Set slave to active, this prevents other modules to use the SPI-bus. Keep in mind that there is now control if its the same module...
-///      
+///
 ///
 /// @param state True if SPI is active, otherwise False
 /// @return bool Status of operation

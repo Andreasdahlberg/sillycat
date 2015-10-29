@@ -24,6 +24,9 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef RTC_H_
+#define RTC_H_
+
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
@@ -48,3 +51,5 @@ typedef struct
 
 void RTC_GetTimestamp(char *timestamp);
 bool RTC_GetCurrentTime(rtc_time_type *current_time);
+
+#endif /* RTC_H_ */
