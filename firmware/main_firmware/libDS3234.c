@@ -135,6 +135,19 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 }
 
 ///
+/// @brief Get the current year NOT IMPLEMENTED
+///
+/// @param  *year Pointer to variable where the year will be stored
+/// @return FALSE  If read of year failed
+/// @return SUCCESS If read of year succeeded
+///
+bool libDS3234_GetYear(uint8_t *year)
+{
+    *year = 15;
+    return TRUE;
+}
+
+///
 /// @brief Get the current month
 ///
 /// @param  *month Pointer to variable where the month will be stored
