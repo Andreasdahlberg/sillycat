@@ -1,7 +1,7 @@
 /**
  * @file   libInput.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-10-29 (Last edit)
  * @brief  Header of Input module.
  *
  * Detailed description of file.
@@ -23,6 +23,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#ifndef LIBINPUT_H_
+#define LIBINPUT_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -46,3 +49,5 @@ bool libInput_Push(void);
 void libInput_SetCallbacks(libinput_callback_type right_event,
                            libinput_callback_type left_event,
                            libinput_callback_type push_event);
+
+#endif /* LIBINPUT_H_ */
