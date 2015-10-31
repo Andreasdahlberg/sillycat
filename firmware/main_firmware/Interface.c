@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-29 (Last edit)
+ * @date   2015-10-31 (Last edit)
  * @brief  Implementation of Interface
  *
  * Detailed description of file.
@@ -74,8 +74,8 @@ static void RightRotationDetected(void);
 static void LeftRotationDetected(void);
 static void PushDetected(void);
 
-static void DrawClockView(void);
-static void DrawDetailedTimeView(void);
+static void DrawClockView(uint16_t context __attribute__ ((unused)));
+static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
 static void DrawViewIndicator(void);
 
 //////////////////////////////////////////////////////////////////////////
@@ -103,12 +103,14 @@ void Interface_Init(void)
 
     //TODO: Does this init belong here? Move views to main?
     main_view.draw_function = DrawClockView;
+    main_view.context = 0;
     main_view.child = NULL;
     main_view.prev = NULL;
     main_view.next = NULL;
     main_view.parent = NULL;
 
     time_view.draw_function = DrawDetailedTimeView;
+    time_view.context = 0;
     time_view.child = NULL;
     time_view.prev = NULL;
     time_view.next = NULL;
@@ -135,7 +137,7 @@ void Interface_AddSibling(struct view *sibling_view, struct view *new_view)
     struct view *view_ptr;
     view_ptr = sibling_view;
 
-    //TODO: Add condition to protect against loops, ex next = current
+    //TODO: Add condition to protect against loops, ex view_ptr->next = view_ptr
     while (view_ptr->next != NULL)
     {
         view_ptr = view_ptr->next;
@@ -198,7 +200,7 @@ void Interface_Update(void)
         if (current_view->draw_function != NULL)
         {
             libDisplay_ClearVRAM();
-            current_view->draw_function();
+            current_view->draw_function(current_view->context);
             if (libTimer_TimeDifference(activity_timer) < 2000)
             {
                 DrawViewIndicator();
@@ -252,7 +254,7 @@ static void DrawViewIndicator(void)
     return;
 }
 
-static void DrawClockView(void)
+static void DrawClockView(uint16_t context __attribute__ ((unused)))
 {
     char text_buffer[20];
     uint8_t min;
@@ -266,7 +268,7 @@ static void DrawClockView(void)
     return;
 }
 
-static void DrawDetailedTimeView(void)
+static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
 {
     char text_buffer[20];
     uint8_t year;

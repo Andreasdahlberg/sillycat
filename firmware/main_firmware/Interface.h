@@ -1,7 +1,7 @@
 /**
  * @file   Interface.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-29 (Last edit)
+ * @date   2015-10-31 (Last edit)
  * @brief  Header of Interface
  *
  * Detailed description of file.
@@ -35,11 +35,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef void (*interface_fp)(void);
+typedef void (*interface_fp)(uint16_t context);
 
 struct view
 {
     interface_fp draw_function;
+    uint16_t context;
     struct view *parent;
     struct view *child;
     struct view *next;
