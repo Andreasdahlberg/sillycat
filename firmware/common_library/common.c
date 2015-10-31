@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-10-31 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -57,16 +57,16 @@ uint16_t exponential_moving_average(uint16_t value, uint16_t average,
 {
     uint32_t tmp = (uint32_t)alpha * (uint32_t)value + (uint32_t)(65536 - alpha) * (uint32_t)average;
     return (uint16_t)((tmp+32768) / 65536);
-                                        
+
 }
 
 uint8_t BCDToDecimal(uint8_t bcd_data)
 {
     uint8_t data;
-        
+
     data = ((bcd_data & 0xF0)>>4)*10;
     data += (bcd_data & 0x0F);
-    
+
     return data;
 }
 
@@ -74,7 +74,7 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
 {
     uint16_t data = 0;
     uint8_t shift = 0;
-    
+
     do
     {
         data |= (decimal_data % 10) << shift;
@@ -82,7 +82,7 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
         decimal_data = decimal_data / 10;
     }
     while (decimal_data > 0);
-    
+
     return data;
 }
 
@@ -105,12 +105,12 @@ int GetFreeRam()
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-void SoftReset()  
- {                   
-    wdt_enable(WDTO_15MS);  
-    while(1)             
-    {                       
-    }                       
+void SoftReset()
+ {
+    wdt_enable(WDTO_15MS);
+    while(1)
+    {
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
