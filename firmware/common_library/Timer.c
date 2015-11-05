@@ -1,8 +1,8 @@
 /**
- * @file   libTimer.c
+ * @file   Timer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2015-11-05 (Last edit)
- * @brief  Implementation of low level timer functions
+ * @brief  Implementation of Timer functions
  *
  * Detailed description of file.
  */
@@ -28,87 +28,65 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/interrupt.h>
-#include <util/atomic.h>
-
 #include "libTimer.h"
+#include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
+//////////////////////////////////////////////////////////////////////////
+
+#define TIMERMAX (uint32_t)0xFFFFFFFF
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-volatile uint32_t system_timer;
-
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////
-//INTERUPT SERVICE ROUTINES
-//////////////////////////////////////////////////////////////////////////
-
-ISR(TIMER1_COMPA_vect)
-{
-    ++system_timer;
-}
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
 ///
-/// @brief Init the timer hardware
+/// @brief Get the current time(s).
 ///
 /// @param  None
-/// @return None
+/// @return uint32_t The current system time in seconds
 ///
-void libTimer_Init()
+uint32_t Timer_GetSeconds()
 {
-    system_timer = 0;
-
-    TCCR1B |= (1 << WGM12);
-    TIMSK1 |= (1 << OCIE1A);
-
-    sei();
-
-    OCR1A = 1000;
-    TCCR1B |= (1 << CS11); // Fosc/8
+	return ((Timer_GetMilliseconds() + 500) / 1000);
 }
 
 ///
-/// @brief Resets the system timer
+/// @brief Get the difference between the system timer and the supplied timestamp(ms).
+///		   Protected against timer wrap around. CAUTION: Does not detect several
+///        wrap arounds but this is a very long time(over 49 days).
 ///
-/// @param  None
-/// @return None
+/// @param  time_ms Timestamp in ms to compare with system timer
+/// @return uint32_t The difference in ms beetween timestamp and system timer
 ///
-void libTimer_Reset()
+uint32_t Timer_TimeDifference(uint32_t time_ms)
 {
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        system_timer = 0;
-    }
-}
+	uint32_t time_difference;
+	uint32_t current_time = Timer_GetMilliseconds();
 
-///
-/// @brief Get the current time(ms)
-///
-/// @param  None
-/// @return uint32_t The current system time in milliseconds
-///
-uint32_t libTimer_GetMilliseconds()
-{
-    uint32_t current_timer;
-
-    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    {
-        current_timer = system_timer;
-    }
-
-    return current_timer;
+	//Check for timer overflow
+	if (time_ms > current_time)
+	{
+		time_difference = (TIMERMAX - time_ms) + current_time;
+	}
+	else
+	{
+		time_difference = current_time - time_ms;
+	}
+	return time_difference;
 }
 
 //////////////////////////////////////////////////////////////////////////

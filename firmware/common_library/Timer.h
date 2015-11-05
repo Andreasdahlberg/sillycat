@@ -1,8 +1,8 @@
 /**
- * @file   libTimer.h
+ * @file   Timer.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2015-11-05 (Last edit)
- * @brief  Header of low level timer functions
+ * @brief  Header of Timer functions
  *
  * Detailed description of file.
  */
@@ -24,18 +24,19 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBTIMER_H_
-#define LIBTIMER_H_
+#ifndef TIMER_H_
+#define TIMER_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <stdint.h>
-
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define Timer_Init() libTimer_Init()
+#define Timer_GetMilliseconds() libTimer_GetMilliseconds()
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -45,7 +46,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libTimer_Init();
-uint32_t libTimer_GetMilliseconds();
+uint32_t Timer_GetSeconds();
+uint32_t Timer_TimeDifference(uint32_t time_ms);
 
-#endif /* LIBTIMER_H_ */
+#endif /* TIMER_H_ */
