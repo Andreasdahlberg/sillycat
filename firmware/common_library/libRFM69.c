@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-11-05 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -27,22 +27,23 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-#define F_CPU 8000000UL // 8 MHz
+
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <util/delay.h>
 
-#include "common.h"
 #include "libRFM69.h"
 #include "libSPI.h"
-#include "libTimer.h"
 #include "libDebug.h"
 #include "RFM69Registers.h"
 
+#include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define LIBNAME "libRFM69"
 #define SS DDB2
 #define SPI_MODE 0
 
@@ -286,11 +287,11 @@ bool libRFM69_SetMode(libRFM69_mode_type mode)
 bool libRFM69_WaitForModeReady()
 {
     bool status = TRUE;
-    uint32_t timeout_timer = libTimer_GetMilliseconds();
+    uint32_t timeout_timer = Timer_GetMilliseconds();
 
     while (!libRFM69_IsModeReady())
     {
-        if (libTimer_TimeDifference(timeout_timer) > WAIT_TIMEOUT_MS)
+        if (Timer_TimeDifference(timeout_timer) > WAIT_TIMEOUT_MS)
         {
             ERROR("Timeout!");
             status = FALSE;
@@ -399,7 +400,7 @@ bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type start_conditi
     uint8_t register_content;
 
     if (start_condition == RFM_TX_START_LEVEL ||
-    start_condition == RFM_TX_START_NOT_EMPTY)
+        start_condition == RFM_TX_START_NOT_EMPTY)
     {
         if (ReadRegister(REG_FIFOTHRESH, &register_content))
         {

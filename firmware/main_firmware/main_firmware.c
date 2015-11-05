@@ -38,7 +38,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "libDebug.h"
-#include "libTimer.h"
 #include "libADC.h"
 #include "libSPI.h"
 #include "libDS3234.h"
@@ -47,9 +46,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Sensor.h"
 #include "Interface.h"
+#include "Timer.h"
 #include "Transceiver.h"
 
 #include "guiSensor.h"
+#include "guiNodes.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -76,41 +77,41 @@ int main(void)
     uint8_t mcu_status = MCUSR;
     MCUSR = 0;
     wdt_disable();
-    
+
     libDS3234_HWInit();
-    libRFM69_HWInit();    
-    
+    libRFM69_HWInit();
+
     libDebug_Init();
     INFO("Main unit started");
     INFO("Last reset: 0x%02X", mcu_status);
-    
+
     libADC_Init();
-    libTimer_Init();		
+    Timer_Init();
     libSPI_Init(1);
     libDS3234_Init();
     libADC_Enable(TRUE);
     Sensor_Init();
     libInput_Init();
- 
-    
+
+
     Transceiver_Init();
-    Interface_Init();  
-    
-    guiSensor_Init();  
-  
+    Interface_Init();
+
+    guiSensor_Init();
+    guiNodes_Init();
+
     INFO("Start up done");
- 
+
     while(1)
     {
-        libADC_Update();				
+        libADC_Update();
         libInput_Update();
         Sensor_Update();
-        
+
         Transceiver_Update();
         Interface_Update();
-        
     }
-    
+
     CRITICAL("Main loop exit");
     SoftReset();
 }

@@ -37,11 +37,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDisplay.h"
 #include "libDS3234.h"
 #include "libInput.h"
-#include "libTimer.h"
 #include "libUI.h"
 
 #include "bitmap_db.h"
 #include "Interface.h"
+#include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -201,7 +201,7 @@ void Interface_Update(void)
         {
             libDisplay_ClearVRAM();
             current_view->draw_function(current_view->context);
-            if (libTimer_TimeDifference(activity_timer) < 2000)
+            if (Timer_TimeDifference(activity_timer) < 2000)
             {
                 DrawViewIndicator();
             }
@@ -212,10 +212,10 @@ void Interface_Update(void)
             ERROR("Invalid draw function");
         }
         refresh_flag = FALSE;
-        auto_timer = libTimer_GetMilliseconds();
+        auto_timer = Timer_GetMilliseconds();
     }
 
-    if (libTimer_TimeDifference(auto_timer) > REFRESH_RATE_MS)
+    if (Timer_TimeDifference(auto_timer) > REFRESH_RATE_MS)
     {
         refresh_flag = TRUE;
     }
@@ -301,7 +301,7 @@ static void LeftRotationDetected(void)
     }
 
     refresh_flag = TRUE;
-    activity_timer = libTimer_GetMilliseconds();
+    activity_timer = Timer_GetMilliseconds();
     return;
 }
 
@@ -313,7 +313,7 @@ static void RightRotationDetected(void)
     }
 
     refresh_flag = TRUE;
-    activity_timer = libTimer_GetMilliseconds();
+    activity_timer = Timer_GetMilliseconds();
     return;
 }
 
@@ -329,6 +329,6 @@ static void PushDetected(void)
     }
 
     refresh_flag = TRUE;
-    activity_timer = libTimer_GetMilliseconds();
+    activity_timer = Timer_GetMilliseconds();
     return;
 }

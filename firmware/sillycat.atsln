@@ -5,6 +5,8 @@ Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "main_firmware", "main_firmw
 EndProject
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "node_firmware", "node_firmware\node_firmware.cproj", "{94859678-0949-453F-8588-280A54573F3C}"
 EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "Test", "Test\Test.cproj", "{51E627FB-66F9-4AB4-AAD8-2AC40F04284D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -16,9 +18,11 @@ Global
 		{94B43BF3-BCA6-4CDA-A6AE-6F0EF5F4DAEB}.Release|AVR.ActiveCfg = Release|AVR
 		{94B43BF3-BCA6-4CDA-A6AE-6F0EF5F4DAEB}.Release|AVR.Build.0 = Release|AVR
 		{94859678-0949-453F-8588-280A54573F3C}.Debug|AVR.ActiveCfg = Debug|AVR
-		{94859678-0949-453F-8588-280A54573F3C}.Debug|AVR.Build.0 = Debug|AVR
 		{94859678-0949-453F-8588-280A54573F3C}.Release|AVR.ActiveCfg = Release|AVR
-		{94859678-0949-453F-8588-280A54573F3C}.Release|AVR.Build.0 = Release|AVR
+		{51E627FB-66F9-4AB4-AAD8-2AC40F04284D}.Debug|AVR.ActiveCfg = Debug|AVR
+		{51E627FB-66F9-4AB4-AAD8-2AC40F04284D}.Debug|AVR.Build.0 = Debug|AVR
+		{51E627FB-66F9-4AB4-AAD8-2AC40F04284D}.Release|AVR.ActiveCfg = Release|AVR
+		{51E627FB-66F9-4AB4-AAD8-2AC40F04284D}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

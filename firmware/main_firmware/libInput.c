@@ -37,7 +37,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libADC.h"
 #include "libDebug.h"
 #include "libInput.h"
-#include "libTimer.h"
+
+#include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
