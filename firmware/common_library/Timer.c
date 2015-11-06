@@ -1,7 +1,7 @@
 /**
  * @file   Timer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-05 (Last edit)
+ * @date   2015-11-06 (Last edit)
  * @brief  Implementation of Timer functions
  *
  * Detailed description of file.
@@ -28,7 +28,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "libTimer.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -61,7 +60,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 ///
 uint32_t Timer_GetSeconds()
 {
-	return ((Timer_GetMilliseconds() + 500) / 1000);
+    return ((Timer_GetMilliseconds() + 500) / 1000);
 }
 
 ///
@@ -74,19 +73,19 @@ uint32_t Timer_GetSeconds()
 ///
 uint32_t Timer_TimeDifference(uint32_t time_ms)
 {
-	uint32_t time_difference;
-	uint32_t current_time = Timer_GetMilliseconds();
+    uint32_t time_difference;
+    uint32_t current_time = Timer_GetMilliseconds();
 
-	//Check for timer overflow
-	if (time_ms > current_time)
-	{
-		time_difference = (TIMERMAX - time_ms) + current_time;
-	}
-	else
-	{
-		time_difference = current_time - time_ms;
-	}
-	return time_difference;
+    //Check for timer overflow
+    if (time_ms > current_time)
+    {
+        time_difference = (TIMERMAX - time_ms) + current_time;
+    }
+    else
+    {
+        time_difference = current_time - time_ms;
+    }
+    return time_difference;
 }
 
 //////////////////////////////////////////////////////////////////////////
