@@ -1,8 +1,8 @@
 /**
- * @file   Interface.h
+ * @file   guiRTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-31 (Last edit)
- * @brief  Header of Interface
+ * @date   2015-11-06 (Last edit)
+ * @brief  Header of guiRTC
  *
  * Detailed description of file.
  */
@@ -24,40 +24,16 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef INTERFACE_H_
-#define INTERFACE_H_
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-
-#include <stdint.h>
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef void (*interface_fp)(uint16_t context);
-
-struct view
-{
-    interface_fp draw_function;
-    uint16_t context;
-    struct view *parent;
-    struct view *child;
-    struct view *next;
-    struct view *prev;
-};
-
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void Interface_Init(void);
-void Interface_Update(void);
-void Interface_Refresh(void);
-void Interface_AddView(struct view *new_view);
-void Interface_AddChild(struct view *parent_view, struct view *child_view);
-void Interface_RemoveView(struct view *view);
-
-#endif /* INTERFACE_H_ */
+void guiRTC_Init(void);

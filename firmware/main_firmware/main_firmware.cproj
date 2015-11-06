@@ -224,6 +224,12 @@
     <Compile Include="gui\guiNodes.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="gui\guiRTC.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="gui\guiRTC.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="gui\guiSensor.c">
       <SubType>compile</SubType>
     </Compile>

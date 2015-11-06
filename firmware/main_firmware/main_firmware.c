@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-11-06 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -49,6 +49,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Timer.h"
 #include "Transceiver.h"
 
+#include "guiRTC.h"
 #include "guiSensor.h"
 #include "guiNodes.h"
 
@@ -97,6 +98,8 @@ int main(void)
     Transceiver_Init();
     Interface_Init();
 
+    //NOTE: The first init called will be the root view.
+    guiRTC_Init();
     guiSensor_Init();
     guiNodes_Init();
 

@@ -1,8 +1,8 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-31 (Last edit)
- * @brief  Implementation of Interface
+ * @date   2015-11-06 (Last edit)
+ * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
  */
@@ -63,7 +63,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 static bool refresh_flag;
 static uint32_t activity_timer;
 
-static struct view main_view;
+static struct view *root_view;
 static struct view *current_view;
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,8 +74,6 @@ static void RightRotationDetected(void);
 static void LeftRotationDetected(void);
 static void PushDetected(void);
 
-static void DrawClockView(uint16_t context __attribute__ ((unused)));
-static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
 static void DrawViewIndicator(void);
 
 //////////////////////////////////////////////////////////////////////////
@@ -91,8 +89,6 @@ static void DrawViewIndicator(void);
 ///
 void Interface_Init(void)
 {
-    static struct view time_view;
-
     libDisplay_Init();
     libDisplay_On();
 
@@ -101,27 +97,44 @@ void Interface_Init(void)
     libInput_SetCallbacks(RightRotationDetected, LeftRotationDetected,
                           PushDetected);
 
-    //TODO: Does this init belong here? Move views to main?
-    main_view.draw_function = DrawClockView;
-    main_view.context = 0;
-    main_view.child = NULL;
-    main_view.prev = NULL;
-    main_view.next = NULL;
-    main_view.parent = NULL;
-
-    time_view.draw_function = DrawDetailedTimeView;
-    time_view.context = 0;
-    time_view.child = NULL;
-    time_view.prev = NULL;
-    time_view.next = NULL;
-    time_view.parent = NULL;
-
-    Interface_AddChild(&main_view, &time_view);
-
+    root_view = NULL;
+    current_view = NULL;
     refresh_flag = TRUE;
-    current_view = &main_view;
 
     INFO("Init done");
+    return;
+}
+
+///
+/// @brief Update interface if needed, call as fast as possible.
+///
+/// @param  None
+/// @return None
+///
+void Interface_Update(void)
+{
+    static uint32_t auto_timer = 0;
+
+    if (refresh_flag == TRUE)
+    {
+        if (current_view != NULL && current_view->draw_function != NULL)
+        {
+            libDisplay_ClearVRAM();
+            current_view->draw_function(current_view->context);
+            if (Timer_TimeDifference(activity_timer) < 2000)
+            {
+                DrawViewIndicator();
+            }
+            libUI_Update();
+        }
+        refresh_flag = FALSE;
+        auto_timer = Timer_GetMilliseconds();
+    }
+
+    if (Timer_TimeDifference(auto_timer) > REFRESH_RATE_MS)
+    {
+        refresh_flag = TRUE;
+    }
     return;
 }
 
@@ -149,14 +162,51 @@ void Interface_AddSibling(struct view *sibling_view, struct view *new_view)
 }
 
 ///
-/// @brief Add a new view as a sibling to the main view
+/// @brief Add a new view as a sibling to the root view
 ///
 /// @param  *new_view Pointer to new view
 /// @return None
 ///
 void Interface_AddView(struct view *new_view)
 {
-    Interface_AddSibling(&main_view, new_view);
+    if (root_view == NULL)
+    {
+        INFO("New view added as root");
+        //Set view as root view if there is no previous root view
+        root_view = new_view;
+        current_view = new_view;
+    }
+    else
+    {
+        INFO("New view added as sibling to root");
+        Interface_AddSibling(root_view, new_view);
+    }
+    return;
+}
+
+
+void Interface_RemoveView(struct view *view)
+{
+    if (view->next != NULL)
+    {
+        view->next->prev = view->prev;
+    }
+
+    if (view->prev != NULL)
+    {
+        view->prev->next = view->next;
+    }
+
+    //Check if view is the first child view or the root view
+    if (view->parent != NULL && view->prev == NULL && view->next != NULL)
+    {
+        view->parent->child = view->next;
+    }
+    else if (view->parent == NULL && view->prev == NULL)
+    {
+        root_view = NULL;
+        current_view = NULL;
+    }
     return;
 }
 
@@ -182,43 +232,6 @@ void Interface_AddChild(struct view *parent_view, struct view *child_view)
     }
 
     child_view->parent = parent_view;
-    return;
-}
-
-///
-/// @brief Update interface if needed, call as fast as possible.
-///
-/// @param  None
-/// @return None
-///
-void Interface_Update(void)
-{
-    static uint32_t auto_timer = 0;
-
-    if (refresh_flag == TRUE)
-    {
-        if (current_view->draw_function != NULL)
-        {
-            libDisplay_ClearVRAM();
-            current_view->draw_function(current_view->context);
-            if (Timer_TimeDifference(activity_timer) < 2000)
-            {
-                DrawViewIndicator();
-            }
-            libUI_Update();
-        }
-        else
-        {
-            ERROR("Invalid draw function");
-        }
-        refresh_flag = FALSE;
-        auto_timer = Timer_GetMilliseconds();
-    }
-
-    if (Timer_TimeDifference(auto_timer) > REFRESH_RATE_MS)
-    {
-        refresh_flag = TRUE;
-    }
     return;
 }
 
@@ -251,45 +264,6 @@ static void DrawViewIndicator(void)
     {
         libUI_DrawLine(0, 0, 0, DISPLAY_HEIGHT - 1);
     }
-    return;
-}
-
-static void DrawClockView(uint16_t context __attribute__ ((unused)))
-{
-    char text_buffer[20];
-    uint8_t min;
-    uint8_t hour;
-
-    libDS3234_GetMinutes(&min);
-    libDS3234_GetHour(&hour);
-    sprintf(text_buffer, "%02u:%02u", hour, min);
-
-    libUI_PrintText(text_buffer, 49, 11);
-    return;
-}
-
-static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
-{
-    char text_buffer[20];
-    uint8_t year;
-    uint8_t month;
-    uint8_t date;
-    uint8_t hour;
-    uint8_t min;
-    uint8_t sec;
-
-    libDS3234_GetYear(&year);
-    libDS3234_GetMonth(&month);
-    libDS3234_GetDate(&date);
-
-    sprintf(text_buffer, "20%02u-%02u-%02u", year, month, date);
-    libUI_PrintText(text_buffer, 31, 2);
-
-    libDS3234_GetMinutes(&min);
-    libDS3234_GetHour(&hour);
-    libDS3234_GetSeconds(&sec);
-    sprintf(text_buffer, "%02u:%02u:%02u", hour, min, sec);
-    libUI_PrintText(text_buffer, 40, 16);
     return;
 }
 
