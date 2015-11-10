@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-06 (Last edit)
+ * @date   2015-11-10 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -35,20 +35,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libDisplay.h"
-#include "libDS3234.h"
-#include "libInput.h"
 #include "libUI.h"
 
 #include "bitmap_db.h"
 #include "Interface.h"
 #include "Timer.h"
 
+#include "guiInterface.h"
+
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define DISPLAY_WIDTH 128
-#define DISPLAY_HEIGHT 32
 
 #define REFRESH_RATE_MS 1000
 
@@ -70,10 +67,6 @@ static struct view *current_view;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void RightRotationDetected(void);
-static void LeftRotationDetected(void);
-static void PushDetected(void);
-
 static void DrawViewIndicator(void);
 
 //////////////////////////////////////////////////////////////////////////
@@ -93,9 +86,6 @@ void Interface_Init(void)
     libDisplay_On();
 
     libUI_SetFont(&ubuntuMono_10ptFontInfo);
-
-    libInput_SetCallbacks(RightRotationDetected, LeftRotationDetected,
-                          PushDetected);
 
     root_view = NULL;
     current_view = NULL;
@@ -248,26 +238,7 @@ void Interface_Refresh(void)
     return;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//LOCAL FUNCTIONS
-//////////////////////////////////////////////////////////////////////////
-
-static void DrawViewIndicator(void)
-{
-    if (current_view->next == NULL)
-    {
-        libUI_DrawLine(DISPLAY_WIDTH - 1, 0, DISPLAY_WIDTH - 1,
-                       DISPLAY_HEIGHT - 1);
-    }
-
-    if (current_view->prev == NULL)
-    {
-        libUI_DrawLine(0, 0, 0, DISPLAY_HEIGHT - 1);
-    }
-    return;
-}
-
-static void LeftRotationDetected(void)
+void Interface_PreviousView(void)
 {
     if (current_view->prev != NULL)
     {
@@ -279,7 +250,7 @@ static void LeftRotationDetected(void)
     return;
 }
 
-static void RightRotationDetected(void)
+void Interface_NextView(void)
 {
     if (current_view->next != NULL)
     {
@@ -291,7 +262,7 @@ static void RightRotationDetected(void)
     return;
 }
 
-static void PushDetected(void)
+void Interface_ActivateView(void)
 {
     if (current_view->child != NULL)
     {
@@ -304,5 +275,23 @@ static void PushDetected(void)
 
     refresh_flag = TRUE;
     activity_timer = Timer_GetMilliseconds();
+    return;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+static void DrawViewIndicator(void)
+{
+    if (current_view->next == NULL)
+    {
+        guiInterface_DrawViewIndicator(INDICATOR_POS_RIGHT);
+    }
+
+    if (current_view->prev == NULL)
+    {
+        guiInterface_DrawViewIndicator(INDICATOR_POS_LEFT);
+    }
     return;
 }

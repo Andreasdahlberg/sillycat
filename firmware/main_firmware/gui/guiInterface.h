@@ -1,8 +1,8 @@
 /**
- * @file   Interface.h
+ * @file   guiInterface.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
- * @brief  Header of Interface
+ * @date   2015-11-06 (Last edit)
+ * @brief  Header of guiInterface
  *
  * Detailed description of file.
  */
@@ -24,43 +24,25 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef INTERFACE_H_
-#define INTERFACE_H_
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-
-#include <stdint.h>
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef void (*interface_fp)(uint16_t context);
-
-struct view
+typedef enum
 {
-    interface_fp draw_function;
-    uint16_t context;
-    struct view *parent;
-    struct view *child;
-    struct view *next;
-    struct view *prev;
-};
+    INDICATOR_POS_RIGHT = 0,
+    INDICATOR_POS_LEFT,
+    INDICATOR_POS_TOP,
+    INDICATOR_POS_BOTTOM,
+
+} indicator_position_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void Interface_Init(void);
-void Interface_Update(void);
-void Interface_Refresh(void);
-void Interface_AddView(struct view *new_view);
-void Interface_AddChild(struct view *parent_view, struct view *child_view);
-void Interface_RemoveView(struct view *view);
-void Interface_NextView(void);
-void Interface_PreviousView(void);
-void Interface_ActivateView(void);
-
-#endif /* INTERFACE_H_ */
+void guiInterface_DrawViewIndicator(indicator_position_type position);

@@ -218,6 +218,20 @@
       <SubType>compile</SubType>
       <Link>RTC.h</Link>
     </Compile>
+    <Compile Include="..\common_library\Timer.c">
+      <SubType>compile</SubType>
+      <Link>Timer.c</Link>
+    </Compile>
+    <Compile Include="..\common_library\Timer.h">
+      <SubType>compile</SubType>
+      <Link>Timer.h</Link>
+    </Compile>
+    <Compile Include="gui\guiInterface.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="gui\guiInterface.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="gui\guiNodes.c">
       <SubType>compile</SubType>
     </Compile>
@@ -252,12 +266,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Nodes.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Timer.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Timer.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Transceiver.c">

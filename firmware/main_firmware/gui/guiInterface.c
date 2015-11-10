@@ -1,8 +1,8 @@
 /**
- * @file   main_firmware.c
+ * @file   guiInterface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2015-11-10 (Last edit)
- * @brief  Implementation of main
+ * @brief  Implementation of guiInterface
  *
  * Detailed description of file.
  */
@@ -24,38 +24,24 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define F_CPU 8000000UL // 8 MHz
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/io.h>
-#include <avr/wdt.h>
-#include <util/delay.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+//NOTE: Include before all other headers
+#include "common.h"
 
 #include "libDebug.h"
-#include "libADC.h"
-#include "libSPI.h"
-#include "libDS3234.h"
-#include "libRFM69.h"
-#include "libInput.h"
-
-#include "Sensor.h"
+#include "libUI.h"
 #include "Interface.h"
-#include "Timer.h"
-#include "Transceiver.h"
-
-#include "guiRTC.h"
-#include "guiSensor.h"
-#include "guiNodes.h"
+#include "guiInterface.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define DISPLAY_WIDTH 128
+#define DISPLAY_HEIGHT 32
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -73,54 +59,28 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-int main(void)
+void guiInterface_DrawViewIndicator(indicator_position_type position)
 {
-    #ifdef DEBUG_ENABLE
-    uint8_t mcu_status = MCUSR;
-    MCUSR = 0;
-    #endif
-
-    wdt_disable();
-
-    libDS3234_HWInit();
-    libRFM69_HWInit();
-
-    libDebug_Init();
-    INFO("Main unit started");
-    INFO("Last reset: 0x%02X", mcu_status);
-
-    libADC_Init();
-    Timer_Init();
-    libSPI_Init(1);
-    libDS3234_Init();
-    libADC_Enable(TRUE);
-    Sensor_Init();
-    libInput_Init();
-
-
-    Transceiver_Init();
-    Interface_Init();
-
-    //NOTE: The first init called will be the root view.
-    guiRTC_Init();
-    guiSensor_Init();
-    guiNodes_Init();
-
-    libInput_SetCallbacks(Interface_NextView, Interface_PreviousView,
-                          Interface_ActivateView);
-
-    INFO("Start up done");
-
-    while (1)
+    switch (position)
     {
-        libADC_Update();
-        libInput_Update();
-        Sensor_Update();
+        case INDICATOR_POS_RIGHT:
+            libUI_DrawLine(DISPLAY_WIDTH - 1, 0, DISPLAY_WIDTH - 1,
+                           DISPLAY_HEIGHT - 1);
+            break;
 
-        Transceiver_Update();
-        Interface_Update();
+        case INDICATOR_POS_LEFT:
+            libUI_DrawLine(0, 0, 0, DISPLAY_HEIGHT - 1);
+            break;
+
+        case INDICATOR_POS_TOP:
+        case INDICATOR_POS_BOTTOM:
+        default:
+            WARNING("Invalid indicator position: %u", (uint8_t)position);
+            break;
     }
-
-    CRITICAL("Main loop exit");
-    SoftReset();
+    return;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
