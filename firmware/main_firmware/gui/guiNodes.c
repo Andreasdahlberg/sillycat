@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-31 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -83,7 +83,6 @@ void guiNodes_Init(void)
         Interface_AddView(&node_views[view_index]);
     }
 
-    Interface_RemoveView(&node_views[2]);
     return;
 }
 
