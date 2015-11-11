@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-14 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -28,16 +28,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#define F_CPU 8000000UL // 8 MHz
+//NOTE: Include before all other headers
+#include "common.h"
 
 #include <util/delay.h>
 #include <string.h>
 
-#include "common.h"
 #include "libDebug.h"
 #include "libRFM69.h"
-#include "libTimer.h"
 
+#include "Timer.h"
 #include "Transceiver.h"
 #include "RTC.h"
 #include "Sensor.h"
@@ -135,42 +135,43 @@ void Transceiver_Init(void)
     libRFM69_WaitForModeReady();
 
     memset(&packet_frame, 0, sizeof(packet_frame_type));
-#ifdef DEBUG_ENABLE
+    #ifdef DEBUG_ENABLE
     transceiver_state = TR_STATE_LISTENING;
-#else
+    #else
     transceiver_state = TR_STATE_IDLE;
-#endif
-
+    #endif
 
     INFO("Transceiver initiated");
 }
 
 void Transceiver_Update(void)
 {
-
     switch (transceiver_state)
     {
+        case TR_STATE_NO_INIT:
+            WARNING("Transceiver not initialized");
+            Transceiver_Init();
+            break;
+
         case TR_STATE_IDLE:
-            //DEBUG("IDLE\r\n");
             transceiver_state = IdleStateMachine();
             break;
 
         case TR_STATE_LISTENING:
-            //DEBUG("Listening\r\n");
             transceiver_state = ListeningStateMachine();
             break;
 
         case TR_STATE_SENDING:
-            //DEBUG("Sending\r\n");
             transceiver_state = SendingStateMachine();
             break;
 
         default:
+            CRITICAL("Unknown state");
+            SoftReset();
             break;
     }
     return;
 }
-
 
 void DumpPacketHeader(packet_header_type *header)
 {
@@ -189,12 +190,12 @@ void DumpPacketContent(packet_content_type *content)
 
     DEBUG("******Packet content******\r\n");
     DEBUG("Timestamp: 20%02u-%02u-%02u %02u:%02u:%02u\r\n",
-    content->timestamp.year,
-    content->timestamp.month,
-    content->timestamp.date,
-    content->timestamp.hour,
-    content->timestamp.minute,
-    content->timestamp.second);
+          content->timestamp.year,
+          content->timestamp.month,
+          content->timestamp.date,
+          content->timestamp.hour,
+          content->timestamp.minute,
+          content->timestamp.second);
     DEBUG("Type: %u\r\n", (uint8_t)content->type);
     DEBUG("Size: %u\r\n", (uint8_t)content->size);
     DEBUG("Data: 0x");
@@ -206,17 +207,16 @@ void DumpPacketContent(packet_content_type *content)
     }
     DEBUG("\r\n");
 
-reading = (sensor_sample_type*)&content->data[1];
+    reading = (sensor_sample_type *)&content->data[1];
 
-DEBUG("Temperature: %u\r\n", reading->value/10);
-DEBUG("Temperature max: %u\r\n", reading->max/10);
-DEBUG("Temperature min: %u\r\n", reading->min/10);
-DEBUG("Temperature avg: %u\r\n", reading->average/10);
+    DEBUG("Temperature: %u\r\n", reading->value / 10);
+    DEBUG("Temperature max: %u\r\n", reading->max / 10);
+    DEBUG("Temperature min: %u\r\n", reading->min / 10);
+    DEBUG("Temperature avg: %u\r\n", reading->average / 10);
 
 }
 
-bool Transceiver_SendPacket(uint8_t target,
-                            bool request_ack,
+bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback)
 {
@@ -248,8 +248,6 @@ bool Transceiver_SendPacket(uint8_t target,
         memcpy(frame_ptr->content.data, content->data, content->size);
 
         frame_ptr->callback = callback;
-
-
     }
 
     return status;
@@ -289,8 +287,8 @@ bool HandlePayload(void)
 
 
 
-    DumpPacketHeader((packet_header_type*)data_buffer);
-    DumpPacketContent((packet_content_type*)&data_buffer[5]);
+    DumpPacketHeader((packet_header_type *)data_buffer);
+    DumpPacketContent((packet_content_type *)&data_buffer[5]);
 
     //DumpPacket(()data_buffer)
 
@@ -362,8 +360,8 @@ transceiver_state_type SendingStateMachine(void)
             if (libRFM69_IsModeReady())
             {
                 DEBUG("Write packet to FIFO\r\n");
-                libRFM69_WriteToFIFO((uint8_t*)&packet_frame.header, sizeof(packet_header_type));
-                libRFM69_WriteToFIFO((uint8_t*)&packet_frame.content, packet_frame.content.size + 8);
+                libRFM69_WriteToFIFO((uint8_t *)&packet_frame.header, sizeof(packet_header_type));
+                libRFM69_WriteToFIFO((uint8_t *)&packet_frame.content, packet_frame.content.size + 8);
                 libRFM69_SetMode(RFM_TRANSMITTER);
                 state = TR_STATE_SENDING_TRANSMITTING;
             }

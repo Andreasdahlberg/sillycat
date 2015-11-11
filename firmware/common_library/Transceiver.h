@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-18 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Header for Transceiver interface.
  *
  * Detailed description of file.
@@ -53,8 +53,7 @@ typedef enum
     TR_PACKET_TYPE_NACK,
     TR_PACKET_TYPE_READING,
     TR_PACKET_TYPE_TIME
-}packet_type_type;
-
+} packet_type_type;
 
 typedef struct
 {
@@ -63,7 +62,7 @@ typedef struct
     uint8_t source;
     bool ack;
     int8_t rssi;
-}packet_header_type;
+} packet_header_type;
 
 typedef struct
 {
@@ -71,15 +70,14 @@ typedef struct
     packet_type_type type;
     uint8_t size;
     uint8_t data[CONTENT_DATA_SIZE];
-}packet_content_type;
+} packet_content_type;
 
 typedef struct
 {
     packet_header_type header;
     packet_content_type content;
     transceiver_callback_type callback;
-}packet_frame_type;
-
+} packet_frame_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
