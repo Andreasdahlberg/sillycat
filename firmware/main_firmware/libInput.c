@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-29 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of input module.
  *
  * Detailed description of file.
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include before all other headers
 #include "common.h"
 
+#include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
 
@@ -77,8 +78,8 @@ void PushCheckAndTrigger(void);
 ///
 void libInput_Init(void)
 {
-	//Set pins as inputs
-	DDRB &= ~(1 << DDB0 | 1 << DDB1);
+    //Set pins as inputs
+    DDRB &= ~(1 << DDB0 | 1 << DDB1);
 
     //NOTE: Using a ADC-channel for the push-button since no other pin is free.
     libADC_EnableInput(PUSH_ADC_CHANNEL, TRUE);
