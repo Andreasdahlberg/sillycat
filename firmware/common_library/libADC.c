@@ -1,7 +1,7 @@
 /**
  * @file   libADC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-09-19 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of ADC-library.
  *
  * Detailed description of file.
@@ -28,9 +28,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "common.h"
+
 #include "libADC.h"
 #include "libDebug.h"
 
@@ -46,17 +49,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum ADCState
 {
-	LIBADC_IDLE = 0,
-	LIBADC_NEW_SAMPLE,
-	LIBADC_SAMPLING
-}ADCState;
+    LIBADC_IDLE = 0,
+    LIBADC_NEW_SAMPLE,
+    LIBADC_SAMPLING
+} ADCState;
 
 typedef struct
 {
-	bool active;
-	uint8_t channel_index;
-	uint16_t sample_value;
-}adc_input_type;
+    bool active;
+    uint8_t channel_index;
+    uint16_t sample_value;
+} adc_input_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -84,16 +87,16 @@ static void SelectInput(uint8_t adc_channel);
 ///
 void libADC_Init(void)
 {
-	//Set the prescaler to 128(115 KHz) and enable interupt
-	ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));
+    //Set the prescaler to 128(115 KHz) and enable interupt
+    ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));
 
-	//Set the reference voltage to AREF
-	ADMUX = 0x00;
+    //Set the reference voltage to AREF
+    ADMUX = 0x00;
 
-	InitInputArray();
-	adc_state = LIBADC_IDLE;
+    InitInputArray();
+    adc_state = LIBADC_IDLE;
 
-	INFO("Init done");
+    INFO("Init done");
 }
 
 ///
@@ -107,50 +110,50 @@ void libADC_Update(void)
 {
     static uint8_t current_input = 0;
 
-	if (current_input >= MAX_ADC_INPUTS)
-	{
-		current_input = 0;
-	}
+    if (current_input >= MAX_ADC_INPUTS)
+    {
+        current_input = 0;
+    }
 
-	switch (adc_state)
-	{
-		case LIBADC_IDLE:
-			//Do nothing when idle
-			break;
+    switch (adc_state)
+    {
+        case LIBADC_IDLE:
+            //Do nothing when idle
+            break;
 
-		case LIBADC_NEW_SAMPLE:
+        case LIBADC_NEW_SAMPLE:
             while (adc_inputs[current_input].active != TRUE &&
-                   current_input < MAX_ADC_INPUTS)
+                    current_input < MAX_ADC_INPUTS)
             {
                 ++current_input;
             }
 
-			if (adc_inputs[current_input].active == TRUE &&
-                current_input < MAX_ADC_INPUTS)
-			{
-				SelectInput(current_input);
-				//Start a new conversion
-				ADCSRA |= (1 << ADSC);
-				adc_state = LIBADC_SAMPLING;
-			}
-			break;
+            if (adc_inputs[current_input].active == TRUE &&
+                    current_input < MAX_ADC_INPUTS)
+            {
+                SelectInput(current_input);
+                //Start a new conversion
+                ADCSRA |= (1 << ADSC);
+                adc_state = LIBADC_SAMPLING;
+            }
+            break;
 
-		case LIBADC_SAMPLING:
-			//Check if ADC is done
-			if (ADCSRA & (1 << ADIF))
-			{
-				adc_inputs[current_input].sample_value = ADCL;
-				adc_inputs[current_input].sample_value |= (ADCH << 8);
-				ADCSRA & ~(1 << ADIF);
-				adc_state = LIBADC_NEW_SAMPLE;
-				++current_input;
-			}
-			break;
+        case LIBADC_SAMPLING:
+            //Check if ADC is done
+            if (ADCSRA & (1 << ADIF))
+            {
+                adc_inputs[current_input].sample_value = ADCL;
+                adc_inputs[current_input].sample_value |= (ADCH << 8);
+                ADCSRA &= ~(1 << ADIF);
+                adc_state = LIBADC_NEW_SAMPLE;
+                ++current_input;
+            }
+            break;
 
-		default:
-			WARNING("Unknown State");
-			break;
-	}
+        default:
+            WARNING("Unknown State");
+            break;
+    }
 }
 
 ///
@@ -161,16 +164,16 @@ void libADC_Update(void)
 ///
 void libADC_Enable(bool mode)
 {
-	if (mode == TRUE)
-	{
-		adc_state = LIBADC_NEW_SAMPLE;
-		ADCSRA |= (1 << ADEN);
-	}
-	else
-	{
-		adc_state = LIBADC_IDLE;
-		ADCSRA &= ~(1 << ADEN);
-	}
+    if (mode == TRUE)
+    {
+        adc_state = LIBADC_NEW_SAMPLE;
+        ADCSRA |= (1 << ADEN);
+    }
+    else
+    {
+        adc_state = LIBADC_IDLE;
+        ADCSRA &= ~(1 << ADEN);
+    }
 }
 
 ///
@@ -184,14 +187,14 @@ void libADC_Enable(bool mode)
 ///
 function_status libADC_EnableInput(uint8_t index, bool mode)
 {
-	function_status status = ERROR;
+    function_status status = ERROR;
 
-	if (index > 0 && index < MAX_ADC_INPUTS)
-	{
-		adc_inputs[index].active = mode;
-		status = SUCCESS;
-	}
-	return status;
+    if (index > 0 && index < MAX_ADC_INPUTS)
+    {
+        adc_inputs[index].active = mode;
+        status = SUCCESS;
+    }
+    return status;
 }
 
 ///
@@ -204,14 +207,14 @@ function_status libADC_EnableInput(uint8_t index, bool mode)
 ///
 function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 {
-	function_status status = ERROR;
+    function_status status = ERROR;
 
-	if (index > 0 && index < MAX_ADC_INPUTS && (adc_inputs[index].active == TRUE))
-	{
-		*sample_value = adc_inputs[index].sample_value;
-		status = SUCCESS;
-	}
-	return status;
+    if (index > 0 && index < MAX_ADC_INPUTS && (adc_inputs[index].active == TRUE))
+    {
+        *sample_value = adc_inputs[index].sample_value;
+        status = SUCCESS;
+    }
+    return status;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -220,30 +223,26 @@ function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 
 static void SelectInput(uint8_t adc_channel)
 {
-	uint8_t new_admux;
-	new_admux = ADMUX;
+    uint8_t new_admux;
+    new_admux = ADMUX;
 
-	//Clear MUX-bits
-	new_admux &= 0xF0;
+    //Clear MUX-bits
+    new_admux &= 0xF0;
 
-	//Set new channel
-	new_admux |= adc_channel;
-	ADMUX = new_admux;
+    //Set new channel
+    new_admux |= adc_channel;
+    ADMUX = new_admux;
 }
 
 
 static void InitInputArray()
 {
-	uint8_t index;
+    uint8_t index;
 
-	for(index = 0; index < MAX_ADC_INPUTS; ++index)
-	{
-		adc_inputs[index].active = FALSE;
-		adc_inputs[index].channel_index = index;
-		adc_inputs[index].sample_value = 0;
-	}
+    for (index = 0; index < MAX_ADC_INPUTS; ++index)
+    {
+        adc_inputs[index].active = FALSE;
+        adc_inputs[index].channel_index = index;
+        adc_inputs[index].sample_value = 0;
+    }
 }
-
-
-
-
