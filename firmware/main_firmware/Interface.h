@@ -1,7 +1,7 @@
 /**
  * @file   Interface.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Header of Interface
  *
  * Detailed description of file.
@@ -62,5 +62,7 @@ void Interface_RemoveView(struct view *view);
 void Interface_NextView(void);
 void Interface_PreviousView(void);
 void Interface_ActivateView(void);
+struct view *Interface_GetRootView(void);
+struct view *Interface_GetActiveView(void);
 
 #endif /* INTERFACE_H_ */

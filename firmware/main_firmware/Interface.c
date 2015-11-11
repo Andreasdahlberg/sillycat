@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -61,7 +61,7 @@ static bool refresh_flag;
 static uint32_t activity_timer;
 
 static struct view *root_view;
-static struct view *current_view;
+static struct view *active_view;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -75,7 +75,6 @@ static void DrawViewIndicator(void);
 
 ///
 /// @brief Init interface, display will be turned on and a font will be set.
-///        A main view with time and date is created.
 ///
 /// @param  None
 /// @return None
@@ -88,7 +87,7 @@ void Interface_Init(void)
     libUI_SetFont(&ubuntuMono_10ptFontInfo);
 
     root_view = NULL;
-    current_view = NULL;
+    active_view = NULL;
     refresh_flag = TRUE;
 
     INFO("Init done");
@@ -107,10 +106,10 @@ void Interface_Update(void)
 
     if (refresh_flag == TRUE)
     {
-        if (current_view != NULL && current_view->draw_function != NULL)
+        if (active_view != NULL && active_view->draw_function != NULL)
         {
             libDisplay_ClearVRAM();
-            current_view->draw_function(current_view->context);
+            active_view->draw_function(active_view->context);
             if (Timer_TimeDifference(activity_timer) < 2000)
             {
                 DrawViewIndicator();
@@ -140,14 +139,17 @@ void Interface_AddSibling(struct view *sibling_view, struct view *new_view)
     struct view *view_ptr;
     view_ptr = sibling_view;
 
-    //TODO: Add condition to protect against loops, ex view_ptr->next = view_ptr
-    while (view_ptr->next != NULL)
+    if (sibling_view != NULL && new_view != NULL)
     {
-        view_ptr = view_ptr->next;
-    }
+        //TODO: Add condition to protect against loops, ex view_ptr->next = view_ptr
+        while (view_ptr->next != NULL)
+        {
+            view_ptr = view_ptr->next;
+        }
 
-    new_view->prev = view_ptr;
-    view_ptr->next = new_view;
+        new_view->prev = view_ptr;
+        view_ptr->next = new_view;
+    }
     return;
 }
 
@@ -164,7 +166,7 @@ void Interface_AddView(struct view *new_view)
         INFO("New view added as root");
         //Set view as root view if there is no previous root view
         root_view = new_view;
-        current_view = new_view;
+        active_view = new_view;
     }
     else
     {
@@ -174,28 +176,36 @@ void Interface_AddView(struct view *new_view)
     return;
 }
 
-
+///
+/// @brief Remove a view from the interface
+///
+/// @param  *view Pointer to view to remove
+/// @return None
+///
 void Interface_RemoveView(struct view *view)
 {
-    if (view->next != NULL)
+    if (view != NULL)
     {
-        view->next->prev = view->prev;
-    }
+        if (view->next != NULL)
+        {
+            view->next->prev = view->prev;
+        }
 
-    if (view->prev != NULL)
-    {
-        view->prev->next = view->next;
-    }
+        if (view->prev != NULL)
+        {
+            view->prev->next = view->next;
+        }
 
-    //Check if view is the first child view or the root view
-    if (view->parent != NULL && view->prev == NULL && view->next != NULL)
-    {
-        view->parent->child = view->next;
-    }
-    else if (view->parent == NULL && view->prev == NULL)
-    {
-        root_view = NULL;
-        current_view = NULL;
+        //Check if view is the first child view or the root view
+        if (view->parent != NULL && view->prev == NULL && view->next != NULL)
+        {
+            view->parent->child = view->next;
+        }
+        else if (view->parent == NULL && view->prev == NULL)
+        {
+            root_view = NULL;
+            active_view = NULL;
+        }
     }
     return;
 }
@@ -210,19 +220,44 @@ void Interface_RemoveView(struct view *view)
 ///
 void Interface_AddChild(struct view *parent_view, struct view *child_view)
 {
-    // If the parent already got a child add the new child as a sibling to
-    // the old one.
-    if (parent_view->child != NULL)
+    if (parent_view != NULL && child_view != NULL)
     {
-        Interface_AddSibling(parent_view->child, child_view);
-    }
-    else
-    {
-        parent_view->child = child_view;
-    }
+        // If the parent already got a child add the new child as a sibling to
+        // the old one.
+        if (parent_view->child != NULL)
+        {
+            Interface_AddSibling(parent_view->child, child_view);
+        }
+        else
+        {
+            parent_view->child = child_view;
+        }
 
-    child_view->parent = parent_view;
+        child_view->parent = parent_view;
+    }
     return;
+}
+
+///
+/// @brief Get the root view.
+///
+/// @param  None
+/// @return struct view * Pointer to the root view
+///
+struct view *Interface_GetRootView(void)
+{
+    return root_view;
+}
+
+///
+/// @brief Get the active view.
+///
+/// @param  None
+/// @return struct view * Pointer to the active view
+///
+struct view *Interface_GetActiveView(void)
+{
+    return active_view;
 }
 
 ///
@@ -238,43 +273,73 @@ void Interface_Refresh(void)
     return;
 }
 
+///
+/// @brief Change the active view to the previous one. If the no previous view
+///        is available nothing will happen.
+///
+/// @param  None
+/// @return None
+///
 void Interface_PreviousView(void)
 {
-    if (current_view->prev != NULL)
+    if (active_view != NULL)
     {
-        current_view = current_view->prev;
-    }
+        if (active_view->prev != NULL)
+        {
+            active_view = active_view->prev;
+        }
 
-    refresh_flag = TRUE;
-    activity_timer = Timer_GetMilliseconds();
+        refresh_flag = TRUE;
+        activity_timer = Timer_GetMilliseconds();
+    }
     return;
 }
 
+///
+/// @brief Change the active view to the next one. If the no next view
+///        is available nothing will happen.
+///
+/// @param  None
+/// @return None
+///
 void Interface_NextView(void)
 {
-    if (current_view->next != NULL)
+    if (active_view != NULL)
     {
-        current_view = current_view->next;
-    }
+        if (active_view->next != NULL)
+        {
+            active_view = active_view->next;
+        }
 
-    refresh_flag = TRUE;
-    activity_timer = Timer_GetMilliseconds();
+        refresh_flag = TRUE;
+        activity_timer = Timer_GetMilliseconds();
+    }
     return;
 }
 
+///
+/// @brief Change the active view to the child view of the current active view.
+///        If the no child view is available nothing will happen.
+///
+/// @param  None
+/// @return None
+///
 void Interface_ActivateView(void)
 {
-    if (current_view->child != NULL)
+    if (active_view != NULL)
     {
-        current_view = current_view->child;
-    }
-    else if (current_view->parent != NULL)
-    {
-        current_view = current_view->parent;
-    }
+        if (active_view->child != NULL)
+        {
+            active_view = active_view->child;
+        }
+        else if (active_view->parent != NULL)
+        {
+            active_view = active_view->parent;
+        }
 
-    refresh_flag = TRUE;
-    activity_timer = Timer_GetMilliseconds();
+        refresh_flag = TRUE;
+        activity_timer = Timer_GetMilliseconds();
+    }
     return;
 }
 
@@ -284,12 +349,12 @@ void Interface_ActivateView(void)
 
 static void DrawViewIndicator(void)
 {
-    if (current_view->next == NULL)
+    if (active_view->next == NULL)
     {
         guiInterface_DrawViewIndicator(INDICATOR_POS_RIGHT);
     }
 
-    if (current_view->prev == NULL)
+    if (active_view->prev == NULL)
     {
         guiInterface_DrawViewIndicator(INDICATOR_POS_LEFT);
     }
