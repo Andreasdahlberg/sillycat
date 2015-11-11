@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-09-19 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Header of Debug-library.
  *
  * Detailed description of file.
@@ -24,7 +24,6 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LIBDEBUG_H_
 #define LIBDEBUG_H_
 
@@ -32,7 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/pgmspace.h>
 #include "common.h"
 #include "libUART.h"
 
@@ -41,17 +39,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_ENABLE
-    #define DEBUG(text, ...)			libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
-    #define CRITICAL(text, ...)         libDebug_Print_P(PSTR("<CRITICAL> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
-    #define ERROR(text, ...)            libDebug_Print_P(PSTR("<ERROR> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
-    #define WARNING(text, ...)          libDebug_Print_P(PSTR("<WARNING> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
-    #define INFO(text, ...)             libDebug_Print_P(PSTR("<INFO> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+#define DEBUG(text, ...)		libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
+#define CRITICAL(text, ...)     libDebug_Print_P(PSTR("<CRITICAL> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+#define ERROR(text, ...)        libDebug_Print_P(PSTR("<ERROR> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+#define WARNING(text, ...)      libDebug_Print_P(PSTR("<WARNING> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+#define INFO(text, ...)         libDebug_Print_P(PSTR("<INFO> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
 #else
-    #define DEBUG(...)
-    #define CRITICAL(text, ...)
-    #define ERROR(text, ...)
-    #define WARNING(text, ...)
-    #define INFO(text, ...)
+#define DEBUG(...)
+#define CRITICAL(text, ...)
+#define ERROR(text, ...)
+#define WARNING(text, ...)
+#define INFO(text, ...)
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,6 +57,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 void libDebug_Init();
-void libDebug_Print_P(const char* text, ...);
+void libDebug_Print_P(const char *text, ...);
 
 #endif /* LIBDEBUG_H_ */

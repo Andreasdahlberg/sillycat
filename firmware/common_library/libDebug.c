@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-09-19 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -33,6 +33,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <stdarg.h>
 
+#include <avr/pgmspace.h>
+
 #include "libDebug.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,12 +65,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 ///
 void libDebug_Init()
 {
-	#ifdef DEBUG_ENABLE
-	libUART_Init();
-	#endif
-	INFO("Init done");
+    #ifdef DEBUG_ENABLE
+    libUART_Init();
+    #endif
+    INFO("Init done");
 }
-
 
 ///
 /// @brief Print string from FLASH
@@ -77,19 +78,19 @@ void libDebug_Init()
 /// @param  variable number of arguments
 /// @return None
 ///
-void libDebug_Print_P(const char* text, ...)
+void libDebug_Print_P(const char *text, ...)
 {
-	va_list args;
-	char buffer[128];
+    va_list args;
+    char buffer[128];
     char format[64];
 
     strncpy_P(format, text, 64);
 
-	va_start(args, text);
-	vsprintf(buffer, format, args);
-	libUART_SendArray((uint8_t*)buffer, strlen(buffer));
-	va_end(args);
-	return;
+    va_start(args, text);
+    vsprintf(buffer, format, args);
+    libUART_SendArray((uint8_t *)buffer, strlen(buffer));
+    va_end(args);
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
