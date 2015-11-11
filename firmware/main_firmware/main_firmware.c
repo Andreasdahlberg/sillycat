@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
+ * @date   2015-11-11 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -24,11 +24,12 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define F_CPU 8000000UL // 8 MHz
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+//NOTE: Include before all other headers
+#include "common.h"
 
 #include <avr/io.h>
 #include <avr/wdt.h>
