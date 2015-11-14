@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2015-11-14 (Last edit)
  * @brief  Implementation of libDHT22
  *
  * Detailed description of file.
@@ -32,8 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 
 #include <avr/io.h>
-#include <util/delay.h>
-#include <string.h>
+#include <avr/interrupt.h>
 
 #include "libdht22.h"
 #include "libDebug.h"
@@ -43,11 +42,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define DATAPIN PB6
+#define DATAPIN DDB0
 #define MEASURE_INTERVAL_MS 2000 //Time between sensor readings, must be at least 2000 ms
-#define PULSE_TIMEOUT_MS 35      //Must be shorter then 127 ms to prevent overflow
-#define TIMINGS_ARRAY_SIZE 85
-#define LOW_HIGH_LIMIT 10
+#define LOW_HIGH_LIMIT 100
+#define REQUEST_READING_TIME_MS 2
+#define READING_TIMEOUT_MS 6
+#define TIMINGS_INDEX_OFFSET 3
+#define EXPECTED_NR_PULSES 43
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -59,29 +60,46 @@ typedef enum
     DHT_POWERUP,
     DHT_READING,
     DHT_DECODING,
-} dht_status;
+} dht_state_type;
+
+typedef enum
+{
+    DHT_READING_REQUEST = 0,
+    DHT_READING_REQUEST_WAIT,
+    DHT_READING_CAPTURE_DATA
+} dht_reading_state_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-dht_status libDHT22_status = DHT_UNINITIALIZED;
-uint32_t init_time;
-uint8_t data[6];
-float hum;
-float temp;
-SensorData sensor_reading;
+static dht_state_type dht22_state = DHT_UNINITIALIZED;
+static dht22_data_type sensor_reading;
+static uint32_t init_time;
+static volatile uint32_t pulse_counter;
+static volatile uint16_t pulse_timings[EXPECTED_NR_PULSES];
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void GetPulseTimings(int8_t *timings);
-void RequestReading();
-void DecodeTimings(int8_t *timings);
-float ConvertToFloat(uint8_t integral, uint8_t fractional);
-uint8_t IsDataValid();
-int32_t GetPulse(uint8_t pin, uint32_t timeout);
+static void DecodeTimings(void);
+static float ConvertToFloat(uint8_t integral, uint8_t fractional);
+static bool IsDataValid(uint8_t *data);
+static dht_state_type ReadingStateMachine(void);
+
+//////////////////////////////////////////////////////////////////////////
+//INTERUPT SERVICE ROUTINES
+//////////////////////////////////////////////////////////////////////////
+
+ISR(TIMER1_CAPT_vect)
+{
+    if (pulse_counter < EXPECTED_NR_PULSES)
+    {
+        pulse_timings[pulse_counter] = ICR1;
+        ++pulse_counter;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -89,10 +107,11 @@ int32_t GetPulse(uint8_t pin, uint32_t timeout);
 
 void libDHT22_Init(void)
 {
+    //Set data pin as output and high
     DDRB |= (1 << DATAPIN);
     PORTB |= (1 << DATAPIN);
 
-    libDHT22_status = DHT_POWERUP;
+    dht22_state = DHT_POWERUP;
     init_time = Timer_GetMilliseconds();
 
     INFO("Init done");
@@ -101,40 +120,31 @@ void libDHT22_Init(void)
 
 void libDHT22_Update(void)
 {
-    static int8_t timings[TIMINGS_ARRAY_SIZE];
-
-    switch (libDHT22_status)
+    switch (dht22_state)
     {
         case DHT_POWERUP:
             if (Timer_TimeDifference(init_time) > MEASURE_INTERVAL_MS)
             {
                 INFO("DHT22 ready for new sample");
-                memset(timings, -1, (sizeof(int8_t) * TIMINGS_ARRAY_SIZE));
-                libDHT22_status = DHT_READING;
+                dht22_state = DHT_READING;
             }
             break;
 
         case DHT_READING:
-            RequestReading();
-            GetPulseTimings(timings);
-            libDHT22_status = DHT_DECODING;
+            dht22_state = ReadingStateMachine();
             break;
 
         case DHT_DECODING:
-            DecodeTimings(timings);
-
-            sensor_reading.humidity = ConvertToFloat(data[0], data[1]);
-            sensor_reading.temperature = ConvertToFloat(data[2], data[3]);
-            sensor_reading.status = IsDataValid();
-
+            DecodeTimings();
             init_time = Timer_GetMilliseconds();
-            libDHT22_status = DHT_POWERUP;
+            dht22_state = DHT_POWERUP;
             break;
 
         case DHT_UNINITIALIZED:
         default:
             ERROR("Uninitialized/unknown state, reseting module");
             libDHT22_Init();
+            break;
     }
     return;
 }
@@ -143,12 +153,11 @@ void libDHT22_Update(void)
 /// @brief Get the latest sensor reading
 ///
 /// @param  None
-/// @return SensorData Struct with the sensor readings and its status
+/// @return dht22_data_type Struct with the sensor readings and its status
 ///
-SensorData libDHT22_GetSensorReading(void)
+dht22_data_type libDHT22_GetSensorReading(void)
 {
-    SensorData return_data = sensor_reading;
-    sensor_reading.status = OUTDATED;
+    dht22_data_type return_data = sensor_reading;
     return return_data;
 }
 
@@ -156,58 +165,105 @@ SensorData libDHT22_GetSensorReading(void)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Get all pulse timings
-///
-/// @param  timings Pointer to array where all timings will be saved
-/// @return None
-///
-void GetPulseTimings(int8_t *timings)
+static void EnableInputCapture(bool enabled)
 {
-    uint8_t  cnt = 0;
-    //Save all pulse timings
-    while (cnt < TIMINGS_ARRAY_SIZE)
+    if (enabled == TRUE)
     {
-        timings[cnt] = GetPulse(DATAPIN, PULSE_TIMEOUT_MS);
-        if (timings[cnt] == -1)
-        {
-            break;
-        }
-        ++cnt;
+        pulse_counter = 0;
+
+        //Set clock source to CLK
+        TCCR1B |= (1 << CS11);
+
+        //Disable noise canceling
+        TCCR1B &= ~(1 << ICNC1);
+
+        //Enabled input capture interrupts
+        TIMSK1 |= (1 << ICIE1);
+    }
+    else
+    {
+        //Disabled input capture interrupts
+        TIMSK1 &= ~(1 << ICIE1);
+
+        //Stop timer by removing the clock source
+        TCCR1B &= ~(1 << CS12 | 1 << CS11 | 1 << CS10);
+
+        //Reset the timer register
+        TCNT1 = 0x00;
     }
     return;
 }
 
-///
-/// @brief Request a new reading from the DHT22 sensor
-///
-/// @param  None
-/// @return None
-///
-void RequestReading()
+static dht_state_type ReadingStateMachine(void)
 {
-    //Pull data pin low for minimum 1 ms to start communicating with the DHT22 sensor
-    DDRB |= (1 << DATAPIN);
-    PORTB &= ~(1 << DATAPIN);
-    //TODO: Fix this, not ok to block for 2 ms!
-    _delay_ms(2);
+    static dht_reading_state_type state = DHT_READING_REQUEST;
+    static uint32_t reading_timer;
+    dht_state_type next_dht_state = DHT_READING;
 
-    PORTB |= (1 << DATAPIN);
-    _delay_us(25);
+    switch (state)
+    {
+        case DHT_READING_REQUEST:
+            reading_timer = Timer_GetMilliseconds();
 
-    DDRB &= ~(1 << DATAPIN);
-    PORTB |= (1 << DATAPIN);
-    return;
+            //Pull data pin low
+            DDRB |= (1 << DATAPIN);
+            PORTB &= ~(1 << DATAPIN);
+
+            state = DHT_READING_REQUEST_WAIT;
+            break;
+
+        case DHT_READING_REQUEST_WAIT:
+            //NOTE: A delay of minimum 1 ms is required
+            if (Timer_TimeDifference(reading_timer) >= REQUEST_READING_TIME_MS)
+            {
+                //Pull data pin high and then reconfigure as input
+                PORTB |= (1 << DATAPIN);
+                DDRB &= ~(1 << DATAPIN);
+
+                reading_timer = Timer_GetMilliseconds();
+
+                EnableInputCapture(TRUE);
+                state = DHT_READING_CAPTURE_DATA;
+            }
+            break;
+
+        case DHT_READING_CAPTURE_DATA:
+            //NOTE: According to the DHT22-datasheet a measurement takes 5 mS,
+            //      with FOSC 8 MHz and 8 as prescaler the timer overflows in 64 mS.
+            //      A timeout between 5 mS and 64 mS is therefore needed.
+            if (Timer_TimeDifference(reading_timer) > READING_TIMEOUT_MS)
+            {
+                ERROR("Timeout while capturing data");
+                state = DHT_READING_REQUEST;
+                init_time = Timer_GetMilliseconds();
+                return DHT_POWERUP;
+            }
+
+            if (pulse_counter == EXPECTED_NR_PULSES)
+            {
+                EnableInputCapture(FALSE);
+                state = DHT_READING_REQUEST;
+                next_dht_state =  DHT_DECODING;
+            }
+            break;
+
+        default:
+            ERROR("Unknown state");
+            state = DHT_READING_REQUEST;
+            libDHT22_Init();
+            break;
+    }
+    return next_dht_state;
 }
 
 ///
 /// @brief Convert integral and fractional part into float
 ///
-/// @param  intergral The integral part of the float
+/// @param  integral The integral part of the float
 /// @param  fractional The fractional part of the float
 /// @return float The resulting float
 ///
-float ConvertToFloat(uint8_t integral, uint8_t fractional)
+static float ConvertToFloat(uint8_t integral, uint8_t fractional)
 {
     float data = (integral << 8);
     data += fractional;
@@ -218,40 +274,40 @@ float ConvertToFloat(uint8_t integral, uint8_t fractional)
 ///
 /// @brief  Decode pulse timings and convert them into usable data
 ///
-/// @param  timings Pointer to an array with all pulse timings
+/// @param  None
 /// @return None
 ///
-void DecodeTimings(int8_t *timings)
+static void DecodeTimings(void)
 {
-    uint8_t data_pulse = 0;
-    uint8_t byte_cnt = 0;
-    uint8_t bit = 0;
-    uint8_t cnt;
+    uint8_t bit_index;
+    uint8_t byte_index;
+    uint8_t index;
+    uint8_t data[5] = {0, 0, 0, 0, 0};
+    uint16_t prev = pulse_timings[TIMINGS_INDEX_OFFSET - 1];
 
-    memset(data, 0, sizeof(uint8_t) * 6);
-
-    for (cnt = 0; cnt < 80; ++cnt)
+    for (byte_index = 0; byte_index < 5; ++byte_index)
     {
-        //Toggle data_pulse since every other pulse is a bit
-        if (data_pulse == 0)
+        for (bit_index = 0; bit_index < 8; ++bit_index)
         {
-            data_pulse = 1;
-        }
-        else if (data_pulse == 1)
-        {
-            //TODO: Check why the two first pulses are skipped
-            if (timings[cnt + 2] > LOW_HIGH_LIMIT)	//Add two to Skip the two first pulses
+            index = (byte_index << 3) + bit_index + TIMINGS_INDEX_OFFSET;
+            if (pulse_timings[index] - prev > LOW_HIGH_LIMIT)
             {
-                data[byte_cnt] |= (1 << (7 - bit));
+                data[byte_index] |= (1 << (7 - bit_index));
             }
-            data_pulse = 0;
-            ++bit;
-            if (bit == 8)
-            {
-                ++byte_cnt;
-                bit = 0;
-            }
+            prev = pulse_timings[index];
         }
+    }
+
+    if (IsDataValid(data) == TRUE)
+    {
+        sensor_reading.humidity = ConvertToFloat(data[0], data[1]);
+        sensor_reading.temperature = ConvertToFloat(data[2], data[3]);
+        sensor_reading.status = TRUE;
+    }
+    else
+    {
+        ERROR("Invalid data");
+        sensor_reading.status = FALSE;
     }
     return;
 }
@@ -259,35 +315,10 @@ void DecodeTimings(int8_t *timings)
 ///
 /// @brief Check if the sensor data is valid
 ///
-/// @param  None
-/// @return float The resulting float
+/// @param  *data Pointer to array with data
+/// @return bool Result
 ///
-uint8_t IsDataValid()
+static bool IsDataValid(uint8_t *data)
 {
     return (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF));
-}
-
-///
-/// @brief Get timings for the next pulse
-///
-/// @param  pin Pin to monitor for next pulse
-/// @param  timeout Time to wait on pulse before timeout
-/// @return int32_t Lenght of the pulse in ms
-///
-int32_t GetPulse(uint8_t pin, uint32_t timeout)
-{
-    uint8_t start_value = PINB & (1 << pin) ;
-    int32_t pulse_time = 0;
-
-    while ((PINB & (1 << pin)) == start_value)
-    {
-        ++pulse_time;
-        _delay_us(1);
-
-        if (pulse_time > timeout)
-        {
-            return -1;
-        }
-    }
-    return pulse_time;
 }

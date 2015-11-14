@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2015-11-14 (Last edit)
  * @brief  Header of libDht22
  *
  * Detailed description of file.
@@ -36,25 +36,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef enum
-{
-    INVALID = 0,
-    VALID,
-    OUTDATED,
-} data_status;
-
-typedef enum
-{
-    CONTINUES = 1,
-    SINGLE
-} sensor_mode;
-
-typedef struct SensorData
+typedef struct
 {
     float humidity;
     float temperature;
-    data_status status;
-} SensorData;
+    bool status;
+} dht22_data_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -62,6 +49,6 @@ typedef struct SensorData
 
 void libDHT22_Init(void);
 void libDHT22_Update(void);
-SensorData libDHT22_GetSensorReading(void);
+dht22_data_type libDHT22_GetSensorReading(void);
 
 #endif /* LIBDHT22_H_ */
