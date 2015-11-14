@@ -1,7 +1,7 @@
 /**
  * @file   libTimer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-05 (Last edit)
+ * @date   2015-11-14 (Last edit)
  * @brief  Implementation of low level timer functions
  *
  * Detailed description of file.
@@ -28,6 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <avr/interrupt.h>
 #include <util/atomic.h>
 
@@ -51,7 +54,7 @@ volatile uint32_t system_timer;
 //INTERUPT SERVICE ROUTINES
 //////////////////////////////////////////////////////////////////////////
 
-ISR(TIMER1_COMPA_vect)
+ISR(TIMER0_COMPA_vect)
 {
     ++system_timer;
 }
@@ -61,7 +64,7 @@ ISR(TIMER1_COMPA_vect)
 //////////////////////////////////////////////////////////////////////////
 
 ///
-/// @brief Init the timer hardware
+/// @brief Initialize the timer hardware to trigger an interrupt every 1 ms
 ///
 /// @param  None
 /// @return None
@@ -70,17 +73,29 @@ void libTimer_Init()
 {
     system_timer = 0;
 
-    TCCR1B |= (1 << WGM12);
-    TIMSK1 |= (1 << OCIE1A);
+    //Set CTC-mode
+    TCCR0A |= (1 << WGM01);
 
+#if F_CPU == 8000000
+    //Set prescaler to 64
+    TCCR0B |= (1 << CS00 | 1 << CS01);
+
+    //Set compare value
+    OCR0A = 125;
+#else
+#error "Unsupported frequency"
+#endif
+
+    //Enabled interrupt on compare match A
+    TIMSK0 |= (1 << OCIE0A);
+
+    //TODO: Can this global interrupt enable cause problems?
     sei();
-
-    OCR1A = 1000;
-    TCCR1B |= (1 << CS11); // Fosc/8
+    return;
 }
 
 ///
-/// @brief Resets the system timer
+/// @brief Reset the system timer
 ///
 /// @param  None
 /// @return None
