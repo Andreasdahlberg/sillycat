@@ -49,10 +49,11 @@ typedef void (*transceiver_callback_type)(bool status);
 
 typedef enum
 {
-    TR_PACKET_TYPE_ACK = 1,
+    TR_PACKET_TYPE_ACK = 0,
     TR_PACKET_TYPE_NACK,
     TR_PACKET_TYPE_READING,
-    TR_PACKET_TYPE_TIME
+    TR_PACKET_TYPE_TIME,
+    TR_PACKET_NR_TYPES
 } packet_type_type;
 
 typedef struct

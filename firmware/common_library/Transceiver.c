@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2015-11-15 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -39,7 +39,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Timer.h"
 #include "Transceiver.h"
-#include "RTC.h"
 #include "Sensor.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -84,8 +83,8 @@ typedef enum
 static uint8_t net_id[6] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 
 static transceiver_state_type transceiver_state = TR_STATE_NO_INIT;
-
 static packet_frame_type packet_frame;
+static transceiver_callback_type packet_handlers[TR_PACKET_NR_TYPES];
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -95,6 +94,7 @@ transceiver_state_type IdleStateMachine(void);
 transceiver_state_type SendingStateMachine(void);
 transceiver_state_type ListeningStateMachine(void);
 
+static bool IsPacketTypeValid(packet_type_type packet_type);
 bool ReadyToSend(void);
 bool PacketToSend(void);
 
@@ -131,15 +131,14 @@ void Transceiver_Init(void)
     libRFM69_ClearFIFOOverrun();
     libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
 
+    libRFM69_EnableOCP(TRUE);
+    libRFM69_SetPowerAmplifierMode(0x04);
+
     libRFM69_SetMode(RFM_RECEIVER);
     libRFM69_WaitForModeReady();
 
     memset(&packet_frame, 0, sizeof(packet_frame_type));
-    #ifdef DEBUG_ENABLE
     transceiver_state = TR_STATE_LISTENING;
-    #else
-    transceiver_state = TR_STATE_IDLE;
-    #endif
 
     INFO("Transceiver initiated");
 }
@@ -206,14 +205,6 @@ void DumpPacketContent(packet_content_type *content)
         DEBUG("%02X", content->data[idx]);
     }
     DEBUG("\r\n");
-
-    reading = (sensor_sample_type *)&content->data[1];
-
-    DEBUG("Temperature: %u\r\n", reading->value / 10);
-    DEBUG("Temperature max: %u\r\n", reading->max / 10);
-    DEBUG("Temperature min: %u\r\n", reading->min / 10);
-    DEBUG("Temperature avg: %u\r\n", reading->average / 10);
-
 }
 
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
@@ -253,9 +244,27 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
     return status;
 }
 
+bool Transceiver_SetPacketHandler(transceiver_callback_type packet_handler,
+                                  packet_type_type packet_type)
+{
+    bool status = FALSE;
+
+    if (IsPacketTypeValid(packet_type))
+    {
+        packet_handlers[packet_type] = packet_handler;
+        status = TRUE;
+    }
+    return status;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static bool IsPacketTypeValid(packet_type_type packet_type)
+{
+    return (packet_type >= 0 && packet_type < TR_PACKET_NR_TYPES);
+}
 
 //TODO: Make this function public?
 bool ReadyToSend(void)
@@ -284,8 +293,6 @@ bool HandlePayload(void)
     }
 
     libRFM69_ReadFromFIFO(&data_buffer[1], length);
-
-
 
     DumpPacketHeader((packet_header_type *)data_buffer);
     DumpPacketContent((packet_content_type *)&data_buffer[5]);
@@ -316,10 +323,12 @@ transceiver_state_type ListeningStateMachine(void)
     {
         case TR_STATE_LISTENING_INIT:
             libRFM69_SetMode(RFM_RECEIVER);
+            libRFM69_EnableHighPowerSetting(FALSE);
             state = TR_STATE_LISTENING_WAITING;
             break;
 
         case TR_STATE_LISTENING_WAITING:
+
             if (libRFM69_IsPayloadReady())
             {
                 if (HandlePayload())
@@ -363,6 +372,7 @@ transceiver_state_type SendingStateMachine(void)
                 libRFM69_WriteToFIFO((uint8_t *)&packet_frame.header, sizeof(packet_header_type));
                 libRFM69_WriteToFIFO((uint8_t *)&packet_frame.content, packet_frame.content.size + 8);
                 libRFM69_SetMode(RFM_TRANSMITTER);
+                libRFM69_EnableHighPowerSetting(TRUE);
                 state = TR_STATE_SENDING_TRANSMITTING;
             }
             break;
@@ -375,6 +385,7 @@ transceiver_state_type SendingStateMachine(void)
                 {
                     DEBUG("Waiting for ACK\r\n");
                     libRFM69_SetMode(RFM_RECEIVER);
+                    libRFM69_EnableHighPowerSetting(FALSE);
                     state = TR_STATE_SENDING_WAIT_FOR_ACK;
                 }
                 else
@@ -399,7 +410,6 @@ transceiver_state_type SendingStateMachine(void)
                 {
 
                 }
-
                 libRFM69_SetMode(RFM_STANDBY);
                 memset(&packet_frame, 0, sizeof(packet_frame_type));
                 state = TR_STATE_SENDING_INIT;
