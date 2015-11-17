@@ -80,6 +80,8 @@ typedef struct
     transceiver_callback_type callback;
 } packet_frame_type;
 
+typedef bool (*transceiver_packet_handler_type)(packet_frame_type *packet);
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -90,5 +92,7 @@ bool Transceiver_Send(void);
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback);
+bool Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
+                                  packet_type_type packet_type);
 
 #endif /* TRANSCEIVER_H_ */

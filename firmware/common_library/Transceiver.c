@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-15 (Last edit)
+ * @date   2015-11-17 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -84,7 +84,7 @@ static uint8_t net_id[6] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 
 static transceiver_state_type transceiver_state = TR_STATE_NO_INIT;
 static packet_frame_type packet_frame;
-static transceiver_callback_type packet_handlers[TR_PACKET_NR_TYPES];
+static transceiver_packet_handler_type packet_handlers[TR_PACKET_NR_TYPES];
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -184,7 +184,6 @@ void DumpPacketHeader(packet_header_type *header)
 void DumpPacketContent(packet_content_type *content)
 {
     uint8_t idx;
-    sensor_sample_type *reading;
 
     DEBUG("******Packet content******\r\n");
     DEBUG("Timestamp: 20%02u-%02u-%02u %02u:%02u:%02u\r\n",
@@ -243,7 +242,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
     return status;
 }
 
-bool Transceiver_SetPacketHandler(transceiver_callback_type packet_handler,
+bool Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
                                   packet_type_type packet_type)
 {
     bool status = FALSE;
@@ -287,14 +286,25 @@ static bool HandlePayload(void)
     if (length > RFM_FIFO_SIZE - 1)
     {
         ERROR("Size of data packet is larger then the FIFO");
+        return FALSE;
     }
 
     libRFM69_ReadFromFIFO(&data_buffer[1], length);
 
-    DumpPacketHeader((packet_header_type *)data_buffer);
-    DumpPacketContent((packet_content_type *)&data_buffer[5]);
+    memcpy(&packet_frame.header, data_buffer, sizeof(packet_header_type));
+    memcpy(&packet_frame.header, &data_buffer[sizeof(packet_header_type)],
+           sizeof(packet_content_type));
 
-    return TRUE;
+    if (IsPacketTypeValid(packet_frame.content.type) &&
+            packet_handlers[packet_frame.content.type] != NULL)
+    {
+        return packet_handlers[packet_frame.content.type](&packet_frame);
+    }
+    else
+    {
+        INFO("No packet handler for packet type %u");
+        return FALSE;
+    }
 }
 
 static transceiver_state_type IdleStateMachine(void)
@@ -323,13 +333,13 @@ static transceiver_state_type ListeningStateMachine(void)
             break;
 
         case TR_STATE_LISTENING_WAITING:
-
             if (libRFM69_IsPayloadReady())
             {
-                if (HandlePayload())
+                if (HandlePayload() == TRUE)
                 {
-                    // state = TR_STATE_LISTENING_DONE;
-                    // libRFM69_SetMode(RFM_STANDBY);
+                    libRFM69_SetMode(RFM_TRANSMITTER);
+                    libRFM69_EnableHighPowerSetting(TRUE);
+                    state = TR_STATE_LISTENING_SEND_ACK;
                 }
             }
             break;
@@ -338,6 +348,7 @@ static transceiver_state_type ListeningStateMachine(void)
             if (libRFM69_IsModeReady())
             {
                 //Transceiver_SendPacket() //Send ACK-packet, async?
+                state = TR_STATE_LISTENING_INIT;
             }
             break;
 
