@@ -74,7 +74,7 @@ typedef enum
     REG_IRQFLAGS2_BIT_FIFOLEVEL,
     REG_IRQFLAGS2_BIT_FIFONOTEMPTY,
     REG_IRQFLAGS2_BIT_FIFOFULL,
-}irqflags2_bit_type;
+} irqflags2_bit_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -153,17 +153,17 @@ void libRFM69_Send(void)
     libRFM69_SetMode(RFM_TRANSMITTER);
     DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
 
-    while(libRFM69_IsFIFONotEmpty())
+    while (libRFM69_IsFIFONotEmpty())
     {
         DEBUG("FIFO not empty: 0x%02X\r\n", libRFM69_IsFIFONotEmpty());
         DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
         DEBUG("Payload ready: 0x%02X\r\n", libRFM69_IsPayloadReady());
-            DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
+        DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
         _delay_ms(1000);
     }
     DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
     libRFM69_SetMode(RFM_STANDBY);
-     DEBUG("All done!\r\n");
+    DEBUG("All done!\r\n");
 
 
 }
@@ -274,7 +274,6 @@ bool libRFM69_SetMode(libRFM69_mode_type mode)
     uint8_t register_content;
 
     //TODO: Check if mode is valid!
-
     if (ReadRegister(REG_OPMODE, &register_content))
     {
         register_content = (register_content & ~REG_OPMODE_MODE_MASK) | (mode << 2);
@@ -382,12 +381,12 @@ bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
     uint8_t register_content;
 
     if (packet_format == RFM_PACKET_FIXED_LEN ||
-        packet_format == RFM_PACKET_VARIABLE_LEN)
+            packet_format == RFM_PACKET_VARIABLE_LEN)
     {
         if (ReadRegister(REG_PACKETCONFIG1, &register_content))
         {
             SetBit(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
-                &register_content);
+                   &register_content);
             status = WriteRegister(REG_PACKETCONFIG1, register_content);
         }
     }
@@ -400,7 +399,7 @@ bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type start_conditi
     uint8_t register_content;
 
     if (start_condition == RFM_TX_START_LEVEL ||
-        start_condition == RFM_TX_START_NOT_EMPTY)
+            start_condition == RFM_TX_START_NOT_EMPTY)
     {
         if (ReadRegister(REG_FIFOTHRESH, &register_content))
         {
@@ -480,7 +479,7 @@ bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
     if (ReadRegister(REG_DATAMODUL, &register_content) && data_mode != RFM_RESERVED)
     {
         register_content = (register_content & ~REG_DATA_MODUL_DATA_MODE_MASK) |
-            (data_mode << 5);
+                           (data_mode << 5);
         status = WriteRegister(REG_DATAMODUL, register_content);
     }
     return status;
@@ -492,10 +491,10 @@ bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
     uint8_t register_content;
 
     if (ReadRegister(REG_DATAMODUL, &register_content) &&
-        (modulation_type == RFM_FSK || modulation_type == RFM_OOK))
+            (modulation_type == RFM_FSK || modulation_type == RFM_OOK))
     {
         register_content = (register_content & ~REG_DATA_MODUL_MODULATION_TYPE_MASK) |
-            (modulation_type << 3);
+                           (modulation_type << 3);
         status = WriteRegister(REG_DATAMODUL, register_content);
     }
     return status;
@@ -517,7 +516,7 @@ bool libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
 {
     bool status = FALSE;
-    uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation/RFM_FSTEP);
+    uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation / RFM_FSTEP);
 
     DEBUG("Freq deviation: %u\r\n", frequency_deviation);
     DEBUG("Freq deviation value: 0x%04X\r\n", frequency_deviation_value);
@@ -535,9 +534,9 @@ bool libRFM69_SetPowerAmplifierMode(uint8_t mode)
     bool status = FALSE;
     uint8_t register_content;
 
-    DEBUG("PA mode: 0x%02X\r\n", mode);
+    DEBUG("Power amplifier mode: 0x%02X\r\n", mode);
 
-    if (mode < 0x04 && mode > 0x01 && ReadRegister(REG_PALEVEL, &register_content))
+    if (mode < 0x05 && mode > 0x01 && ReadRegister(REG_PALEVEL, &register_content))
     {
         register_content &= ~REG_PA_LEVEL_PA_MASK;
         register_content |= (mode << 5);
@@ -567,6 +566,24 @@ bool libRFM69_IsHighPowerEnabled(void)
     bool status = FALSE;
 
     //Not implemented
+
+    return status;
+}
+
+bool libRFM69_EnableHighPowerSetting(bool enable)
+{
+    bool status;
+
+    if (enable == TRUE)
+    {
+        status = WriteRegister(REG_TESTPA1, 0x5D) &&
+                 WriteRegister(REG_TESTPA2, 0x7C);
+    }
+    else
+    {
+        status = WriteRegister(REG_TESTPA1, 0x55) &&
+                 WriteRegister(REG_TESTPA2, 0x70);
+    }
 
     return status;
 }
@@ -643,7 +660,8 @@ int8_t libRFM69_GetRSSI(void)
     do
     {
         ReadRegister(REG_RSSICONFIG, &register_content);
-    }while (register_content == 0);
+    }
+    while (register_content == 0);
 
     ReadRegister(REG_RSSIVALUE, &register_content);
 
@@ -787,7 +805,7 @@ bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length)
             //Abort if read fails
             if (ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]) == FALSE)
             {
-                WARNING("Failed to read from REG_SYNCVALUE%u", index+1);
+                WARNING("Failed to read from REG_SYNCVALUE%u", index + 1);
                 break;
             }
         }
@@ -818,6 +836,12 @@ void libRFM69_DumpRegisterValues(void)
         ReadRegister(register_address, &register_content);
         DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", register_address, register_content);
     }
+
+    ReadRegister(REG_TESTPA1, &register_content);
+    DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA1, register_content);
+
+    ReadRegister(REG_TESTPA2, &register_content);
+    DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA2, register_content);
     return;
 }
 

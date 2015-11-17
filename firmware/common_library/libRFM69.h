@@ -45,7 +45,7 @@ typedef enum
     RFM_SYNTHESIZER,
     RFM_TRANSMITTER,
     RFM_RECEIVER
-}libRFM69_mode_type;
+} libRFM69_mode_type;
 
 typedef enum
 {
@@ -53,43 +53,43 @@ typedef enum
     RFM_RESERVED,	//Do not use
     RFM_CONT_SYNC_DATA,
     RFM_CONT_DATA
-}libRFM69_data_mode_type;
+} libRFM69_data_mode_type;
 
 typedef enum
 {
     RFM_PACKET_FIXED_LEN,
     RFM_PACKET_VARIABLE_LEN
 
-}libRFM69_packet_format_type;
+} libRFM69_packet_format_type;
 
 typedef enum
 {
     RFM_FSK,
     RFM_OOK
-}libRFM69_modulation_type_type;
+} libRFM69_modulation_type_type;
 
 typedef enum
 {
     RFM_FIFO_FILL_AUTO = 0,
     RFM_FIFO_FILL_MAN
-}libRFM69_fifo_fill_condition_type;
+} libRFM69_fifo_fill_condition_type;
 
 typedef enum
 {
     RFM_TX_START_LEVEL = 0,
     RFM_TX_START_NOT_EMPTY
-}libRFM69_tx_start_condition_type;
+} libRFM69_tx_start_condition_type;
 
 #ifndef NODE_ADDRESS
-    #define NODE_ADDRESS 0xAA
+#define NODE_ADDRESS 0xAA
 #endif
 
 #ifndef BROADCAST_ADDRESS
-    #define BROADCAST_ADDRESS 0x00
+#define BROADCAST_ADDRESS 0x00
 #endif
 
 #ifdef	NETWORK_MASTER
-    #define NETWORK_ID NODE_ADDRESS
+#define NETWORK_ID NODE_ADDRESS
 #endif
 
 #define RFM_PWR_1	0x04 //PA0 output on pin RFIO
@@ -160,6 +160,8 @@ bool libRFM69_IsCRCOk(void);
 void libRFM69_DumpRegisterValues(void);
 bool libRFM69_SetNodeAddress(uint8_t node_address);
 bool libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
+bool libRFM69_EnableHighPowerSetting(bool enable);
+bool libRFM69_SetPowerLevel(uint8_t power_level);
 
 void libRFM69_Send(void);
 
