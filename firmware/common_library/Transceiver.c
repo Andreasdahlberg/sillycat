@@ -90,13 +90,12 @@ static transceiver_callback_type packet_handlers[TR_PACKET_NR_TYPES];
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-transceiver_state_type IdleStateMachine(void);
-transceiver_state_type SendingStateMachine(void);
-transceiver_state_type ListeningStateMachine(void);
-
+static transceiver_state_type IdleStateMachine(void);
+static transceiver_state_type SendingStateMachine(void);
+static transceiver_state_type ListeningStateMachine(void);
 static bool IsPacketTypeValid(packet_type_type packet_type);
-bool ReadyToSend(void);
-bool PacketToSend(void);
+static bool ReadyToSend(void);
+static bool PacketToSend(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -263,29 +262,27 @@ bool Transceiver_SetPacketHandler(transceiver_callback_type packet_handler,
 
 static bool IsPacketTypeValid(packet_type_type packet_type)
 {
-    return (packet_type >= 0 && packet_type < TR_PACKET_NR_TYPES);
+    return (packet_type < TR_PACKET_NR_TYPES);
 }
 
 //TODO: Make this function public?
-bool ReadyToSend(void)
+static bool ReadyToSend(void)
 {
     return (transceiver_state == TR_STATE_IDLE && libRFM69_GetRSSI() < -90);
 }
 
-bool PacketToSend(void)
+static bool PacketToSend(void)
 {
     return (packet_frame.header.target > 0);
 }
 
-bool HandlePayload(void)
+static bool HandlePayload(void)
 {
     uint8_t length;
     uint8_t data_buffer[RFM_FIFO_SIZE - 1];
 
-
     libRFM69_ReadFromFIFO(data_buffer, 1);
     length = data_buffer[0];
-
 
     if (length > RFM_FIFO_SIZE - 1)
     {
@@ -297,12 +294,10 @@ bool HandlePayload(void)
     DumpPacketHeader((packet_header_type *)data_buffer);
     DumpPacketContent((packet_content_type *)&data_buffer[5]);
 
-    //DumpPacket(()data_buffer)
-
     return TRUE;
 }
 
-transceiver_state_type IdleStateMachine(void)
+static transceiver_state_type IdleStateMachine(void)
 {
     transceiver_state_type next_state = TR_STATE_IDLE;
 
@@ -315,7 +310,7 @@ transceiver_state_type IdleStateMachine(void)
     return next_state;
 }
 
-transceiver_state_type ListeningStateMachine(void)
+static transceiver_state_type ListeningStateMachine(void)
 {
     static transceiver_listening_state_type state = TR_STATE_LISTENING_INIT;
 
@@ -353,7 +348,7 @@ transceiver_state_type ListeningStateMachine(void)
     return TR_STATE_LISTENING;
 }
 
-transceiver_state_type SendingStateMachine(void)
+static transceiver_state_type SendingStateMachine(void)
 {
     static transceiver_sending_state_type state = TR_STATE_SENDING_INIT;
     transceiver_state_type next_state = TR_STATE_SENDING;
