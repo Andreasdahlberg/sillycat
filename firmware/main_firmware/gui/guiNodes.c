@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2015-11-18 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -92,11 +92,20 @@ void guiNodes_Init(void)
 
 static void DrawNodeView(uint16_t context)
 {
-    char text_buffer[20];
-    sprintf(text_buffer, "%u", context + 1);
-    libUI_PrintText(text_buffer, 0, 0);
+    //Add one to node index(context) since end users are more familiar
+    //with indexing starting at 1.
+    libUI_Print("%u", 0, 0, context + 1);
 
-    libUI_PrintText("Temperature: -", 20, 2);
-    libUI_PrintText("Humidity: -", 28, 16);
+    if (Nodes_GetLatestData(context) != NULL)
+    {
+        libUI_Print("Temperature: 23", 20, 2);
+        libUI_Print("Humidity: 34", 28, 16);
+    }
+    else
+    {
+        libUI_Print("Temperature: -", 20, 2);
+        libUI_Print("Humidity: -", 28, 16);
+        INFO("No valid data, context: %u", context);
+    }
     return;
 }

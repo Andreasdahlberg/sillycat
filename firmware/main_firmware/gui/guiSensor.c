@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
+ * @date   2015-11-18 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -92,50 +92,35 @@ void guiSensor_Init(void)
 
 void guiSensor_DrawSensorInformation(uint16_t context __attribute__ ((unused)))
 {
-    char text[32];
-
-    sprintf(text, "Avg. period: %u min", (AVERAGE_WINDOW_S / 60));
-    libUI_PrintText(text, 6, 2);
-
-    sprintf(text, "Sample time: %u sec", SAMPLE_FREQUENCY_MS / 1000);
-    libUI_PrintText(text, 6, 16);
+    libUI_Print("Avg. period: %u min", 6, 2, (AVERAGE_WINDOW_S / 60));
+    libUI_Print("Sample time: %u sec", 6, 16, (SAMPLE_FREQUENCY_MS / 1000));
     return;
 }
 
 void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((unused)))
 {
     sensor_sample_type reading;
-    char text[16];
 
     Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading);
 
-    sprintf(text, "max: %uC", reading.max / 10);
-    libUI_PrintText(text, 6, 2);
-
-    sprintf(text, "min: %uC", reading.min / 10);
-    libUI_PrintText(text, 70, 2);
-
-    sprintf(text, "now: %uC", reading.value / 10);
-    libUI_PrintText(text, 6, 16);
-
-    sprintf(text, "avg: %uC", reading.average / 10);
-    libUI_PrintText(text, 70, 16);
+    libUI_Print("max: %uC", 6, 2, reading.max / 10);
+    libUI_Print("min: %uC", 70, 2, reading.min / 10);
+    libUI_Print("now: %uC", 6, 16, reading.value / 10);
+    libUI_Print("avg: %uC", 70, 16, reading.average / 10);
     return;
 }
 
 void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 {
     sensor_sample_type reading;
-    char text[20];
 
     if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
     {
-        sprintf(text, "Temperature: %uC", reading.value / 10);
-        libUI_PrintText(text, 10, 10);
+        libUI_Print("Temperature: %uC", 10, 10, reading.value / 10);
     }
     else
     {
-        libUI_PrintText("Temperature: --", 10, 10);
+        libUI_Print("Temperature: --", 10, 10);
     }
     return;
 }

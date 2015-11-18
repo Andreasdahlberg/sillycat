@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-06 (Last edit)
+ * @date   2015-11-18 (Last edit)
  * @brief  Implementation of guiRTC
  *
  * Detailed description of file.
@@ -95,21 +95,18 @@ void guiRTC_Init(void)
 
 static void DrawClockView(uint16_t context __attribute__ ((unused)))
 {
-    char text_buffer[20];
     uint8_t min;
     uint8_t hour;
 
     libDS3234_GetMinutes(&min);
     libDS3234_GetHour(&hour);
-    sprintf(text_buffer, "%02u:%02u", hour, min);
 
-    libUI_PrintText(text_buffer, 49, 11);
+    libUI_Print("%02u:%02u", 49, 11, hour, min);
     return;
 }
 
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
 {
-    char text_buffer[20];
     uint8_t year;
     uint8_t month;
     uint8_t date;
@@ -120,14 +117,11 @@ static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
     libDS3234_GetYear(&year);
     libDS3234_GetMonth(&month);
     libDS3234_GetDate(&date);
-
-    sprintf(text_buffer, "20%02u-%02u-%02u", year, month, date);
-    libUI_PrintText(text_buffer, 31, 2);
+    libUI_Print("20%02u-%02u-%02u", 31, 2, year, month, date);
 
     libDS3234_GetMinutes(&min);
     libDS3234_GetHour(&hour);
     libDS3234_GetSeconds(&sec);
-    sprintf(text_buffer, "%02u:%02u:%02u", hour, min, sec);
-    libUI_PrintText(text_buffer, 40, 16);
+    libUI_Print("%02u:%02u:%02u", 40, 16, hour, min, sec);
     return;
 }
