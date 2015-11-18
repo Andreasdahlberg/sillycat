@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-11-18 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -61,7 +61,9 @@ static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool RegisterAddressValid(uint8_t address);
 static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 static bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
+#ifndef DEBUG_ENABLE
 static void DumpRegisterValues(void);
+#endif
 
 static void PreCallback(void);
 static void PostCallback(void);
@@ -79,11 +81,11 @@ static void PostCallback(void);
 void libDS3234_Init(void)
 {
     libDS3234_HWInit();
-    
+
     // Clear control register, this makes sure that the oscillator is running
     // when power is removed.
     WriteRegister(REG_CONTROL, 0x00);
-        
+
     INFO("Init done");
     return;
 }
@@ -100,7 +102,7 @@ void libDS3234_HWInit(void)
     //Set SS as output
     DDRC |= (1 << SS);
     //Pull SS high to release device
-    PORTC |= (1 << SS);    
+    PORTC |= (1 << SS);
     return;
 }
 
@@ -124,13 +126,13 @@ void libDS3234_Update(void)
 void libDS3234_GetTemperature(uint16_t *temperature)
 {
     uint8_t data;
-    
+
     ReadRegister(REG_TEMP_MSB, &data);
     *temperature = data * 100;
-    
+
     ReadRegister(REG_TEMP_LSB, &data);
     *temperature += (data >> 6);
-    
+
     return;
 }
 
@@ -159,7 +161,7 @@ bool libDS3234_GetMonth(uint8_t *month)
     bool status = FALSE;
     uint8_t register_data;
 
-    if(ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
+    if (ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
     {
         *month = BCDToDecimal(register_data & MONTH_MASK);
         status = TRUE;
@@ -203,9 +205,9 @@ bool libDS3234_GetHour(uint8_t *hour)
     bool status = FALSE;
     uint8_t register_data;
 
-    if(ReadRegister(REG_HOUR, &register_data) == TRUE)
+    if (ReadRegister(REG_HOUR, &register_data) == TRUE)
     {
-        *hour = BCDToDecimal(register_data);		
+        *hour = BCDToDecimal(register_data);
         status = TRUE;
     }
     return status;
@@ -283,13 +285,13 @@ bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
     bool status = FALSE;
     uint8_t register_value;
 
-    if(ReadRegister(REG_HOUR, &register_value)== TRUE)
+    if (ReadRegister(REG_HOUR, &register_value) == TRUE)
     {
-        if((register_value & HOUR_MODE_BIT) == 0x00)
+        if ((register_value & HOUR_MODE_BIT) == 0x00)
         {
             *hour_mode = LIBDS3234_24HOUR_MODE;
             status = TRUE;
-        }		
+        }
         else
         {
             *hour_mode = LIBDS3234_12HOUR_MODE;
@@ -310,13 +312,13 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 {
     bool status = FALSE;
     uint8_t register_value;
-    
-    if(ReadRegister(REG_HOUR, &register_value)== TRUE)
+
+    if (ReadRegister(REG_HOUR, &register_value) == TRUE)
     {
-        if(hour_mode == LIBDS3234_24HOUR_MODE)
+        if (hour_mode == LIBDS3234_24HOUR_MODE)
         {
             register_value &= ~(1 << HOUR_MODE_BIT);
-            status = WriteRegister(REG_HOUR, register_value);	
+            status = WriteRegister(REG_HOUR, register_value);
         }
         else
         {
@@ -341,17 +343,17 @@ bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
     bool status = FALSE;
     uint8_t index;
-    
+
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
         WriteRegister(REG_SRAM_ADDRESS, address);
         for (index = 0; index < length; ++index)
         {
-            //SRAM address is auto incremented after each write            
+            //SRAM address is auto incremented after each write
             WriteRegister(REG_SRAM_DATA, data[index]);
         }
         status = TRUE;
-    }    
+    }
     return status;
 }
 
@@ -369,18 +371,18 @@ bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
     bool status = FALSE;
     uint8_t index;
-    
+
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
         WriteRegister(REG_SRAM_ADDRESS, address);
         for (index = 0; index < length; ++index)
         {
-            //SRAM address is auto incremented after each read            
-            ReadRegister(REG_SRAM_DATA, &data[index]);     
+            //SRAM address is auto incremented after each read
+            ReadRegister(REG_SRAM_DATA, &data[index]);
         }
         status = TRUE;
     }
-    return status;    
+    return status;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -400,8 +402,8 @@ static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 {
     bool status = FALSE;
     uint8_t register_data;
-        
-    if(ReadRegister(address, &register_data) == TRUE)
+
+    if (ReadRegister(address, &register_data) == TRUE)
     {
         *value = BCDToDecimal(register_data);
         status = TRUE;
@@ -413,13 +415,13 @@ static bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 {
     bool status = FALSE;
     uint8_t register_data;
-    
+
     //Only values smaller then 100 is accepted since a byte
     //only can hold two-digits of BCD data.
-    if(value < 100)
+    if (value < 100)
     {
         register_data = (uint8_t)DecimalToBCD(value);
-        status = WriteRegister(address, register_data);		 
+        status = WriteRegister(address, register_data);
     }
     return status;
 }
@@ -427,10 +429,10 @@ static bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
     bool status = FALSE;
-    
-    if(RegisterAddressValid(address))
+
+    if (RegisterAddressValid(address))
     {
-        libSPI_WriteByte(address|WRITE_ADDRESS, &PreCallback, NULL);
+        libSPI_WriteByte(address | WRITE_ADDRESS, &PreCallback, NULL);
         libSPI_WriteByte(register_data, NULL, &PostCallback);
         status = TRUE;
     }
@@ -440,10 +442,10 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
     bool status = FALSE;
-    
-    if(RegisterAddressValid(address))
+
+    if (RegisterAddressValid(address))
     {
-        libSPI_WriteByte(address|READ_ADDRESS, &PreCallback, NULL);
+        libSPI_WriteByte(address | READ_ADDRESS, &PreCallback, NULL);
         libSPI_ReadByte(register_data, NULL, &PostCallback);
         status = TRUE;
     }
@@ -468,24 +470,24 @@ static void PostCallback(void)
     return;
 }
 
+#ifndef DEBUG_ENABLE
 static void DumpRegisterValues(void)
 {
     uint8_t reg_addr;
     uint8_t reg_value;
-    
+
     DEBUG("**DS3234 registers**\r\n");
     for (reg_addr = 0x00; reg_addr <= REG_DISABLE_TEMP; ++ reg_addr)
     {
         if (ReadRegister(reg_addr, &reg_value) == TRUE)
         {
             DEBUG("Addr: 0x%02X, Value: 0x%02X\r\n", reg_addr, reg_value);
-        } 
+        }
         else
         {
-            DEBUG("Addr: 0x--, Value: 0x--\r\n");  
-        }                       
+            DEBUG("Addr: 0x--, Value: 0x--\r\n");
+        }
     }
     return;
 }
-
-
+#endif
