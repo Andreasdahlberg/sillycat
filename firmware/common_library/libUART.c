@@ -1,3 +1,12 @@
+/**
+ * @file   libUART.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-11-18 (Last edit)
+ * @brief  Implementation of libUART functions
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,9 +24,35 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "libUART.h"
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <avr/io.h>
 
+#include "libUART.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
+#define UBRRn 1		//Baud:250K, Fosc: 8 MHz, Error: 0%
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 ///
 /// @brief Init UART
@@ -25,18 +60,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 /// @param  None
 /// @return None
 ///
-void libUART_Init()
+void libUART_Init(void)
 {
-	//Set baud rate
-	UBRR0H = (uint8_t)(UBRRn>>8);
-	UBRR0L = (uint8_t)UBRRn;
-		
-	//Enable RX & TX
-	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-	
-	//Set frame format: 1 stop bit 8 data
-	UCSR0C =  (3 << UCSZ00);
-	return;
+    //Set baud rate
+    UBRR0H = (uint8_t)(UBRRn >> 8);
+    UBRR0L = (uint8_t)UBRRn;
+
+    //Enable RX & TX
+    UCSR0B = (1 << RXEN0) | (1 << TXEN0);
+
+    //Set frame format: 1 stop bit 8 data
+    UCSR0C =  (3 << UCSZ00);
+    return;
 }
 
 ///
@@ -46,17 +81,16 @@ void libUART_Init()
 /// @param  len Length of array
 /// @return None
 ///
-void libUART_SendArray(uint8_t* data, uint8_t len)
+void libUART_SendArray(uint8_t *data, uint8_t len)
 {
-	uint8_t byte_counter;
-	
-	for(byte_counter = 0; byte_counter < len; ++byte_counter)
-	{
-		libUART_SendByte(data[byte_counter]);
-	}
-	return;
-}
+    uint8_t byte_counter;
 
+    for (byte_counter = 0; byte_counter < len; ++byte_counter)
+    {
+        libUART_SendByte(data[byte_counter]);
+    }
+    return;
+}
 
 ///
 /// @brief Send a byte via UART
@@ -66,10 +100,11 @@ void libUART_SendArray(uint8_t* data, uint8_t len)
 ///
 void libUART_SendByte(uint8_t data)
 {
-	//wait for empty transmit buffer
-	while(!(UCSR0A & (1 << UDRE0)))
-	{	
-	}
-	//put data in buffer
-	UDR0 = data;
+    //wait for empty transmit buffer
+    while (!(UCSR0A & (1 << UDRE0)))
+    {
+    }
+    //put data in buffer
+    UDR0 = data;
+    return;
 }

@@ -1,3 +1,12 @@
+/**
+ * @file   libUART.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-11-16 (Last edit)
+ * @brief  Header of libUART
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -12,18 +21,28 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef LIBUART_H_
 #define LIBUART_H_
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <stdint.h>
 
-#define UBRRn 1		//Baud:250K, Fosc: 8 MHz, Error: 0%
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 void libUART_Init(void);
 void libUART_SendByte(uint8_t data);
-void libUART_SendArray(uint8_t* data, uint8_t len);
+void libUART_SendArray(uint8_t *data, uint8_t len);
 
 #endif /* LIBUART_H_ */
