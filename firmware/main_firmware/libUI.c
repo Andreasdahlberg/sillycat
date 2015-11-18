@@ -184,7 +184,7 @@ void libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos)
         if ((char)buffer[buffer_index] != ' ')
         {
             desc_offset = (buffer[buffer_index] - (char)current_font->startChar);
-            char_offset = current_font->charInfo[desc_offset].offset;
+            char_offset = pgm_read_word(&current_font->charInfo[desc_offset].offset);
 
             for (data_row = 0; data_row < current_font->heightPages; ++data_row)
             {
@@ -200,7 +200,7 @@ void libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos)
                     }
                 }
             }
-            x_pos += (current_font->charInfo[desc_offset].widthBits + 2);
+            x_pos += (pgm_read_byte(&current_font->charInfo[desc_offset].widthBits) + 2);
         }
         else
         {
