@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2015-11-18 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -33,8 +33,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <stdarg.h>
 
-#include <avr/pgmspace.h>
-
 #include "libDebug.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,12 +61,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 /// @param  None
 /// @return None
 ///
-void libDebug_Init()
+void libDebug_Init(void)
 {
-    #ifdef DEBUG_ENABLE
+#ifdef DEBUG_ENABLE
     libUART_Init();
-    #endif
+#endif
     INFO("Init done");
+    return;
 }
 
 ///
@@ -81,7 +80,8 @@ void libDebug_Init()
 void libDebug_Print_P(const char *text, ...)
 {
     va_list args;
-    char buffer[128];
+    //TODO: Find another safe solution for this, these buffers is too large!
+    char buffer[80];
     char format[64];
 
     strncpy_P(format, text, 64);
