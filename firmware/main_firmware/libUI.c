@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-29 (Last edit)
+ * @date   2015-11-18 (Last edit)
  * @brief  Implementation of UI-library.
  *
  * Detailed description of file.
@@ -35,6 +35,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/pgmspace.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "libDisplay.h"
 #include "libUI.h"
@@ -141,7 +143,32 @@ void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
     return;
 }
 
-void libUI_PrintText(char *buffer, uint8_t x_pos, uint8_t y_pos)
+///
+/// @brief Print string from FLASH to the display
+///
+/// @param  text Text to print
+/// @param  x_pos Vertical position in pixels
+/// @param  y_pos Horizontal position in pixels
+/// @param  variable number of arguments
+/// @return None
+///
+void libUI_Print_P(const char *text, uint8_t x_pos, uint8_t y_pos, ...)
+{
+    va_list args;
+    //TODO: Find another safe solution for this, these buffers is too large!
+    char buffer[24];
+    char format[24];
+
+    strncpy_P(format, text, 24);
+
+    va_start(args, y_pos);
+    vsprintf(buffer, format, args);
+    libUI_PrintText(buffer, x_pos, y_pos);
+    va_end(args);
+    return;
+}
+
+void libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos)
 {
     uint8_t desc_offset;
     uint16_t char_offset;
