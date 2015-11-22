@@ -1,3 +1,12 @@
+/**
+ * @file   libLED.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-11-22 (Last edit)
+ * @brief  Header of libLED
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -19,18 +28,20 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBLED_H_
 #define LIBLED_H_
 
-#define STATUS_LED PC5
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
-typedef enum LEDStatus
-{
-	LED_OFF = 0,
-	LED_ON
-}LEDStatus;
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
 
-void libLED_Init();
-void libLED_Update();
-void libLED_Toggle();
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
-
+void libLED_Init(void);
+void libLED_Enable(uint8_t index __attribute__ ((unused)), bool enable);
+void libLED_Toggle(uint8_t index __attribute__ ((unused)));
 
 #endif /* LIBLED_H_ */

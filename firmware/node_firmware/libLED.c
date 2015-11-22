@@ -1,3 +1,12 @@
+/**
+ * @file   libLED.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-11-22 (Last edit)
+ * @brief  Implementation of libLED
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,17 +24,38 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <avr/io.h>
 #include "libDebug.h"
 #include "libLED.h"
-#include "libTimer.h"
+#include "Timer.h"
 
-#define LIBNAME "libLED"
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
+//TODO: Change to correct pin when using real hardware!
+#define LED_PIN DDD5
+#define NR_LEDS 1
 
-//uint32_t LED_timer;
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
 
-void FlashLED();
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 ///
 /// @brief Init the LED library
@@ -33,38 +63,44 @@ void FlashLED();
 /// @param  None
 /// @return None
 ///
-void libLED_Init()
+void libLED_Init(void)
 {
-	//Set led pin as output and pull it low
-	DDRC |= (1 << STATUS_LED);
-	PORTC &= ~(1 << STATUS_LED); 
-	//LED_timer = libTimer_GetMilliseconds();
-	return;
+    //Set led pin as output and pull it low
+    DDRD |= (1 << LED_PIN);
+    PORTD &= ~(1 << LED_PIN);
+
+    DEBUG("Init done");
+    return;
 }
 
-void libLED_Toggle()
+///
+/// @brief Enable/disable a selected LED
+///
+/// @param  index LED to enable/disable, (is unused in this implementation)
+/// @param  enable True to enable, false to disable
+/// @return None
+///
+void libLED_Enable(uint8_t index __attribute__ ((unused)), bool enable)
 {
-	PORTC ^= (1 << STATUS_LED);
-	return;
+    if (enable == TRUE)
+    {
+        PORTD |= (1 << LED_PIN);
+    }
+    else
+    {
+        PORTD &= ~(1 << LED_PIN);
+    }
+    return;
 }
 
-
-
-void libLED_Update()
+///
+/// @brief Toggle the state a selected LED
+///
+/// @param  index LED to toggle, (is unused in this implementation)
+/// @return None
+///
+void libLED_Toggle(uint8_t index __attribute__ ((unused)))
 {
-	FlashLED();
-	return;
+    PORTD ^= (1 << LED_PIN);
+    return;
 }
-
-
-void FlashLED()
-{	
-	static uint32_t flash_timer = 0;
-	
-	if (libTimer_TimeDifference(flash_timer) > 1000)
-	{
-		libLED_Toggle();
-		flash_timer = libTimer_GetMilliseconds();
-	}
-}
-
