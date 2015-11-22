@@ -28,6 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <avr/io.h>
 #include "libDebug.h"
 #include "libLED.h"
