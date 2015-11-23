@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2015-11-23 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -27,10 +27,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <avr/io.h>
 #include <string.h>
 
-#include "common.h"
 #include "libDebug.h"
 #include "libSPI.h"
 #include "libDS3234.h"
@@ -137,7 +140,7 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 }
 
 ///
-/// @brief Get the current year NOT IMPLEMENTED
+/// @brief Get the current year
 ///
 /// @param  *year Pointer to variable where the year will be stored
 /// @return FALSE  If read of year failed
@@ -145,8 +148,25 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 ///
 bool libDS3234_GetYear(uint8_t *year)
 {
-    *year = 15;
-    return TRUE;
+    return GetDecimalRegisterValue(REG_YEAR, year);
+}
+
+///
+/// @brief Set the current year
+///
+/// @param  year Year to set
+/// @return FALSE  If set of year failed
+/// @return SUCCESS If set of year succeeded
+///
+bool libDS3234_SetYear(uint8_t year)
+{
+    bool status = FALSE;
+
+    if (year < 100)
+    {
+        status = SetDecimalRegisterValue(REG_YEAR, year);
+    }
+    return status;
 }
 
 ///
@@ -170,6 +190,26 @@ bool libDS3234_GetMonth(uint8_t *month)
 }
 
 ///
+/// @brief Set the current month
+///
+/// @param  month Month to set
+/// @return FALSE  If set of month failed
+/// @return SUCCESS If set of month succeeded
+///
+bool libDS3234_SetMonth(uint8_t month)
+{
+    bool status = FALSE;
+    uint8_t register_data;
+
+    if (month > 0 && month < 13 && ReadRegister(REG_MONTH_CENTURY, &register_data))
+    {
+        register_data = ((register_data & 0x80) | (uint8_t)DecimalToBCD(month));
+        status = WriteRegister(REG_MONTH_CENTURY, register_data);
+    }
+    return status;
+}
+
+///
 /// @brief Get the current date
 ///
 /// @param  *date Pointer to variable where the date will be stored(1-31)
@@ -182,6 +222,24 @@ bool libDS3234_GetDate(uint8_t *date)
 }
 
 ///
+/// @brief Set the current date
+///
+/// @param  date Date to set
+/// @return FALSE  If set of date failed
+/// @return SUCCESS If set of date succeeded
+///
+bool libDS3234_SetDate(uint8_t date)
+{
+    bool status = FALSE;
+
+    if (date > 0 && date < 32)
+    {
+        status = WriteRegister(REG_DATE, DecimalToBCD(date));
+    }
+    return status;
+}
+
+///
 /// @brief Get the current day in week
 ///
 /// @param  *day Pointer to variable where the day will be stored(1-7)
@@ -191,6 +249,24 @@ bool libDS3234_GetDate(uint8_t *date)
 bool libDS3234_GetDay(uint8_t *day)
 {
     return GetDecimalRegisterValue(REG_DAY, day);
+}
+
+///
+/// @brief Set the current day of the week
+///
+/// @param  day Day to set
+/// @return FALSE  If set of day failed
+/// @return SUCCESS If set of day succeeded
+///
+bool libDS3234_SetDay(uint8_t day)
+{
+    bool status = FALSE;
+
+    if (day > 0 && day < 8)
+    {
+        status = WriteRegister(REG_DAY, DecimalToBCD(day));
+    }
+    return status;
 }
 
 ///

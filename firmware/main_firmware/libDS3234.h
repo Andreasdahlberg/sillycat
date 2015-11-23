@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-11-23 (Last edit)
  * @brief  Header of DS3234-library.
  *
  * Detailed description of file.
@@ -84,9 +84,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum
 {
-    LIBDS3234_12HOUR_MODE= 0,
-    LIBDS3234_24HOUR_MODE		
-}libDS3234_hour_mode_type;
+    LIBDS3234_12HOUR_MODE = 0,
+    LIBDS3234_24HOUR_MODE
+} libDS3234_hour_mode_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -102,10 +102,15 @@ bool libDS3234_GetDate(uint8_t *date);
 bool libDS3234_GetHour(uint8_t *hour);
 bool libDS3234_GetMinutes(uint8_t *minutes);
 bool libDS3234_GetSeconds(uint8_t *seconds);
+bool libDS3234_GetDay(uint8_t *day);
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode);
 bool libDS3234_SetMinutes(uint8_t minutes);
 bool libDS3234_SetSeconds(uint8_t seconds);
 bool libDS3234_SetHour(uint8_t hour);
+bool libDS3234_SetYear(uint8_t year);
+bool libDS3234_SetMonth(uint8_t month);
+bool libDS3234_SetDate(uint8_t date);
+bool libDS3234_SetDay(uint8_t day);
 bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length);
 bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
 
