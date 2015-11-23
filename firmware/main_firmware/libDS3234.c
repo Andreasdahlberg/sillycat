@@ -110,17 +110,6 @@ void libDS3234_HWInit(void)
 }
 
 ///
-/// @brief Update the internal state of libDS3234. NOT IMPLEMENTED
-///
-/// @param  None
-/// @return None
-///
-void libDS3234_Update(void)
-{
-    return;
-}
-
-///
 /// @brief Get the chip-temperature from the DS3234 RTC
 ///
 /// @param  *temperature Pointer to variable where the temperature will be stored

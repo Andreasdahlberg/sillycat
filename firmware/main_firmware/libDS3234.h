@@ -94,7 +94,6 @@ typedef enum
 
 void libDS3234_Init(void);
 void libDS3234_HWInit(void);
-void libDS3234_Update(void);
 void libDS3234_GetTemperature(uint16_t *temperature);
 bool libDS3234_GetYear(uint8_t *year);
 bool libDS3234_GetMonth(uint8_t *month);
