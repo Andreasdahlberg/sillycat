@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-17 (Last edit)
+ * @date   2015-11-29 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -46,6 +46,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TIMESTAMP_FORMAT "20%02u-%02u-%02u %02u:%02u:%02u"
 
+#define DAYS_IN_MARCH_OCTOBER 31
+#define DAYS_IN_WEEK 7
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -62,6 +65,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+//TODO: Remove this function, implement time struct to string instead
 void RTC_GetTimestamp(char *timestamp)
 {
     rtc_time_type time;
@@ -78,15 +82,67 @@ void RTC_GetTimestamp(char *timestamp)
     return;
 }
 
-//TODO: Implement abstraction layer
-bool RTC_GetCurrentTime(rtc_time_type *current_time)
+bool RTC_GetCurrentTime(rtc_time_type *time)
 {
-    return (libDS3234_GetYear(&current_time->year) &&
-            libDS3234_GetMonth(&current_time->month) &&
-            libDS3234_GetDate(&current_time->date) &&
-            libDS3234_GetHour(&current_time->hour) &&
-            libDS3234_GetMinutes(&current_time->minute) &&
-            libDS3234_GetSeconds(&current_time->second));
+    return (libDS3234_GetYear(&time->year) &&
+            libDS3234_GetMonth(&time->month) &&
+            libDS3234_GetDate(&time->date) &&
+            libDS3234_GetHour(&time->hour) &&
+            libDS3234_GetMinutes(&time->minute) &&
+            libDS3234_GetSeconds(&time->second));
+}
+
+bool RTC_SetCurrentTime(rtc_time_type *time)
+{
+    return (libDS3234_SetYear(time->year) &&
+            libDS3234_SetMonth(time->month) &&
+            libDS3234_SetDate(time->date) &&
+            libDS3234_SetHour(time->hour) &&
+            libDS3234_SetMinutes(time->minute) &&
+            libDS3234_SetSeconds(time->second));
+}
+
+//TODO: Fixe edge cases!
+bool RTC_IsDaylightSavingActive(void)
+{
+    rtc_time_type time;
+    bool dst_active;
+    uint8_t next_sunday;
+    uint8_t week_day;
+
+    if (RTC_GetCurrentTime(&time) != TRUE || libDS3234_GetDay(&week_day) != TRUE)
+    {
+        return FALSE;
+    }
+
+    if (time.month > MARCH && time.month < OCTOBER)
+    {
+        dst_active = TRUE;
+    }
+    else if (time.month < MARCH || time.month > OCTOBER)
+    {
+        dst_active = FALSE;
+    }
+    else
+    {
+        next_sunday = time.date + (DAYS_IN_WEEK - week_day);
+
+        if (next_sunday < DAYS_IN_MARCH_OCTOBER)
+        {
+            while (next_sunday + DAYS_IN_WEEK < DAYS_IN_MARCH_OCTOBER)
+            {
+                next_sunday += DAYS_IN_WEEK;
+            }
+        }
+        else
+        {
+            next_sunday -= DAYS_IN_WEEK;
+        }
+
+        dst_active = ((time.month == MARCH && time.date > next_sunday) ||
+                      (time.month == OCTOBER && time.date < next_sunday));
+    }
+    return dst_active;
 }
 
 //////////////////////////////////////////////////////////////////////////
