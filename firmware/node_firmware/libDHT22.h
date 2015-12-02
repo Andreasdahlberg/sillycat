@@ -50,5 +50,8 @@ typedef struct
 void libDHT22_Init(void);
 void libDHT22_Update(void);
 dht22_data_type libDHT22_GetSensorReading(void);
+bool libDHT22_IsIdle(void);
+void libDHT22_StartReading(void);
+bool libDHT22_IsReadingValid(void);
 
 #endif /* LIBDHT22_H_ */

@@ -57,6 +57,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 typedef enum
 {
     DHT_UNINITIALIZED = 0,
+    DHT_IDLE,
     DHT_POWERUP,
     DHT_READING,
     DHT_DECODING,
@@ -111,8 +112,9 @@ void libDHT22_Init(void)
     DDRB |= (1 << DATAPIN);
     PORTB |= (1 << DATAPIN);
 
-    dht22_state = DHT_POWERUP;
+    dht22_state = DHT_IDLE;
     init_time = Timer_GetMilliseconds();
+    sensor_reading.status = FALSE;
 
     INFO("Init done");
     return;
@@ -122,10 +124,12 @@ void libDHT22_Update(void)
 {
     switch (dht22_state)
     {
+        case DHT_IDLE:
+            break;
+
         case DHT_POWERUP:
             if (Timer_TimeDifference(init_time) > MEASURE_INTERVAL_MS)
             {
-                INFO("DHT22 ready for new sample");
                 dht22_state = DHT_READING;
             }
             break;
@@ -137,7 +141,7 @@ void libDHT22_Update(void)
         case DHT_DECODING:
             DecodeTimings();
             init_time = Timer_GetMilliseconds();
-            dht22_state = DHT_POWERUP;
+            dht22_state = DHT_IDLE;
             break;
 
         case DHT_UNINITIALIZED:
@@ -158,7 +162,27 @@ void libDHT22_Update(void)
 dht22_data_type libDHT22_GetSensorReading(void)
 {
     dht22_data_type return_data = sensor_reading;
+    sensor_reading.status = FALSE;
     return return_data;
+}
+
+bool libDHT22_IsReadingValid(void)
+{
+    return sensor_reading.status;
+}
+
+bool libDHT22_IsIdle(void)
+{
+    return (dht22_state == DHT_IDLE);
+}
+
+void libDHT22_StartReading(void)
+{
+    if (libDHT22_IsIdle() == TRUE)
+    {
+        dht22_state = DHT_POWERUP;
+    }
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
