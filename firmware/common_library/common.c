@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-31 (Last edit)
+ * @date   2015-12-6 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -29,6 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include <avr/wdt.h>
+#include <avr/io.h>
 
 #include "common.h"
 
@@ -56,15 +57,14 @@ uint16_t exponential_moving_average(uint16_t value, uint16_t average,
                                     uint16_t alpha)
 {
     uint32_t tmp = (uint32_t)alpha * (uint32_t)value + (uint32_t)(65536 - alpha) * (uint32_t)average;
-    return (uint16_t)((tmp+32768) / 65536);
-
+    return (uint16_t)((tmp + 32768) / 65536);
 }
 
 uint8_t BCDToDecimal(uint8_t bcd_data)
 {
     uint8_t data;
 
-    data = ((bcd_data & 0xF0)>>4)*10;
+    data = ((bcd_data & 0xF0) >> 4) * 10;
     data += (bcd_data & 0x0F);
 
     return data;
@@ -96,21 +96,27 @@ void SetBit(uint8_t bit_index, bool state, uint8_t *data)
     {
         *data &= ~(1 << bit_index);
     }
+    return;
 }
 
-int GetFreeRam()
+int GetFreeRam(void)
 {
     extern int __heap_start, *__brkval;
     int v;
     return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
 }
 
-void SoftReset()
- {
+void SoftReset(void)
+{
     wdt_enable(WDTO_15MS);
-    while(1)
+    while (1)
     {
     }
+}
+
+bool IsGlobalInteruptEnabled(void)
+{
+    return ((SREG & (1 << 7)) > 0);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2015-12-6 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -50,18 +50,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum bool
 {
-	FALSE = 0,
-	TRUE
-}bool;
+    FALSE = 0,
+    TRUE
+} bool;
 
 
 typedef enum function_status
 {
-	ERROR = 0,
-	SUCCESS,
-	BUSY,
-	TIMEOUT
-}function_status;
+    ERROR = 0,
+    SUCCESS,
+    BUSY,
+    TIMEOUT
+} function_status;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -71,7 +71,8 @@ uint16_t exponential_moving_average(uint16_t value, uint16_t average,
 void SetBit(uint8_t bit_index, bool state, uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
 uint16_t DecimalToBCD(uint8_t decimal_data);
-int GetFreeRam();
-void SoftReset() __attribute__((noreturn));
+int GetFreeRam(void);
+void SoftReset(void) __attribute__((noreturn));
+bool IsGlobalInteruptEnabled(void);
 
 #endif /* COMMON_H_ */
