@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-23 (Last edit)
+ * @date   2015-12-6 (Last edit)
  * @brief  Header of DS3234-library.
  *
  * Detailed description of file.
@@ -94,6 +94,7 @@ typedef enum
 
 void libDS3234_Init(void);
 void libDS3234_HWInit(void);
+
 void libDS3234_GetTemperature(uint16_t *temperature);
 bool libDS3234_GetYear(uint8_t *year);
 bool libDS3234_GetMonth(uint8_t *month);
@@ -102,6 +103,7 @@ bool libDS3234_GetHour(uint8_t *hour);
 bool libDS3234_GetMinutes(uint8_t *minutes);
 bool libDS3234_GetSeconds(uint8_t *seconds);
 bool libDS3234_GetDay(uint8_t *day);
+
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode);
 bool libDS3234_SetMinutes(uint8_t minutes);
 bool libDS3234_SetSeconds(uint8_t seconds);
@@ -110,6 +112,12 @@ bool libDS3234_SetYear(uint8_t year);
 bool libDS3234_SetMonth(uint8_t month);
 bool libDS3234_SetDate(uint8_t date);
 bool libDS3234_SetDay(uint8_t day);
+
+bool libDS3234_SetAlarmDate(uint8_t data, uint8_t alarm_index);
+bool libDS3234_SetAlarmHour(uint8_t hour, uint8_t alarm_index);
+bool libDS3234_SetAlarmMinutes(uint8_t minutes, uint8_t alarm_index);
+bool libDS3234_SetAlarmSeconds(uint8_t seconds);
+
 bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length);
 bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
 

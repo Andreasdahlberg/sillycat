@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-23 (Last edit)
+ * @date   2015-12-6 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -229,6 +229,28 @@ bool libDS3234_SetDate(uint8_t date)
 }
 
 ///
+/// @brief Set the alarm date
+///
+/// @param  date Date to set
+/// @return FALSE  If set of alarm date failed
+/// @return SUCCESS If set of alarm date succeeded
+///
+bool libDS3234_SetAlarmDate(uint8_t date, uint8_t alarm_index)
+{
+    bool status = FALSE;
+    uint8_t register_address;
+
+    register_address = (alarm_index == 1) ? REG_ALARM_1_DAY_DATE :
+                       REG_ALARM_2_DAY_DATE;
+
+    if (date > 0 && date < 32)
+    {
+        status = WriteRegister(register_address, DecimalToBCD(date));
+    }
+    return status;
+}
+
+///
 /// @brief Get the current day in week
 ///
 /// @param  *day Pointer to variable where the day will be stored(1-7)
@@ -291,6 +313,23 @@ bool libDS3234_SetHour(uint8_t hour)
 }
 
 ///
+/// @brief Set the alarm hour
+///
+/// @param  hour New alarm hour to set
+/// @return FALSE  If set failed
+/// @return SUCCESS If set succeeded
+///
+bool libDS3234_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
+{
+    uint8_t register_address;
+
+    register_address = (alarm_index == 1) ? REG_ALARM_1_HOURS :
+                       REG_ALARM_2_HOURS;
+
+    return SetDecimalRegisterValue(register_address, hour);
+}
+
+///
 /// @brief Get the current minute
 ///
 /// @param  *date Pointer to variable where the minute will be stored
@@ -315,6 +354,22 @@ bool libDS3234_SetMinutes(uint8_t minutes)
 }
 
 ///
+/// @brief Set the alarm minute
+///
+/// @param  minutes New alarm minute to set
+/// @return FALSE  If set failed
+/// @return SUCCESS If set succeeded
+///
+bool libDS3234_SetAlarmMinutes(uint8_t minutes, uint8_t alarm_index)
+{
+    uint8_t register_address;
+
+    register_address = (alarm_index == 1) ? REG_ALARM_1_MINUTES :
+                       REG_ALARM_2_MINUTES;
+    return SetDecimalRegisterValue(register_address, minutes);
+}
+
+///
 /// @brief Get the current second
 ///
 /// @param  *date Pointer to variable where the second will be stored
@@ -336,6 +391,18 @@ bool libDS3234_GetSeconds(uint8_t *seconds)
 bool libDS3234_SetSeconds(uint8_t seconds)
 {
     return SetDecimalRegisterValue(REG_SECONDS, seconds);
+}
+
+///
+/// @brief Set the alarm second
+///
+/// @param  seconds New alarm second to set
+/// @return FALSE  If set failed
+/// @return SUCCESS If set succeeded
+///
+bool libDS3234_SetAlarmSeconds(uint8_t seconds)
+{
+    return SetDecimalRegisterValue(REG_ALARM_1_SECONDS, seconds);
 }
 
 ///
