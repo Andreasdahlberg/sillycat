@@ -1,3 +1,12 @@
+/**
+ * @file   libPower.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-12-06 (Last edit)
+ * @brief  Header of libPower
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,22 +24,25 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LIBPOWER_H_
 #define LIBPOWER_H_
 
-typedef enum power_state_type
-{
-	CHARGING,
-	CHARGER_CONNECTED,
-	BATTERY,
-	LOW_VOLTAGE,
-	CRITICAL_VOLTAGE
-}power_state_type;
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
 void libPower_Init(void);
-void libPower_Update(void);
+void libPower_Sleep(void);
+bool libPower_IsChargerConnected(void);
+bool libPower_IsCharging(void);
 uint32_t libPower_GetBatteryVoltage(void);
 
-
-#endif /* LIBLED_H_ */
+#endif /* LIBPOWER_H_ */

@@ -1,3 +1,12 @@
+/**
+ * @file   libPower.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2015-12-6 (Last edit)
+ * @brief  Implementation of libPower
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,110 +24,184 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <avr/io.h>
 #include <avr/sleep.h>
+#include <avr/interrupt.h>
+
 #include "libPower.h"
 #include "libDebug.h"
-#include "libTimer.h"
 #include "libADC.h"
+#include "Timer.h"
 
-#define LIBNAME "libPower"
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 #define VREF 3300 // mV
 #define R1_RESISTANCE 5600.0
 #define R2_RESISTANCE 100000.0
 
-/*
- | VBAT
- |
- -
-| | R1 = 5.6 KOhm
-| |
- -
- |
- ------- VSENSE
- |
- -
-| | R2 = 100 KOhm
-| |
- -
- |
- | GND
-*/
+#define CONNECTED_PIN PINC1
+#define CHARGING_PIN PINC4
 
-//TODO: These values must be verified!
-//Assuming two NiMh battery cells in series 
-#define LOWVOLTAGE 2000
-#define CRITICALVOLTAGE 1700
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
 
-power_state_type power_state;
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+void EnableLowLevelInterupt(bool enable);
+
+//////////////////////////////////////////////////////////////////////////
+//INTERUPT SERVICE ROUTINES
+//////////////////////////////////////////////////////////////////////////
+
+ISR(INT1_vect)
+{
+    //Do nothing here
+}
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 ///
-/// @brief Init....
+/// @brief Init power module
 ///
 /// @param  None
 /// @return None
 ///
-void libPower_Init()
+void libPower_Init(void)
 {
-	//Turn of unused modules
-	//ADCSRA = 0x00;
-	//PRR = (1 << PRTWI) | (1 << PRTIM0) | (1 << PRTIM2) | (1 << PRADC);
+    DDRC &= ~(1 << CONNECTED_PIN | 1 << CHARGING_PIN);
 
+    DDRD &= ~(1 << DDD3);
+    PORTD |= (1 << DDD3);
+
+    PRR = ((1 << PRTWI) | (1 << PRTIM2));
+
+    //Turn off USART if debug is disabled
+#ifndef DEBUG_ENABLE
+    PRR |= (1 << PRUSART0);
+#endif
+    return;
 }
 
-
-void libPower_Update()
+///
+/// @brief Enter sleep mode.
+///
+/// @param  None
+/// @return None
+///
+void libPower_Sleep(void)
 {
-	static uint32_t update_timer = 0;
-		
-	switch (power_state)
-	{
-		case CHARGING:
-			break;
-		
-		case CHARGER_CONNECTED:
-			break;
-		
-		case BATTERY:
-			break;
-		
-		case LOW_VOLTAGE:
-			break;
-		
-		case CRITICAL_VOLTAGE:	
-			break;
-			
-		default:
-			break;
-	}
-		
+    //Do not enter sleep if global interrupts are disabled.
+    //Without this the device can not wake up again.
+    //IMPORTANT: This function does not catch cases where
+    //           interrupts is disabled inside an interrupt vector.
+    if (IsGlobalInteruptEnabled() == FALSE)
+    {
+        return;
+    }
 
-		
-		if (libTimer_TimeDifference(update_timer) > 1000)
-		{
-			DEBUG_INT(LIBNAME, libPower_GetBatteryVoltage());
-			update_timer = libTimer_GetMilliseconds();
-		}
-	
-	
-		
+    EnableLowLevelInterupt(TRUE);
 
-	return;
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+    sleep_enable();
+    sleep_cpu();
+    sleep_disable();
+
+    EnableLowLevelInterupt(FALSE);
+
+#ifdef DEBUG_ENABLE
+    DEBUG("\r\n");
+#endif
+    return;
 }
 
-void libPower_Standby()
+///
+/// @brief Check if the charger is connected
+///
+/// @param  None
+/// @return TRUE if connected, otherwise FALSE
+///
+bool libPower_IsChargerConnected(void)
 {
-
-	
+    return ((PINC & (1 << CONNECTED_PIN)) == 0);
 }
 
+///
+/// @brief Check if the battery is charging
+///
+/// @param  None
+/// @return TRUE if charging, otherwise FALSE
+///
+bool libPower_IsCharging(void)
+{
+    return ((PINC & (1 << CHARGING_PIN)) == 0);
+}
 
+///
+/// @brief Get the current battery voltage
+///
+/// @param  None
+/// @return Battery voltage in mV
+///
 uint32_t libPower_GetBatteryVoltage(void)
 {
-	uint32_t sample = libADC_GetSample();
-	uint32_t voltage = (sample * VREF) / 1024;
-	
-	//Adjust voltage from voltage divider
-	return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE + R2_RESISTANCE)));
+    uint32_t sample = 0;//libADC_GetSample();
+    uint32_t voltage = (sample * VREF) / 1024;
+
+    /*
+     | VBAT
+     |
+     -
+    | | R1 = 5.6 KOhm
+    | |
+     -
+     |
+     ------- VSENSE
+     |
+     -
+    | | R2 = 100 KOhm
+    | |
+     -
+     |
+     | GND
+    */
+
+    //Adjust voltage from voltage divider
+    return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE + R2_RESISTANCE)));
+}
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+//NOTE: This function does not touch the global interrupt enable!
+void EnableLowLevelInterupt(bool enable)
+{
+    if (enable == TRUE)
+    {
+        //Enable low level sense
+        EICRA &= ~(1 << ISC11 | 1 << ISC10);
+
+        //Enable external interrupt 1
+        EIMSK |= (1 << INT1);
+    }
+    else
+    {
+        //Disable external interrupt 1
+        EIMSK &= ~(1 << INT1);
+    }
+    return;
 }
