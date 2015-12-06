@@ -39,8 +39,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RTC_ALARM_INDEX 1
 
-#define RTC_InitHW()    libDS3234_Init()
-#define RTC_Init()      libDS3234_HWInit()
+#define RTC_InitHW()    libDS3234_HWInit()
+#define RTC_Init()      libDS3234_Init()
 
 #define RTC_GetYear(year)           libDS3234_GetYear(year)
 #define RTC_GetMonth(month)         libDS3234_GetMonth(month)
