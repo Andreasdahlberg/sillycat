@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-29 (Last edit)
+ * @date   2015-12-6 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -33,11 +33,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.h"
 #include "libDebug.h"
-
-#ifdef IS_MAIN
-#include "libDS3234.h"
-#endif
-
 #include "RTC.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -57,6 +52,19 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
+static const uint8_t days_in_months[12] = {DAYS_IN_JAN,
+                                           DAYS_IN_FEB,
+                                           DAYS_IN_MAR,
+                                           DAYS_IN_APR,
+                                           DAYS_IN_MAY,
+                                           DAYS_IN_JUN,
+                                           DAYS_IN_JUL,
+                                           DAYS_IN_AUG,
+                                           DAYS_IN_SEP,
+                                           DAYS_IN_OCT,
+                                           DAYS_IN_NOV,
+                                           DAYS_IN_DEC
+                                          };
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -84,22 +92,22 @@ void RTC_GetTimestamp(char *timestamp)
 
 bool RTC_GetCurrentTime(rtc_time_type *time)
 {
-    return (libDS3234_GetYear(&time->year) &&
-            libDS3234_GetMonth(&time->month) &&
-            libDS3234_GetDate(&time->date) &&
-            libDS3234_GetHour(&time->hour) &&
-            libDS3234_GetMinutes(&time->minute) &&
-            libDS3234_GetSeconds(&time->second));
+    return (RTC_GetYear(&time->year) &&
+            RTC_GetMonth(&time->month) &&
+            RTC_GetDate(&time->date) &&
+            RTC_GetHour(&time->hour) &&
+            RTC_GetMinutes(&time->minute) &&
+            RTC_GetSeconds(&time->second));
 }
 
 bool RTC_SetCurrentTime(rtc_time_type *time)
 {
-    return (libDS3234_SetYear(time->year) &&
-            libDS3234_SetMonth(time->month) &&
-            libDS3234_SetDate(time->date) &&
-            libDS3234_SetHour(time->hour) &&
-            libDS3234_SetMinutes(time->minute) &&
-            libDS3234_SetSeconds(time->second));
+    return (RTC_SetYear(time->year) &&
+            RTC_SetMonth(time->month) &&
+            RTC_SetDate(time->date) &&
+            RTC_SetHour(time->hour) &&
+            RTC_SetMinutes(time->minute) &&
+            RTC_SetSeconds(time->second));
 }
 
 //TODO: Fixe edge cases!
@@ -110,7 +118,7 @@ bool RTC_IsDaylightSavingActive(void)
     uint8_t next_sunday;
     uint8_t week_day;
 
-    if (RTC_GetCurrentTime(&time) != TRUE || libDS3234_GetDay(&week_day) != TRUE)
+    if (RTC_GetCurrentTime(&time) != TRUE || RTC_GetDay(&week_day) != TRUE)
     {
         return FALSE;
     }

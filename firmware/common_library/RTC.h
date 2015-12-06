@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-17 (Last edit)
+ * @date   2015-12-6 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.
@@ -30,6 +30,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+#include "RTC_HAL.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -65,6 +67,18 @@ typedef enum
     DECEMBER
 } rtc_months_type;
 
+#define DAYS_IN_JAN 31
+#define DAYS_IN_FEB 28
+#define DAYS_IN_MAR 31
+#define DAYS_IN_APR 30
+#define DAYS_IN_MAY 31
+#define DAYS_IN_JUN 30
+#define DAYS_IN_JUL 31
+#define DAYS_IN_AUG 31
+#define DAYS_IN_SEP 30
+#define DAYS_IN_OCT 31
+#define DAYS_IN_NOV 30
+#define DAYS_IN_DEC 31
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
