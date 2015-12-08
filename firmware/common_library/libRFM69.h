@@ -134,6 +134,7 @@ uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length);
 bool libRFM69_EnableSyncWordGeneration(bool enabled);
 void libRFM69_EnableListenMode(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
+libRFM69_mode_type libRFM69_GetMode(void);
 uint32_t libRFM69_GetBitrate(void);
 uint8_t libRFM69_GetChipVersion(void);
 uint8_t libRFM69_GetPowerAmplifierMode(void);

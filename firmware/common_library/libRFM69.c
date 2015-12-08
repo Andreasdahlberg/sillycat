@@ -268,6 +268,18 @@ bool libRFM69_ClearFIFO(void)
     return status;
 }
 
+libRFM69_mode_type libRFM69_GetMode(void)
+{
+    uint8_t register_content;
+
+    if (ReadRegister(REG_OPMODE, &register_content))
+    {
+        return (libRFM69_mode_type)((register_content & ~REG_OPMODE_MODE_MASK) >> 2);
+    }
+    //TODO: Handle failure!
+    return 0;
+}
+
 bool libRFM69_SetMode(libRFM69_mode_type mode)
 {
     bool status = FALSE;
@@ -281,7 +293,6 @@ bool libRFM69_SetMode(libRFM69_mode_type mode)
     }
     return status;
 }
-
 
 bool libRFM69_WaitForModeReady()
 {
@@ -299,7 +310,6 @@ bool libRFM69_WaitForModeReady()
     }
     return status;
 }
-
 
 bool libRFM69_IsModeReady()
 {
