@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2015-12-9 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -24,7 +24,6 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef COMMON_H_
 #define COMMON_H_
 
@@ -34,6 +33,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stddef.h>
+
+#include "sc_assert.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -53,7 +54,6 @@ typedef enum bool
     FALSE = 0,
     TRUE
 } bool;
-
 
 typedef enum function_status
 {
