@@ -1,7 +1,7 @@
 /**
  * @file   List.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-5 (Last edit)
+ * @date   2015-12-9 (Last edit)
  * @brief  Implementation of a single linked list
  *
  * Detailed description of file.
@@ -28,7 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdio.h>
 #include "List.h"
+#include "sc_assert.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -55,10 +57,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 ///
 /// @param  *list Pointer to list.
 /// @param  *node Pointer to node.
-/// @return Status of append.
+/// @return None.
 ///
 void List_Append(list_type *list, list_node_type *node)
 {
+    sc_assert(list != NULL);
+    sc_assert(node != NULL);
+
     if (list->root == NULL)
     {
         list->root = node;
@@ -84,8 +89,11 @@ void List_Append(list_type *list, list_node_type *node)
 /// @param  *node Pointer to node.
 /// @return Status of remove.
 ///
-bool List_Remove(list_type *list, list_node_type *node)
+void List_Remove(list_type *list, list_node_type *node)
 {
+    sc_assert(list != NULL);
+    sc_assert(node != NULL);
+
     list_node_type *curr_node;
     list_node_type *prev_node;
 
@@ -119,6 +127,8 @@ bool List_Remove(list_type *list, list_node_type *node)
 ///
 uint32_t List_GetLength(list_type *list)
 {
+    sc_assert(list != NULL);
+
     uint32_t node_count = 0;
     list_node_type *node_ptr;
     node_ptr = list->root;
@@ -141,6 +151,9 @@ uint32_t List_GetLength(list_type *list)
 ///
 void List_Iterate(list_type *list, list_fp function)
 {
+    sc_assert(list != NULL);
+    sc_assert(function != NULL);
+
     uint32_t node_count = 0;
     list_node_type *node_ptr;
     node_ptr = list->root;

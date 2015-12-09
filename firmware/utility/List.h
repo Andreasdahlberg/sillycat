@@ -1,7 +1,7 @@
 /**
  * @file   List.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-5 (Last edit)
+ * @date   2015-12-9 (Last edit)
  * @brief  Header of List
  *
  * Detailed description of file.
@@ -33,7 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
-#include <stdbool.h>
+#include <stdio.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -41,6 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define List_New(type_id) (list_type){type_id, NULL};
 #define List_NewNode(data_ptr) (list_node_type){data_ptr, NULL};
+//#define List_Reset(list) (list_node_type){list->type_id, NULL};
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -48,15 +49,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct list_node_type
 {
-	void *data;
+    void *data;
     struct list_node_type *next;
-}list_node_type;
+} list_node_type;
 
 typedef struct list_type
 {
-	uint32_t type_id;
-	struct list_node_type *root;
-}list_type;
+    uint32_t type_id;
+    struct list_node_type *root;
+} list_type;
 
 typedef void (*list_fp)(list_node_type *node, uint32_t index);
 
@@ -64,8 +65,9 @@ typedef void (*list_fp)(list_node_type *node, uint32_t index);
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-bool List_Append(list_type *list, list_node_type *item);
-bool List_Remove(list_type *list, list_node_type *item);
+void List_Append(list_type *list, list_node_type *item);
+void List_Remove(list_type *list, list_node_type *item);
 uint32_t List_GetLength(list_type *list);
+void List_Iterate(list_type *list, list_fp function);
 
 #endif /* LIST_H_ */
