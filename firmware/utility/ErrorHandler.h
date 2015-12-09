@@ -32,6 +32,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define ASSERT_HANDLER(e) ErrorHandler_AssertFail(__func__, __FILE__, __LINE__, #e)
+
+#include "sc_assert.h"
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -41,5 +45,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 void ErrorHandler_PointOfNoReturn(void) __attribute__((noreturn));
+void ErrorHandler_AssertFail(const char *__func, const char *__file,
+                             int __lineno, const char *__sexp);
 
 #endif /* ERRORHANDLER_H_ */

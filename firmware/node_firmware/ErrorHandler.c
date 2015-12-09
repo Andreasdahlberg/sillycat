@@ -35,6 +35,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libLED.h"
+#include "ErrorHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -60,21 +61,23 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+void ErrorHandler_AssertFail(const char *__func, const char *__file,
+                             int __lineno, const char *__sexp)
+{
+    DEBUG("<ERROR> Failed assert: %s:%s:%u (%s)\r\n", __file, __func, __lineno, __sexp);
+    ErrorHandler_PointOfNoReturn();
+    return;
+}
+
 void ErrorHandler_PointOfNoReturn()
 {
-    libDebug_Init();
-    libLED_Init();
-
     libLED_Enable(0, TRUE);
     CRITICAL("Entering fail state, manual reboot is needed.");
 
     wdt_disable();
-
     while (1)
     {
     }
-
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
