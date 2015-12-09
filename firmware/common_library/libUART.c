@@ -1,7 +1,7 @@
 /**
  * @file   libUART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2015-12-9 (Last edit)
  * @brief  Implementation of libUART functions
  *
  * Detailed description of file.
@@ -100,11 +100,24 @@ void libUART_SendArray(uint8_t *data, uint8_t len)
 ///
 void libUART_SendByte(uint8_t data)
 {
+    libUART_WaitForEmptyBuffer();
+
+    //put data in buffer
+    UDR0 = data;
+    return;
+}
+
+///
+/// @brief Wait for empty transmit buffer
+///
+/// @param  None
+/// @return None
+///
+void libUART_WaitForEmptyBuffer(void)
+{
     //wait for empty transmit buffer
     while (!(UCSR0A & (1 << UDRE0)))
     {
     }
-    //put data in buffer
-    UDR0 = data;
     return;
 }

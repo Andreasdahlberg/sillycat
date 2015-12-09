@@ -1,7 +1,7 @@
 /**
  * @file   libUART.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-16 (Last edit)
+ * @date   2015-12-9 (Last edit)
  * @brief  Header of libUART
  *
  * Detailed description of file.
@@ -44,5 +44,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void libUART_Init(void);
 void libUART_SendByte(uint8_t data);
 void libUART_SendArray(uint8_t *data, uint8_t len);
+void libUART_WaitForEmptyBuffer(void);
 
 #endif /* LIBUART_H_ */
