@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2015-12-12 (Last edit)
  * @brief  Implementation of libPower
  *
  * Detailed description of file.
@@ -87,6 +87,7 @@ void libPower_Init(void)
     DDRD &= ~(1 << DDD3);
     PORTD |= (1 << DDD3);
 
+    //Disable TWI(I2C) and Timer 2
     PRR = ((1 << PRTWI) | (1 << PRTIM2));
 
     //Turn off USART if debug is disabled
@@ -110,6 +111,7 @@ void libPower_Sleep(void)
     //           interrupts is disabled inside an interrupt vector.
     if (IsGlobalInteruptEnabled() == FALSE)
     {
+        sc_assert_fail();
         return;
     }
 
