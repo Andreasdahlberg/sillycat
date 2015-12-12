@@ -49,7 +49,7 @@ typedef struct
     uint32_t id;
 } event_type;
 
-typedef void (*event_listener)(event_type *event);
+typedef void (*event_listener)(const event_type *event);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
