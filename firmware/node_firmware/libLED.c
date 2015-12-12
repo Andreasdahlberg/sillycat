@@ -1,7 +1,7 @@
 /**
  * @file   libLED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-22 (Last edit)
+ * @date   2015-12-12 (Last edit)
  * @brief  Implementation of libLED
  *
  * Detailed description of file.
@@ -72,7 +72,7 @@ void libLED_Init(void)
     DDRD |= (1 << LED_PIN);
     PORTD &= ~(1 << LED_PIN);
 
-    DEBUG("Init done");
+    INFO("Init done");
     return;
 }
 
