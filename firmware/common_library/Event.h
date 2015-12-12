@@ -43,10 +43,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+typedef enum
+{
+    EVENT_SLEEP = 0,
+    EVENT_WAKEUP,
+    EVENT_CHARGING_STARTED,
+    EVENT_CHARGING_STOPED
+} event_id_type;
+
 typedef struct
 {
     uint32_t timestamp;
-    uint32_t id;
+    event_id_type id;
 } event_type;
 
 typedef void (*event_listener)(const event_type *event);
