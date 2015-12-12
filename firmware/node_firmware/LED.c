@@ -1,7 +1,7 @@
 /**
  * @file   LED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-2 (Last edit)
+ * @date   2015-12-12 (Last edit)
  * @brief  Implementation of LED
  *
  * Detailed description of file.
@@ -106,6 +106,8 @@ void LED_Init(void)
 ///
 void LED_Update(void)
 {
+    sc_assert(led_state <= LED_STATE_CHARGING);
+
     switch (led_state)
     {
         case LED_STATE_IDLE:
@@ -128,6 +130,9 @@ void LED_Update(void)
         case LED_STATE_SEARCHING:
             break;
 
+        case LED_STATE_SLEEPING:
+            break;
+
         default:
             break;
     }
@@ -143,6 +148,8 @@ void LED_Update(void)
 ///
 void LED_ChangeState(led_state_type state)
 {
+    sc_assert(state <= LED_STATE_SLEEPING);
+
     switch (state)
     {
         case LED_STATE_IDLE:
@@ -158,9 +165,39 @@ void LED_ChangeState(led_state_type state)
             led_state = LED_STATE_CHARGING;
             break;
 
+        case LED_STATE_SLEEPING:
+            EnabledBlueLED(FALSE);
+            led_state = LED_STATE_SLEEPING;
+            break;
+
         default:
-            ERROR("Invalid LED-state");
-            LED_Init();
+            break;
+    }
+    return;
+}
+
+///
+/// @brief Handle events
+///
+/// @param  *event Pointer to triggered event
+/// @return None
+///
+void LED_EventHandler(const event_type *event)
+{
+    switch (event->id)
+    {
+        case EVENT_SLEEP:
+            LED_ChangeState(LED_STATE_SLEEPING);
+            INFO("Entering sleep");
+            break;
+
+        case EVENT_WAKEUP:
+            LED_ChangeState(LED_STATE_IDLE);
+            INFO("Exiting sleep");
+            break;
+
+        default:
+            //Do nothing if an unknown event is received
             break;
     }
     return;

@@ -1,7 +1,7 @@
 /**
  * @file   LED.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-22 (Last edit)
+ * @date   2015-12-12 (Last edit)
  * @brief  Header of LED
  *
  * Detailed description of file.
@@ -29,6 +29,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define LED_H_
 
 //////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include "Event.h"
+
+//////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
@@ -42,7 +48,8 @@ typedef enum
     LED_STATE_SENDING,
     LED_STATE_CHARGING,
     LED_STATE_CHARGING_DONE,
-    LED_STATE_SEARCHING
+    LED_STATE_SEARCHING,
+    LED_STATE_SLEEPING
 } led_state_type;
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,5 +59,6 @@ typedef enum
 void LED_Init(void);
 void LED_Update(void);
 void LED_ChangeState(led_state_type state);
+void LED_EventHandler(const event_type *event);
 
 #endif /* LED_H_ */
