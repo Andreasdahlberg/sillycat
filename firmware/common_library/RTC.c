@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2015-12-12 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -151,6 +151,22 @@ bool RTC_IsDaylightSavingActive(void)
                       (time.month == OCTOBER && time.date < next_sunday));
     }
     return dst_active;
+}
+
+bool RTC_IsLeapYear(uint16_t year)
+{
+    bool is_leap_year = FALSE;
+
+    //All leap years are divisible by 4
+    if (year % 4 == 0)
+    {
+        if (year % 100 != 0 || year % 400 == 0)
+        {
+            is_leap_year = TRUE;
+        }
+    }
+
+    return is_leap_year;
 }
 
 //////////////////////////////////////////////////////////////////////////

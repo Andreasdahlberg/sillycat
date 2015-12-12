@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2015-12-12 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.
@@ -87,5 +87,6 @@ void RTC_GetTimestamp(char *timestamp);
 bool RTC_GetCurrentTime(rtc_time_type *time);
 bool RTC_SetCurrentTime(rtc_time_type *time);
 bool RTC_IsDaylightSavingActive(void);
+bool RTC_IsLeapYear(uint16_t year);
 
 #endif /* RTC_H_ */
