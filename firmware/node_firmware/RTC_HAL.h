@@ -65,6 +65,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_SetAlarmSeconds(seconds)    libDS3234_SetAlarmSeconds(seconds)
 
 #define RTC_ClearAlarm() libDS3234_ClearAlarmFlag(1)
+#define RTC_EnableAlarm(enable) libDS3234_EnableAlarm(enable, 1)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
