@@ -88,5 +88,10 @@ bool RTC_GetCurrentTime(rtc_time_type *time);
 bool RTC_SetCurrentTime(rtc_time_type *time);
 bool RTC_IsDaylightSavingActive(void);
 bool RTC_IsLeapYear(uint16_t year);
+void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
+void RTC_AddHours(rtc_time_type *time, uint8_t hours);
+void RTC_AddDays(rtc_time_type *time, uint8_t days);
+void RTC_AddMonths(rtc_time_type *time, uint8_t months);
+void RTC_AddYear(rtc_time_type *time, uint8_t year);
 
 #endif /* RTC_H_ */

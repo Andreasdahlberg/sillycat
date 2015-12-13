@@ -110,7 +110,8 @@ bool RTC_SetCurrentTime(rtc_time_type *time)
             RTC_SetSeconds(time->second));
 }
 
-//TODO: Fixe edge cases!
+//TODO: Fix edge cases!
+//TODO: Take time struct as argument
 bool RTC_IsDaylightSavingActive(void)
 {
     rtc_time_type time;
@@ -167,6 +168,85 @@ bool RTC_IsLeapYear(uint16_t year)
     }
 
     return is_leap_year;
+}
+
+void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes)
+{
+    sc_assert(time != NULL);
+    uint16_t carry;
+
+    carry = (time->minute + minutes) / 60;
+    time->minute = (time->minute + minutes) % 60;
+
+    if (carry > 0)
+    {
+        RTC_AddHours(time, carry);
+    }
+    return;
+}
+
+void RTC_AddHours(rtc_time_type *time, uint8_t hours)
+{
+    sc_assert(time != NULL);
+    uint16_t carry;
+
+    carry =  (time->hour + hours) / 24;
+    time->hour = (time->hour + hours) % 24;
+
+    if (carry > 0)
+    {
+        RTC_AddDays(time, carry);
+    }
+    return;
+}
+
+void RTC_AddDays(rtc_time_type *time, uint8_t days)
+{
+    sc_assert(time != NULL);
+    uint16_t carry;
+    uint8_t days_in_month;
+
+    days_in_month = days_in_months[time->month - 1];
+    if (time->month == FEBRUARY && RTC_IsLeapYear(2000 + (uint16_t)time->year))
+    {
+        ++days_in_month;
+    }
+
+    carry = (time->date + days) / days_in_month;
+    time->date = (time->date + days) % days_in_month;
+
+    //TODO: Fix cases when carry > 1
+    sc_assert(carry < 2);
+
+    if (carry > 0)
+    {
+        RTC_AddMonths(time, carry);
+    }
+    return;
+}
+
+void RTC_AddMonths(rtc_time_type *time, uint8_t months)
+{
+    sc_assert(time != NULL);
+    uint16_t carry;
+
+    carry =  (time->month + months) / 12;
+    time->month = (time->month + months) % 12;
+
+    if (carry > 0)
+    {
+        RTC_AddYear(time, carry);
+    }
+    return;
+}
+
+void RTC_AddYear(rtc_time_type *time, uint8_t year)
+{
+    sc_assert(time != NULL);
+    time->year += year;
+
+    sc_assert(time->year < 100);
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
