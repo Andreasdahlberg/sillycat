@@ -214,19 +214,6 @@ void DumpPacketContent(packet_content_type *content)
     DEBUG("\r\n");
 }
 
-void Transceiver_Sleep(__attribute__((unused)) uint32_t time_before_sleep_ms)
-{
-    transceiver_state = TR_STATE_SLEEPING;
-    return;
-}
-
-void Transceiver_WakeUp(__attribute__((unused)) uint32_t time_before_awaken_ms)
-{
-    //NOTE: Perform full init here, power could be turned off during sleep.
-    Transceiver_Init();
-    return;
-}
-
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback)
