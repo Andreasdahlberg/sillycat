@@ -178,8 +178,7 @@ void Transceiver_Update(void)
             break;
 
         default:
-            CRITICAL("Unknown state");
-            SoftReset();
+            sc_assert_fail();
             break;
     }
     return;
@@ -189,6 +188,8 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback)
 {
+    sc_assert(content != NULL);
+
     bool status = TRUE;
     packet_frame_type *frame_ptr;
 
@@ -204,7 +205,6 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
 
     if (ReadyToSend() && status)
     {
-
         frame_ptr->header.target = target;
         frame_ptr->header.source = NODE_ADDRESS;
         frame_ptr->header.ack = request_ack;
@@ -216,7 +216,6 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
         frame_ptr->content.type = content->type;
         frame_ptr->content.size = content->size;
         memcpy(frame_ptr->content.data, content->data, content->size);
-
         frame_ptr->callback = callback;
     }
     return status;
@@ -226,6 +225,7 @@ bool Transceiver_SetPacketHandler(transceiver_packet_handler_type
                                   packet_handler,
                                   packet_type_type packet_type)
 {
+    sc_assert(packet_handler != NULL);
     bool status = FALSE;
 
     if (IsPacketTypeValid(packet_type))
@@ -384,7 +384,7 @@ static transceiver_state_type ListeningStateMachine(void)
             break;
 
         default:
-            CRITICAL("Invalid state");
+            sc_assert_fail();
             break;
     }
     return TR_STATE_LISTENING;
@@ -461,9 +461,7 @@ static transceiver_state_type SendingStateMachine(void)
             break;
 
         default:
-            ERROR("Unknown state, reset transceiver");
-            state = TR_STATE_SENDING_INIT;
-            Transceiver_Init();
+            sc_assert_fail();
             break;
     }
     return next_state;
