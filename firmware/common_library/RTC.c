@@ -111,30 +111,25 @@ bool RTC_SetCurrentTime(rtc_time_type *time)
 }
 
 //TODO: Fix edge cases!
-//TODO: Take time struct as argument
-bool RTC_IsDaylightSavingActive(void)
+bool RTC_IsDaylightSavingActive(rtc_time_type *time, uint8_t week_day)
 {
-    rtc_time_type time;
+    sc_assert(time != NULL);
+    sc_assert(week_day <= 7);
+
     bool dst_active;
     uint8_t next_sunday;
-    uint8_t week_day;
 
-    if (RTC_GetCurrentTime(&time) != TRUE || RTC_GetDay(&week_day) != TRUE)
-    {
-        return FALSE;
-    }
-
-    if (time.month > MARCH && time.month < OCTOBER)
+    if (time->month > MARCH && time->month < OCTOBER)
     {
         dst_active = TRUE;
     }
-    else if (time.month < MARCH || time.month > OCTOBER)
+    else if (time->month < MARCH || time->month > OCTOBER)
     {
         dst_active = FALSE;
     }
     else
     {
-        next_sunday = time.date + (DAYS_IN_WEEK - week_day);
+        next_sunday = time->date + (DAYS_IN_WEEK - week_day);
 
         if (next_sunday < DAYS_IN_MARCH_OCTOBER)
         {
@@ -148,8 +143,8 @@ bool RTC_IsDaylightSavingActive(void)
             next_sunday -= DAYS_IN_WEEK;
         }
 
-        dst_active = ((time.month == MARCH && time.date > next_sunday) ||
-                      (time.month == OCTOBER && time.date < next_sunday));
+        dst_active = ((time->month == MARCH && time->date > next_sunday) ||
+                      (time->month == OCTOBER && time->date < next_sunday));
     }
     return dst_active;
 }

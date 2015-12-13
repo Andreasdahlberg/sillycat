@@ -86,7 +86,7 @@ typedef enum
 void RTC_GetTimestamp(char *timestamp);
 bool RTC_GetCurrentTime(rtc_time_type *time);
 bool RTC_SetCurrentTime(rtc_time_type *time);
-bool RTC_IsDaylightSavingActive(void);
+bool RTC_IsDaylightSavingActive(rtc_time_type *time, uint8_t week_day);
 bool RTC_IsLeapYear(uint16_t year);
 void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
 void RTC_AddHours(rtc_time_type *time, uint8_t hours);
