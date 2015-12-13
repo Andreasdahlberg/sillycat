@@ -94,5 +94,6 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             transceiver_callback_type callback);
 bool Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
                                   packet_type_type packet_type);
+void Transceiver_Sleep(__attribute__((unused)) uint32_t time_before_sleep_ms);
 
 #endif /* TRANSCEIVER_H_ */

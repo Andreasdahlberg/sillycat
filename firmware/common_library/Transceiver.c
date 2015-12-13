@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-17 (Last edit)
+ * @date   2015-12-13 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -55,6 +55,7 @@ typedef enum
     TR_STATE_IDLE,
     TR_STATE_LISTENING,
     TR_STATE_SENDING,
+    TR_STATE_SLEEPING
 } transceiver_state_type;
 
 typedef enum
@@ -94,6 +95,7 @@ static transceiver_state_type IdleStateMachine(void);
 static transceiver_state_type SendingStateMachine(void);
 static transceiver_state_type ListeningStateMachine(void);
 static bool IsPacketTypeValid(packet_type_type packet_type);
+static bool IsActive(void);
 static bool ReadyToSend(void);
 static bool PacketToSend(void);
 
@@ -130,14 +132,14 @@ void Transceiver_Init(void)
     libRFM69_ClearFIFOOverrun();
     libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
 
-    libRFM69_EnableOCP(TRUE);
+    libRFM69_EnableOCP(FALSE);
     libRFM69_SetPowerAmplifierMode(0x04);
 
-    libRFM69_SetMode(RFM_RECEIVER);
+    libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
 
     memset(&packet_frame, 0, sizeof(packet_frame_type));
-    transceiver_state = TR_STATE_LISTENING;
+    transceiver_state = TR_STATE_IDLE;
 
     INFO("Transceiver initiated");
 }
@@ -161,6 +163,13 @@ void Transceiver_Update(void)
 
         case TR_STATE_SENDING:
             transceiver_state = SendingStateMachine();
+            break;
+
+        case TR_STATE_SLEEPING:
+            if (!IsActive() && libRFM69_IsModeReady() && libRFM69_GetMode() != RFM_SLEEP)
+            {
+                libRFM69_SetMode(RFM_SLEEP);
+            }
             break;
 
         default:
@@ -205,6 +214,19 @@ void DumpPacketContent(packet_content_type *content)
     DEBUG("\r\n");
 }
 
+void Transceiver_Sleep(__attribute__((unused)) uint32_t time_before_sleep_ms)
+{
+    transceiver_state = TR_STATE_SLEEPING;
+    return;
+}
+
+void Transceiver_WakeUp(__attribute__((unused)) uint32_t time_before_awaken_ms)
+{
+    //NOTE: Perform full init here, power could be turned off during sleep.
+    Transceiver_Init();
+    return;
+}
+
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback)
@@ -229,7 +251,8 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
         frame_ptr->header.source = NODE_ADDRESS;
         frame_ptr->header.ack = request_ack;
         frame_ptr->header.rssi = libRFM69_GetRSSI();
-        frame_ptr->header.total_size = sizeof(packet_header_type) + 8 + content->size; //TODO: sizeof or define!
+        frame_ptr->header.total_size = sizeof(packet_header_type) + 8 +
+                                       content->size; //TODO: sizeof or define!
 
         frame_ptr->content.timestamp = content->timestamp;
         frame_ptr->content.type = content->type;
@@ -238,11 +261,11 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
 
         frame_ptr->callback = callback;
     }
-
     return status;
 }
 
-bool Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
+bool Transceiver_SetPacketHandler(transceiver_packet_handler_type
+                                  packet_handler,
                                   packet_type_type packet_type)
 {
     bool status = FALSE;
@@ -258,6 +281,12 @@ bool Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static bool IsActive(void)
+{
+    return (transceiver_state == TR_STATE_SENDING ||
+            transceiver_state == TR_STATE_SENDING);
+}
 
 static bool IsPacketTypeValid(packet_type_type packet_type)
 {
@@ -292,8 +321,11 @@ static bool HandlePayload(void)
     libRFM69_ReadFromFIFO(&data_buffer[1], length);
 
     memcpy(&packet_frame.header, data_buffer, sizeof(packet_header_type));
-    memcpy(&packet_frame.header, &data_buffer[sizeof(packet_header_type)],
+    memcpy(&packet_frame.content, &data_buffer[sizeof(packet_header_type)],
            sizeof(packet_content_type));
+
+    DumpPacketHeader(&packet_frame.header);
+    DumpPacketContent(&packet_frame.content);
 
     if (IsPacketTypeValid(packet_frame.content.type) &&
             packet_handlers[packet_frame.content.type] != NULL)
@@ -335,6 +367,7 @@ static transceiver_state_type ListeningStateMachine(void)
         case TR_STATE_LISTENING_WAITING:
             if (libRFM69_IsPayloadReady())
             {
+                DEBUG("RSSI: %i\r\n", libRFM69_GetRSSI());
                 if (HandlePayload() == TRUE)
                 {
                     libRFM69_SetMode(RFM_TRANSMITTER);
@@ -375,8 +408,10 @@ static transceiver_state_type SendingStateMachine(void)
             if (libRFM69_IsModeReady())
             {
                 DEBUG("Write packet to FIFO\r\n");
-                libRFM69_WriteToFIFO((uint8_t *)&packet_frame.header, sizeof(packet_header_type));
-                libRFM69_WriteToFIFO((uint8_t *)&packet_frame.content, packet_frame.content.size + 8);
+                libRFM69_WriteToFIFO((uint8_t *)&packet_frame.header,
+                                     sizeof(packet_header_type));
+                libRFM69_WriteToFIFO((uint8_t *)&packet_frame.content,
+                                     packet_frame.content.size + 8);
                 libRFM69_SetMode(RFM_TRANSMITTER);
                 libRFM69_EnableHighPowerSetting(TRUE);
                 state = TR_STATE_SENDING_TRANSMITTING;
