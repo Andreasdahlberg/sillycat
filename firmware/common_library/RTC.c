@@ -73,20 +73,21 @@ static const uint8_t days_in_months[12] = {DAYS_IN_JAN,
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Remove this function, implement time struct to string instead
-void RTC_GetTimestamp(char *timestamp)
+///
+/// @brief Format time to an string timestamp
+///
+/// @param  *time Pointer to time
+/// @param  *timestamp Pointer to char array where timestamp will be stored
+/// @return None
+///
+void RTC_FormatTimestamp(rtc_time_type *time, char *timestamp)
 {
-    rtc_time_type time;
+    sc_assert(time != NULL);
+    sc_assert(timestamp != NULL);
 
-    if (RTC_GetCurrentTime(&time))
-    {
-        sprintf(timestamp, TIMESTAMP_FORMAT, time.year, time.month, time.date,
-                time.hour, time.minute, time.second);
-    }
-    else
-    {
-        ERROR("Failed to get the current time");
-    }
+    sprintf(timestamp, TIMESTAMP_FORMAT, time->year, time->month, time->date,
+            time->hour, time->minute, time->second);
+
     return;
 }
 
