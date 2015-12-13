@@ -94,6 +94,8 @@ typedef enum
 
 void libDS3234_Init(void);
 void libDS3234_HWInit(void);
+bool libDS3234_ClearAlarmFlag(uint8_t alarm);
+bool libDS3234_EnableAlarm(bool enable, uint8_t alarm);
 
 void libDS3234_GetTemperature(uint16_t *temperature);
 bool libDS3234_GetYear(uint8_t *year);

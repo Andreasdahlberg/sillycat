@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2015-12-13 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -42,7 +42,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define SS	DDC0
+#define SS  DDC0
 #define SPIMODE 1
 
 #define SRAM_SIZE 256
@@ -64,12 +64,12 @@ static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool RegisterAddressValid(uint8_t address);
 static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value);
 static bool SetDecimalRegisterValue(uint8_t address, uint8_t value);
-#ifndef DEBUG_ENABLE
-static void DumpRegisterValues(void);
-#endif
-
 static void PreCallback(void);
 static void PostCallback(void);
+
+#ifdef DEBUG_ENABLE
+static void DumpRegisterValues(void);
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -87,7 +87,7 @@ void libDS3234_Init(void)
 
     // Clear control register, this makes sure that the oscillator is running
     // when power is removed.
-    WriteRegister(REG_CONTROL, 0x00);
+    WriteRegister(REG_CONTROL, 0x1C);
 
     INFO("Init done");
     return;
@@ -107,6 +107,87 @@ void libDS3234_HWInit(void)
     //Pull SS high to release device
     PORTC |= (1 << SS);
     return;
+}
+
+///
+/// @brief Clear alarm flag
+///
+/// @param  Index of alarm flag to clear, 1 or 2
+/// @return FALSE  If clear failed
+/// @return SUCCESS If clear succeeded
+///
+bool libDS3234_ClearAlarmFlag(uint8_t alarm)
+{
+    if (alarm < 1 || alarm > 2)
+    {
+        return FALSE;
+    }
+    uint8_t register_data;
+
+    if (ReadRegister(REG_CONTROL_STATUS, &register_data) == TRUE)
+    {
+        register_data &= ~(1 << (alarm - 1));
+        return WriteRegister(REG_CONTROL_STATUS, register_data);
+    }
+    return FALSE;
+}
+
+///
+/// @brief Reset an alarm
+///
+/// @param  Index of alarm to clear, 1 or 2
+/// @return FALSE  If clear failed
+/// @return SUCCESS If clear succeeded
+///
+bool libDS3234_ResetAlarm(uint8_t alarm)
+{
+    bool status = FALSE;
+    if (alarm == 1)
+    {
+        status = WriteRegister(REG_ALARM_1_DAY_DATE, 0x00) &&
+                 WriteRegister(REG_ALARM_1_HOURS, 0x00) &&
+                 WriteRegister(REG_ALARM_1_MINUTES, 0x00) &&
+                 WriteRegister(REG_ALARM_1_SECONDS, 0x00);
+    }
+    else
+    {
+        status = WriteRegister(REG_ALARM_2_DAY_DATE, 0x00) &&
+                 WriteRegister(REG_ALARM_2_HOURS, 0x00) &&
+                 WriteRegister(REG_ALARM_2_MINUTES, 0x00);
+    }
+    return status;
+}
+
+///
+/// @brief Enable an alarm
+///
+/// @param  Index of alarm to enable, 1 or 2
+/// @return FALSE  If enable failed
+/// @return SUCCESS If enable succeeded
+///
+bool libDS3234_EnableAlarm(bool enable, uint8_t alarm)
+{
+    if (alarm < 1 || alarm > 2)
+    {
+        return FALSE;
+    }
+
+    uint8_t register_data;
+    if (ReadRegister(REG_CONTROL, &register_data) == TRUE)
+    {
+        if (enable == TRUE)
+        {
+            //TODO: Check status
+            WriteRegister(REG_ALARM_1_DAY_DATE, 0x80);
+            register_data |= (1 << (alarm - 1));
+        }
+        else
+        {
+            register_data &= ~(1 << (alarm - 1));
+        }
+        return WriteRegister(REG_CONTROL, register_data);
+    }
+    return FALSE;
 }
 
 ///
@@ -522,12 +603,12 @@ bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 //////////////////////////////////////////////////////////////////////////
 
 ///
-/// @brief	Get the value of a register as a decimal value. The register must
-///			contain packed BCD-data.
+/// @brief  Get the value of a register as a decimal value. The register must
+///         contain packed BCD-data.
 ///
 ///
-/// @param	address Address to register
-/// @param	value Pointer to variable where the value will be stored.
+/// @param  address Address to register
+/// @param  value Pointer to variable where the value will be stored.
 /// @return bool Status of operation
 ///
 static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
@@ -602,7 +683,7 @@ static void PostCallback(void)
     return;
 }
 
-#ifndef DEBUG_ENABLE
+#ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void)
 {
     uint8_t reg_addr;
