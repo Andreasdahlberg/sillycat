@@ -1,8 +1,8 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-14 (Last edit)
- * @brief  Implementation of libDHT22
+ * @date   2015-12-13 (Last edit)
+ * @brief  Implementation of low level functions for the DHT22 RHT sensor
  *
  * Detailed description of file.
  */
@@ -43,7 +43,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define DATAPIN DDB0
-#define MEASURE_INTERVAL_MS 2000 //Time between sensor readings, must be at least 2000 ms
+#define POWERUP_DELAY_MS 1000 //Time after power up before reading can stary
 #define LOW_HIGH_LIMIT 100
 #define REQUEST_READING_TIME_MS 2
 #define READING_TIMEOUT_MS 6
@@ -112,7 +112,7 @@ void libDHT22_Init(void)
     DDRB |= (1 << DATAPIN);
     PORTB |= (1 << DATAPIN);
 
-    dht22_state = DHT_IDLE;
+    dht22_state = DHT_POWERUP;
     init_time = Timer_GetMilliseconds();
     sensor_reading.status = FALSE;
 
@@ -124,14 +124,14 @@ void libDHT22_Update(void)
 {
     switch (dht22_state)
     {
-        case DHT_IDLE:
+        case DHT_POWERUP:
+            if (Timer_TimeDifference(init_time) > POWERUP_DELAY_MS)
+            {
+                dht22_state = DHT_IDLE;
+            }
             break;
 
-        case DHT_POWERUP:
-            if (Timer_TimeDifference(init_time) > MEASURE_INTERVAL_MS)
-            {
-                dht22_state = DHT_READING;
-            }
+        case DHT_IDLE:
             break;
 
         case DHT_READING:
@@ -141,13 +141,14 @@ void libDHT22_Update(void)
         case DHT_DECODING:
             DecodeTimings();
             init_time = Timer_GetMilliseconds();
+
+            //TODO: Power up or new state? save last reading time?
             dht22_state = DHT_IDLE;
             break;
 
         case DHT_UNINITIALIZED:
         default:
-            ERROR("Uninitialized/unknown state, reseting module");
-            libDHT22_Init();
+            sc_assert_fail();
             break;
     }
     return;
@@ -166,21 +167,39 @@ dht22_data_type libDHT22_GetSensorReading(void)
     return return_data;
 }
 
+///
+/// @brief Check if the last reading was valid
+///
+/// @param  None
+/// @return bool TRUE if valid, otherwise FALSE
+///
 bool libDHT22_IsReadingValid(void)
 {
     return sensor_reading.status;
 }
 
+///
+/// @brief Check if the sensor is idle
+///
+/// @param  None
+/// @return bool TRUE if idle, otherwise FALSE
+///
 bool libDHT22_IsIdle(void)
 {
     return (dht22_state == DHT_IDLE);
 }
 
+///
+/// @brief Start a new reading
+///
+/// @param  None
+/// @return bool TRUE if a new reading is started, otherwise FALSE
+///
 void libDHT22_StartReading(void)
 {
     if (libDHT22_IsIdle() == TRUE)
     {
-        dht22_state = DHT_POWERUP;
+        dht22_state = DHT_READING;
     }
     return;
 }
@@ -272,9 +291,7 @@ static dht_state_type ReadingStateMachine(void)
             break;
 
         default:
-            ERROR("Unknown state");
-            state = DHT_READING_REQUEST;
-            libDHT22_Init();
+            sc_assert_fail();
             break;
     }
     return next_dht_state;
