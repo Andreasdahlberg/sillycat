@@ -90,6 +90,7 @@ void RTC_GetTimestamp(char *timestamp)
     return;
 }
 
+#ifdef RTC_HAL
 bool RTC_GetCurrentTime(rtc_time_type *time)
 {
     return (RTC_GetYear(&time->year) &&
@@ -109,6 +110,7 @@ bool RTC_SetCurrentTime(rtc_time_type *time)
             RTC_SetMinutes(time->minute) &&
             RTC_SetSeconds(time->second));
 }
+#endif
 
 //TODO: Fix edge cases!
 bool RTC_IsDaylightSavingActive(rtc_time_type *time, uint8_t week_day)
