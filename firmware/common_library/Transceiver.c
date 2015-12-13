@@ -99,6 +99,11 @@ static bool IsActive(void);
 static bool ReadyToSend(void);
 static bool PacketToSend(void);
 
+#ifdef DEBUG_ENABLE
+static void DumpPacketHeader(packet_header_type *header);
+static void DumpPacketContent(packet_content_type *content);
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -178,40 +183,6 @@ void Transceiver_Update(void)
             break;
     }
     return;
-}
-
-void DumpPacketHeader(packet_header_type *header)
-{
-    DEBUG("******Packet header******\r\n");
-    DEBUG("Target: %u\r\n", header->target);
-    DEBUG("Source: %u\r\n", header->source);
-    DEBUG("Ack: %u\r\n", (uint8_t)header->ack);
-    DEBUG("RSSI: %d\r\n", header->rssi);
-    DEBUG("Total size: %u\r\n", header->total_size);
-}
-
-void DumpPacketContent(packet_content_type *content)
-{
-    uint8_t idx;
-
-    DEBUG("******Packet content******\r\n");
-    DEBUG("Timestamp: 20%02u-%02u-%02u %02u:%02u:%02u\r\n",
-          content->timestamp.year,
-          content->timestamp.month,
-          content->timestamp.date,
-          content->timestamp.hour,
-          content->timestamp.minute,
-          content->timestamp.second);
-    DEBUG("Type: %u\r\n", (uint8_t)content->type);
-    DEBUG("Size: %u\r\n", (uint8_t)content->size);
-    DEBUG("Data: 0x");
-
-
-    for (idx = 0; idx < content->size; ++idx)
-    {
-        DEBUG("%02X", content->data[idx]);
-    }
-    DEBUG("\r\n");
 }
 
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
@@ -349,8 +320,10 @@ static bool HandlePayload(void)
     memcpy(&packet_frame.content, &data_buffer[sizeof(packet_header_type)],
            sizeof(packet_content_type));
 
+#ifdef DEBUG_ENABLE
     DumpPacketHeader(&packet_frame.header);
     DumpPacketContent(&packet_frame.content);
+#endif
 
     if (IsPacketTypeValid(packet_frame.content.type) &&
             packet_handlers[packet_frame.content.type] != NULL)
@@ -495,3 +468,39 @@ static transceiver_state_type SendingStateMachine(void)
     }
     return next_state;
 }
+
+#ifdef DEBUG_ENABLE
+void DumpPacketHeader(packet_header_type *header)
+{
+    DEBUG("******Packet header******\r\n");
+    DEBUG("Target: %u\r\n", header->target);
+    DEBUG("Source: %u\r\n", header->source);
+    DEBUG("Ack: %u\r\n", (uint8_t)header->ack);
+    DEBUG("RSSI: %d\r\n", header->rssi);
+    DEBUG("Total size: %u\r\n", header->total_size);
+}
+
+void DumpPacketContent(packet_content_type *content)
+{
+    uint8_t idx;
+
+    DEBUG("******Packet content******\r\n");
+    DEBUG("Timestamp: 20%02u-%02u-%02u %02u:%02u:%02u\r\n",
+          content->timestamp.year,
+          content->timestamp.month,
+          content->timestamp.date,
+          content->timestamp.hour,
+          content->timestamp.minute,
+          content->timestamp.second);
+    DEBUG("Type: %u\r\n", (uint8_t)content->type);
+    DEBUG("Size: %u\r\n", (uint8_t)content->size);
+    DEBUG("Data: 0x");
+
+
+    for (idx = 0; idx < content->size; ++idx)
+    {
+        DEBUG("%02X", content->data[idx]);
+    }
+    DEBUG("\r\n");
+}
+#endif
