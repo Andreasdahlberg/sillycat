@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2015-12-13 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.
@@ -90,11 +90,13 @@ typedef enum
 #ifdef RTC_HAL
 bool RTC_GetCurrentTime(rtc_time_type *time);
 bool RTC_SetCurrentTime(rtc_time_type *time);
+bool RTC_SetAlarmTime(rtc_time_type *time);
 #endif
 
 void RTC_FormatTimestamp(rtc_time_type *time, char *timestamp);
 bool RTC_IsDaylightSavingActive(rtc_time_type *time, uint8_t week_day);
 bool RTC_IsLeapYear(uint16_t year);
+void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds);
 void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
 void RTC_AddHours(rtc_time_type *time, uint8_t hours);
 void RTC_AddDays(rtc_time_type *time, uint8_t days);

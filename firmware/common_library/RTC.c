@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2015-12-13 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -111,6 +111,14 @@ bool RTC_SetCurrentTime(rtc_time_type *time)
             RTC_SetMinutes(time->minute) &&
             RTC_SetSeconds(time->second));
 }
+
+bool RTC_SetAlarmTime(rtc_time_type *time)
+{
+    return (RTC_SetAlarmDate(time->date) &&
+            RTC_SetAlarmHour(time->hour) &&
+            RTC_SetAlarmMinutes(time->minute) &&
+            RTC_SetAlarmSeconds(time->second));
+}
 #endif
 
 //TODO: Fix edge cases!
@@ -166,6 +174,21 @@ bool RTC_IsLeapYear(uint16_t year)
     }
 
     return is_leap_year;
+}
+
+void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds)
+{
+    sc_assert(time != NULL);
+    uint16_t carry;
+
+    carry = (time->second + seconds) / 60;
+    time->second = (time->second + seconds) % 60;
+
+    if (carry > 0)
+    {
+        RTC_AddMinutes(time, carry);
+    }
+    return;
 }
 
 void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes)
