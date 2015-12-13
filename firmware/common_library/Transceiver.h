@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2015-12-13 (Last edit)
  * @brief  Header for Transceiver interface.
  *
  * Detailed description of file.
@@ -34,6 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libRFM69.h"
 #include "RTC.h"
+#include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -92,8 +93,10 @@ bool Transceiver_Send(void);
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback);
-bool Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
+bool Transceiver_SetPacketHandler(transceiver_packet_handler_type
+                                  packet_handler,
                                   packet_type_type packet_type);
 void Transceiver_Sleep(__attribute__((unused)) uint32_t time_before_sleep_ms);
+void Transceiver_EventHandler(const event_type *event);
 
 #endif /* TRANSCEIVER_H_ */

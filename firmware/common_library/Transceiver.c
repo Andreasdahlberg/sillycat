@@ -278,6 +278,44 @@ bool Transceiver_SetPacketHandler(transceiver_packet_handler_type
     return status;
 }
 
+///
+/// @brief Handle events
+///
+/// @param  *event Pointer to triggered event
+/// @return None
+///
+void Transceiver_EventHandler(const event_type *event)
+{
+    sc_assert(event != NULL);
+
+    switch (event->id)
+    {
+        case EVENT_SLEEP:
+            INFO("Entering sleep");
+
+            //TODO: Measure worst case time waiting here
+            while(IsActive() == TRUE)
+            {
+                Transceiver_Update();
+            }
+
+            libRFM69_SetMode(RFM_SLEEP);
+            libRFM69_WaitForModeReady();
+            break;
+
+        case EVENT_WAKEUP:
+            INFO("Exiting sleep");
+            libRFM69_SetMode(RFM_STANDBY);
+            libRFM69_WaitForModeReady();
+            break;
+
+        default:
+            //Do nothing if an unknown event is received
+            break;
+    }
+    return;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
