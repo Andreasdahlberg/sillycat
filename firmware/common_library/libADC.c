@@ -1,7 +1,7 @@
 /**
  * @file   libADC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2016-01-12 (Last edit)
  * @brief  Implementation of ADC-library.
  *
  * Detailed description of file.
@@ -41,7 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define MAX_ADC_INPUTS 9	//Eight external inputs and one internal temperature sensor
+#define MAX_ADC_INPUTS 9    //Eight external inputs and one internal temperature sensor
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -57,6 +57,7 @@ typedef enum ADCState
 typedef struct
 {
     bool active;
+    bool valid;
     uint8_t channel_index;
     uint16_t sample_value;
 } adc_input_type;
@@ -87,7 +88,7 @@ static void SelectInput(uint8_t adc_channel);
 ///
 void libADC_Init(void)
 {
-    //Set the prescaler to 128(115 KHz) and enable interupt
+    //Set the prescaler to 128(115 KHz) and enable interrupt
     ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));
 
     //Set the reference voltage to AREF
@@ -101,7 +102,7 @@ void libADC_Init(void)
 
 ///
 /// @brief Update the internal library state, this selects the next active input and starts sampling.
-///		   Run as fast as possible.
+///        Run as fast as possible.
 ///
 /// @param  None
 /// @return None
@@ -144,6 +145,7 @@ void libADC_Update(void)
             {
                 adc_inputs[current_input].sample_value = ADCL;
                 adc_inputs[current_input].sample_value |= (ADCH << 8);
+                adc_inputs[current_input].valid = TRUE;
                 ADCSRA &= ~(1 << ADIF);
                 adc_state = LIBADC_NEW_SAMPLE;
                 ++current_input;
@@ -178,23 +180,18 @@ void libADC_Enable(bool mode)
 
 ///
 /// @brief Enable ADC input. This will enable/disable the selected input and start sampling the input if in
-///		   free running mode.
+///        free running mode.
 ///
 /// @param  index Index of input to enable/disable
 /// @param  mode Selects if to enable or disable input
-/// @return ERROR  If index is invalid
-/// @return SUCCESS If index is valid
+/// @return None
 ///
-function_status libADC_EnableInput(uint8_t index, bool mode)
+void libADC_EnableInput(uint8_t index, bool mode)
 {
-    function_status status = ERROR;
+    sc_assert(index < MAX_ADC_INPUTS);
 
-    if (index > 0 && index < MAX_ADC_INPUTS)
-    {
-        adc_inputs[index].active = mode;
-        status = SUCCESS;
-    }
-    return status;
+    adc_inputs[index].active = mode;
+    return;
 }
 
 ///
@@ -209,12 +206,26 @@ function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 {
     function_status status = ERROR;
 
-    if (index > 0 && index < MAX_ADC_INPUTS && (adc_inputs[index].active == TRUE))
+    sc_assert(index < MAX_ADC_INPUTS);
+
+    if (adc_inputs[index].active == TRUE && adc_inputs[index].valid == TRUE)
     {
         *sample_value = adc_inputs[index].sample_value;
         status = SUCCESS;
     }
     return status;
+}
+
+///
+/// @brief Check if any ADC-conversion for the selected channel is done
+///
+/// @param  index Index of channel
+/// @return bool True if valid, otherwise false
+///
+bool libADC_IsChannelValid(uint8_t index)
+{
+    sc_assert(index < MAX_ADC_INPUTS);
+    return (adc_inputs[index].valid == TRUE);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -224,8 +235,10 @@ function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 static void SelectInput(uint8_t adc_channel)
 {
     uint8_t new_admux;
-    new_admux = ADMUX;
 
+    sc_assert(adc_channel < MAX_ADC_INPUTS);
+
+    new_admux = ADMUX;
     //Clear MUX-bits
     new_admux &= 0xF0;
 
@@ -234,7 +247,6 @@ static void SelectInput(uint8_t adc_channel)
     ADMUX = new_admux;
 }
 
-
 static void InitInputArray()
 {
     uint8_t index;
@@ -242,6 +254,7 @@ static void InitInputArray()
     for (index = 0; index < MAX_ADC_INPUTS; ++index)
     {
         adc_inputs[index].active = FALSE;
+        adc_inputs[index].valid = FALSE;
         adc_inputs[index].channel_index = index;
         adc_inputs[index].sample_value = 0;
     }
