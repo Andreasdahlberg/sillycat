@@ -203,6 +203,8 @@ uint8_t Config_GetNodeRole(void)
 ///
 void Config_SetNetworkId(const uint8_t *network_id)
 {
+    sc_assert(network_id != NULL);
+
     memcpy(active_config.network_id, network_id, sizeof(active_config.network_id));
     return;
 }
@@ -215,6 +217,8 @@ void Config_SetNetworkId(const uint8_t *network_id)
 ///
 void Config_SetAESKey(const char *aes_key)
 {
+    sc_assert(aes_key != NULL);
+
     memcpy(active_config.aes_key, aes_key, sizeof(active_config.aes_key));
     return;
 }
@@ -227,6 +231,8 @@ void Config_SetAESKey(const char *aes_key)
 ///
 void Config_SetReportInterval(uint32_t report_interval)
 {
+    sc_assert(report_interval > 0);
+
     active_config.report_interval_s = report_interval;
     return;
 }
@@ -239,6 +245,8 @@ void Config_SetReportInterval(uint32_t report_interval)
 ///
 void Config_SetNodeRole(uint8_t node_role)
 {
+    sc_assert(node_role > 0);
+
     active_config.node_role = node_role;
     return;
 }
@@ -247,8 +255,10 @@ void Config_SetNodeRole(uint8_t node_role)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Implement this function
 static bool ValidateConfig(config_type *config)
 {
-    return TRUE;
+    sc_assert(config != NULL);
+
+    return (config->node_id != 0 &&
+            (config->node_role > 0 && config->node_role < 4));
 }
