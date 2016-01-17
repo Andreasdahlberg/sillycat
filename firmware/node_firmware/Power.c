@@ -49,8 +49,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-#define LOW_VOLTAGE_MV 2000
-#define CRITICAL_VOLTAGE_MV 1800
+#define LOW_VOLTAGE_MV 2100
+#define CRITICAL_VOLTAGE_MV 1900
 
 #define AWAKE_TIME_S 3
 
@@ -131,7 +131,8 @@ void Power_Update(void)
         time_since_sleep = event.timestamp;
     }
 
-    if (libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
+    if (libPower_IsBatteryVoltageValid() == TRUE &&
+            libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
     {
         WARNING("Critical battery voltage");
 

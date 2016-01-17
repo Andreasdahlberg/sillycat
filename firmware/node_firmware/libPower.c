@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2016-01-17 (Last edit)
  * @brief  Implementation of libPower
  *
  * Detailed description of file.
@@ -94,6 +94,8 @@ void libPower_Init(void)
 #ifndef DEBUG_ENABLE
     PRR |= (1 << PRUSART0);
 #endif
+
+    libADC_EnableInput(0x07, TRUE);
     return;
 }
 
@@ -138,7 +140,7 @@ void libPower_Sleep(void)
 ///
 bool libPower_IsChargerConnected(void)
 {
-    return ((PINC & (1 << CONNECTED_PIN)) == 0);
+    return ((PINC & (1 << CONNECTED_PIN)) != 0);
 }
 
 ///
@@ -160,8 +162,11 @@ bool libPower_IsCharging(void)
 ///
 uint32_t libPower_GetBatteryVoltage(void)
 {
-    uint32_t sample = 0;//libADC_GetSample();
-    uint32_t voltage = (sample * VREF) / 1024;
+    uint16_t sample;
+    uint32_t voltage;
+
+    libADC_GetSample(0x07, &sample);
+    voltage = ((uint32_t)sample * VREF) / 1024;
 
     /*
      | VBAT
@@ -182,13 +187,26 @@ uint32_t libPower_GetBatteryVoltage(void)
     */
 
     //Adjust voltage from voltage divider
-    return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE + R2_RESISTANCE)));
+    return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE +
+                                        R2_RESISTANCE)));
+}
+
+///
+/// @brief Check if battery voltage reading is valid
+///
+/// @param  None
+/// @return TRUE if valid, otherwise FALSE
+///
+bool libPower_IsBatteryVoltageValid(void)
+{
+    return libADC_IsChannelValid(0x07);
 }
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+//TODO: Change to edge interupt?
 //NOTE: This function does not touch the global interrupt enable!
 void EnableLowLevelInterupt(bool enable)
 {
