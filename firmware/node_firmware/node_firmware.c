@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-12 (Last edit)
+ * @date   2016-01-17 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -46,11 +46,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Sensor.h"
 #include "Transceiver.h"
 #include "ErrorHandler.h"
-
+#include "Config.h"
 #include "RTC.h"
 #include "Power.h"
-
-#include "sc_assert.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -96,16 +94,27 @@ int main(void)
     libPower_Init();
 
     LED_Init();
+    Config_Load();
     RTC_Init();
     Sensor_Init();
     Transceiver_Init();
     Power_Init();
 
     Power_AddListener(LED_EventHandler);
+    Power_AddListener(Transceiver_EventHandler);
+    Power_AddListener(Sensor_EventHandler);
+
+//#ifdef DEBUG_ENABLE
+    //Add this event handler last to ensure all debug prints are flushed
+    //before sleep.
+    // Power_AddListener(libDebug_EventHandler);
+//#endif
 
     INFO("Start up done");
+
     while (1)
     {
+        libADC_Update();
         libDHT22_Update();
         Sensor_Update();
         Transceiver_Update();
