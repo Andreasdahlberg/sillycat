@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2016-01-17 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -37,6 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Timer.h"
 #include "Power.h"
 #include "RTC.h"
+#include "Config.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -59,7 +60,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 static uint8_t nr_listeners;
 static uint32_t time_since_sleep;
-static uint32_t sleep_interval_s;
 static event_listener listener_pool[MAX_NR_LISTENERS] = {0};
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,11 +81,7 @@ static void NotifyListeners(event_type *event);
 ///
 void Power_Init(void)
 {
-    //TODO: Read from config(EEPROM or FLASH)
-    sleep_interval_s = 60;
-
-    //TODO: Maybe change to default value if this fails?
-    sc_assert(sleep_interval_s > AWAKE_TIME_S);
+    sc_assert(Config_GetReportInterval() > AWAKE_TIME_S);
 
     nr_listeners = 0;
     time_since_sleep = Timer_GetMilliseconds();
@@ -114,7 +110,7 @@ void Power_Update(void)
         RTC_GetCurrentTime(&time);
         DEBUG("%u:%u:%u\r\n", time.hour, time.minute, time.second);
 
-        RTC_AddSeconds(&time, sleep_interval_s - AWAKE_TIME_S);
+        RTC_AddSeconds(&time, Config_GetReportInterval() - AWAKE_TIME_S);
         RTC_SetAlarmTime(&time);
         RTC_EnableAlarm(TRUE);
 
@@ -172,10 +168,10 @@ void Power_Update(void)
 ///
 void Power_SetSleepInterval(uint16_t seconds)
 {
-    //TODO: Maybe change to default value if this fails?
-    sc_assert(sleep_interval_s > AWAKE_TIME_S);
+    sc_assert(seconds > AWAKE_TIME_S);
 
-    sleep_interval_s = seconds;
+    Config_SetReportInterval(seconds);
+    Config_Save();
 }
 
 ///
