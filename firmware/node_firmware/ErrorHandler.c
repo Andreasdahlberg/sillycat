@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-9 (Last edit)
+ * @date   2016-01-17 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -64,11 +64,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void ErrorHandler_AssertFail(const char *__func, const char *__file,
                              int __lineno, const char *__sexp)
 {
-    DEBUG("<ERROR> Failed assert: %s:%s:%u (%s)\r\n", __file, __func, __lineno, __sexp);
+    DEBUG("<ERROR> Failed assert: %s:%s:%u (%s)\r\n", __file, __func, __lineno,
+          __sexp);
     ErrorHandler_PointOfNoReturn();
     return;
 }
 
+///
+/// @brief Halt device and indicate that an fault has occurred.
+///
+/// @param  None
+/// @return None, does not return since an manual reboot is needed.
+///
 void ErrorHandler_PointOfNoReturn()
 {
     libLED_Enable(0, TRUE);
