@@ -32,20 +32,36 @@ LIB_DEP:=
 LINKER_SCRIPT_DEP:=
 
 # Every subdirectory with source files must be described here
-SUBDIRS := 
+SUBDIRS :=  \
+../Utility
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../../common_library/common.c \
 ../../common_library/libADC.c \
 ../../common_library/libDebug.c \
+../../common_library/libRFM69.c \
 ../../common_library/libSPI.c \
 ../../common_library/libTimer.c \
 ../../common_library/libUART.c \
+../../common_library/RTC.c \
+../../common_library/Timer.c \
+../../common_library/Transceiver.c \
+../../utility/FIFO.c \
+../../utility/List.c \
+../Config.c \
+../ErrorHandler.c \
+../LED.c \
 ../libDHT22.c \
+../libDS3234.c \
+../libLED.c \
 ../libMCP79510.c \
 ../libPower.c \
-../node_firmware.c
+../node_firmware.c \
+../Power.c \
+../Sensor.c \
+../template.c
 
 
 PREPROCESSING_SRCS += 
@@ -55,48 +71,108 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+common.o \
 libADC.o \
 libDebug.o \
+libRFM69.o \
 libSPI.o \
 libTimer.o \
 libUART.o \
+RTC.o \
+Timer.o \
+Transceiver.o \
+Utility/FIFO.o \
+Utility/List.o \
+Config.o \
+ErrorHandler.o \
+LED.o \
 libDHT22.o \
+libDS3234.o \
+libLED.o \
 libMCP79510.o \
 libPower.o \
-node_firmware.o
+node_firmware.o \
+Power.o \
+Sensor.o \
+template.o
 
 OBJS_AS_ARGS +=  \
+common.o \
 libADC.o \
 libDebug.o \
+libRFM69.o \
 libSPI.o \
 libTimer.o \
 libUART.o \
+RTC.o \
+Timer.o \
+Transceiver.o \
+Utility/FIFO.o \
+Utility/List.o \
+Config.o \
+ErrorHandler.o \
+LED.o \
 libDHT22.o \
+libDS3234.o \
+libLED.o \
 libMCP79510.o \
 libPower.o \
-node_firmware.o
+node_firmware.o \
+Power.o \
+Sensor.o \
+template.o
 
 C_DEPS +=  \
+common.d \
 libADC.d \
 libDebug.d \
+libRFM69.d \
 libSPI.d \
 libTimer.d \
 libUART.d \
+RTC.d \
+Timer.d \
+Transceiver.d \
+Utility/FIFO.d \
+Utility/List.d \
+Config.d \
+ErrorHandler.d \
+LED.d \
 libDHT22.d \
+libDS3234.d \
+libLED.d \
 libMCP79510.d \
 libPower.d \
-node_firmware.d
+node_firmware.d \
+Power.d \
+Sensor.d \
+template.d
 
 C_DEPS_AS_ARGS +=  \
+common.d \
 libADC.d \
 libDebug.d \
+libRFM69.d \
 libSPI.d \
 libTimer.d \
 libUART.d \
+RTC.d \
+Timer.d \
+Transceiver.d \
+Utility/FIFO.d \
+Utility/List.d \
+Config.d \
+ErrorHandler.d \
+LED.d \
 libDHT22.d \
+libDS3234.d \
+libLED.d \
 libMCP79510.d \
 libPower.d \
-node_firmware.d
+node_firmware.d \
+Power.d \
+Sensor.d \
+template.d
 
 OUTPUT_FILE_PATH +=node_firmware.elf
 
@@ -131,17 +207,54 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ./%.o: ../../common_library/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"../../common_library"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I".." -I"../../utility"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Utility/%.o: ../../utility/%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.8.1
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I".." -I"../../utility"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"../../common_library"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I".." -I"../../utility"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
@@ -176,6 +289,7 @@ $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER
 	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "node_firmware.elf" "node_firmware.eep" || exit 0
 	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objdump.exe" -h -S "node_firmware.elf" > "node_firmware.lss"
 	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O srec -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures "node_firmware.elf" "node_firmware.srec"
+	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .user_signatures --set-section-flags=.user_signatures=alloc,load --change-section-lma .user_signatures=0 --no-change-warnings -O ihex "node_firmware.elf" "node_firmware.usersignatures" || exit 0
 	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-size.exe" "node_firmware.elf"
 	
 	
