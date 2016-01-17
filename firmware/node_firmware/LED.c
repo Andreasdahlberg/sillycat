@@ -1,7 +1,7 @@
 /**
  * @file   LED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2016-01-17 (Last edit)
  * @brief  Implementation of LED
  *
  * Detailed description of file.
@@ -94,7 +94,7 @@ void LED_Init(void)
     led_state = LED_STATE_IDLE;
     EnabledBlueLED(FALSE);
 
-    DEBUG("Init done");
+    INFO("Init done");
     return;
 }
 
