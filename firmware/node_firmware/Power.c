@@ -161,20 +161,6 @@ void Power_Update(void)
 }
 
 ///
-/// @brief Update the internal state of the Power module
-///
-/// @param  seconds New sleep interval in seconds
-/// @return None
-///
-void Power_SetSleepInterval(uint16_t seconds)
-{
-    sc_assert(seconds > AWAKE_TIME_S);
-
-    Config_SetReportInterval(seconds);
-    Config_Save();
-}
-
-///
 /// @brief Add listener event handler to events from Power module
 ///
 /// @param  listener Function pointer to an event handler
