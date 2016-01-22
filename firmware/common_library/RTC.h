@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-01-22 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.
@@ -32,6 +32,19 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define RTC_HAL
+
+#define DAYS_IN_JAN 31
+#define DAYS_IN_FEB 28
+#define DAYS_IN_MAR 31
+#define DAYS_IN_APR 30
+#define DAYS_IN_MAY 31
+#define DAYS_IN_JUN 30
+#define DAYS_IN_JUL 31
+#define DAYS_IN_AUG 31
+#define DAYS_IN_SEP 30
+#define DAYS_IN_OCT 31
+#define DAYS_IN_NOV 30
+#define DAYS_IN_DEC 31
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -71,30 +84,19 @@ typedef enum
     DECEMBER
 } rtc_months_type;
 
-#define DAYS_IN_JAN 31
-#define DAYS_IN_FEB 28
-#define DAYS_IN_MAR 31
-#define DAYS_IN_APR 30
-#define DAYS_IN_MAY 31
-#define DAYS_IN_JUN 30
-#define DAYS_IN_JUL 31
-#define DAYS_IN_AUG 31
-#define DAYS_IN_SEP 30
-#define DAYS_IN_OCT 31
-#define DAYS_IN_NOV 30
-#define DAYS_IN_DEC 31
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef RTC_HAL
+bool RTC_GetTimeStamp(uint32_t *timestamp);
 bool RTC_GetCurrentTime(rtc_time_type *time);
-bool RTC_SetCurrentTime(rtc_time_type *time);
-bool RTC_SetAlarmTime(rtc_time_type *time);
+bool RTC_SetCurrentTime(const rtc_time_type *time);
+bool RTC_SetAlarmTime(const rtc_time_type *time);
 #endif
 
-void RTC_FormatTimestamp(rtc_time_type *time, char *timestamp);
-bool RTC_IsDaylightSavingActive(rtc_time_type *time, uint8_t week_day);
+void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp);
+bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day);
 bool RTC_IsLeapYear(uint16_t year);
 void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds);
 void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
@@ -102,5 +104,6 @@ void RTC_AddHours(rtc_time_type *time, uint8_t hours);
 void RTC_AddDays(rtc_time_type *time, uint8_t days);
 void RTC_AddMonths(rtc_time_type *time, uint8_t months);
 void RTC_AddYear(rtc_time_type *time, uint8_t year);
+uint32_t RTC_ConvertToTimestamp(const rtc_time_type *timeptr);
 
 #endif /* RTC_H_ */

@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-01-22 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -44,6 +44,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define DAYS_IN_MARCH_OCTOBER 31
 #define DAYS_IN_WEEK 7
 
+//One hour, expressed in seconds
+#define ONE_HOUR_S 3600
+
+//One day, expressed in seconds
+#define ONE_DAY_S 86400
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -80,7 +86,7 @@ static const uint8_t days_in_months[12] = {DAYS_IN_JAN,
 /// @param  *timestamp Pointer to char array where timestamp will be stored
 /// @return None
 ///
-void RTC_FormatTimestamp(rtc_time_type *time, char *timestamp)
+void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp)
 {
     sc_assert(time != NULL);
     sc_assert(timestamp != NULL);
@@ -92,6 +98,30 @@ void RTC_FormatTimestamp(rtc_time_type *time, char *timestamp)
 }
 
 #ifdef RTC_HAL
+///
+/// @brief Get the number of seconds since midnight, January 1 2000, UTC.
+///
+/// @param  *timestamp Pointer to timestamp where the result will be stored
+/// @return bool TRUE, if current time was successfully read, otherwise FALSE.
+///
+bool RTC_GetTimeStamp(uint32_t *timestamp)
+{
+    rtc_time_type time;
+
+    if (RTC_GetCurrentTime(&time) == TRUE)
+    {
+        *timestamp = RTC_ConvertToTimestamp(&time);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+///
+/// @brief Get a time struct with fields for different time periods.
+///
+/// @param  *time Pointer to struct where the result will be stored
+/// @return bool TRUE, if current time was successfully read, otherwise FALSE.
+///
 bool RTC_GetCurrentTime(rtc_time_type *time)
 {
     return (RTC_GetYear(&time->year) &&
@@ -102,7 +132,7 @@ bool RTC_GetCurrentTime(rtc_time_type *time)
             RTC_GetSeconds(&time->second));
 }
 
-bool RTC_SetCurrentTime(rtc_time_type *time)
+bool RTC_SetCurrentTime(const rtc_time_type *time)
 {
     return (RTC_SetYear(time->year) &&
             RTC_SetMonth(time->month) &&
@@ -112,17 +142,16 @@ bool RTC_SetCurrentTime(rtc_time_type *time)
             RTC_SetSeconds(time->second));
 }
 
-bool RTC_SetAlarmTime(rtc_time_type *time)
+bool RTC_SetAlarmTime(const rtc_time_type *time)
 {
-    return (RTC_SetAlarmDate(time->date) &&
-            RTC_SetAlarmHour(time->hour) &&
+    return (RTC_SetAlarmHour(time->hour) &&
             RTC_SetAlarmMinutes(time->minute) &&
             RTC_SetAlarmSeconds(time->second));
 }
 #endif
 
 //TODO: Fix edge cases!
-bool RTC_IsDaylightSavingActive(rtc_time_type *time, uint8_t week_day)
+bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day)
 {
     sc_assert(time != NULL);
     sc_assert(week_day <= 7);
@@ -268,6 +297,94 @@ void RTC_AddYear(rtc_time_type *time, uint8_t year)
 
     sc_assert(time->year < 100);
     return;
+}
+
+///
+/// @brief Convert an broken down time struct into number of seconds since
+///     midnight, January 1 2000, UTC
+///
+/// @author Michael Duane Rice, Original
+/// @author Andreas Dahlberg, Adaptations
+///
+/// @param  *time Pointer to time struct
+/// @return uint32_t Timestamp in seconds
+///
+uint32_t RTC_ConvertToTimestamp(const rtc_time_type *time)
+{
+    sc_assert(time != NULL);
+
+    uint32_t tmp;
+    int n, d, leaps;
+
+    //Determine elapsed whole days since the epoch to the beginning of this year. Since our epoch is
+    //at a conjunction of the leap cycles, we can do this rather quickly.
+    n = time->year;
+    leaps = 0;
+    if (n)
+    {
+        uint32_t m;
+        m = n - 1;
+        leaps = m / 4;
+        leaps -= m / 100;
+        leaps++;
+    }
+    tmp = 365UL * n + leaps;
+
+    //Derive the day of year from month and day of month. We use the pattern of 31 day months
+    //followed by 30 day months to our advantage, but we must 'special case' Jan/Feb, and
+    //account for a 'phase change' between July and August (153 days after March 1).
+
+    d = time->date - 1; //Date is one based
+
+    //Handle Jan/Feb as a special case
+    if (time->month < 2)
+    {
+        if (time->month)
+        {
+            d += 31;
+        }
+    }
+    else
+    {
+        uint32_t m;
+        n = 59 + RTC_IsLeapYear((uint16_t)time->year + 2000);
+        d += n;
+        n = time->month - MARCH;
+
+        //Account for phase change
+        if (n > (JULY - MARCH))
+        {
+            d += 153;
+        }
+        n %= 5;
+
+        //n is now an index into a group of alternating 31 and 30
+        //day months... 61 day pairs.
+        m = n / 2;
+        m *= 61;
+        d += m;
+
+        //if n is odd, we are in the second half of the month pair
+        if (n & 1)
+        {
+            d += 31;
+        }
+    }
+
+    uint32_t return_value;
+
+    //Add day of year to elapsed days, and convert to seconds
+    tmp += d;
+    tmp *= ONE_DAY_S;
+    return_value = tmp;
+
+    //Compute 'fractional' day
+    tmp = time->hour;
+    tmp *= ONE_HOUR_S;
+    tmp += time->minute * 60UL;
+    tmp += time->second;
+
+    return return_value += tmp;
 }
 
 //////////////////////////////////////////////////////////////////////////
