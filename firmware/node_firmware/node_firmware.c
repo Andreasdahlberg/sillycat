@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-17 (Last edit)
+ * @date   2016-01-23 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -72,13 +72,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 int main(void)
 {
-#ifdef DEBUG_ENABLE
     uint8_t mcu_status = MCUSR;
     MCUSR = 0;
-#endif
-
     wdt_disable();
 
+    //Init hardware early to ensure all CS are disabled.
     libRFM69_HWInit();
     RTC_InitHW();
 
@@ -96,6 +94,12 @@ int main(void)
     LED_Init();
     Config_Load();
     RTC_Init();
+    ErrorHandler_Init();
+    //NOTE: Log reset reasons, during normal conditions the device should never restart.
+    //      Disabled during development to prevent filling the error log.
+#ifndef DEBUG_ENABLE
+    ErrorHandler_LogError(POWERON, mcu_status);
+#endif
     Sensor_Init();
     Transceiver_Init();
     Power_Init();
@@ -104,11 +108,11 @@ int main(void)
     Power_AddListener(Transceiver_EventHandler);
     Power_AddListener(Sensor_EventHandler);
 
-//#ifdef DEBUG_ENABLE
+#ifdef DEBUG_ENABLE
     //Add this event handler last to ensure all debug prints are flushed
     //before sleep.
-    // Power_AddListener(libDebug_EventHandler);
-//#endif
+    Power_AddListener(libDebug_EventHandler);
+#endif
 
     INFO("Start up done");
 
