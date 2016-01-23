@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2016-01-23 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -28,6 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,6 +41,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define OUT_BUFFER_SIZE 80
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -80,16 +85,40 @@ void libDebug_Init(void)
 void libDebug_Print_P(const char *text, ...)
 {
     va_list args;
-    //TODO: Find another safe solution for this, these buffers is too large!
-    char buffer[80];
-    char format[64];
-
-    strncpy_P(format, text, 64);
+    char buffer[OUT_BUFFER_SIZE];
 
     va_start(args, text);
-    vsprintf(buffer, format, args);
+
+    vsnprintf_P(buffer, OUT_BUFFER_SIZE, text, args);
+
+    //Make sure that the output always is null terminated.
+    buffer[OUT_BUFFER_SIZE - 1] = '\n';
+
     libUART_SendArray((uint8_t *)buffer, strlen(buffer));
     va_end(args);
+    return;
+}
+
+///
+/// @brief Handle events
+///
+/// @param  *event Pointer to triggered event
+/// @return None
+///
+void libDebug_EventHandler(const event_type *event)
+{
+    sc_assert(event != NULL);
+
+    switch (event->id)
+    {
+        case EVENT_SLEEP:
+            libUART_WaitForEmptyBuffer();
+            break;
+
+        default:
+            //Do nothing if an unknown event is received
+            break;
+    }
     return;
 }
 
