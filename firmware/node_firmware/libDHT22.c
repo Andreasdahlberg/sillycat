@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-01-23 (Last edit)
  * @brief  Implementation of low level functions for the DHT22 RHT sensor
  *
  * Detailed description of file.
@@ -271,22 +271,23 @@ static dht_state_type ReadingStateMachine(void)
             break;
 
         case DHT_READING_CAPTURE_DATA:
+            if (pulse_counter == EXPECTED_NR_PULSES)
+            {
+                EnableInputCapture(FALSE);
+                state = DHT_READING_REQUEST;
+                next_dht_state =  DHT_DECODING;
+            }
+
             //NOTE: According to the DHT22-datasheet a measurement takes 5 mS,
             //      with FOSC 8 MHz and 8 as prescaler the timer overflows in 64 mS.
             //      A timeout between 5 mS and 64 mS is therefore needed.
             if (Timer_TimeDifference(reading_timer) > READING_TIMEOUT_MS)
             {
                 ERROR("Timeout while capturing data");
+                EnableInputCapture(FALSE);
                 state = DHT_READING_REQUEST;
                 init_time = Timer_GetMilliseconds();
                 return DHT_POWERUP;
-            }
-
-            if (pulse_counter == EXPECTED_NR_PULSES)
-            {
-                EnableInputCapture(FALSE);
-                state = DHT_READING_REQUEST;
-                next_dht_state =  DHT_DECODING;
             }
             break;
 
