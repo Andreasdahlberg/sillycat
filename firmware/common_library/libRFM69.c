@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-05 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -49,9 +49,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define REG_OPMODE_MODE_MASK 0x1C
 
-#define REG_DATA_MODUL_DATA_MODE_MASK			0x60
-#define REG_DATA_MODUL_MODULATION_TYPE_MASK		0x18
-#define REG_DATA_MODUL_MODULATION_SHAPING_MASK	0x03
+#define REG_DATA_MODUL_DATA_MODE_MASK           0x60
+#define REG_DATA_MODUL_MODULATION_TYPE_MASK     0x18
+#define REG_DATA_MODUL_MODULATION_SHAPING_MASK  0x03
 
 #define REG_PA_LEVEL_PA_MASK 0xE0
 #define REG_PA_LEVEL_POUT_MASK 0x1F
@@ -80,7 +80,6 @@ typedef enum
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -108,7 +107,6 @@ void libRFM69_Init(void)
     return;
 }
 
-
 ///
 /// @brief Set the SS pin as output and pull high. This function should
 ///        be called as early as possible in a systems with several SPI-devices.
@@ -123,7 +121,6 @@ void libRFM69_HWInit(void)
     return;
 }
 
-
 ///
 /// @brief Update the internal state of libRFM69. NOT IMPLEMENTED
 ///
@@ -133,39 +130,6 @@ void libRFM69_HWInit(void)
 void libRFM69_Update(void)
 {
     return;
-}
-
-void libRFM69_Send(void)
-{
-    uint8_t test_data[6] = {0x05, 0x11, 0x22, 0x22, 0x33, 0x33};
-
-    INFO("Sending...");
-    DEBUG("Change to standby...");
-    libRFM69_SetMode(RFM_STANDBY);
-    libRFM69_WaitForModeReady();
-    DEBUG(" done\r\n");
-
-
-
-    libRFM69_WriteToFIFO(test_data, 6);
-    DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
-    DEBUG("Changed to transmitter\r\n");
-    libRFM69_SetMode(RFM_TRANSMITTER);
-    DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
-
-    while (libRFM69_IsFIFONotEmpty())
-    {
-        DEBUG("FIFO not empty: 0x%02X\r\n", libRFM69_IsFIFONotEmpty());
-        DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
-        DEBUG("Payload ready: 0x%02X\r\n", libRFM69_IsPayloadReady());
-        DEBUG("TX ready: %u\r\n", libRFM69_IsTxReady());
-        _delay_ms(1000);
-    }
-    DEBUG("Packet sent: 0x%02X\r\n", libRFM69_IsPacketSent());
-    libRFM69_SetMode(RFM_STANDBY);
-    DEBUG("All done!\r\n");
-
-
 }
 
 bool libRFM69_IsFIFOFull(void)
@@ -403,7 +367,8 @@ bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
     return status;
 }
 
-bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type start_condition)
+bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
+                                  start_condition)
 {
     bool status = FALSE;
     uint8_t register_content;
@@ -439,6 +404,8 @@ void libRFM69_GetTemperature(uint8_t *temperature)
 
     ReadRegister(REG_TEMP2, &register_data);
     *temperature = register_data;
+
+    return;
 }
 
 bool libRFM69_SetBitRate(uint32_t bit_rate)
@@ -517,7 +484,8 @@ bool libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 
     if (ReadRegister(REG_DATAMODUL, &register_content) && modulation_shaping < 0x4)
     {
-        register_content = (register_content & ~REG_DATA_MODUL_MODULATION_SHAPING_MASK) | modulation_shaping;
+        register_content = (register_content & ~REG_DATA_MODUL_MODULATION_SHAPING_MASK)
+                           | modulation_shaping;
         status = WriteRegister(REG_DATAMODUL, register_content);
     }
     return status;
@@ -526,7 +494,8 @@ bool libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
 {
     bool status = FALSE;
-    uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation / RFM_FSTEP);
+    uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation /
+                                         RFM_FSTEP);
 
     DEBUG("Freq deviation: %u\r\n", frequency_deviation);
     DEBUG("Freq deviation value: 0x%04X\r\n", frequency_deviation_value);
@@ -575,7 +544,8 @@ bool libRFM69_IsHighPowerEnabled(void)
 {
     bool status = FALSE;
 
-    //Not implemented
+    //This function not implemented
+    sc_assert_fail();
 
     return status;
 }
@@ -645,7 +615,6 @@ uint8_t libRFM69_GetPowerAmplifierMode(void)
     return 0;
 }
 
-//Overload Current Protection
 bool libRFM69_EnableOCP(bool enabled)
 {
     bool status = FALSE;
@@ -690,7 +659,6 @@ bool libRFM69_ClearFIFOOverrun(void)
     }
     return status;
 }
-
 
 bool libRFM69_CalibrateRCOscillator(void)
 {
@@ -799,43 +767,52 @@ bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length)
     return status;
 }
 
-//TODO: Return number of bytes read?
-bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length)
+///
+/// @brief Get the current sync word.
+///
+/// @param sync_world* Pointer to buffer where the sync word will be stored.
+/// @param buffer_size Size of the supplied buffer.
+/// @return uint8_t Number of bytes written to buffer.
+///
+uint8_t libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t buffer_size)
 {
-    bool status = FALSE;
     uint8_t sync_word_size;
+    uint8_t index = 0;
 
     sync_word_size = libRFM69_GetSyncWordSize();
 
-    if (length <= sync_word_size)
+    if (buffer_size >= sync_word_size)
     {
-        uint8_t index;
-        for (index = 0; index < sync_word_size; ++index)
+        for (index; index < sync_word_size; ++index)
         {
-            //Abort if read fails
-            if (ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]) == FALSE)
-            {
-                WARNING("Failed to read from REG_SYNCVALUE%u", index + 1);
-                break;
-            }
+            ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]);
         }
-        //Check if a complete sync word was written.
-        status = (index == sync_word_size);
     }
-    return status;
+    return index;
 }
 
-
+///
+/// @brief Get the version code of the chip. Bits 7-4 give the full revision
+///        number. Bits 3-0 give the metal mask revision number.
+///
+/// @param None
+/// @return uint8_t Version code
+///
 uint8_t libRFM69_GetChipVersion(void)
 {
     uint8_t register_content;
-    if (ReadRegister(REG_VERSION, &register_content) == TRUE)
-    {
-        return register_content;
-    }
-    return 0;
+    ReadRegister(REG_VERSION, &register_content);
+
+    return register_content;
 }
 
+#ifdef DEBUG_ENABLE
+///
+/// @brief Print all register values
+///
+/// @param None
+/// @return None
+///
 void libRFM69_DumpRegisterValues(void)
 {
     uint8_t register_address;
@@ -844,7 +821,8 @@ void libRFM69_DumpRegisterValues(void)
     for (register_address = 0; register_address < 0x4F; ++register_address)
     {
         ReadRegister(register_address, &register_content);
-        DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", register_address, register_content);
+        DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", register_address,
+              register_content);
     }
 
     ReadRegister(REG_TESTPA1, &register_content);
@@ -854,32 +832,41 @@ void libRFM69_DumpRegisterValues(void)
     DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA2, register_content);
     return;
 }
+#endif
 
-bool libRFM69_EnableSyncWordGeneration(bool enabled)
+///
+/// @brief Enable or disable sync word generation.
+///
+/// @param enabled Enable/disable
+/// @return None
+///
+void libRFM69_EnableSyncWordGeneration(bool enabled)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (ReadRegister(REG_SYNCCONFIG, &register_content) == TRUE)
-    {
-        SetBit(7, enabled, &register_content);
-        status = WriteRegister(REG_SYNCCONFIG, register_content);
-    }
+    ReadRegister(REG_SYNCCONFIG, &register_content);
+    SetBit(7, enabled, &register_content);
+    WriteRegister(REG_SYNCCONFIG, register_content);
 
-    return status;
+    return;
 }
 
-bool libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type fill_condition)
+///
+/// @brief Set the FIFO fill condition.
+///
+/// @param register fill_condition The fill condition, AUTO or MAN.
+/// @return None
+///
+void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
+                                   fill_condition)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (ReadRegister(REG_SYNCCONFIG, &register_content) == TRUE)
-    {
-        SetBit(6, (bool)fill_condition, &register_content);
-        status = WriteRegister(REG_SYNCCONFIG, register_content);
-    }
-    return status;
+    ReadRegister(REG_SYNCCONFIG, &register_content);
+    SetBit(6, (bool)fill_condition, &register_content);
+    WriteRegister(REG_SYNCCONFIG, register_content);
+
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -901,6 +888,7 @@ static void PostCallback(void)
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
+    sc_assert(address <= REG_TESTPA2);
     bool status = FALSE;
 
     libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
@@ -910,9 +898,11 @@ static bool WriteRegister(uint8_t address, uint8_t register_data)
     return status;
 }
 
-//TODO: Add check if address is valid and return status
+//TODO: return void
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
+    sc_assert(address <= REG_TESTPA2);
+
     bool status = FALSE;
 
     libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
@@ -933,14 +923,11 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 ///
 static bool IsBitSet(uint8_t address, uint8_t bit)
 {
+    sc_assert(bit <= 7);
+    sc_assert(address <= REG_TESTPA2);
+
     uint8_t register_content;
     bool status = TRUE;
-
-    if (bit > 7 || address > REG_TEMP2)
-    {
-        WARNING("Register or bit index is invalid");
-        return TRUE;
-    }
 
     if (ReadRegister(address, &register_content))
     {

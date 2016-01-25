@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -35,8 +35,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LIBRFM69_H_
 #define LIBRFM69_H_
 
-#define READ_REG	0x7F
-#define WRITE_REG	0x80
+#define READ_REG    0x7F
+#define WRITE_REG   0x80
 
 typedef enum
 {
@@ -50,7 +50,7 @@ typedef enum
 typedef enum
 {
     RFM_PACKET_DATA,
-    RFM_RESERVED,	//Do not use
+    RFM_RESERVED,   //Do not use
     RFM_CONT_SYNC_DATA,
     RFM_CONT_DATA
 } libRFM69_data_mode_type;
@@ -88,13 +88,13 @@ typedef enum
 #define BROADCAST_ADDRESS 0x00
 #endif
 
-#ifdef	NETWORK_MASTER
+#ifdef  NETWORK_MASTER
 #define NETWORK_ID NODE_ADDRESS
 #endif
 
-#define RFM_PWR_1	0x04 //PA0 output on pin RFIO
-#define RFM_PWR_2	0x02 //PA1 enabled on pin PA_BOOST
-#define RFM_PWR_3_4	0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
+#define RFM_PWR_1   0x04 //PA0 output on pin RFIO
+#define RFM_PWR_2   0x02 //PA1 enabled on pin PA_BOOST
+#define RFM_PWR_3_4 0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
 
 #define MAX_SYNC_WORD_SIZE 7
 
@@ -128,10 +128,12 @@ bool libRFM69_SetPreambleLength(uint16_t length);
 bool libRFM69_SetSyncWordSize(uint8_t size);
 bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
 bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
-bool libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type fill_condition);
-bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type start_condition);
+void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
+                                   fill_condition);
+bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
+                                  start_condition);
 uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length);
-bool libRFM69_EnableSyncWordGeneration(bool enabled);
+void libRFM69_EnableSyncWordGeneration(bool enabled);
 void libRFM69_EnableListenMode(bool enabled);
 bool libRFM69_CalibrateRCOscillator(void);
 libRFM69_mode_type libRFM69_GetMode(void);
@@ -142,7 +144,7 @@ int8_t libRFM69_GetOutputPower(void);
 int8_t libRFM69_GetRSSI(void);
 uint16_t libRFM69_GetPreambleLength(void);
 uint8_t libRFM69_GetSyncWordSize(void);
-bool libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
+uint8_t libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
 bool libRFM69_EnableOCP(bool enabled);
 bool libRFM69_ClearFIFOOverrun(void);
 bool libRFM69_ClearFIFO(void);
@@ -158,12 +160,13 @@ bool libRFM69_IsFIFOOverrun(void);
 bool libRFM69_IsPacketSent(void);
 bool libRFM69_IsPayloadReady(void);
 bool libRFM69_IsCRCOk(void);
-void libRFM69_DumpRegisterValues(void);
 bool libRFM69_SetNodeAddress(uint8_t node_address);
 bool libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
 bool libRFM69_EnableHighPowerSetting(bool enable);
 bool libRFM69_SetPowerLevel(uint8_t power_level);
 
-void libRFM69_Send(void);
+#ifdef DEBUG_ENABLE
+void libRFM69_DumpRegisterValues(void);
+#endif
 
 #endif /* LIBRFM69_H_ */
