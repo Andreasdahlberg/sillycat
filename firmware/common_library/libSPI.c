@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of SPI-library.
  *
  * Detailed description of file.
@@ -39,10 +39,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define SS		DDB2
-#define MOSI	DDB3
-#define MISO	DDB4
-#define SCK		DDB5
+#define SS      DDB2
+#define MOSI    DDB3
+#define MISO    DDB4
+#define SCK     DDB5
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -52,8 +52,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-SPI_status spi_status;
-bool slave_active;
+static SPI_status spi_status;
+static bool slave_active;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -225,6 +225,10 @@ bool libSPI_SetMode(uint8_t mode)
     return status;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
 //TODO: Fix this description
 ///
 /// @brief Set slave to active, this prevents other modules to use the SPI-bus. Keep in mind that there is now control if its the same module...
@@ -249,17 +253,13 @@ bool SetActiveSlave(bool state)
     return status;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//LOCAL FUNCTIONS
-//////////////////////////////////////////////////////////////////////////
-
 ///
 /// @brief Check if the SPI-bus is busy
 ///
 /// @param None
 /// @return bool Status of SPI-bus
 ///
-bool SPIBusy()
+bool SPIBusy(void)
 {
     return ((SPSR & (1 << SPIF)) == 0);
 }
