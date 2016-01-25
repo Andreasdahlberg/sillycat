@@ -1,7 +1,7 @@
 /**
  * @file   LED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-17 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of LED
  *
  * Detailed description of file.
@@ -40,8 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Increase this, short interval during testing!
-#define IDLE_FLASH_INTERVAL_MS 30000
+#define IDLE_FLASH_INTERVAL_MS 3000
 #define FLASH_DURATION_MS 100
 #define BLINK_DURATION_MS 300
 
@@ -82,7 +81,7 @@ bool FlashLED(uint8_t flashes, uint16_t duration);
 //////////////////////////////////////////////////////////////////////////
 
 ///
-/// @brief Init ...
+/// @brief Init LED-states and turn off the blue LED
 ///
 /// @param  None
 /// @return None
@@ -99,14 +98,14 @@ void LED_Init(void)
 }
 
 ///
-/// @brief Update ...
+/// @brief Update status LED
 ///
 /// @param  None
 /// @return None
 ///
 void LED_Update(void)
 {
-    sc_assert(led_state <= LED_STATE_CHARGING);
+    sc_assert(led_state <= LED_STATE_SLEEPING);
 
     switch (led_state)
     {
@@ -115,28 +114,13 @@ void LED_Update(void)
             break;
 
         case LED_STATE_SENDING:
-            if (FlashLED(2, FLASH_DURATION_MS) == TRUE)
-            {
-                LED_ChangeState(LED_STATE_IDLE);
-            }
-            break;
-
         case LED_STATE_CHARGING:
-            break;
-
-        case LED_STATE_CHARGING_DONE:
-            break;
-
-        case LED_STATE_SEARCHING:
-            break;
-
         case LED_STATE_SLEEPING:
             break;
 
         default:
             break;
     }
-
     return;
 }
 
@@ -153,21 +137,15 @@ void LED_ChangeState(led_state_type state)
     switch (state)
     {
         case LED_STATE_IDLE:
-        case LED_STATE_SENDING:
-        case LED_STATE_CHARGING_DONE:
-        case LED_STATE_SEARCHING:
+        case LED_STATE_SLEEPING:
             EnabledBlueLED(FALSE);
             led_state = state;
             break;
 
+        case LED_STATE_SENDING:
         case LED_STATE_CHARGING:
             EnabledBlueLED(TRUE);
-            led_state = LED_STATE_CHARGING;
-            break;
-
-        case LED_STATE_SLEEPING:
-            EnabledBlueLED(FALSE);
-            led_state = LED_STATE_SLEEPING;
+            led_state = state;
             break;
 
         default:
@@ -188,12 +166,15 @@ void LED_EventHandler(const event_type *event)
     {
         case EVENT_SLEEP:
             LED_ChangeState(LED_STATE_SLEEPING);
-            INFO("Entering sleep");
             break;
 
+        case EVENT_BATTERY_CHARGING_STOPPED:
         case EVENT_WAKEUP:
             LED_ChangeState(LED_STATE_IDLE);
-            INFO("Exiting sleep");
+            break;
+
+        case EVENT_BATTERY_CHARGING_STARTED:
+            LED_ChangeState(LED_STATE_CHARGING);
             break;
 
         default:
@@ -222,7 +203,7 @@ void IdleLED(void)
             break;
 
         case IDLE_LED_FLASH:
-            if (FlashLED(1, BLINK_DURATION_MS) == TRUE)
+            if (FlashLED(2, BLINK_DURATION_MS) == TRUE)
             {
                 idle_led_state = IDLE_LED_WAIT;
                 led_timer = Timer_GetMilliseconds();

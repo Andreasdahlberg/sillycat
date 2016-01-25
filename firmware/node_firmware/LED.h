@@ -1,7 +1,7 @@
 /**
  * @file   LED.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Header of LED
  *
  * Detailed description of file.
@@ -47,8 +47,6 @@ typedef enum
     LED_STATE_IDLE = 0,
     LED_STATE_SENDING,
     LED_STATE_CHARGING,
-    LED_STATE_CHARGING_DONE,
-    LED_STATE_SEARCHING,
     LED_STATE_SLEEPING
 } led_state_type;
 
