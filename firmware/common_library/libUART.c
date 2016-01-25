@@ -1,7 +1,7 @@
 /**
  * @file   libUART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-9 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of libUART functions
  *
  * Detailed description of file.
@@ -36,7 +36,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define UBRRn 1		//Baud:250K, Fosc: 8 MHz, Error: 0%
+#define UBRRn 1     //Baud:250K, Fosc: 8 MHz, Error: 0%
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
