@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-23 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -100,25 +100,16 @@ void libDebug_Print_P(const char *text, ...)
 }
 
 ///
-/// @brief Handle events
+/// @brief Flush buffers before sleep
 ///
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void libDebug_EventHandler(const event_type *event)
+void libDebug_Sleep(const event_type *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
-    switch (event->id)
-    {
-        case EVENT_SLEEP:
-            libUART_WaitForEmptyBuffer();
-            break;
-
-        default:
-            //Do nothing if an unknown event is received
-            break;
-    }
+    libUART_WaitForEmptyBuffer();
     return;
 }
 

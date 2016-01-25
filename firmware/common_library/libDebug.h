@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Header of Debug-library.
  *
  * Detailed description of file.
@@ -34,13 +34,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/pgmspace.h>
 
 #include "libUART.h"
+#include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_ENABLE
-#define DEBUG(text, ...)		libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
+#define DEBUG(text, ...)        libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
 #define CRITICAL(text, ...)     libDebug_Print_P(PSTR("<CRITICAL> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
 #define ERROR(text, ...)        libDebug_Print_P(PSTR("<ERROR> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
 #define WARNING(text, ...)      libDebug_Print_P(PSTR("<WARNING> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
@@ -59,5 +60,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void libDebug_Init(void);
 void libDebug_Print_P(const char *text, ...);
+void libDebug_Sleep(const event_type *event __attribute__ ((unused)));
 
 #endif /* LIBDEBUG_H_ */
