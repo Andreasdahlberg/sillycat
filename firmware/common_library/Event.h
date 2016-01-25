@@ -1,7 +1,7 @@
 /**
  * @file   Event.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Header of Event
  *
  * Detailed description of file.
@@ -37,7 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define NewEvent(typeid) ((event_type){Timer_GetMilliseconds(), typeid})
+#define Event_New(typeid) ((event_type){Timer_GetMilliseconds(), typeid})
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -45,10 +45,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef enum
 {
-    EVENT_SLEEP = 0,
+    EVENT_ALL = 0,
+    EVENT_SLEEP,
     EVENT_WAKEUP,
-    EVENT_CHARGING_STARTED,
-    EVENT_CHARGING_STOPED
+    EVENT_BATTERY_CHARGING_STARTED,
+    EVENT_BATTERY_CHARGING_STOPPED,
+    EVENT_BATTERY_CHARGER_DISCONNECTED,
+    EVENT_BATTERY_CRITICAL,
+    EVENT_BATTERY_LOW,
+    EVENT_RHT_SENT
 } event_id_type;
 
 typedef struct
@@ -57,10 +62,19 @@ typedef struct
     event_id_type id;
 } event_type;
 
-typedef void (*event_listener)(const event_type *event);
+typedef void (*event_callback)(const event_type *event);
+
+typedef struct
+{
+    event_id_type id;
+    event_callback callback;
+} event_listener_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+void Event_AddListener(event_callback listener, event_id_type id);
+void Event_Trigger(const event_type *event);
 
 #endif /* EVENT_H_ */
