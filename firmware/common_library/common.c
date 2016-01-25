@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -56,7 +56,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 uint16_t exponential_moving_average(uint16_t value, uint16_t average,
                                     uint16_t alpha)
 {
-    uint32_t tmp = (uint32_t)alpha * (uint32_t)value + (uint32_t)(65536 - alpha) * (uint32_t)average;
+    uint32_t tmp = (uint32_t)alpha * (uint32_t)value + (uint32_t)(65536 - alpha) *
+                   (uint32_t)average;
     return (uint16_t)((tmp + 32768) / 65536);
 }
 
