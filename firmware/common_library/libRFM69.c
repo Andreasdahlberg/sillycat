@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-30 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -86,7 +86,7 @@ typedef enum
 
 static bool WriteRegister(uint8_t address, uint8_t register_data);
 static bool ReadRegister(uint8_t address, uint8_t *register_data);
-static bool IsBitSet(uint8_t address, uint8_t bit);
+static bool IsBitSetInRegister(uint8_t address, uint8_t bit);
 
 static void PreCallback(void);
 static void PostCallback(void);
@@ -132,39 +132,40 @@ void libRFM69_Update(void)
     return;
 }
 
+//TODO: Use remove these functions and use macros!
 bool libRFM69_IsFIFOFull(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOFULL);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOFULL);
 }
 
 bool libRFM69_IsFIFONotEmpty(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFONOTEMPTY);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFONOTEMPTY);
 }
 
 bool libRFM69_IsFIFOLevel(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOLEVEL);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOLEVEL);
 }
 
 bool libRFM69_IsFIFOOverrun(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOOVERRUN);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOOVERRUN);
 }
 
 bool libRFM69_IsPacketSent(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_PACKETSENT);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_PACKETSENT);
 }
 
 bool libRFM69_IsPayloadReady(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_PAYLOADREADY);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_PAYLOADREADY);
 }
 
 bool libRFM69_IsCRCOk(void)
 {
-    return IsBitSet(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_CRCOK);
+    return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_CRCOK);
 }
 
 //TODO: Return number of bytes written to FIFO.
@@ -545,19 +546,27 @@ bool libRFM69_IsHighPowerEnabled(void)
     bool status = FALSE;
 
     //This function not implemented
-    sc_assert_fail();
+    // sc_assert_fail();
 
     return status;
 }
 
 bool libRFM69_EnableHighPowerSetting(bool enable)
 {
-    bool status;
+    bool status = FALSE;
 
     if (enable == TRUE)
     {
-        status = WriteRegister(REG_TESTPA1, 0x5D) &&
-                 WriteRegister(REG_TESTPA2, 0x7C);
+
+        WriteRegister(REG_OCP, 0x0A); //disable OCP
+        WriteRegister(REG_PALEVEL, 0x7F);
+
+        //pa0 = 0
+        //pa1 = 1
+        //pa2 = 1
+
+        // status = WriteRegister(REG_TESTPA1, 0x5D) &&
+        //        WriteRegister(REG_TESTPA2, 0x7C);
     }
     else
     {
@@ -647,124 +656,153 @@ int8_t libRFM69_GetRSSI(void)
     return (-1 * (int8_t)(register_content >> 1));
 }
 
+///
+/// @brief Clear any active FIFO overrun flag.
+///
+/// @param  None
+/// @return bool TRUE if overrun flag was set, otherwise FALSE.
+///
 bool libRFM69_ClearFIFOOverrun(void)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (ReadRegister(REG_IRQFLAGS2, &register_content) == TRUE)
-    {
-        SetBit(4, TRUE, &register_content);
-        status = WriteRegister(REG_IRQFLAGS2, register_content);
-    }
-    return status;
-}
+    ReadRegister(REG_IRQFLAGS2, &register_content);
 
-bool libRFM69_CalibrateRCOscillator(void)
-{
-    //Not implemented
-    return FALSE;
-}
-
-bool libRFM69_SetSyncWordSize(uint8_t size)
-{
-    bool status = FALSE;
-    uint8_t register_content;
-
-    if (size <= MAX_SYNC_WORD_SIZE)
-    {
-        if (ReadRegister(REG_SYNCCONFIG, &register_content))
-        {
-            register_content &= ~(MAX_SYNC_WORD_SIZE << 3);
-
-            register_content |= (size << 3);
-            status = WriteRegister(REG_SYNCCONFIG, register_content);
-
-        }
-    }
-    return status;
-}
-
-bool libRFM69_SetPreambleLength(uint16_t length)
-{
     bool status;
+    status = IsBitSet(REG_IRQFLAGS2_BIT_FIFOOVERRUN, &register_content);
 
-    status = (WriteRegister(REG_PREAMBLEMSB, (length >> 8)) &&
-              WriteRegister(REG_PREAMBLELSB, (length & 0xFF)));
+    if (status)
+    {
+        SetBit(REG_IRQFLAGS2_BIT_FIFOOVERRUN, TRUE, &register_content);
+        WriteRegister(REG_IRQFLAGS2, register_content);
+    }
     return status;
 }
 
+///
+/// @brief Calibrate the internal RC oscillator. This oscillator is automatically
+///        calibrated at the device power-up but for applications with large
+///        temperature variations, and for which the power supply is never removed,
+///        RC calibration can be performed upon user request. Use the function
+///        libRFM69_IsRCCalibrationDone() to check if the calibration is done.
+///
+///        IMPORTENT: Not implemented
+///
+/// @param  None
+/// @return None
+///
+void libRFM69_CalibrateRCOscillator(void)
+{
+    sc_assert_fail(); //Not implemented yet
+    return;
+}
+
+///
+/// @brief Set the sync word size.
+///
+/// @param  uint8_t Size of the sync word, (1-8).
+/// @return None
+///
+void libRFM69_SetSyncWordSize(uint8_t size)
+{
+    sc_assert(size > 0 && size <= MAX_SYNC_WORD_SIZE);
+
+    uint8_t register_content;
+
+    ReadRegister(REG_SYNCCONFIG, &register_content);
+    register_content &= ~(0xC7);
+
+    register_content |= ((size - 1) << 3);
+    WriteRegister(REG_SYNCCONFIG, register_content);
+
+    return;
+}
+
+///
+/// @brief Set the number of preamble bytes.
+///
+/// @param length Number of preamble bytes.
+/// @return None
+///
+void libRFM69_SetPreambleLength(uint16_t length)
+{
+    WriteRegister(REG_PREAMBLEMSB, (length >> 8));
+    WriteRegister(REG_PREAMBLELSB, (length & 0x00FF));
+    return;
+}
+
+///
+/// @brief Get the number of preamble bytes.
+///
+/// @param None
+/// @return uint16_t Number of preamble bytes.
+///
 uint16_t libRFM69_GetPreambleLength(void)
 {
-    uint16_t length = 0;
+    uint16_t length;
     uint8_t register_content;
 
-    if (ReadRegister(REG_PREAMBLEMSB, &register_content) == FALSE)
-    {
-        ERROR("Failed to read MSB of preamble");
-        return 0;
-    }
-
+    ReadRegister(REG_PREAMBLEMSB, &register_content);
     length = (uint16_t)(register_content << 8);
 
-    if (ReadRegister(REG_PREAMBLELSB, &register_content) == FALSE)
-    {
-        ERROR("Failed to read LSB of preamble");
-        return 0;
-    }
-
+    ReadRegister(REG_PREAMBLELSB, &register_content);
     length |= register_content;
+
     return length;
 }
 
+///
+/// @brief Get the current sync word size.
+///
+/// @param None
+/// @return uint8_t Size of the sync word, (1-8).
+///
 uint8_t libRFM69_GetSyncWordSize(void)
 {
     uint8_t register_content;
-    uint8_t size = 0;
 
-    if (ReadRegister(REG_SYNCCONFIG, &register_content))
-    {
-        //From RFM69HW datasheet, table 28: sync word size = RegSyncConfig[5:2] + 1
-        size = ((register_content >> 3) & 0x07) + 1;
-    }
+    ReadRegister(REG_SYNCCONFIG, &register_content);
 
-    return size;
+    //From RFM69HW datasheet, table 28: sync word size = RegSyncConfig[5:2] + 1
+    return ((register_content >> 3) & 0x07) + 1;
 }
 
-bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length)
+///
+/// @brief Set a new sync word. The length must match the configured
+///        sync word size.
+///
+/// @param sync_world* Pointer to new sync word.
+/// @param length Length of the sync word.
+/// @return bool TRUE if the new sync word was valid, otherwise FALSE.
+///
+bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
 {
-    bool status = FALSE;
-    uint8_t sync_word_size;
-
-    sync_word_size = libRFM69_GetSyncWordSize();
-
-    if (length == sync_word_size)
+    //Validate sync word.
+    if (length != libRFM69_GetSyncWordSize())
     {
-        uint8_t index;
-        for (index = 0; index < length; ++index)
-        {
-            //Abort if write fails, this can leave an incomplete sync word
-            //so this must be handle by the caller.
-
-            //From RFM69HW datasheet, note on page 56: sync word values equal
-            //to 0x00 is forbidden.
-            if (sync_word[index] == 0x00)
-            {
-                WARNING("Sync word value 0x00 is not valid");
-                break;
-            }
-
-            if (WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]) == FALSE)
-            {
-                ERROR("Failed to write sync word value");
-                break;
-            }
-        }
-        //Check if a complete sync word was written.
-        status = (index == length);
+        ERROR("Invalid sync word length: %u", length);
+        return FALSE;
     }
 
-    return status;
+    //From RFM69HW datasheet, note on page 56: sync
+    //word values equal to 0x00 is forbidden.
+    uint8_t index;
+    for (index = 0; index < length; ++index)
+    {
+        if (sync_word[index] == 0x00)
+        {
+            ERROR("Invalid sync word value: 0x00");
+            return FALSE;
+        }
+    }
+
+    //Write new sync word if all checks passed.
+    for (index = 0; index < length; ++index)
+    {
+        WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]);
+    }
+
+    return TRUE;
 }
 
 ///
@@ -783,7 +821,7 @@ uint8_t libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t buffer_size)
 
     if (buffer_size >= sync_word_size)
     {
-        for (index; index < sync_word_size; ++index)
+        for (; index < sync_word_size; ++index)
         {
             ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]);
         }
@@ -921,7 +959,7 @@ static bool ReadRegister(uint8_t address, uint8_t *register_data)
 /// @return TRUE if bit is set
 /// @return FALSE if bit is not set
 ///
-static bool IsBitSet(uint8_t address, uint8_t bit)
+static bool IsBitSetInRegister(uint8_t address, uint8_t bit)
 {
     sc_assert(bit <= 7);
     sc_assert(address <= REG_TESTPA2);

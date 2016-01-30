@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-30 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -96,7 +96,7 @@ typedef enum
 #define RFM_PWR_2   0x02 //PA1 enabled on pin PA_BOOST
 #define RFM_PWR_3_4 0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
 
-#define MAX_SYNC_WORD_SIZE 7
+#define MAX_SYNC_WORD_SIZE 8
 
 #define RFM_FIFO_SIZE 66
 
@@ -124,9 +124,9 @@ bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
 bool libRFM69_SetModulationShaping(uint8_t modulation_shaping);
 bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation);
 bool libRFM69_SetPowerAmplifierMode(uint8_t mode);
-bool libRFM69_SetPreambleLength(uint16_t length);
-bool libRFM69_SetSyncWordSize(uint8_t size);
-bool libRFM69_SetSyncWord(uint8_t *sync_word, uint8_t length);
+void libRFM69_SetPreambleLength(uint16_t length);
+void libRFM69_SetSyncWordSize(uint8_t size);
+bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length);
 bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
 void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
                                    fill_condition);
@@ -135,7 +135,7 @@ bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
 uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length);
 void libRFM69_EnableSyncWordGeneration(bool enabled);
 void libRFM69_EnableListenMode(bool enabled);
-bool libRFM69_CalibrateRCOscillator(void);
+void libRFM69_CalibrateRCOscillator(void);
 libRFM69_mode_type libRFM69_GetMode(void);
 uint32_t libRFM69_GetBitrate(void);
 uint8_t libRFM69_GetChipVersion(void);
