@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-9 (Last edit)
+ * @date   2016-01-30 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -69,6 +69,7 @@ typedef enum function_status
 uint16_t exponential_moving_average(uint16_t value, uint16_t average,
                                     uint16_t alpha);
 void SetBit(uint8_t bit_index, bool state, uint8_t *data);
+bool IsBitSet(uint8_t bit_index, const uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
 uint16_t DecimalToBCD(uint8_t decimal_data);
 int GetFreeRam(void);

@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-30 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -98,6 +98,12 @@ void SetBit(uint8_t bit_index, bool state, uint8_t *data)
         *data &= ~(1 << bit_index);
     }
     return;
+}
+
+bool IsBitSet(uint8_t bit_index, const uint8_t *data)
+{
+    sc_assert(bit_index < 8);
+    return (bool)(*data & (1 << bit_index));
 }
 
 int GetFreeRam(void)
