@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -99,26 +99,11 @@ void Sensor_Update(void)
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void Sensor_EventHandler(const event_type *event)
+void Sensor_WakeUp(const event_type *event)
 {
     sc_assert(event != NULL);
 
-    switch (event->id)
-    {
-        case EVENT_SLEEP:
-            INFO("Entering sleep");
-            break;
-
-        case EVENT_WAKEUP:
-            INFO("Exiting sleep");
-            libDHT22_StartReading();
-
-            break;
-
-        default:
-            //Do nothing if an unknown event is received
-            break;
-    }
+    libDHT22_StartReading();
     return;
 }
 
@@ -128,5 +113,9 @@ void Sensor_EventHandler(const event_type *event)
 
 static void SendCallback(bool status)
 {
+    event_type event;
+    event = Event_New(EVENT_RHT_SENT);
+
+    Event_Trigger(&event);
     INFO("Sensor callback: %u\r\n", (uint8_t)status);
 }
