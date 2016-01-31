@@ -583,7 +583,7 @@ void libRFM69_EnableHighPowerSetting(bool enable)
     {
 
 #ifdef DEBUG_ENABLE
-        if (libRFM69_IsOCPEnabled() == FALSE)
+        if (libRFM69_IsOCPEnabled() == TRUE)
         {
             WARNING("OCP must be disabled while in high power mode");
         }
