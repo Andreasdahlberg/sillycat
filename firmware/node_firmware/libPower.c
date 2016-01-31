@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-17 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of libPower
  *
  * Detailed description of file.
@@ -98,7 +98,7 @@ void libPower_Init(void)
     PRR |= (1 << PRUSART0);
 #endif
 
-    libADC_EnableInput(0x07, TRUE);
+    libADC_EnableInput(0x07, true);
     return;
 }
 
@@ -114,20 +114,20 @@ void libPower_Sleep(void)
     //Without this the device can not wake up again.
     //IMPORTANT: This function does not catch cases where
     //           interrupts is disabled inside an interrupt vector.
-    if (IsGlobalInteruptEnabled() == FALSE)
+    if (IsGlobalInteruptEnabled() == false)
     {
         sc_assert_fail();
         return;
     }
 
-    EnableLowLevelInterupt(TRUE);
+    EnableLowLevelInterupt(true);
 
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
     sleep_enable();
     sleep_cpu();
     sleep_disable();
 
-    EnableLowLevelInterupt(FALSE);
+    EnableLowLevelInterupt(false);
     return;
 }
 
@@ -135,7 +135,7 @@ void libPower_Sleep(void)
 /// @brief Check if the charger is connected
 ///
 /// @param  None
-/// @return TRUE if connected, otherwise FALSE
+/// @return true if connected, otherwise false
 ///
 bool libPower_IsChargerConnected(void)
 {
@@ -146,7 +146,7 @@ bool libPower_IsChargerConnected(void)
 /// @brief Check if the battery is charging
 ///
 /// @param  None
-/// @return TRUE if charging, otherwise FALSE
+/// @return true if charging, otherwise false
 ///
 bool libPower_IsCharging(void)
 {
@@ -194,7 +194,7 @@ uint32_t libPower_GetBatteryVoltage(void)
 /// @brief Check if battery voltage reading is valid
 ///
 /// @param  None
-/// @return TRUE if valid, otherwise FALSE
+/// @return true if valid, otherwise false
 ///
 bool libPower_IsBatteryVoltageValid(void)
 {
@@ -209,7 +209,7 @@ bool libPower_IsBatteryVoltageValid(void)
 //NOTE: This function does not touch the global interrupt enable!
 void EnableLowLevelInterupt(bool enable)
 {
-    if (enable == TRUE)
+    if (enable == true)
     {
         //Enable low level sense
         EICRA &= ~(1 << ISC11 | 1 << ISC10);

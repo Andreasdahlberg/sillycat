@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -94,7 +94,7 @@ int main(void)
     Timer_Init();
     libSPI_Init(1);
     libDS3234_Init();
-    libADC_Enable(TRUE);
+    libADC_Enable(true);
     Sensor_Init();
     libInput_Init();
 

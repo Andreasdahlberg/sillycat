@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of input module.
  *
  * Detailed description of file.
@@ -82,7 +82,7 @@ void libInput_Init(void)
     DDRB &= ~(1 << DDB0 | 1 << DDB1);
 
     //NOTE: Using a ADC-channel for the push-button since no other pin is free.
-    libADC_EnableInput(PUSH_ADC_CHANNEL, TRUE);
+    libADC_EnableInput(PUSH_ADC_CHANNEL, true);
 
     //Reset all callbacks
     right_event_callback = NULL;
@@ -171,14 +171,14 @@ void DirectionCheckAndTrigger(void)
 
 void PushCheckAndTrigger(void)
 {
-    static bool prev_push = FALSE;
+    static bool prev_push = false;
     uint16_t adc_sample;
     bool curr_push;
 
     libADC_GetSample(PUSH_ADC_CHANNEL, &adc_sample);
     curr_push = adc_sample > 512;
 
-    if (prev_push == FALSE && curr_push == TRUE)
+    if (prev_push == false && curr_push == true)
     {
         DEBUG("Push\r\n");
         if (push_event_callback != NULL)

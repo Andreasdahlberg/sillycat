@@ -1,7 +1,7 @@
 /**
  * @file   FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-1 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of a FIFO
  *
  * Detailed description of file.
@@ -58,7 +58,7 @@ uint8_t NextPosition(fifo_type *fifo, uint8_t current_position);
 ///
 /// @param  *fifo Pointer to FIFO.
 /// @param  *item Pointer to item to push.
-/// @return Status of push. False if FIFO is full, otherwise true.
+/// @return Status of push. false if FIFO is full, otherwise true.
 ///
 bool FIFO_Push(fifo_type *fifo, void *item)
 {
@@ -82,7 +82,7 @@ bool FIFO_Push(fifo_type *fifo, void *item)
 ///
 /// @param  *fifo Pointer to FIFO.
 /// @param  *item Pointer to item where the new item will be stored.
-/// @return Status of pop. False if FIFO is empty, otherwise true
+/// @return Status of pop. false if FIFO is empty, otherwise true
 ///
 bool FIFO_Pop(fifo_type *fifo, void *item)
 {
@@ -95,7 +95,7 @@ bool FIFO_Pop(fifo_type *fifo, void *item)
 
     //Move tail one item forward
     fifo->tail = NextPosition(fifo, fifo->tail);
-    ptr = fifo->data + fifo->tail;    
+    ptr = fifo->data + fifo->tail;
 
     memcpy(item, ptr, fifo->item_size);
     return true;
@@ -106,7 +106,7 @@ bool FIFO_Pop(fifo_type *fifo, void *item)
 ///
 /// @param  *fifo Pointer to FIFO.
 /// @param  *item Pointer to item where the new item will be stored.
-/// @return Status of pop. False if FIFO is empty, otherwise true
+/// @return Status of pop. false if FIFO is empty, otherwise true
 ///
 bool FIFO_Peek(fifo_type *fifo, void *item)
 {
@@ -126,7 +126,7 @@ bool FIFO_Peek(fifo_type *fifo, void *item)
 /// @brief Check if FIFO is full.
 ///
 /// @param  *fifo Pointer to FIFO.
-/// @return True if FIFO is full, otherwise false.
+/// @return true if FIFO is full, otherwise false.
 ///
 bool FIFO_IsFull(fifo_type *fifo)
 {
@@ -137,7 +137,7 @@ bool FIFO_IsFull(fifo_type *fifo)
 /// @brief Check if FIFO is empty.
 ///
 /// @param  *fifo Pointer to FIFO.
-/// @return True if FIFO is empty, otherwise false.
+/// @return true if FIFO is empty, otherwise false.
 ///
 bool FIFO_IsEmpty(fifo_type *fifo)
 {
@@ -165,5 +165,5 @@ void FIFO_Clear(fifo_type *fifo)
 uint8_t NextPosition(fifo_type *fifo, uint8_t current_position)
 {
     return (uint8_t)((uint16_t)(current_position + fifo->item_size) %
-        (uint16_t)(fifo->size * fifo->item_size));
+                     (uint16_t)(fifo->size * fifo->item_size));
 }

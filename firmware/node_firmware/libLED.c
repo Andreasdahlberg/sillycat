@@ -1,7 +1,7 @@
 /**
  * @file   libLED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-12 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of libLED
  *
  * Detailed description of file.
@@ -80,12 +80,12 @@ void libLED_Init(void)
 /// @brief Enable/disable a selected LED
 ///
 /// @param  index LED to enable/disable, (is unused in this implementation)
-/// @param  enable True to enable, false to disable
+/// @param  enable true to enable, false to disable
 /// @return None
 ///
 void libLED_Enable(uint8_t index __attribute__ ((unused)), bool enable)
 {
-    if (enable == TRUE)
+    if (enable == true)
     {
         PORTD |= (1 << LED_PIN);
     }

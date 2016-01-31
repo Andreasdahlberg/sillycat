@@ -1,7 +1,7 @@
 /**
  * @file   libADC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-12 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of ADC-library.
  *
  * Detailed description of file.
@@ -123,13 +123,13 @@ void libADC_Update(void)
             break;
 
         case LIBADC_NEW_SAMPLE:
-            while (adc_inputs[current_input].active != TRUE &&
+            while (adc_inputs[current_input].active != true &&
                     current_input < MAX_ADC_INPUTS)
             {
                 ++current_input;
             }
 
-            if (adc_inputs[current_input].active == TRUE &&
+            if (adc_inputs[current_input].active == true &&
                     current_input < MAX_ADC_INPUTS)
             {
                 SelectInput(current_input);
@@ -145,7 +145,7 @@ void libADC_Update(void)
             {
                 adc_inputs[current_input].sample_value = ADCL;
                 adc_inputs[current_input].sample_value |= (ADCH << 8);
-                adc_inputs[current_input].valid = TRUE;
+                adc_inputs[current_input].valid = true;
                 ADCSRA &= ~(1 << ADIF);
                 adc_state = LIBADC_NEW_SAMPLE;
                 ++current_input;
@@ -166,7 +166,7 @@ void libADC_Update(void)
 ///
 void libADC_Enable(bool mode)
 {
-    if (mode == TRUE)
+    if (mode == true)
     {
         adc_state = LIBADC_NEW_SAMPLE;
         ADCSRA |= (1 << ADEN);
@@ -208,7 +208,7 @@ function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 
     sc_assert(index < MAX_ADC_INPUTS);
 
-    if (adc_inputs[index].active == TRUE && adc_inputs[index].valid == TRUE)
+    if (adc_inputs[index].active == true && adc_inputs[index].valid == true)
     {
         *sample_value = adc_inputs[index].sample_value;
         status = SUCCESS;
@@ -220,12 +220,12 @@ function_status libADC_GetSample(uint8_t index, uint16_t *sample_value)
 /// @brief Check if any ADC-conversion for the selected channel is done
 ///
 /// @param  index Index of channel
-/// @return bool True if valid, otherwise false
+/// @return bool true if valid, otherwise false
 ///
 bool libADC_IsChannelValid(uint8_t index)
 {
     sc_assert(index < MAX_ADC_INPUTS);
-    return (adc_inputs[index].valid == TRUE);
+    return (adc_inputs[index].valid == true);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -253,8 +253,8 @@ static void InitInputArray()
 
     for (index = 0; index < MAX_ADC_INPUTS; ++index)
     {
-        adc_inputs[index].active = FALSE;
-        adc_inputs[index].valid = FALSE;
+        adc_inputs[index].active = false;
+        adc_inputs[index].valid = false;
         adc_inputs[index].channel_index = index;
         adc_inputs[index].sample_value = 0;
     }

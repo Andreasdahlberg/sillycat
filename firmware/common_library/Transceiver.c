@@ -108,9 +108,9 @@ void Transceiver_Init(void)
 {
     libRFM69_Init();
     //IMPORTANT: Only disable encryption during development!
-    libRFM69_EnableEncryption(FALSE);
-    libRFM69_EnableSequencer(TRUE);
-    libRFM69_EnableListenMode(FALSE);
+    libRFM69_EnableEncryption(false);
+    libRFM69_EnableSequencer(true);
+    libRFM69_EnableListenMode(false);
 
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
@@ -121,7 +121,7 @@ void Transceiver_Init(void)
     libRFM69_SetModulationShaping(0x00);
     libRFM69_SetFrequencyDeviation(5000);
     libRFM69_SetCarrierFrequency(868000000);
-    libRFM69_EnableSyncWordGeneration(TRUE);
+    libRFM69_EnableSyncWordGeneration(true);
     libRFM69_SetFIFOFillCondition(RFM_FIFO_FILL_AUTO);
 
     //TODO: Decide how network id is set, only set this if master?
@@ -133,9 +133,9 @@ void Transceiver_Init(void)
     libRFM69_ClearFIFOOverrun();
     libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
 
-    libRFM69_EnableOCP(FALSE);
+    libRFM69_EnableOCP(false);
     libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
-    libRFM69_EnableHighPowerSetting(TRUE);
+    libRFM69_EnableHighPowerSetting(true);
     libRFM69_SetMode(RFM_TRANSMITTER);
     libRFM69_WaitForModeReady();
 
@@ -188,7 +188,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
 {
     sc_assert(content != NULL);
 
-    bool status = TRUE;
+    bool status = true;
     packet_frame_type *frame_ptr;
 
     frame_ptr = &packet_frame;
@@ -196,7 +196,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
     if (content->size > CONTENT_DATA_SIZE)
     {
         ERROR("Size of packet content is to large");
-        status = FALSE;
+        status = false;
     }
 
     DEBUG("Ready to send: %u\r\n", (uint8_t)ReadyToSend());
@@ -228,12 +228,12 @@ bool Transceiver_SetPacketHandler(transceiver_packet_handler_type
                                   packet_type_type packet_type)
 {
     sc_assert(packet_handler != NULL);
-    bool status = FALSE;
+    bool status = false;
 
     if (IsPacketTypeValid(packet_type))
     {
         packet_handlers[packet_type] = packet_handler;
-        status = TRUE;
+        status = true;
     }
     return status;
 }
@@ -254,7 +254,7 @@ void Transceiver_EventHandler(const event_type *event)
             INFO("Entering sleep");
 
             //TODO: Measure worst case time waiting here
-            while(IsActive() == TRUE)
+            while(IsActive() == true)
             {
                 Transceiver_Update();
             }
@@ -313,7 +313,7 @@ static bool HandlePayload(void)
     if (length > RFM_FIFO_SIZE - 1)
     {
         ERROR("Size of data packet is larger then the FIFO");
-        return FALSE;
+        return false;
     }
 
     libRFM69_ReadFromFIFO(&data_buffer[1], length);
@@ -334,7 +334,7 @@ static bool HandlePayload(void)
     else
     {
         INFO("No packet handler for packet type %u");
-        return FALSE;
+        return false;
     }
 }
 
@@ -359,7 +359,7 @@ static transceiver_state_type ListeningStateMachine(void)
     {
         case TR_STATE_LISTENING_INIT:
             libRFM69_SetMode(RFM_RECEIVER);
-            libRFM69_EnableHighPowerSetting(FALSE);
+            libRFM69_EnableHighPowerSetting(false);
             state = TR_STATE_LISTENING_WAITING;
             break;
 
@@ -367,10 +367,10 @@ static transceiver_state_type ListeningStateMachine(void)
             if (libRFM69_IsPayloadReady())
             {
                 DEBUG("RSSI: %i\r\n", libRFM69_GetRSSI());
-                if (HandlePayload() == TRUE)
+                if (HandlePayload() == true)
                 {
                     libRFM69_SetMode(RFM_TRANSMITTER);
-                    libRFM69_EnableHighPowerSetting(TRUE);
+                    libRFM69_EnableHighPowerSetting(true);
                     state = TR_STATE_LISTENING_SEND_ACK;
                 }
             }
@@ -412,7 +412,7 @@ static transceiver_state_type SendingStateMachine(void)
                 libRFM69_WriteToFIFO((uint8_t *)&packet_frame.content,
                                      packet_frame.content.size + 8);
                 libRFM69_SetMode(RFM_TRANSMITTER);
-                libRFM69_EnableHighPowerSetting(TRUE);
+                libRFM69_EnableHighPowerSetting(true);
                 state = TR_STATE_SENDING_TRANSMITTING;
             }
             break;
@@ -425,7 +425,7 @@ static transceiver_state_type SendingStateMachine(void)
                 {
                     DEBUG("Waiting for ACK\r\n");
                     //  libRFM69_SetMode(RFM_RECEIVER);
-                    //   libRFM69_EnableHighPowerSetting(FALSE);
+                    //   libRFM69_EnableHighPowerSetting(false);
                     state = TR_STATE_SENDING_WAIT_FOR_ACK;
                 }
                 else
@@ -434,7 +434,7 @@ static transceiver_state_type SendingStateMachine(void)
                     //  libRFM69_SetMode(RFM_STANDBY);
                     if (packet_frame.callback != NULL)
                     {
-                        packet_frame.callback(TRUE);
+                        packet_frame.callback(true);
                     }
                     memset(&packet_frame, 0, sizeof(packet_frame_type));
                     state = TR_STATE_SENDING_INIT;

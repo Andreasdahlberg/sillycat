@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-22 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -157,7 +157,7 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
 ///                 the assert failed.
 /// @param  __lineno Line number of the failed assert.
 /// @param  *__exp Pointer to string with the assert expression that
-///                returned FALSE.
+///                returned false.
 /// @return None, does not return since an manual reboot is needed.
 ///
 void ErrorHandler_AssertFail(const char *__func, const char *__file,

@@ -1,7 +1,7 @@
 /**
  * @file   LED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of LED
  *
  * Detailed description of file.
@@ -91,7 +91,7 @@ void LED_Init(void)
     libLED_Init();
     led_timer = Timer_GetMilliseconds();
     led_state = LED_STATE_IDLE;
-    EnabledBlueLED(FALSE);
+    EnabledBlueLED(false);
 
     INFO("Init done");
     return;
@@ -138,13 +138,13 @@ void LED_ChangeState(led_state_type state)
     {
         case LED_STATE_IDLE:
         case LED_STATE_SLEEPING:
-            EnabledBlueLED(FALSE);
+            EnabledBlueLED(false);
             led_state = state;
             break;
 
         case LED_STATE_SENDING:
         case LED_STATE_CHARGING:
-            EnabledBlueLED(TRUE);
+            EnabledBlueLED(true);
             led_state = state;
             break;
 
@@ -203,7 +203,7 @@ void IdleLED(void)
             break;
 
         case IDLE_LED_FLASH:
-            if (FlashLED(2, BLINK_DURATION_MS) == TRUE)
+            if (FlashLED(2, BLINK_DURATION_MS) == true)
             {
                 idle_led_state = IDLE_LED_WAIT;
                 led_timer = Timer_GetMilliseconds();
@@ -227,7 +227,7 @@ bool FlashLED(uint8_t flashes, uint16_t duration)
         case FLASH_LED_OFF:
             if (Timer_TimeDifference(led_timer) > duration)
             {
-                EnabledBlueLED(TRUE);
+                EnabledBlueLED(true);
                 led_timer = Timer_GetMilliseconds();
                 flash_state = FLASH_LED_ON;
             }
@@ -236,7 +236,7 @@ bool FlashLED(uint8_t flashes, uint16_t duration)
         case FLASH_LED_ON:
             if (Timer_TimeDifference(led_timer) > duration)
             {
-                EnabledBlueLED(FALSE);
+                EnabledBlueLED(false);
                 led_timer = Timer_GetMilliseconds();
                 flash_state = FLASH_LED_OFF;
 
@@ -245,7 +245,7 @@ bool FlashLED(uint8_t flashes, uint16_t duration)
                 if (flash_counter == flashes)
                 {
                     flash_counter = 0;
-                    return TRUE;
+                    return true;
                 }
             }
             break;
@@ -253,5 +253,5 @@ bool FlashLED(uint8_t flashes, uint16_t duration)
         default:
             break;
     }
-    return FALSE;
+    return false;
 }

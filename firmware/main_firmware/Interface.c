@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -88,7 +88,7 @@ void Interface_Init(void)
 
     root_view = NULL;
     active_view = NULL;
-    refresh_flag = TRUE;
+    refresh_flag = true;
 
     INFO("Init done");
     return;
@@ -104,7 +104,7 @@ void Interface_Update(void)
 {
     static uint32_t auto_timer = 0;
 
-    if (refresh_flag == TRUE)
+    if (refresh_flag == true)
     {
         if (active_view != NULL && active_view->draw_function != NULL)
         {
@@ -116,13 +116,13 @@ void Interface_Update(void)
             }
             libUI_Update();
         }
-        refresh_flag = FALSE;
+        refresh_flag = false;
         auto_timer = Timer_GetMilliseconds();
     }
 
     if (Timer_TimeDifference(auto_timer) > REFRESH_RATE_MS)
     {
-        refresh_flag = TRUE;
+        refresh_flag = true;
     }
     return;
 }
@@ -269,7 +269,7 @@ struct view *Interface_GetActiveView(void)
 ///
 void Interface_Refresh(void)
 {
-    refresh_flag = TRUE;
+    refresh_flag = true;
     return;
 }
 
@@ -289,7 +289,7 @@ void Interface_PreviousView(void)
             active_view = active_view->prev;
         }
 
-        refresh_flag = TRUE;
+        refresh_flag = true;
         activity_timer = Timer_GetMilliseconds();
     }
     return;
@@ -311,7 +311,7 @@ void Interface_NextView(void)
             active_view = active_view->next;
         }
 
-        refresh_flag = TRUE;
+        refresh_flag = true;
         activity_timer = Timer_GetMilliseconds();
     }
     return;
@@ -337,7 +337,7 @@ void Interface_ActivateView(void)
             active_view = active_view->parent;
         }
 
-        refresh_flag = TRUE;
+        refresh_flag = true;
         activity_timer = Timer_GetMilliseconds();
     }
     return;

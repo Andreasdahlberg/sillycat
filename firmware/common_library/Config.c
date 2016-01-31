@@ -1,7 +1,7 @@
 /**
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-16 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Config
  *
  * Detailed description of file.
@@ -89,17 +89,17 @@ static bool ValidateConfig(config_type *config);
 /// @brief Save the active configuration to NVM
 ///
 /// @param  None
-/// @return bool TRUE if active configuration was valid, otherwise FALSE
+/// @return bool true if active configuration was valid, otherwise false
 ///
 bool Config_Save(void)
 {
-    bool status = FALSE;
+    bool status = false;
 
-    if(ValidateConfig(&active_config) == TRUE)
+    if(ValidateConfig(&active_config) == true)
     {
         eeprom_write_block(&active_config, &nvm_config, sizeof(active_config));
 
-        status = TRUE;
+        status = true;
         INFO("Configuration saved");
     }
     return status;
@@ -109,21 +109,21 @@ bool Config_Save(void)
 /// @brief Load an configuration from NVM into the active configuration
 ///
 /// @param  None
-/// @return bool TRUE if the NVM configuration was valid, otherwise FALSE
+/// @return bool true if the NVM configuration was valid, otherwise false
 ///
 bool Config_Load(void)
 {
-    bool status = FALSE;
+    bool status = false;
     config_type new_config;
 
     sc_assert(CONFIG_VERSION == eeprom_read_word(&nvm_config.version));
 
     eeprom_read_block(&new_config, &nvm_config, sizeof(active_config));
 
-    if(ValidateConfig(&new_config) == TRUE)
+    if(ValidateConfig(&new_config) == true)
     {
         active_config = new_config;
-        status = TRUE;
+        status = true;
         INFO("Configuration loaded");
     }
     return status;

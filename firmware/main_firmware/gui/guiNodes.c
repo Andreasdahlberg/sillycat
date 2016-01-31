@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -110,8 +110,10 @@ static void DrawNodeView(uint16_t context)
 
     if (packet != NULL)
     {
-        libUI_Print("Temperature: %uC", 16, 2, (uint32_t)((dht22_data_type *)packet->content.data)->temperature);
-        libUI_Print("Humidity: %u%%", 26, 16, (uint32_t)((dht22_data_type *)packet->content.data)->humidity);
+        libUI_Print("Temperature: %uC", 16, 2,
+                    (uint32_t)((dht22_data_type *)packet->content.data)->temperature);
+        libUI_Print("Humidity: %u%%", 26, 16,
+                    (uint32_t)((dht22_data_type *)packet->content.data)->humidity);
     }
     else
     {

@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -103,7 +103,7 @@ int main(void)
     libADC_Init();
     Timer_Init();
     libSPI_Init(1);
-    libADC_Enable(TRUE);
+    libADC_Enable(true);
     libDHT22_Init();
     libPower_Init();
 
@@ -129,7 +129,7 @@ int main(void)
 
     //Since RTC-alarms are persistent between restarts so we need to make
     //sure that they are disabled.
-    RTC_EnableAlarm(FALSE);
+    RTC_EnableAlarm(false);
 
 #ifdef DEBUG_ENABLE
     //Add debug listener last to ensure all debug prints are flushed
@@ -150,7 +150,7 @@ int main(void)
         LED_Update();
         Power_Update();
 
-        if (IsTimeForSleep() == TRUE)
+        if (IsTimeForSleep() == true)
         {
             NotifyAndEnterSleep();
         }
@@ -162,18 +162,18 @@ int main(void)
 
 static void RHTSent(const event_type *event __attribute__ ((unused)))
 {
-    sleep_status.sleep_now = TRUE;
+    sleep_status.sleep_now = true;
     return;
 }
 
 static bool IsTimeForSleep(void)
 {
-    if (libPower_IsChargerConnected() == TRUE)
+    if (libPower_IsChargerConnected() == true)
     {
-        return FALSE;
+        return false;
     }
 
-    return (sleep_status.sleep_now == TRUE ||
+    return (sleep_status.sleep_now == true ||
             Timer_TimeDifference(sleep_status.last_sleep_time) > MAX_AWAKE_TIME_MS);
 }
 
@@ -188,7 +188,7 @@ static void NotifyAndEnterSleep(void)
     //TODO: Compensate for time awake
     RTC_AddSeconds(&time, Config_GetReportInterval());
     RTC_SetAlarmTime(&time);
-    RTC_EnableAlarm(TRUE);
+    RTC_EnableAlarm(true);
 
     event = Event_New(EVENT_SLEEP);
     Event_Trigger(&event);
@@ -197,10 +197,10 @@ static void NotifyAndEnterSleep(void)
     //after sleep is done.
     libPower_Sleep();
     RTC_ClearAlarm();
-    RTC_EnableAlarm(FALSE);
+    RTC_EnableAlarm(false);
 
     sleep_status.last_sleep_time = Timer_GetMilliseconds();
-    sleep_status.sleep_now = FALSE;
+    sleep_status.sleep_now = false;
 
     event = Event_New(EVENT_WAKEUP);
     Event_Trigger(&event);

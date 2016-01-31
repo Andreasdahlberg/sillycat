@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-30 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -33,6 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 #include "sc_assert.h"
 
@@ -48,12 +49,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
-
-typedef enum bool
-{
-    FALSE = 0,
-    TRUE
-} bool;
 
 typedef enum function_status
 {

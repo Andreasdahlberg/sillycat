@@ -257,7 +257,7 @@ void libRFM69_SetMode(libRFM69_mode_type mode)
 
 bool libRFM69_WaitForModeReady()
 {
-    bool status = TRUE;
+    bool status = true;
     uint32_t timeout_timer = Timer_GetMilliseconds();
 
     while (!libRFM69_IsModeReady())
@@ -265,7 +265,7 @@ bool libRFM69_WaitForModeReady()
         if (Timer_TimeDifference(timeout_timer) > WAIT_TIMEOUT_MS)
         {
             ERROR("Timeout!");
-            status = FALSE;
+            status = false;
             break;
         }
     }
@@ -556,7 +556,7 @@ void libRFM69_SetPowerLevel(uint8_t power_level)
 /// @brief Check if the high power setting is enabled.
 ///
 /// @param  None
-/// @return TRUE if enabled, otherwise FALSE.
+/// @return true if enabled, otherwise false.
 ///
 bool libRFM69_IsHighPowerEnabled(void)
 {
@@ -570,7 +570,7 @@ bool libRFM69_IsHighPowerEnabled(void)
         return (register_content == 0x7C);
     }
 
-    return FALSE;
+    return false;
 }
 
 ///
@@ -582,11 +582,11 @@ bool libRFM69_IsHighPowerEnabled(void)
 ///
 void libRFM69_EnableHighPowerSetting(bool enable)
 {
-    if (enable == TRUE)
+    if (enable == true)
     {
 
 #ifdef DEBUG_ENABLE
-        if (libRFM69_IsOCPEnabled() == TRUE)
+        if (libRFM69_IsOCPEnabled() == true)
         {
             WARNING("OCP must be disabled while in high power mode");
         }
@@ -626,7 +626,7 @@ int8_t libRFM69_GetOutputPower(void)
             break;
 
         case RFM_PWR_3_4:
-            if (libRFM69_IsHighPowerEnabled() == TRUE)
+            if (libRFM69_IsHighPowerEnabled() == true)
             {
                 pout = -11 + (int8_t)register_content;
             }
@@ -668,7 +668,7 @@ uint8_t libRFM69_GetPowerAmplifierMode(void)
 ///        limit accordingly, except above +18dBm where it must be disabled.
 ///
 /// @param  None
-/// @return bool TRUE if overrun flag was set, otherwise FALSE.
+/// @return bool true if overrun flag was set, otherwise false.
 ///
 void libRFM69_EnableOCP(bool enabled)
 {
@@ -710,7 +710,7 @@ int8_t libRFM69_GetRSSI(void)
 /// @brief Clear any active FIFO overrun flag.
 ///
 /// @param  None
-/// @return bool TRUE if overrun flag was set, otherwise FALSE.
+/// @return bool true if overrun flag was set, otherwise false.
 ///
 bool libRFM69_ClearFIFOOverrun(void)
 {
@@ -723,7 +723,7 @@ bool libRFM69_ClearFIFOOverrun(void)
 
     if (status)
     {
-        SetBit(REG_IRQFLAGS2_BIT_FIFOOVERRUN, TRUE, &register_content);
+        SetBit(REG_IRQFLAGS2_BIT_FIFOOVERRUN, true, &register_content);
         WriteRegister(REG_IRQFLAGS2, register_content);
     }
     return status;
@@ -823,7 +823,7 @@ uint8_t libRFM69_GetSyncWordSize(void)
 ///
 /// @param sync_world* Pointer to new sync word.
 /// @param length Length of the sync word.
-/// @return bool TRUE if the new sync word was valid, otherwise FALSE.
+/// @return bool true if the new sync word was valid, otherwise false.
 ///
 bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
 {
@@ -831,7 +831,7 @@ bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
     if (length != libRFM69_GetSyncWordSize())
     {
         ERROR("Invalid sync word length: %u", length);
-        return FALSE;
+        return false;
     }
 
     //From RFM69HW datasheet, note on page 56: sync
@@ -842,7 +842,7 @@ bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
         if (sync_word[index] == 0x00)
         {
             ERROR("Invalid sync word value: 0x00");
-            return FALSE;
+            return false;
         }
     }
 
@@ -852,7 +852,7 @@ bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
         WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]);
     }
 
-    return TRUE;
+    return true;
 }
 
 ///
@@ -1000,8 +1000,8 @@ static void ReadRegister(uint8_t address, uint8_t *register_data)
 ///
 /// @param register Register to check in
 /// @param bit Bit to check
-/// @return TRUE if bit is set
-/// @return FALSE if bit is not set
+/// @return true if bit is set
+/// @return false if bit is not set
 ///
 static bool IsBitSetInRegister(uint8_t address, uint8_t bit)
 {

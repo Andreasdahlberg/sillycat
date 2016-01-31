@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -113,35 +113,35 @@ void libDS3234_HWInit(void)
 /// @brief Clear alarm flag
 ///
 /// @param  Index of alarm flag to clear, 1 or 2
-/// @return FALSE  If clear failed
+/// @return false  If clear failed
 /// @return SUCCESS If clear succeeded
 ///
 bool libDS3234_ClearAlarmFlag(uint8_t alarm)
 {
     if (alarm < 1 || alarm > 2)
     {
-        return FALSE;
+        return false;
     }
     uint8_t register_data;
 
-    if (ReadRegister(REG_CONTROL_STATUS, &register_data) == TRUE)
+    if (ReadRegister(REG_CONTROL_STATUS, &register_data) == true)
     {
         register_data &= ~(1 << (alarm - 1));
         return WriteRegister(REG_CONTROL_STATUS, register_data);
     }
-    return FALSE;
+    return false;
 }
 
 ///
 /// @brief Reset an alarm
 ///
 /// @param  Index of alarm to clear, 1 or 2
-/// @return FALSE  If clear failed
+/// @return false  If clear failed
 /// @return SUCCESS If clear succeeded
 ///
 bool libDS3234_ResetAlarm(uint8_t alarm)
 {
-    bool status = FALSE;
+    bool status = false;
     if (alarm == 1)
     {
         status = WriteRegister(REG_ALARM_1_DAY_DATE, 0x00) &&
@@ -162,20 +162,20 @@ bool libDS3234_ResetAlarm(uint8_t alarm)
 /// @brief Enable an alarm
 ///
 /// @param  Index of alarm to enable, 1 or 2
-/// @return FALSE  If enable failed
+/// @return false  If enable failed
 /// @return SUCCESS If enable succeeded
 ///
 bool libDS3234_EnableAlarm(bool enable, uint8_t alarm)
 {
     if (alarm < 1 || alarm > 2)
     {
-        return FALSE;
+        return false;
     }
 
     uint8_t register_data;
-    if (ReadRegister(REG_CONTROL, &register_data) == TRUE)
+    if (ReadRegister(REG_CONTROL, &register_data) == true)
     {
-        if (enable == TRUE)
+        if (enable == true)
         {
             //TODO: Check status
             WriteRegister(REG_ALARM_1_DAY_DATE, 0x80);
@@ -187,7 +187,7 @@ bool libDS3234_EnableAlarm(bool enable, uint8_t alarm)
         }
         return WriteRegister(REG_CONTROL, register_data);
     }
-    return FALSE;
+    return false;
 }
 
 ///
@@ -213,7 +213,7 @@ void libDS3234_GetTemperature(uint16_t *temperature)
 /// @brief Get the current year
 ///
 /// @param  *year Pointer to variable where the year will be stored
-/// @return FALSE  If read of year failed
+/// @return false  If read of year failed
 /// @return SUCCESS If read of year succeeded
 ///
 bool libDS3234_GetYear(uint8_t *year)
@@ -225,12 +225,12 @@ bool libDS3234_GetYear(uint8_t *year)
 /// @brief Set the current year
 ///
 /// @param  year Year to set
-/// @return FALSE  If set of year failed
+/// @return false  If set of year failed
 /// @return SUCCESS If set of year succeeded
 ///
 bool libDS3234_SetYear(uint8_t year)
 {
-    bool status = FALSE;
+    bool status = false;
 
     if (year < 100)
     {
@@ -243,18 +243,18 @@ bool libDS3234_SetYear(uint8_t year)
 /// @brief Get the current month
 ///
 /// @param  *month Pointer to variable where the month will be stored
-/// @return FALSE  If read of month failed
+/// @return false  If read of month failed
 /// @return SUCCESS If read of month succeeded
 ///
 bool libDS3234_GetMonth(uint8_t *month)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_data;
 
-    if (ReadRegister(REG_MONTH_CENTURY, &register_data) == TRUE)
+    if (ReadRegister(REG_MONTH_CENTURY, &register_data) == true)
     {
         *month = BCDToDecimal(register_data & MONTH_MASK);
-        status = TRUE;
+        status = true;
     }
     return status;
 }
@@ -263,12 +263,12 @@ bool libDS3234_GetMonth(uint8_t *month)
 /// @brief Set the current month
 ///
 /// @param  month Month to set
-/// @return FALSE  If set of month failed
+/// @return false  If set of month failed
 /// @return SUCCESS If set of month succeeded
 ///
 bool libDS3234_SetMonth(uint8_t month)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_data;
 
     if (month > 0 && month < 13 && ReadRegister(REG_MONTH_CENTURY, &register_data))
@@ -283,7 +283,7 @@ bool libDS3234_SetMonth(uint8_t month)
 /// @brief Get the current date
 ///
 /// @param  *date Pointer to variable where the date will be stored(1-31)
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_GetDate(uint8_t *date)
@@ -295,12 +295,12 @@ bool libDS3234_GetDate(uint8_t *date)
 /// @brief Set the current date
 ///
 /// @param  date Date to set
-/// @return FALSE  If set of date failed
+/// @return false  If set of date failed
 /// @return SUCCESS If set of date succeeded
 ///
 bool libDS3234_SetDate(uint8_t date)
 {
-    bool status = FALSE;
+    bool status = false;
 
     if (date > 0 && date < 32)
     {
@@ -313,12 +313,12 @@ bool libDS3234_SetDate(uint8_t date)
 /// @brief Set the alarm date
 ///
 /// @param  date Date to set
-/// @return FALSE  If set of alarm date failed
+/// @return false  If set of alarm date failed
 /// @return SUCCESS If set of alarm date succeeded
 ///
 bool libDS3234_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_address;
 
     register_address = (alarm_index == 1) ? REG_ALARM_1_DAY_DATE :
@@ -335,7 +335,7 @@ bool libDS3234_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 /// @brief Get the current day in week
 ///
 /// @param  *day Pointer to variable where the day will be stored(1-7)
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_GetDay(uint8_t *day)
@@ -347,12 +347,12 @@ bool libDS3234_GetDay(uint8_t *day)
 /// @brief Set the current day of the week
 ///
 /// @param  day Day to set
-/// @return FALSE  If set of day failed
+/// @return false  If set of day failed
 /// @return SUCCESS If set of day succeeded
 ///
 bool libDS3234_SetDay(uint8_t day)
 {
-    bool status = FALSE;
+    bool status = false;
 
     if (day > 0 && day < 8)
     {
@@ -365,18 +365,18 @@ bool libDS3234_SetDay(uint8_t day)
 /// @brief Get the current hour
 ///
 /// @param  *hour Pointer to variable where the hour will be stored
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_GetHour(uint8_t *hour)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_data;
 
-    if (ReadRegister(REG_HOUR, &register_data) == TRUE)
+    if (ReadRegister(REG_HOUR, &register_data) == true)
     {
         *hour = BCDToDecimal(register_data);
-        status = TRUE;
+        status = true;
     }
     return status;
 }
@@ -385,7 +385,7 @@ bool libDS3234_GetHour(uint8_t *hour)
 /// @brief Set the current hour
 ///
 /// @param  hour New hour to set
-/// @return FALSE  If set failed
+/// @return false  If set failed
 /// @return SUCCESS If set succeeded
 ///
 bool libDS3234_SetHour(uint8_t hour)
@@ -397,7 +397,7 @@ bool libDS3234_SetHour(uint8_t hour)
 /// @brief Set the alarm hour
 ///
 /// @param  hour New alarm hour to set
-/// @return FALSE  If set failed
+/// @return false  If set failed
 /// @return SUCCESS If set succeeded
 ///
 bool libDS3234_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
@@ -414,7 +414,7 @@ bool libDS3234_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 /// @brief Get the current minute
 ///
 /// @param  *date Pointer to variable where the minute will be stored
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_GetMinutes(uint8_t *minutes)
@@ -426,7 +426,7 @@ bool libDS3234_GetMinutes(uint8_t *minutes)
 /// @brief Set the current minute
 ///
 /// @param  minutes New minute to set
-/// @return FALSE  If set failed
+/// @return false  If set failed
 /// @return SUCCESS If set succeeded
 ///
 bool libDS3234_SetMinutes(uint8_t minutes)
@@ -438,7 +438,7 @@ bool libDS3234_SetMinutes(uint8_t minutes)
 /// @brief Set the alarm minute
 ///
 /// @param  minutes New alarm minute to set
-/// @return FALSE  If set failed
+/// @return false  If set failed
 /// @return SUCCESS If set succeeded
 ///
 bool libDS3234_SetAlarmMinutes(uint8_t minutes, uint8_t alarm_index)
@@ -454,7 +454,7 @@ bool libDS3234_SetAlarmMinutes(uint8_t minutes, uint8_t alarm_index)
 /// @brief Get the current second
 ///
 /// @param  *date Pointer to variable where the second will be stored
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_GetSeconds(uint8_t *seconds)
@@ -466,7 +466,7 @@ bool libDS3234_GetSeconds(uint8_t *seconds)
 /// @brief Set the current second
 ///
 /// @param  seconds New second to set
-/// @return FALSE  If set failed
+/// @return false  If set failed
 /// @return SUCCESS If set succeeded
 ///
 bool libDS3234_SetSeconds(uint8_t seconds)
@@ -478,7 +478,7 @@ bool libDS3234_SetSeconds(uint8_t seconds)
 /// @brief Set the alarm second
 ///
 /// @param  seconds New alarm second to set
-/// @return FALSE  If set failed
+/// @return false  If set failed
 /// @return SUCCESS If set succeeded
 ///
 bool libDS3234_SetAlarmSeconds(uint8_t seconds)
@@ -490,25 +490,25 @@ bool libDS3234_SetAlarmSeconds(uint8_t seconds)
 /// @brief Get the current hour mode, 12 or 24
 ///
 /// @param  *hour_mode Pointer to variable where the hour mode will be stored
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_value;
 
-    if (ReadRegister(REG_HOUR, &register_value) == TRUE)
+    if (ReadRegister(REG_HOUR, &register_value) == true)
     {
         if ((register_value & HOUR_MODE_BIT) == 0x00)
         {
             *hour_mode = LIBDS3234_24HOUR_MODE;
-            status = TRUE;
+            status = true;
         }
         else
         {
             *hour_mode = LIBDS3234_12HOUR_MODE;
-            status = TRUE;
+            status = true;
         }
     }
     return status;
@@ -518,15 +518,15 @@ bool libDS3234_GetHourMode(libDS3234_hour_mode_type *hour_mode)
 /// @brief Set the current hour mode, 12 or 24
 ///
 /// @param  hour_mode The hour mode to set
-/// @return FALSE
+/// @return false
 /// @return SUCCESS
 ///
 bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_value;
 
-    if (ReadRegister(REG_HOUR, &register_value) == TRUE)
+    if (ReadRegister(REG_HOUR, &register_value) == true)
     {
         if (hour_mode == LIBDS3234_24HOUR_MODE)
         {
@@ -549,12 +549,12 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 /// @param  address Address in flash to write
 /// @param  *data Pointer to data to write
 /// @param  length Number of bytes to write
-/// @return FALSE  If write failed
+/// @return false  If write failed
 /// @return SUCCESS If write succeeded
 ///
 bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t index;
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
@@ -565,7 +565,7 @@ bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
             //SRAM address is auto incremented after each write
             WriteRegister(REG_SRAM_DATA, data[index]);
         }
-        status = TRUE;
+        status = true;
     }
     return status;
 }
@@ -577,12 +577,12 @@ bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
 /// @param  address Address in flash to read
 /// @param  *data Pointer to buffer where data will be stored
 /// @param  length Number of bytes to read
-/// @return FALSE  If read failed
+/// @return false  If read failed
 /// @return SUCCESS If read succeeded
 ///
 bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t index;
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
@@ -593,7 +593,7 @@ bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
             //SRAM address is auto incremented after each read
             ReadRegister(REG_SRAM_DATA, &data[index]);
         }
-        status = TRUE;
+        status = true;
     }
     return status;
 }
@@ -613,20 +613,20 @@ bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 ///
 static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_data;
 
-    if (ReadRegister(address, &register_data) == TRUE)
+    if (ReadRegister(address, &register_data) == true)
     {
         *value = BCDToDecimal(register_data);
-        status = TRUE;
+        status = true;
     }
     return status;
 }
 
 static bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t register_data;
 
     //Only values smaller then 100 is accepted since a byte
@@ -641,26 +641,26 @@ static bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 
 static bool WriteRegister(uint8_t address, uint8_t register_data)
 {
-    bool status = FALSE;
+    bool status = false;
 
     if (RegisterAddressValid(address))
     {
         libSPI_WriteByte(address | WRITE_ADDRESS, &PreCallback, NULL);
         libSPI_WriteByte(register_data, NULL, &PostCallback);
-        status = TRUE;
+        status = true;
     }
     return status;
 }
 
 static bool ReadRegister(uint8_t address, uint8_t *register_data)
 {
-    bool status = FALSE;
+    bool status = false;
 
     if (RegisterAddressValid(address))
     {
         libSPI_WriteByte(address | READ_ADDRESS, &PreCallback, NULL);
         libSPI_ReadByte(register_data, NULL, &PostCallback);
-        status = TRUE;
+        status = true;
     }
     return status;
 }
@@ -692,7 +692,7 @@ static void DumpRegisterValues(void)
     DEBUG("**DS3234 registers**\r\n");
     for (reg_addr = 0x00; reg_addr <= REG_DISABLE_TEMP; ++ reg_addr)
     {
-        if (ReadRegister(reg_addr, &reg_value) == TRUE)
+        if (ReadRegister(reg_addr, &reg_value) == true)
         {
             DEBUG("Addr: 0x%02X, Value: 0x%02X\r\n", reg_addr, reg_value);
         }

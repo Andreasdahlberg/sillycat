@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-30 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -115,7 +115,7 @@ void Sensor_Init(void)
                     AVERAGE_WINDOW_S);
     DEBUG("Smoothing alpha: %u", current_alpha);
 
-    libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, TRUE);
+    libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, true);
     INFO("Init done");
 }
 
@@ -176,7 +176,7 @@ bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading)
 
 bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading)
 {
-    bool status = FALSE;
+    bool status = false;
     uint8_t address;
 
     address = READING_START_ADDRESS + (ADDRESS_OFFSET + sensor) *

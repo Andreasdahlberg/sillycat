@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-22 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -102,25 +102,25 @@ void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp)
 /// @brief Get the number of seconds since midnight, January 1 2000, UTC.
 ///
 /// @param  *timestamp Pointer to timestamp where the result will be stored
-/// @return bool TRUE, if current time was successfully read, otherwise FALSE.
+/// @return bool true, if current time was successfully read, otherwise false.
 ///
 bool RTC_GetTimeStamp(uint32_t *timestamp)
 {
     rtc_time_type time;
 
-    if (RTC_GetCurrentTime(&time) == TRUE)
+    if (RTC_GetCurrentTime(&time) == true)
     {
         *timestamp = RTC_ConvertToTimestamp(&time);
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 ///
 /// @brief Get a time struct with fields for different time periods.
 ///
 /// @param  *time Pointer to struct where the result will be stored
-/// @return bool TRUE, if current time was successfully read, otherwise FALSE.
+/// @return bool true, if current time was successfully read, otherwise false.
 ///
 bool RTC_GetCurrentTime(rtc_time_type *time)
 {
@@ -161,11 +161,11 @@ bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day)
 
     if (time->month > MARCH && time->month < OCTOBER)
     {
-        dst_active = TRUE;
+        dst_active = true;
     }
     else if (time->month < MARCH || time->month > OCTOBER)
     {
-        dst_active = FALSE;
+        dst_active = false;
     }
     else
     {
@@ -191,14 +191,14 @@ bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day)
 
 bool RTC_IsLeapYear(uint16_t year)
 {
-    bool is_leap_year = FALSE;
+    bool is_leap_year = false;
 
     //All leap years are divisible by 4
     if (year % 4 == 0)
     {
         if (year % 100 != 0 || year % 400 == 0)
         {
-            is_leap_year = TRUE;
+            is_leap_year = true;
         }
     }
 

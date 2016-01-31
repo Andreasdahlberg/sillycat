@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of SPI-library.
  *
  * Detailed description of file.
@@ -82,9 +82,9 @@ void libSPI_Init(uint8_t spi_mode)
 
     SPCR = (1 << SPR0);
 
-    libSPI_SetMaster(TRUE);
+    libSPI_SetMaster(true);
 
-    if (libSPI_SetMode(spi_mode) == TRUE)
+    if (libSPI_SetMode(spi_mode) == true)
     {
         SPCR |= (1 << SPE);
         spi_status = IDLE;
@@ -96,7 +96,7 @@ void libSPI_Init(uint8_t spi_mode)
         ERROR("Failed to init SPI, invalid mode: %u", spi_mode);
     }
 
-    slave_active = FALSE;
+    slave_active = false;
     return;
 }
 
@@ -171,12 +171,12 @@ SPI_status libSPI_GetStatus(void)
 ///
 /// @brief Select if master or slave mode
 ///
-/// @param bool True if master, else slave  //TODO: Fix this description
+/// @param bool true if master, else slave  //TODO: Fix this description
 /// @return None
 ///
 void libSPI_SetMaster(bool master_value)
 {
-    if (master_value == TRUE)
+    if (master_value == true)
     {
         SPCR |= (1 << MSTR);
     }
@@ -195,7 +195,7 @@ void libSPI_SetMaster(bool master_value)
 ///
 bool libSPI_SetMode(uint8_t mode)
 {
-    bool status = TRUE;
+    bool status = true;
     switch (mode)
     {
         case 0:
@@ -219,7 +219,7 @@ bool libSPI_SetMode(uint8_t mode)
         default:
             //Invalid mode
             WARNING("Invalid SPI-mode");
-            status = FALSE;
+            status = false;
             break;
     }
     return status;
@@ -234,21 +234,21 @@ bool libSPI_SetMode(uint8_t mode)
 /// @brief Set slave to active, this prevents other modules to use the SPI-bus. Keep in mind that there is now control if its the same module...
 ///
 ///
-/// @param state True if SPI is active, otherwise False
+/// @param state true if SPI is active, otherwise false
 /// @return bool Status of operation
 ///
 bool SetActiveSlave(bool state)
 {
-    bool status = FALSE;
-    if (slave_active == FALSE)
+    bool status = false;
+    if (slave_active == false)
     {
-        slave_active = TRUE;
-        status = TRUE;
+        slave_active = true;
+        status = true;
     }
-    else if (slave_active == TRUE && state == FALSE)
+    else if (slave_active == true && state == false)
     {
-        slave_active = FALSE;
-        status = TRUE;
+        slave_active = false;
+        status = true;
     }
     return status;
 }

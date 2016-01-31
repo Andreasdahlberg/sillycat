@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-17 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Nodes
  *
  * Detailed description of file.
@@ -75,7 +75,7 @@ void Nodes_Init(void)
     memset(packets, 0, sizeof(packets));
 
     if (Transceiver_SetPacketHandler(ReadingPacketHandler,
-                                     TR_PACKET_TYPE_READING) == TRUE)
+                                     TR_PACKET_TYPE_READING) == true)
     {
         guiNodes_Init();
     }
@@ -112,5 +112,5 @@ static bool ReadingPacketHandler(packet_frame_type *packet)
     //DEBUG("Temp: %u, ", (uint32_t)reading.temperature);
     //DEBUG("Hum: %u\r\n", (uint32_t)reading.humidity);
     //NOTE: Return false so no ACK is sent
-    return FALSE;
+    return false;
 }

@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-23 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of low level functions for the DHT22 RHT sensor
  *
  * Detailed description of file.
@@ -114,7 +114,7 @@ void libDHT22_Init(void)
 
     dht22_state = DHT_POWERUP;
     init_time = Timer_GetMilliseconds();
-    sensor_reading.status = FALSE;
+    sensor_reading.status = false;
 
     INFO("Init done");
     return;
@@ -163,7 +163,7 @@ void libDHT22_Update(void)
 dht22_data_type libDHT22_GetSensorReading(void)
 {
     dht22_data_type return_data = sensor_reading;
-    sensor_reading.status = FALSE;
+    sensor_reading.status = false;
     return return_data;
 }
 
@@ -171,7 +171,7 @@ dht22_data_type libDHT22_GetSensorReading(void)
 /// @brief Check if the last reading was valid
 ///
 /// @param  None
-/// @return bool TRUE if valid, otherwise FALSE
+/// @return bool true if valid, otherwise false
 ///
 bool libDHT22_IsReadingValid(void)
 {
@@ -182,7 +182,7 @@ bool libDHT22_IsReadingValid(void)
 /// @brief Check if the sensor is idle
 ///
 /// @param  None
-/// @return bool TRUE if idle, otherwise FALSE
+/// @return bool true if idle, otherwise false
 ///
 bool libDHT22_IsIdle(void)
 {
@@ -193,11 +193,11 @@ bool libDHT22_IsIdle(void)
 /// @brief Start a new reading
 ///
 /// @param  None
-/// @return bool TRUE if a new reading is started, otherwise FALSE
+/// @return bool true if a new reading is started, otherwise false
 ///
 void libDHT22_StartReading(void)
 {
-    if (libDHT22_IsIdle() == TRUE)
+    if (libDHT22_IsIdle() == true)
     {
         dht22_state = DHT_READING;
     }
@@ -210,7 +210,7 @@ void libDHT22_StartReading(void)
 
 static void EnableInputCapture(bool enabled)
 {
-    if (enabled == TRUE)
+    if (enabled == true)
     {
         pulse_counter = 0;
 
@@ -265,7 +265,7 @@ static dht_state_type ReadingStateMachine(void)
 
                 reading_timer = Timer_GetMilliseconds();
 
-                EnableInputCapture(TRUE);
+                EnableInputCapture(true);
                 state = DHT_READING_CAPTURE_DATA;
             }
             break;
@@ -273,7 +273,7 @@ static dht_state_type ReadingStateMachine(void)
         case DHT_READING_CAPTURE_DATA:
             if (pulse_counter == EXPECTED_NR_PULSES)
             {
-                EnableInputCapture(FALSE);
+                EnableInputCapture(false);
                 state = DHT_READING_REQUEST;
                 next_dht_state =  DHT_DECODING;
             }
@@ -284,7 +284,7 @@ static dht_state_type ReadingStateMachine(void)
             if (Timer_TimeDifference(reading_timer) > READING_TIMEOUT_MS)
             {
                 ERROR("Timeout while capturing data");
-                EnableInputCapture(FALSE);
+                EnableInputCapture(false);
                 state = DHT_READING_REQUEST;
                 init_time = Timer_GetMilliseconds();
                 return DHT_POWERUP;
@@ -340,16 +340,16 @@ static void DecodeTimings(void)
         }
     }
 
-    if (IsDataValid(data) == TRUE)
+    if (IsDataValid(data) == true)
     {
         sensor_reading.humidity = ConvertToFloat(data[0], data[1]);
         sensor_reading.temperature = ConvertToFloat(data[2], data[3]);
-        sensor_reading.status = TRUE;
+        sensor_reading.status = true;
     }
     else
     {
         ERROR("Invalid data");
-        sensor_reading.status = FALSE;
+        sensor_reading.status = false;
     }
     return;
 }

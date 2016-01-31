@@ -89,7 +89,7 @@ void Sensor_Update(void)
         memcpy(sample_packet.data, (uint8_t *)&sample, sizeof(dht22_data_type));
 
         LED_ChangeState(LED_STATE_SENDING);
-        Transceiver_SendPacket(0xAA, FALSE, &sample_packet, SendCallback);
+        Transceiver_SendPacket(0xAA, false, &sample_packet, SendCallback);
     }
 }
 

@@ -89,7 +89,7 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
 
 void SetBit(uint8_t bit_index, bool state, uint8_t *data)
 {
-    if (state == TRUE)
+    if (state == true)
     {
         *data |= (1 << bit_index);
     }

@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -102,7 +102,7 @@ void Power_Update(void)
     {
         case POWER_NORMAL:
 
-            if (libPower_IsCharging() == TRUE)
+            if (libPower_IsCharging() == true)
             {
                 event_type event = {0};
 
@@ -111,7 +111,7 @@ void Power_Update(void)
                 Event_Trigger(&event);
                 state = POWER_CHARGING;
             }
-            else if (libPower_IsBatteryVoltageValid() == TRUE
+            else if (libPower_IsBatteryVoltageValid() == true
                      && libPower_GetBatteryVoltage() < LOW_VOLTAGE_MV)
             {
                 event_type event = {0};
@@ -124,7 +124,7 @@ void Power_Update(void)
             break;
 
         case POWER_LOW:
-            if (libPower_IsCharging() == TRUE)
+            if (libPower_IsCharging() == true)
             {
                 event_type event = {0};
 
@@ -133,7 +133,7 @@ void Power_Update(void)
                 Event_Trigger(&event);
                 state = POWER_CHARGING;
             }
-            else if (libPower_IsBatteryVoltageValid() == TRUE
+            else if (libPower_IsBatteryVoltageValid() == true
                      && libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
             {
                 event_type event = {0};
@@ -146,7 +146,7 @@ void Power_Update(void)
             break;
 
         case POWER_CRITICAL:
-            if (libPower_IsCharging() == TRUE)
+            if (libPower_IsCharging() == true)
             {
                 event_type event = {0};
 
@@ -158,7 +158,7 @@ void Power_Update(void)
             break;
 
         case POWER_CHARGING:
-            if (libPower_IsCharging() == FALSE)
+            if (libPower_IsCharging() == false)
             {
                 event_type event = {0};
 
@@ -170,7 +170,7 @@ void Power_Update(void)
             break;
 
         case POWER_CONNECTED:
-            if (libPower_IsCharging() == TRUE)
+            if (libPower_IsCharging() == true)
             {
                 event_type event = {0};
 
@@ -180,7 +180,7 @@ void Power_Update(void)
                 state = POWER_CHARGING;
             }
 
-            if (libPower_IsChargerConnected() == FALSE)
+            if (libPower_IsChargerConnected() == false)
             {
                 event_type event = {0};
 
