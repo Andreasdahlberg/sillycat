@@ -4,6 +4,10 @@
 
 ..\common_library\common.c
 
+..\common_library\Config.c
+
+..\common_library\Event.c
+
 ..\common_library\libADC.c
 
 ..\common_library\libDebug.c
@@ -22,13 +26,11 @@
 
 ..\common_library\Transceiver.c
 
+..\utility\ErrorHandler.c
+
 ..\utility\FIFO.c
 
 ..\utility\List.c
-
-Config.c
-
-ErrorHandler.c
 
 LED.c
 
@@ -45,6 +47,8 @@ libPower.c
 node_firmware.c
 
 Power.c
+
+Regdefault.c
 
 Sensor.c
 

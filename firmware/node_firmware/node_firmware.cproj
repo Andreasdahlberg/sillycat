@@ -90,40 +90,40 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-  <avrgcc.common.outputfiles.usersignatures>True</avrgcc.common.outputfiles.usersignatures>
-  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-  <avrgcc.compiler.symbols.DefSymbols>
-    <ListValues>
-      <Value>DEBUG_ENABLE</Value>
-      <Value>NODE_ADDRESS=0x05</Value>
-    </ListValues>
-  </avrgcc.compiler.symbols.DefSymbols>
-  <avrgcc.compiler.directories.IncludePaths>
-    <ListValues>
-      <Value>../../common_library</Value>
-      <Value>..</Value>
-      <Value>../../utility</Value>
-    </ListValues>
-  </avrgcc.compiler.directories.IncludePaths>
-  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
-  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-  <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
-  <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
-  <avrgcc.linker.libraries.Libraries>
-    <ListValues>
-      <Value>libm</Value>
-    </ListValues>
-  </avrgcc.linker.libraries.Libraries>
-  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-</AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>True</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>DEBUG_ENABLE</Value>
+            <Value>NODE_ADDRESS=0x05</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>../../common_library</Value>
+            <Value>../../utility</Value>
+            <Value>C:\Users\Andreas\Documents\GitHub\sillycat\firmware\node_firmware</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+        <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+      </AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Test' ">
@@ -137,6 +137,18 @@
     <Compile Include="..\common_library\common.h">
       <SubType>compile</SubType>
       <Link>common.h</Link>
+    </Compile>
+    <Compile Include="..\common_library\Config.c">
+      <SubType>compile</SubType>
+      <Link>Config.c</Link>
+    </Compile>
+    <Compile Include="..\common_library\Config.h">
+      <SubType>compile</SubType>
+      <Link>Config.h</Link>
+    </Compile>
+    <Compile Include="..\common_library\Event.c">
+      <SubType>compile</SubType>
+      <Link>Event.c</Link>
     </Compile>
     <Compile Include="..\common_library\Event.h">
       <SubType>compile</SubType>
@@ -218,6 +230,10 @@
       <SubType>compile</SubType>
       <Link>Transceiver.h</Link>
     </Compile>
+    <Compile Include="..\utility\ErrorHandler.c">
+      <SubType>compile</SubType>
+      <Link>Utility\ErrorHandler.c</Link>
+    </Compile>
     <Compile Include="..\utility\ErrorHandler.h">
       <SubType>compile</SubType>
       <Link>ErrorHandler.h</Link>
@@ -241,15 +257,6 @@
     <Compile Include="..\utility\sc_assert.h">
       <SubType>compile</SubType>
       <Link>Utility\sc_assert.h</Link>
-    </Compile>
-    <Compile Include="Config.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Config.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="ErrorHandler.c">
-      <SubType>compile</SubType>
     </Compile>
     <Compile Include="LED.c">
       <SubType>compile</SubType>
@@ -295,6 +302,9 @@
       <Link>Power.c</Link>
     </Compile>
     <Compile Include="Power.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Regdefault.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="RTC_HAL.h">

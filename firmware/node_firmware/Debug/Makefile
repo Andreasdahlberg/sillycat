@@ -39,6 +39,8 @@ SUBDIRS :=  \
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../../common_library/common.c \
+../../common_library/Config.c \
+../../common_library/Event.c \
 ../../common_library/libADC.c \
 ../../common_library/libDebug.c \
 ../../common_library/libRFM69.c \
@@ -48,10 +50,9 @@ C_SRCS +=  \
 ../../common_library/RTC.c \
 ../../common_library/Timer.c \
 ../../common_library/Transceiver.c \
+../../utility/ErrorHandler.c \
 ../../utility/FIFO.c \
 ../../utility/List.c \
-../Config.c \
-../ErrorHandler.c \
 ../LED.c \
 ../libDHT22.c \
 ../libDS3234.c \
@@ -60,6 +61,7 @@ C_SRCS +=  \
 ../libPower.c \
 ../node_firmware.c \
 ../Power.c \
+../Regdefault.c \
 ../Sensor.c \
 ../template.c
 
@@ -72,6 +74,8 @@ ASM_SRCS +=
 
 OBJS +=  \
 common.o \
+Config.o \
+Event.o \
 libADC.o \
 libDebug.o \
 libRFM69.o \
@@ -81,10 +85,9 @@ libUART.o \
 RTC.o \
 Timer.o \
 Transceiver.o \
+Utility/ErrorHandler.o \
 Utility/FIFO.o \
 Utility/List.o \
-Config.o \
-ErrorHandler.o \
 LED.o \
 libDHT22.o \
 libDS3234.o \
@@ -93,11 +96,14 @@ libMCP79510.o \
 libPower.o \
 node_firmware.o \
 Power.o \
+Regdefault.o \
 Sensor.o \
 template.o
 
 OBJS_AS_ARGS +=  \
 common.o \
+Config.o \
+Event.o \
 libADC.o \
 libDebug.o \
 libRFM69.o \
@@ -107,10 +113,9 @@ libUART.o \
 RTC.o \
 Timer.o \
 Transceiver.o \
+Utility/ErrorHandler.o \
 Utility/FIFO.o \
 Utility/List.o \
-Config.o \
-ErrorHandler.o \
 LED.o \
 libDHT22.o \
 libDS3234.o \
@@ -119,11 +124,14 @@ libMCP79510.o \
 libPower.o \
 node_firmware.o \
 Power.o \
+Regdefault.o \
 Sensor.o \
 template.o
 
 C_DEPS +=  \
 common.d \
+Config.d \
+Event.d \
 libADC.d \
 libDebug.d \
 libRFM69.d \
@@ -133,10 +141,9 @@ libUART.d \
 RTC.d \
 Timer.d \
 Transceiver.d \
+Utility/ErrorHandler.d \
 Utility/FIFO.d \
 Utility/List.d \
-Config.d \
-ErrorHandler.d \
 LED.d \
 libDHT22.d \
 libDS3234.d \
@@ -145,11 +152,14 @@ libMCP79510.d \
 libPower.d \
 node_firmware.d \
 Power.d \
+Regdefault.d \
 Sensor.d \
 template.d
 
 C_DEPS_AS_ARGS +=  \
 common.d \
+Config.d \
+Event.d \
 libADC.d \
 libDebug.d \
 libRFM69.d \
@@ -159,10 +169,9 @@ libUART.d \
 RTC.d \
 Timer.d \
 Transceiver.d \
+Utility/ErrorHandler.d \
 Utility/FIFO.d \
 Utility/List.d \
-Config.d \
-ErrorHandler.d \
 LED.d \
 libDHT22.d \
 libDS3234.d \
@@ -171,6 +180,7 @@ libMCP79510.d \
 libPower.d \
 node_firmware.d \
 Power.d \
+Regdefault.d \
 Sensor.d \
 template.d
 
@@ -237,24 +247,28 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
 ./%.o: ../../common_library/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I".." -I"../../utility"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I"../../utility" -I"C:\Users\Andreas\Documents\GitHub\sillycat\firmware\node_firmware"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 Utility/%.o: ../../utility/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I".." -I"../../utility"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I"../../utility" -I"C:\Users\Andreas\Documents\GitHub\sillycat\firmware\node_firmware"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./%.o: .././%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I".." -I"../../utility"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG_ENABLE -DNODE_ADDRESS=0x05  -I"../../common_library" -I"../../utility" -I"C:\Users\Andreas\Documents\GitHub\sillycat\firmware\node_firmware"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -Wextra -pedantic -mmcu=atmega328p -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

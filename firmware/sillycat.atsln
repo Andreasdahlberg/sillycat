@@ -16,7 +16,9 @@ Global
 		{94B43BF3-BCA6-4CDA-A6AE-6F0EF5F4DAEB}.Release|AVR.ActiveCfg = Release|AVR
 		{94B43BF3-BCA6-4CDA-A6AE-6F0EF5F4DAEB}.Release|AVR.Build.0 = Release|AVR
 		{94859678-0949-453F-8588-280A54573F3C}.Debug|AVR.ActiveCfg = Debug|AVR
+		{94859678-0949-453F-8588-280A54573F3C}.Debug|AVR.Build.0 = Debug|AVR
 		{94859678-0949-453F-8588-280A54573F3C}.Release|AVR.ActiveCfg = Release|AVR
+		{94859678-0949-453F-8588-280A54573F3C}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

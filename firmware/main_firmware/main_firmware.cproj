@@ -57,40 +57,41 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
       <AvrGcc>
-        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-        <avrgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>NDEBUG</Value>
-            <Value>SERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"</Value>
-            <Value>IS_MAIN</Value>
-          </ListValues>
-        </avrgcc.compiler.symbols.DefSymbols>
-        <avrgcc.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>../../common_library</Value>
-            <Value>../fonts</Value>
-            <Value>../gui</Value>
-            <Value>..</Value>
-          </ListValues>
-        </avrgcc.compiler.directories.IncludePaths>
-        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
-        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
-        <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
-        <avrgcc.linker.libraries.Libraries>
-          <ListValues>
-            <Value>libm</Value>
-          </ListValues>
-        </avrgcc.linker.libraries.Libraries>
-      </AvrGcc>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>NDEBUG</Value>
+      <Value>SERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"</Value>
+      <Value>IS_MAIN</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>..</Value>
+      <Value>../../common_library</Value>
+      <Value>../fonts</Value>
+      <Value>../gui</Value>
+      <Value>../../utility</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+  <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+</AvrGcc>
     </ToolchainSettings>
     <PreBuildEvent>
     </PreBuildEvent>
@@ -98,43 +99,44 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <ToolchainSettings>
       <AvrGcc>
-        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
-        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
-        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
-        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
-        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
-        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
-        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
-        <avrgcc.compiler.symbols.DefSymbols>
-          <ListValues>
-            <Value>DEBUG_ENABLE</Value>
-            <Value>SERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"</Value>
-            <Value>NODE_ADDRESS=0x05</Value>
-            <Value>IS_MAIN</Value>
-          </ListValues>
-        </avrgcc.compiler.symbols.DefSymbols>
-        <avrgcc.compiler.directories.IncludePaths>
-          <ListValues>
-            <Value>../../common_library</Value>
-            <Value>../fonts</Value>
-            <Value>../gui</Value>
-            <Value>..</Value>
-          </ListValues>
-        </avrgcc.compiler.directories.IncludePaths>
-        <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
-        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
-        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
-        <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
-        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
-        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
-        <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
-        <avrgcc.linker.libraries.Libraries>
-          <ListValues>
-            <Value>libm</Value>
-          </ListValues>
-        </avrgcc.linker.libraries.Libraries>
-        <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
-      </AvrGcc>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG_ENABLE</Value>
+      <Value>SERIAL=\"30D6C0A63C414E95AD1BB6EDC57198A6\"</Value>
+      <Value>NODE_ADDRESS=0x05</Value>
+      <Value>IS_MAIN</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>..</Value>
+      <Value>../../common_library</Value>
+      <Value>../fonts</Value>
+      <Value>../gui</Value>
+      <Value>../../utility</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+  <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
     </ToolchainSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Test' ">
@@ -157,6 +159,14 @@
     <Compile Include="..\common_library\common.h">
       <SubType>compile</SubType>
       <Link>common.h</Link>
+    </Compile>
+    <Compile Include="..\common_library\Config.c">
+      <SubType>compile</SubType>
+      <Link>Config.c</Link>
+    </Compile>
+    <Compile Include="..\common_library\Config.h">
+      <SubType>compile</SubType>
+      <Link>Config.h</Link>
     </Compile>
     <Compile Include="..\common_library\libADC.c">
       <SubType>compile</SubType>
@@ -226,6 +236,26 @@
       <SubType>compile</SubType>
       <Link>Timer.h</Link>
     </Compile>
+    <Compile Include="..\common_library\Transceiver.c">
+      <SubType>compile</SubType>
+      <Link>Transceiver.c</Link>
+    </Compile>
+    <Compile Include="..\common_library\Transceiver.h">
+      <SubType>compile</SubType>
+      <Link>Transceiver.h</Link>
+    </Compile>
+    <Compile Include="..\utility\ErrorHandler.c">
+      <SubType>compile</SubType>
+      <Link>ErrorHandler.c</Link>
+    </Compile>
+    <Compile Include="..\utility\ErrorHandler.h">
+      <SubType>compile</SubType>
+      <Link>ErrorHandler.h</Link>
+    </Compile>
+    <Compile Include="..\utility\sc_assert.h">
+      <SubType>compile</SubType>
+      <Link>sc_assert.h</Link>
+    </Compile>
     <Compile Include="gui\guiInterface.c">
       <SubType>compile</SubType>
     </Compile>
@@ -262,13 +292,16 @@
     <Compile Include="libInput.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Sensor.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Sensor.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Nodes.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Nodes.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Transceiver.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="fonts\bitmap_db.h">
@@ -309,10 +342,7 @@
     <Compile Include="libNHD223.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="Sensor.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Sensor.h">
+    <Compile Include="RTC_HAL.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="libUI.c">
@@ -322,9 +352,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main_firmware.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="Transceiver.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

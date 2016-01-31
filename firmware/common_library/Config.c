@@ -67,8 +67,8 @@ static config_type EEMEM nvm_config =
     {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF},
     "1DUMMYKEYFOOBAR1",
     60,
-    1,
-    1,
+    128,
+    2,
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ char *Config_GetAESKey(void)
 ///
 uint32_t Config_GetReportInterval(void)
 {
-    return active_config.report_interval_s;
+    return 10;//active_config.report_interval_s;
 }
 
 ///

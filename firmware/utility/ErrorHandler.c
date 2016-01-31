@@ -35,7 +35,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/eeprom.h>
 
 #include "libDebug.h"
-#include "libLED.h"
 #include "ErrorHandler.h"
 #include "RTC.h"
 
@@ -177,7 +176,6 @@ void ErrorHandler_AssertFail(const char *__func, const char *__file,
 ///
 void ErrorHandler_PointOfNoReturn(void)
 {
-    libLED_Enable(0, TRUE);
     CRITICAL("Entering fail state, manual reboot is needed.");
 
     wdt_disable();
