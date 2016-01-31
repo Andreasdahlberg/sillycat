@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-30 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -84,8 +84,8 @@ typedef enum
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static bool WriteRegister(uint8_t address, uint8_t register_data);
-static bool ReadRegister(uint8_t address, uint8_t *register_data);
+static void WriteRegister(uint8_t address, uint8_t register_data);
+static void ReadRegister(uint8_t address, uint8_t *register_data);
 static bool IsBitSetInRegister(uint8_t address, uint8_t bit);
 
 static void PreCallback(void);
@@ -129,6 +129,7 @@ void libRFM69_HWInit(void)
 ///
 void libRFM69_Update(void)
 {
+    sc_assert_fail();
     return;
 }
 
@@ -168,16 +169,23 @@ bool libRFM69_IsCRCOk(void)
     return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_CRCOK);
 }
 
-//TODO: Return number of bytes written to FIFO.
-bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length)
+bool libRFM69_IsOCPEnabled(void)
 {
-    uint8_t index;
+    return IsBitSetInRegister(REG_OCP, 4);
+}
 
-    if (length > RFM_FIFO_SIZE)
-    {
-        WARNING("Not enough space in FIFO");
-        return FALSE;
-    }
+///
+/// @brief Write data to FIFO.
+///
+/// @param  data Pointer to buffer with data to write.
+/// @param  length Number of bytes to write.
+/// @return uint8_t Number of bytes written.
+///
+uint8_t libRFM69_WriteToFIFO(const uint8_t *data, uint8_t length)
+{
+    sc_assert(length <= RFM_FIFO_SIZE);
+
+    uint8_t index;
 
     for (index = 0; index < length; ++index)
     {
@@ -187,76 +195,61 @@ bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length)
             break;
         }
 
-        if (!WriteRegister(REG_FIFO, data[index]))
-        {
-            ERROR("Failed write to FIFO");
-            break;
-        }
+        WriteRegister(REG_FIFO, data[index]);
     }
-    //If index not is equal to length something went wrong
-    return (index == length);
+
+    return index;
 }
 
+///
+/// @brief Read data from FIFO.
+///
+/// @param  data Pointer to buffer where the FIFO data will be stored.
+/// @param  max_length Max number of bytes to read.
+/// @return uint8_t Number of bytes read.
+///
 uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length)
 {
     uint8_t index = 0;
 
     while (libRFM69_IsFIFONotEmpty() && index < max_length)
     {
-        if (!ReadRegister(REG_FIFO, &data[index]))
-        {
-            ERROR("Failed to read from FIFO");
-            break;
-        }
+        ReadRegister(REG_FIFO, &data[index]);
         ++index;
     }
 
     return index;
 }
 
-bool libRFM69_ClearFIFO(void)
+void libRFM69_ClearFIFO(void)
 {
-    bool status = TRUE;
-    uint8_t tmp;
-
     INFO("Clear FIFO");
 
     while (libRFM69_IsFIFONotEmpty())
     {
-        if (!ReadRegister(REG_FIFO, &tmp))
-        {
-            ERROR("Failed to clear FIFO");
-            status = FALSE;
-            break;
-        }
+        uint8_t tmp;
+        ReadRegister(REG_FIFO, &tmp);
     }
-    return status;
+    return;
 }
 
 libRFM69_mode_type libRFM69_GetMode(void)
 {
     uint8_t register_content;
 
-    if (ReadRegister(REG_OPMODE, &register_content))
-    {
-        return (libRFM69_mode_type)((register_content & ~REG_OPMODE_MODE_MASK) >> 2);
-    }
-    //TODO: Handle failure!
-    return 0;
+    ReadRegister(REG_OPMODE, &register_content);
+    return (libRFM69_mode_type)((register_content & ~REG_OPMODE_MODE_MASK) >> 2);
 }
 
-bool libRFM69_SetMode(libRFM69_mode_type mode)
+void libRFM69_SetMode(libRFM69_mode_type mode)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    //TODO: Check if mode is valid!
-    if (ReadRegister(REG_OPMODE, &register_content))
-    {
-        register_content = (register_content & ~REG_OPMODE_MODE_MASK) | (mode << 2);
-        status = WriteRegister(REG_OPMODE, register_content);
-    }
-    return status;
+    ReadRegister(REG_OPMODE, &register_content);
+    register_content = (register_content & ~REG_OPMODE_MODE_MASK) | (mode << 2);
+    WriteRegister(REG_OPMODE, register_content);
+
+    return;
 }
 
 bool libRFM69_WaitForModeReady()
@@ -319,6 +312,8 @@ void libRFM69_SetCarrierFrequency(uint32_t frequency)
     WriteRegister(REG_FRFMSB, (frequency_value >> 16) & 0xFF);
     WriteRegister(REG_FRFMID, (frequency_value >> 8) & 0xFF);
     WriteRegister(REG_FRFLSB, frequency_value & 0xFF);
+
+    return;
 }
 
 void libRFM69_EnableListenMode(bool enable)
@@ -326,9 +321,10 @@ void libRFM69_EnableListenMode(bool enable)
     uint8_t register_content;
 
     ReadRegister(REG_OPMODE, &register_content);
-
     register_content = (register_content & 0xBF) | (uint8_t)enable;
     WriteRegister(REG_OPMODE, register_content);
+
+    return;
 }
 
 void libRFM69_EnableSequencer(bool enable)
@@ -336,9 +332,10 @@ void libRFM69_EnableSequencer(bool enable)
     uint8_t register_content;
 
     ReadRegister(REG_OPMODE, &register_content);
-
     register_content = (register_content & 0x7F) | ((uint8_t)!enable << 7);
     WriteRegister(REG_OPMODE, register_content);
+
+    return;
 }
 
 void libRFM69_EnableEncryption(bool enable)
@@ -348,55 +345,57 @@ void libRFM69_EnableEncryption(bool enable)
     ReadRegister(REG_PACKETCONFIG2, &register_content);
     SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
     WriteRegister(REG_PACKETCONFIG2, register_content);
+
+    return;
 }
 
-bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
+void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (packet_format == RFM_PACKET_FIXED_LEN ||
-            packet_format == RFM_PACKET_VARIABLE_LEN)
-    {
-        if (ReadRegister(REG_PACKETCONFIG1, &register_content))
-        {
-            SetBit(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
-                   &register_content);
-            status = WriteRegister(REG_PACKETCONFIG1, register_content);
-        }
-    }
-    return status;
+    ReadRegister(REG_PACKETCONFIG1, &register_content);
+    SetBit(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
+           &register_content);
+
+    WriteRegister(REG_PACKETCONFIG1, register_content);
+    return;
 }
 
-bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
+void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
                                   start_condition)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (start_condition == RFM_TX_START_LEVEL ||
-            start_condition == RFM_TX_START_NOT_EMPTY)
-    {
-        if (ReadRegister(REG_FIFOTHRESH, &register_content))
-        {
-            SetBit(0x07, (bool)start_condition, &register_content);
-            status = WriteRegister(REG_FIFOTHRESH, register_content);
-        }
-    }
-    return status;
+    ReadRegister(REG_FIFOTHRESH, &register_content);
+    SetBit(0x07, (bool)start_condition, &register_content);
+
+    WriteRegister(REG_FIFOTHRESH, register_content);
+    return;
 }
 
+///
+/// @brief Get the chip temperature. This function changes the mode to
+///        standby while the measurement is in progress, the previous mode
+///        is then restored.
+///
+/// @param  mode The power amplifier mode, value between 2 and 4.
+/// @return None
+///
 void libRFM69_GetTemperature(uint8_t *temperature)
 {
     uint8_t register_data;
+    libRFM69_mode_type active_mode;
 
-    //Enter standby mode, temperature can only be read in standby or synthesizer mode
+    //Save the active mode so it can be restored after the measurement is done.
+    active_mode = libRFM69_GetMode();
+
+    //Enter standby mode, temperature can only be read in standby or synthesizer mode.
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
 
     WriteRegister(REG_TEMP1, RF_TEMP1_MEAS_START);
 
-    //Wait for temperature measurement to finish
+    //Wait for temperature measurement to finish. Less then 100 uS.
     do
     {
         ReadRegister(REG_TEMP1, &register_data);
@@ -406,19 +405,21 @@ void libRFM69_GetTemperature(uint8_t *temperature)
     ReadRegister(REG_TEMP2, &register_data);
     *temperature = register_data;
 
+    //Restore mode.
+    libRFM69_SetMode(active_mode);
+    libRFM69_WaitForModeReady();
+
     return;
 }
 
-bool libRFM69_SetBitRate(uint32_t bit_rate)
+void libRFM69_SetBitRate(uint32_t bit_rate)
 {
-    bool status = FALSE;
     uint16_t bit_rate_value = (uint16_t)(RFM_FXOSC / bit_rate);
 
-    if (WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8)) == TRUE)
-    {
-        status = WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
-    }
-    return status;
+    WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8));
+    WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
+
+    return;
 }
 
 uint32_t libRFM69_GetBitrate(void)
@@ -439,205 +440,251 @@ uint32_t libRFM69_GetBitrate(void)
     return 0;
 }
 
-bool libRFM69_SetNodeAddress(uint8_t node_address)
+void libRFM69_SetNodeAddress(uint8_t node_address)
 {
-    return WriteRegister(REG_NODEADRS, node_address);
+    WriteRegister(REG_NODEADRS, node_address);
+    return;
 }
 
-bool libRFM69_SetBroadcastAddress(uint8_t broadcast_address)
+void libRFM69_SetBroadcastAddress(uint8_t broadcast_address)
 {
-    return WriteRegister(REG_BROADCASTADRS, broadcast_address);
+    WriteRegister(REG_BROADCASTADRS, broadcast_address);
+    return;
 }
 
-bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
+void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (ReadRegister(REG_DATAMODUL, &register_content) && data_mode != RFM_RESERVED)
-    {
-        register_content = (register_content & ~REG_DATA_MODUL_DATA_MODE_MASK) |
-                           (data_mode << 5);
-        status = WriteRegister(REG_DATAMODUL, register_content);
-    }
-    return status;
+    ReadRegister(REG_DATAMODUL, &register_content);
+    register_content = (register_content & ~REG_DATA_MODUL_DATA_MODE_MASK) |
+                       (data_mode << 5);
+
+    WriteRegister(REG_DATAMODUL, register_content);
+    return;
 }
 
-bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
+void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
 {
-    bool status = FALSE;
+    sc_assert(modulation_type == RFM_FSK || modulation_type == RFM_OOK);
     uint8_t register_content;
 
-    if (ReadRegister(REG_DATAMODUL, &register_content) &&
-            (modulation_type == RFM_FSK || modulation_type == RFM_OOK))
-    {
-        register_content = (register_content & ~REG_DATA_MODUL_MODULATION_TYPE_MASK) |
-                           (modulation_type << 3);
-        status = WriteRegister(REG_DATAMODUL, register_content);
-    }
-    return status;
+    ReadRegister(REG_DATAMODUL, &register_content);
+    register_content = (register_content & ~REG_DATA_MODUL_MODULATION_TYPE_MASK) |
+                       (modulation_type << 3);
+
+    WriteRegister(REG_DATAMODUL, register_content);
+    return;
 }
 
-bool libRFM69_SetModulationShaping(uint8_t modulation_shaping)
+void libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 {
-    bool status = FALSE;
+    sc_assert(modulation_shaping < 0x04);
     uint8_t register_content;
 
-    if (ReadRegister(REG_DATAMODUL, &register_content) && modulation_shaping < 0x4)
-    {
-        register_content = (register_content & ~REG_DATA_MODUL_MODULATION_SHAPING_MASK)
-                           | modulation_shaping;
-        status = WriteRegister(REG_DATAMODUL, register_content);
-    }
-    return status;
+    DEBUG("Modulation shaping: 0x%02X\r\n", modulation_shaping);
+
+    ReadRegister(REG_DATAMODUL, &register_content);
+    register_content = (register_content & ~REG_DATA_MODUL_MODULATION_SHAPING_MASK)
+                       | modulation_shaping;
+
+    WriteRegister(REG_DATAMODUL, register_content);
+    return;
 }
 
-bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
+void libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
 {
-    bool status = FALSE;
     uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation /
                                          RFM_FSTEP);
 
     DEBUG("Freq deviation: %u\r\n", frequency_deviation);
     DEBUG("Freq deviation value: 0x%04X\r\n", frequency_deviation_value);
 
-    if (WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF)))
-    {
-        status = WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
-    }
+    WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF));
+    WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
 
-    return status;
+    return;
 }
 
-bool libRFM69_SetPowerAmplifierMode(uint8_t mode)
+///
+/// @brief Set the power amplifier mode.
+///
+/// @param  mode The power amplifier mode, value between 2 and 4.
+/// @return None
+///
+void libRFM69_SetPowerAmplifierMode(uint8_t mode)
 {
-    bool status = FALSE;
+    sc_assert(mode > 0x01 && mode < 0x05);
     uint8_t register_content;
 
     DEBUG("Power amplifier mode: 0x%02X\r\n", mode);
 
-    if (mode < 0x05 && mode > 0x01 && ReadRegister(REG_PALEVEL, &register_content))
-    {
-        register_content &= ~REG_PA_LEVEL_PA_MASK;
-        register_content |= (mode << 5);
+    ReadRegister(REG_PALEVEL, &register_content);
 
-        status = WriteRegister(REG_PALEVEL, register_content);
-    }
-    return status;
+    register_content &= ~REG_PA_LEVEL_PA_MASK;
+    register_content |= (mode << 5);
+
+    WriteRegister(REG_PALEVEL, register_content);
+    return;
 }
 
-bool libRFM69_SetPowerLevel(uint8_t power_level)
+///
+/// @brief Set the power level. The resulting output power is dependent on
+///        the power amplifier mode and if the high power setting is active.
+///
+/// @param  power_level Value between 0 and 31.
+/// @return None
+///
+void libRFM69_SetPowerLevel(uint8_t power_level)
 {
-    bool status = FALSE;
+    sc_assert(power_level <= 31);
+
     uint8_t register_content;
+    ReadRegister(REG_PALEVEL, &register_content);
 
-    if (power_level <= 31 && ReadRegister(REG_PALEVEL, &register_content))
-    {
-        register_content &= ~REG_PA_LEVEL_POUT_MASK;
-        register_content |= power_level;
+    register_content &= ~REG_PA_LEVEL_POUT_MASK;
+    register_content |= power_level;
 
-        status = WriteRegister(REG_PALEVEL, register_content);
-    }
-    return status;
+    WriteRegister(REG_PALEVEL, register_content);
+    return;
 }
 
+///
+/// @brief Check if the high power setting is enabled.
+///
+/// @param  None
+/// @return TRUE if enabled, otherwise FALSE.
+///
 bool libRFM69_IsHighPowerEnabled(void)
 {
-    bool status = FALSE;
+    uint8_t register_content;
 
-    //This function not implemented
-    // sc_assert_fail();
+    ReadRegister(REG_TESTPA1, &register_content);
 
-    return status;
+    if (register_content == 0x5D)
+    {
+        ReadRegister(REG_TESTPA2, &register_content);
+        return (register_content == 0x7C);
+    }
+
+    return FALSE;
 }
 
-bool libRFM69_EnableHighPowerSetting(bool enable)
+///
+/// @brief Enabled the high power setting. OCP must first be disabled
+///        for high power setting to work properly.
+///
+/// @param  enable Enable/disable
+/// @return None
+///
+void libRFM69_EnableHighPowerSetting(bool enable)
 {
-    bool status = FALSE;
-
     if (enable == TRUE)
     {
 
-        WriteRegister(REG_OCP, 0x0A); //disable OCP
-        WriteRegister(REG_PALEVEL, 0x7F);
+#ifdef DEBUG_ENABLE
+        if (libRFM69_IsOCPEnabled() == FALSE)
+        {
+            WARNING("OCP must be disabled while in high power mode");
+        }
+#endif
 
-        //pa0 = 0
-        //pa1 = 1
-        //pa2 = 1
-
-        // status = WriteRegister(REG_TESTPA1, 0x5D) &&
-        //        WriteRegister(REG_TESTPA2, 0x7C);
+        WriteRegister(REG_TESTPA1, 0x5D);
+        WriteRegister(REG_TESTPA2, 0x7C);
     }
     else
     {
-        status = WriteRegister(REG_TESTPA1, 0x55) &&
-                 WriteRegister(REG_TESTPA2, 0x70);
+        WriteRegister(REG_TESTPA1, 0x55);
+        WriteRegister(REG_TESTPA2, 0x70);
     }
 
-    return status;
+    return;
 }
 
-
+///
+/// @brief Get the output power.
+///
+/// @param  None
+/// @return int8_t Output power in dBm, -18 to 20.
+///
 int8_t libRFM69_GetOutputPower(void)
 {
     int8_t pout = 0;
     uint8_t register_content;
 
-    if (ReadRegister(REG_PALEVEL, &register_content) == TRUE)
+    ReadRegister(REG_PALEVEL, &register_content);
+    register_content &= REG_PA_LEVEL_POUT_MASK;
+
+    switch (libRFM69_GetPowerAmplifierMode())
     {
-        register_content &= REG_PA_LEVEL_POUT_MASK;
+        case RFM_PWR_1:
+        case RFM_PWR_2:
+            pout = -18 + (int8_t)register_content;
+            break;
 
-        switch (libRFM69_GetPowerAmplifierMode())
-        {
-            case RFM_PWR_1:
-            case RFM_PWR_2:
-                pout = -18 + (int8_t)register_content;
-                break;
+        case RFM_PWR_3_4:
+            if (libRFM69_IsHighPowerEnabled() == TRUE)
+            {
+                pout = -11 + (int8_t)register_content;
+            }
+            else
+            {
+                pout = -14 + (int8_t)register_content;
+            }
+            break;
 
-            case RFM_PWR_3_4:
-
-                if (libRFM69_IsHighPowerEnabled() == TRUE)
-                {
-                    pout = -11 + (int8_t)register_content;
-                }
-                else
-                {
-                    pout = -14 + (int8_t)register_content;
-                }
-                break;
-
-            default:
-                break;
-        }
+        default:
+            ERROR("Invalid PA-mode");
+            break;
     }
+
     return pout;
 }
 
+///
+/// @brief Get the power amplifier mode.
+///
+/// @param  None
+/// @return uint8_t The power amplifier mode.
+///         0x04, PA0 output on pin RFIO,                                       -18 to +13 dBm
+///         0x02, PA1 enabled on pin PA_BOOST,                                  -2 to +13 dBm
+///         0x03, PA1 and PA2 combined on pin PA_BOOST,                         +2 to +17 dBm
+///         0x03, PA1+PA2 on PA_BOOST with high output power +20dBm settings,   +5 to +20 dBm
+///
 uint8_t libRFM69_GetPowerAmplifierMode(void)
 {
     uint8_t register_content;
 
-    if (ReadRegister(REG_PALEVEL, &register_content) == TRUE)
-    {
-        return (register_content >> 5);
-    }
-    return 0;
+    ReadRegister(REG_PALEVEL, &register_content);
+    return (register_content >> 5);
 }
 
-bool libRFM69_EnableOCP(bool enabled)
+///
+/// @brief Enable/disable the PA over current protection. To ensure correct
+///        operation at the highest power levels, make sure to adjust the OCP
+///        limit accordingly, except above +18dBm where it must be disabled.
+///
+/// @param  None
+/// @return bool TRUE if overrun flag was set, otherwise FALSE.
+///
+void libRFM69_EnableOCP(bool enabled)
 {
-    bool status = FALSE;
     uint8_t register_content;
 
-    if (ReadRegister(REG_OCP, &register_content) == TRUE)
-    {
-        SetBit(4, enabled, &register_content);
-        status = WriteRegister(REG_OCP, register_content);
-    }
+    ReadRegister(REG_OCP, &register_content);
+    SetBit(4, enabled, &register_content);
 
-    return status;
+    WriteRegister(REG_OCP, register_content);
+    return;
 }
 
+///
+/// @brief Get the RSSI-value. This function trigger a RSSI measurement and
+///        blocks until the RSSI-done flag is set.
+///
+/// @param  None
+/// @return int8_t The RSSI-value.
+///
 int8_t libRFM69_GetRSSI(void)
 {
     uint8_t register_content;
@@ -924,30 +971,24 @@ static void PostCallback(void)
     return;
 }
 
-static bool WriteRegister(uint8_t address, uint8_t register_data)
+static void WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address <= REG_TESTPA2);
-    bool status = FALSE;
 
     libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
     libSPI_WriteByte(register_data, NULL, &PostCallback);
 
-    status = TRUE;
-    return status;
+    return;
 }
 
-//TODO: return void
-static bool ReadRegister(uint8_t address, uint8_t *register_data)
+static void ReadRegister(uint8_t address, uint8_t *register_data)
 {
     sc_assert(address <= REG_TESTPA2);
-
-    bool status = FALSE;
 
     libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
     libSPI_ReadByte(register_data, NULL, &PostCallback);
 
-    status = TRUE;
-    return status;
+    return;
 }
 
 ///
@@ -965,11 +1006,7 @@ static bool IsBitSetInRegister(uint8_t address, uint8_t bit)
     sc_assert(address <= REG_TESTPA2);
 
     uint8_t register_content;
-    bool status = TRUE;
 
-    if (ReadRegister(address, &register_content))
-    {
-        status = (register_content & (1 << bit)) > 0;
-    }
-    return status;
+    ReadRegister(address, &register_content);
+    return ((register_content & (1 << bit)) > 0);
 }

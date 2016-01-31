@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-30 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -111,26 +111,26 @@ typedef enum
 void libRFM69_Init(void);
 void libRFM69_HWInit(void);
 void libRFM69_Update(void);
-bool libRFM69_SetMode(libRFM69_mode_type mode);
+void libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 bool libRFM69_IsModeReady();
 bool libRFM69_WaitForModeReady();
 void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
 void libRFM69_GetTemperature(uint8_t *temperature);
-bool libRFM69_SetBitRate(uint32_t bit_rate);
-bool libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
-bool libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
-bool libRFM69_SetModulationShaping(uint8_t modulation_shaping);
-bool libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation);
-bool libRFM69_SetPowerAmplifierMode(uint8_t mode);
+void libRFM69_SetBitRate(uint32_t bit_rate);
+void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
+void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
+void libRFM69_SetModulationShaping(uint8_t modulation_shaping);
+void libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation);
+void libRFM69_SetPowerAmplifierMode(uint8_t mode);
 void libRFM69_SetPreambleLength(uint16_t length);
 void libRFM69_SetSyncWordSize(uint8_t size);
 bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length);
-bool libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
+void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format);
 void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
                                    fill_condition);
-bool libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
+void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
                                   start_condition);
 uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length);
 void libRFM69_EnableSyncWordGeneration(bool enabled);
@@ -145,10 +145,10 @@ int8_t libRFM69_GetRSSI(void);
 uint16_t libRFM69_GetPreambleLength(void);
 uint8_t libRFM69_GetSyncWordSize(void);
 uint8_t libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t length);
-bool libRFM69_EnableOCP(bool enabled);
+void libRFM69_EnableOCP(bool enabled);
 bool libRFM69_ClearFIFOOverrun(void);
-bool libRFM69_ClearFIFO(void);
-bool libRFM69_WriteToFIFO(uint8_t *data, uint8_t length);
+void libRFM69_ClearFIFO(void);
+uint8_t libRFM69_WriteToFIFO(const uint8_t *data, uint8_t length);
 bool libRFM69_IsHighPowerEnabled(void);
 bool libRFM69_IsRxReady();
 bool libRFM69_IsTxReady();
@@ -160,10 +160,10 @@ bool libRFM69_IsFIFOOverrun(void);
 bool libRFM69_IsPacketSent(void);
 bool libRFM69_IsPayloadReady(void);
 bool libRFM69_IsCRCOk(void);
-bool libRFM69_SetNodeAddress(uint8_t node_address);
-bool libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
-bool libRFM69_EnableHighPowerSetting(bool enable);
-bool libRFM69_SetPowerLevel(uint8_t power_level);
+void libRFM69_SetNodeAddress(uint8_t node_address);
+void libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
+void libRFM69_EnableHighPowerSetting(bool enable);
+void libRFM69_SetPowerLevel(uint8_t power_level);
 
 #ifdef DEBUG_ENABLE
 void libRFM69_DumpRegisterValues(void);
