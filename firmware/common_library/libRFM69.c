@@ -104,6 +104,9 @@ static void PostCallback(void);
 void libRFM69_Init(void)
 {
     libRFM69_HWInit();
+
+    //TODO: Fix this in a better way(power on delay required!)
+    _delay_ms(15);
     return;
 }
 

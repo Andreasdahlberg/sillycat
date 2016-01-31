@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-01-31 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -39,7 +39,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Timer.h"
 #include "Transceiver.h"
-#include "Sensor.h"
+#include "Config.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -80,9 +80,6 @@ typedef enum
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-//static char aes_key[17] = "1DUMMYKEYFOOBAR1";
-static uint8_t net_id[6] = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
-
 static transceiver_state_type transceiver_state = TR_STATE_NO_INIT;
 static packet_frame_type packet_frame;
 static transceiver_packet_handler_type packet_handlers[TR_PACKET_NR_TYPES];
@@ -100,8 +97,7 @@ static bool ReadyToSend(void);
 static bool PacketToSend(void);
 
 #ifdef DEBUG_ENABLE
-static void DumpPacketHeader(packet_header_type *header);
-static void DumpPacketContent(packet_content_type *content);
+static void DumpPacket(packet_frame_type *packet);
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -129,19 +125,21 @@ void Transceiver_Init(void)
     libRFM69_SetFIFOFillCondition(RFM_FIFO_FILL_AUTO);
 
     //TODO: Decide how network id is set, only set this if master?
-    libRFM69_SetSyncWordSize(5);
-    libRFM69_SetSyncWord(net_id, 6);
+    libRFM69_SetSyncWordSize(6);
+    libRFM69_SetSyncWord(Config_GetNetworkId(), 6);
 
     libRFM69_SetTXStartCondition(RFM_TX_START_NOT_EMPTY);
-    libRFM69_SetNodeAddress(NODE_ADDRESS);
+    libRFM69_SetNodeAddress(Config_GetNodeId());
     libRFM69_ClearFIFOOverrun();
     libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
 
     libRFM69_EnableOCP(FALSE);
-    libRFM69_SetPowerAmplifierMode(0x04);
-
-    libRFM69_SetMode(RFM_STANDBY);
+    libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
+    libRFM69_EnableHighPowerSetting(TRUE);
+    libRFM69_SetMode(RFM_TRANSMITTER);
     libRFM69_WaitForModeReady();
+
+    DEBUG("Output power: %i dBm\r\n", libRFM69_GetOutputPower());
 
     memset(&packet_frame, 0, sizeof(packet_frame_type));
     transceiver_state = TR_STATE_IDLE;
@@ -206,7 +204,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
     if (ReadyToSend() && status)
     {
         frame_ptr->header.target = target;
-        frame_ptr->header.source = NODE_ADDRESS;
+        frame_ptr->header.source = Config_GetNodeId();
         frame_ptr->header.ack = request_ack;
         frame_ptr->header.rssi = libRFM69_GetRSSI();
         frame_ptr->header.total_size = sizeof(packet_header_type) + 8 +
@@ -217,6 +215,10 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
         frame_ptr->content.size = content->size;
         memcpy(frame_ptr->content.data, content->data, content->size);
         frame_ptr->callback = callback;
+
+#ifdef DEBUG_ENABLE
+        DumpPacket(frame_ptr);
+#endif
     }
     return status;
 }
@@ -321,8 +323,7 @@ static bool HandlePayload(void)
            sizeof(packet_content_type));
 
 #ifdef DEBUG_ENABLE
-    DumpPacketHeader(&packet_frame.header);
-    DumpPacketContent(&packet_frame.content);
+    DumpPacket(&packet_frame);
 #endif
 
     if (IsPacketTypeValid(packet_frame.content.type) &&
@@ -398,7 +399,7 @@ static transceiver_state_type SendingStateMachine(void)
     switch (state)
     {
         case TR_STATE_SENDING_INIT:
-            libRFM69_SetMode(RFM_STANDBY);
+            // libRFM69_SetMode(RFM_STANDBY);
             state = TR_STATE_SENDING_WRITING;
             break;
 
@@ -423,14 +424,14 @@ static transceiver_state_type SendingStateMachine(void)
                 if (packet_frame.header.ack)
                 {
                     DEBUG("Waiting for ACK\r\n");
-                    libRFM69_SetMode(RFM_RECEIVER);
-                    libRFM69_EnableHighPowerSetting(FALSE);
+                    //  libRFM69_SetMode(RFM_RECEIVER);
+                    //   libRFM69_EnableHighPowerSetting(FALSE);
                     state = TR_STATE_SENDING_WAIT_FOR_ACK;
                 }
                 else
                 {
                     DEBUG("No ACK needed\r\n");
-                    libRFM69_SetMode(RFM_STANDBY);
+                    //  libRFM69_SetMode(RFM_STANDBY);
                     if (packet_frame.callback != NULL)
                     {
                         packet_frame.callback(TRUE);
@@ -468,37 +469,22 @@ static transceiver_state_type SendingStateMachine(void)
 }
 
 #ifdef DEBUG_ENABLE
-void DumpPacketHeader(packet_header_type *header)
+static void DumpPacket(packet_frame_type *packet)
 {
-    DEBUG("******Packet header******\r\n");
-    DEBUG("Target: %u\r\n", header->target);
-    DEBUG("Source: %u\r\n", header->source);
-    DEBUG("Ack: %u\r\n", (uint8_t)header->ack);
-    DEBUG("RSSI: %d\r\n", header->rssi);
-    DEBUG("Total size: %u\r\n", header->total_size);
-}
-
-void DumpPacketContent(packet_content_type *content)
-{
-    uint8_t idx;
-
-    DEBUG("******Packet content******\r\n");
-    DEBUG("Timestamp: 20%02u-%02u-%02u %02u:%02u:%02u\r\n",
-          content->timestamp.year,
-          content->timestamp.month,
-          content->timestamp.date,
-          content->timestamp.hour,
-          content->timestamp.minute,
-          content->timestamp.second);
-    DEBUG("Type: %u\r\n", (uint8_t)content->type);
-    DEBUG("Size: %u\r\n", (uint8_t)content->size);
-    DEBUG("Data: 0x");
-
-
-    for (idx = 0; idx < content->size; ++idx)
-    {
-        DEBUG("%02X", content->data[idx]);
-    }
-    DEBUG("\r\n");
+    DEBUG("<PCK>");
+    DEBUG("%u,", packet->header.target);
+    DEBUG("%u,", packet->header.source);
+    DEBUG("%u,", packet->header.ack);
+    DEBUG("%d,", packet->header.rssi);
+    DEBUG("%u,", packet->header.total_size);
+    DEBUG("20%02u-%02u-%02u %02u:%02u:%02u,",
+          packet->content.timestamp.year,
+          packet->content.timestamp.month,
+          packet->content.timestamp.date,
+          packet->content.timestamp.hour,
+          packet->content.timestamp.minute,
+          packet->content.timestamp.second);
+    DEBUG("%u,", packet->content.type);
+    DEBUG("%u\r\n", packet->content.size);
 }
 #endif
