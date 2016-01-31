@@ -52,6 +52,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+typedef struct
+{
+    float humidity;
+    float temperature;
+    bool status;
+} dht22_data_type;
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
@@ -92,20 +99,43 @@ void guiNodes_Init(void)
 
 static void DrawNodeView(uint16_t context)
 {
+    packet_frame_type *packet;
+
     //Add one to node index(context) since end users are more familiar
     //with indexing starting at 1.
     libUI_Print("%u", 0, 0, context + 1);
 
-    if (Nodes_GetLatestData(context) != NULL)
+
+    packet = Nodes_GetLatestData(context);
+
+    if (packet != NULL)
     {
-        libUI_Print("Temperature: 23", 20, 2);
-        libUI_Print("Humidity: 34", 28, 16);
+        libUI_Print("Temperature: %uC", 16, 2, (uint32_t)((dht22_data_type *)packet->content.data)->temperature);
+        libUI_Print("Humidity: %u%%", 26, 16, (uint32_t)((dht22_data_type *)packet->content.data)->humidity);
     }
     else
     {
-        libUI_Print("Temperature: -", 20, 2);
-        libUI_Print("Humidity: -", 28, 16);
+        libUI_Print("Temperature: -", 16, 2);
+        libUI_Print("Humidity: -", 26, 16);
         INFO("No valid data, context: %u", context);
     }
     return;
 }
+
+
+
+/*
+dht22_data_type reading;
+
+DEBUG("Packet handled\r\n");
+
+//TODO: Use source address to determine index in packets
+memcpy(&packets[0], packet, sizeof(packet_frame_type));
+
+memcpy(&reading, &packet->content.data, sizeof(dht22_data_type));
+
+
+DEBUG("Temp: %u, ", (uint32_t)reading.temperature);
+DEBUG("Hum: %u\r\n", (uint32_t)reading.humidity);
+//NOTE: Return false so no ACK is sent
+*/
