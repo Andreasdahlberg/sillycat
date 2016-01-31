@@ -133,7 +133,7 @@ void LED_Update(void)
 void LED_ChangeState(led_state_type state)
 {
     sc_assert(state <= LED_STATE_SLEEPING);
-
+    led_timer = Timer_GetMilliseconds();
     switch (state)
     {
         case LED_STATE_IDLE:
