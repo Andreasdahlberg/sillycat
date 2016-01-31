@@ -12,10 +12,11 @@ from PyQt4 import QtGui, QtCore
 from SerialInterface import *
 from DataLog import *
 from DisplayView import DisplayView
+from PacketView import PacketView
 
 
-PORT = 'com5'
-BAUDRATE = 38400
+PORT = 'com3'
+BAUDRATE = 250000
 
 LOG_PATH = 'logs'
 DEV_ICON = os.path.join('icons', 'dev_tool_icon.png')
@@ -40,9 +41,6 @@ class ConsoleView(QtGui.QPlainTextEdit):
 
 
     def update_console_view(self, text):
-
-
-
         self._stream_buffer.append(text)
         if not self._paused:
             self._flush_stream_buffer()      
@@ -50,7 +48,7 @@ class ConsoleView(QtGui.QPlainTextEdit):
 
     def _flush_stream_buffer(self):
         while len(self._stream_buffer) > 0:
-            self.appendPlainText(self._stream_buffer.pop())
+            self.appendPlainText(self._stream_buffer.popleft())
 
 
 
@@ -69,46 +67,58 @@ class DevTool(QtGui.QWidget):
             self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
             self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
 
-            self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)   
+            self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)
+            self.connect(self.ser, QtCore.SIGNAL('new_pck(QString)'), self.pv.update_packet_view)                 
+            self.connect(self.dv, QtCore.SIGNAL('new_pixel(QPoint)'), self.update_pixel_text)   
                         
             self.ser.start()
         else:
             self.console_view.setPlainText('Failed to open interface on ' + PORT)
 
-
         
     def initUI(self):
 
         self.console_view = ConsoleView()
-        self.console_view.appendHtml('Waiting for input...')
-        #self.console_view.appendPlainText('Foobar')
+        self.console_view.appendHtml('<b>Waiting for input...<b>')
 
         self.dv = DisplayView()
-
-
+        self.dv.hide()
+        self.pv = PacketView()
 
         self.checkbox = QtGui.QCheckBox('Pause')
         self.checkbox.stateChanged.connect(self.console_view.toogle_pause)
 
+        self.label = QtGui.QLabel() 
+        self.label.setText('');
+        self.label.hide()
 
+        display_vbox = QtGui.QVBoxLayout()
+        display_vbox.addWidget(self.dv)
+        display_vbox.addWidget(self.label)
+
+        hbox = QtGui.QHBoxLayout()
+        hbox.addLayout(display_vbox)
+        hbox.addWidget(self.console_view)
 
         vbox = QtGui.QVBoxLayout()
-        #vbox.setAlignment(Qt.AlignVCenter)
-        #vbox.addStretch(1)
-        #vbox.addWidget(label)   
-
         vbox.addWidget(self.checkbox)
-        vbox.addWidget(self.dv)
-        vbox.addWidget(self.console_view)  
+        vbox.addLayout(hbox) 
+
+        vbox.addWidget(self.pv)      
 
         self.setLayout(vbox)    
 
-        self.resize(550, 400)
+        self.resize(1050, 600)
         self.center()
         self.setWindowTitle('SillyCat Development Tool')
         self.setWindowIcon(QtGui.QIcon(DEV_ICON))        
         self.show()
 
+
+    def update_pixel_text(self, point):
+        if (self.label.isHidden()):
+            self.label.show()
+        self.label.setText('X: ' + str(point.x()) + ',Y: ' + str(point.y()))
 
     def closeEvent(self, event):
         self.ser.stop()

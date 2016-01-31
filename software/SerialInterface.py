@@ -51,6 +51,9 @@ class SerialInterface(QtCore.QThread):
                     rx_data += (self._ser.read(520 - len(rx_data)))
                     self.emit(QtCore.SIGNAL('new_vram(QByteArray)'),
                                             rx_data[6:-2])
+                elif rx_data[:5] == b'<PCK>':
+                        self.emit(QtCore.SIGNAL('new_pck(QString)'),
+                                                rx_data[5:].decode('utf-8').rstrip('\r\n'))                    
                 else:
                     try:
                         self.emit(QtCore.SIGNAL('new_stream(QString)'),

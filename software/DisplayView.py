@@ -42,11 +42,37 @@ def create_bitmap_image(rows, w):
         b"".join([bytes(row+pad) for row in reversed(rows)]))
 
 
+
+class DisplayPixmap(QtGui.QLabel):
+    def __init__(self):
+        super(DisplayPixmap, self).__init__()
+
 class DisplayView(QtGui.QLabel):
     def __init__(self):
         super(DisplayView, self).__init__()
         self._pixmap = QtGui.QPixmap()
         self.setPixmap(self._pixmap)
+
+        self.setMouseTracking(True)
+
+
+    def mouseMoveEvent(self, event):
+        mouse_position = event.pos(); 
+
+        x_pos = math.floor(mouse_position.x() / 3);
+        if x_pos > 127:
+            x_pos = 127
+
+        y_pos = math.floor(mouse_position.y() / 3);
+        if y_pos > 30:
+            y_pos = 30            
+
+
+
+        scaled_point = QtCore.QPoint(x_pos, y_pos)
+
+
+        self.emit(QtCore.SIGNAL('new_pixel(QPoint)'), scaled_point)
 
 
     def add_color(self, pixmap):
@@ -75,7 +101,9 @@ class DisplayView(QtGui.QLabel):
     def update_display_view(self, image_data):
         self._pixmap.loadFromData(self.format_image_data(bytes(image_data)))
         self.setPixmap(self.add_color(self._pixmap).scaled(384, 93))
-        self.save_view_to_file()
+
+        if (self.isHidden()):
+            self.show()
 
 
     def format_image_data(self, image_data):
@@ -111,3 +139,4 @@ class DisplayView(QtGui.QLabel):
             row_data.append(byte)
             cnt = cnt + 1
         return bytes(create_bitmap_image(img_data, 128))
+
