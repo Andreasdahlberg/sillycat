@@ -31,9 +31,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define SENSOR_EXTERNAL_LIGHT		0x06
-#define SENSOR_EXTERNAL_TEMPERATURE	0x07
-#define SENSOR_INTERNAL_TEMPERATURE	0x08
+#define SENSOR_EXTERNAL_LIGHT       0x06
+#define SENSOR_EXTERNAL_TEMPERATURE 0x07
+#define SENSOR_INTERNAL_TEMPERATURE 0x08
+
+#define AVERAGE_WINDOW_S    300    //5 min
+#define SAMPLE_FREQUENCY_MS 5000   //5 sec
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -47,7 +50,8 @@ typedef struct __attribute__((packed))
     uint16_t min;
     uint16_t value;
     uint16_t average;
-}sensor_sample_type;
+}
+sensor_sample_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES

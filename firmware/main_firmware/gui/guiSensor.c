@@ -97,7 +97,8 @@ void guiSensor_DrawSensorInformation(uint16_t context __attribute__ ((unused)))
     return;
 }
 
-void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((unused)))
+void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
+            unused)))
 {
     sensor_sample_type reading;
 
