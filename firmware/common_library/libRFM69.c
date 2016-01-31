@@ -710,7 +710,7 @@ void libRFM69_SetSyncWordSize(uint8_t size)
     uint8_t register_content;
 
     ReadRegister(REG_SYNCCONFIG, &register_content);
-    register_content &= ~(0xC7);
+    register_content &= (0xC7);
 
     register_content |= ((size - 1) << 3);
     WriteRegister(REG_SYNCCONFIG, register_content);
