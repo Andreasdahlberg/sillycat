@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-23 (Last edit)
+ * @date   2016-01-25 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -49,26 +49,42 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Config.h"
 #include "RTC.h"
 #include "Power.h"
+#include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define MAX_AWAKE_TIME_MS 3000
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
+
+typedef struct
+{
+    uint32_t last_sleep_time;
+    bool sleep_now;
+} sleep_status_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
+static sleep_status_type sleep_status = {0};
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+static void NotifyAndEnterSleep(void);
+static bool IsTimeForSleep(void);
+static void RHTSent(const event_type *event __attribute__ ((unused)));
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
 
 int main(void)
 {
@@ -95,26 +111,35 @@ int main(void)
     Config_Load();
     RTC_Init();
     ErrorHandler_Init();
+
     //NOTE: Log reset reasons, during normal conditions the device should never restart.
     //      Disabled during development to prevent filling the error log.
 #ifndef DEBUG_ENABLE
     ErrorHandler_LogError(POWERON, mcu_status);
 #endif
+
     Sensor_Init();
     Transceiver_Init();
     Power_Init();
 
-    Power_AddListener(LED_EventHandler);
-    Power_AddListener(Transceiver_EventHandler);
-    Power_AddListener(Sensor_EventHandler);
+    Event_AddListener(Sensor_WakeUp, EVENT_WAKEUP);
+    Event_AddListener(LED_EventHandler, EVENT_ALL);
+    //Event_AddListener(Transceiver_EventHandler, EVENT_ALL);
+    Event_AddListener(RHTSent, EVENT_RHT_SENT);
+
+    //Since RTC-alarms are persistent between restarts so we need to make
+    //sure that they are disabled.
+    RTC_EnableAlarm(FALSE);
 
 #ifdef DEBUG_ENABLE
-    //Add this event handler last to ensure all debug prints are flushed
+    //Add debug listener last to ensure all debug prints are flushed
     //before sleep.
-    Power_AddListener(libDebug_EventHandler);
+    Event_AddListener(libDebug_Sleep, EVENT_SLEEP);
 #endif
 
     INFO("Start up done");
+
+    sleep_status.last_sleep_time = Timer_GetMilliseconds();
 
     while (1)
     {
@@ -124,7 +149,64 @@ int main(void)
         Transceiver_Update();
         LED_Update();
         Power_Update();
+
+        if (IsTimeForSleep() == TRUE)
+        {
+            NotifyAndEnterSleep();
+        }
+
     }
     sc_assert_fail();
     SoftReset();
+}
+
+static void RHTSent(const event_type *event __attribute__ ((unused)))
+{
+    sleep_status.sleep_now = TRUE;
+    return;
+}
+
+static bool IsTimeForSleep(void)
+{
+    if (libPower_IsChargerConnected() == TRUE)
+    {
+        return FALSE;
+    }
+
+    return (sleep_status.sleep_now == TRUE ||
+            Timer_TimeDifference(sleep_status.last_sleep_time) > MAX_AWAKE_TIME_MS);
+}
+
+static void NotifyAndEnterSleep(void)
+{
+    rtc_time_type time;
+    event_type event = {0};
+
+    RTC_GetCurrentTime(&time);
+    DEBUG("Sleep: %u:%u:%u\r\n", time.hour, time.minute, time.second);
+
+    //TODO: Compensate for time awake
+    RTC_AddSeconds(&time, Config_GetReportInterval());
+    RTC_SetAlarmTime(&time);
+    RTC_EnableAlarm(TRUE);
+
+    event = Event_New(EVENT_SLEEP);
+    Event_Trigger(&event);
+
+    //Enter sleep mode, execution will continue from this point
+    //after sleep is done.
+    libPower_Sleep();
+    RTC_ClearAlarm();
+    RTC_EnableAlarm(FALSE);
+
+    sleep_status.last_sleep_time = Timer_GetMilliseconds();
+    sleep_status.sleep_now = FALSE;
+
+    event = Event_New(EVENT_WAKEUP);
+    Event_Trigger(&event);
+
+    RTC_GetCurrentTime(&time);
+    DEBUG("Wake: %u:%u:%u\r\n", time.hour, time.minute, time.second);
+
+    return;
 }
