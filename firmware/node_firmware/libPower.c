@@ -84,6 +84,9 @@ void libPower_Init(void)
 {
     DDRC &= ~(1 << CONNECTED_PIN | 1 << CHARGING_PIN);
 
+    PORTC  |= (1 << CONNECTED_PIN);
+    PORTC  |= (1 << CHARGING_PIN);
+
     DDRD &= ~(1 << DDD3);
     PORTD |= (1 << DDD3);
 
@@ -125,10 +128,6 @@ void libPower_Sleep(void)
     sleep_disable();
 
     EnableLowLevelInterupt(FALSE);
-
-#ifdef DEBUG_ENABLE
-    DEBUG("\r\n");
-#endif
     return;
 }
 
@@ -140,7 +139,7 @@ void libPower_Sleep(void)
 ///
 bool libPower_IsChargerConnected(void)
 {
-    return ((PINC & (1 << CONNECTED_PIN)) != 0);
+    return ((PINC & (1 << CONNECTED_PIN)) == 0);
 }
 
 ///
