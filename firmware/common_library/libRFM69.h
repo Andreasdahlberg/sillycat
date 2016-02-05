@@ -92,7 +92,7 @@ typedef enum
 #endif
 
 #ifndef BROADCAST_ADDRESS
-#define BROADCAST_ADDRESS 0x00
+#define BROADCAST_ADDRESS 0xFF
 #endif
 
 #ifdef  NETWORK_MASTER
