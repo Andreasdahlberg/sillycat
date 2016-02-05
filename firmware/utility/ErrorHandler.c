@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-01-06 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -160,11 +160,21 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
 ///                returned false.
 /// @return None, does not return since an manual reboot is needed.
 ///
-void ErrorHandler_AssertFail(const char *__func, const char *__file,
-                             int __lineno, const char *__exp)
+void ErrorHandler_AssertFail(const char *__file, int __lineno,
+                             const char *__exp)
 {
-    DEBUG("<ERROR> Failed assert: %s:%s:%u (%s)\r\n", __file, __func, __lineno,
-          __exp);
+    char expression[40];
+    char file[24];
+
+    //TODO: Use libDebug_PrintP, skip these buffers!
+
+    strncpy_P(file, __file, sizeof(file));
+    file[sizeof(file) / sizeof(*file) - 1] = '\0';
+
+    strncpy_P(expression, __exp, sizeof(expression));
+    expression[sizeof(expression) / sizeof(*expression) - 1] = '\0';
+
+    DEBUG("<ERROR> Failed assert: %s:%u (%s)\r\n", file, __lineno, expression);
     ErrorHandler_PointOfNoReturn();
 }
 

@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-22 (Last edit)
+ * @date   2016-02-06 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -32,8 +32,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define ASSERT_HANDLER(e) ErrorHandler_AssertFail(__func__, __FILE__, __LINE__, #e)
-
 #include "sc_assert.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -53,8 +51,8 @@ enum
 void ErrorHandler_Init(void);
 void ErrorHandler_LogError(uint8_t code, uint8_t information);
 void ErrorHandler_PointOfNoReturn(void) __attribute__((noreturn));
-void ErrorHandler_AssertFail(const char *__func, const char *__file,
-                             int __lineno, const char *__sexp) __attribute__((noreturn));
+void ErrorHandler_AssertFail(const char *__file, int __lineno,
+                             const char *__sexp) __attribute__((noreturn));
 #ifdef DEBUG_ENABLE
 void ErrorHandler_DumpLog(void);
 #endif

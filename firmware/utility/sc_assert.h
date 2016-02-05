@@ -1,7 +1,7 @@
 /**
  * @file   sc_assert.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-17 (Last edit)
+ * @date   2016-02-06 (Last edit)
  * @brief  Implementation of sc_assert
  *
  * Detailed description of file.
@@ -43,8 +43,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #   define sc_assert_fail() ((void)0)
 #   define sc_assert(e) ((void)0)
 #else
-#   define sc_assert_fail() (ErrorHandler_AssertFail(__func__, PSTR(__FILE__), __LINE__, PSTR("sc_assert_fail")))
-#   define sc_assert(e) ((e) ? (void)0 : ErrorHandler_AssertFail(__func__, PSTR(__FILE__), __LINE__, PSTR(#e)))
+#   define sc_assert_fail() (ErrorHandler_AssertFail(PSTR(__FILE__), __LINE__, PSTR("sc_assert_fail")))
+#   define sc_assert(e) ((e) ? (void)0 : ErrorHandler_AssertFail(PSTR(__FILE__), __LINE__, PSTR(#e)))
 #endif
 
 //////////////////////////////////////////////////////////////////////////
