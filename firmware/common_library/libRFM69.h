@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-05 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -79,6 +79,13 @@ typedef enum
     RFM_TX_START_LEVEL = 0,
     RFM_TX_START_NOT_EMPTY
 } libRFM69_tx_start_condition_type;
+
+typedef enum
+{
+    RFM_ADDRESS_FILTER_NONE = 0,
+    RFM_ADDRESS_FILTER_ADDRESS,
+    RFM_ADDRESS_FILTER_ADDRESS_BROADCAST,
+} libRFM69_address_filtering_type;
 
 #ifndef NODE_ADDRESS
 #define NODE_ADDRESS 0xAA
@@ -160,6 +167,7 @@ bool libRFM69_IsFIFOOverrun(void);
 bool libRFM69_IsPacketSent(void);
 bool libRFM69_IsPayloadReady(void);
 bool libRFM69_IsCRCOk(void);
+void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering);
 void libRFM69_SetNodeAddress(uint8_t node_address);
 void libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
 void libRFM69_EnableHighPowerSetting(bool enable);

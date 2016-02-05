@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-05 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -441,6 +441,30 @@ uint32_t libRFM69_GetBitrate(void)
         return (RFM_FXOSC / bit_rate_value);
     }
     return 0;
+}
+
+///
+/// @brief Set the address filtering type
+///
+/// @param  filtering The filtering type,
+///         RFM_ADDRESS_FILTER_NONE: None (off)
+///         RFM_ADDRESS_FILTER_ADDRESS: Address must match node address
+///         RFM_ADDRESS_FILTER_ADDRESS_BROADCAST: Address must match node address or broadcast address
+
+/// @return None
+///
+void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering)
+{
+    sc_assert(filtering < 3);
+
+    uint8_t register_content;
+
+    ReadRegister(REG_PACKETCONFIG1, &register_content);
+    register_content = (register_content & 0xF9) |
+                       (filtering << 1);
+
+    WriteRegister(REG_PACKETCONFIG1, register_content);
+    return;
 }
 
 void libRFM69_SetNodeAddress(uint8_t node_address)
