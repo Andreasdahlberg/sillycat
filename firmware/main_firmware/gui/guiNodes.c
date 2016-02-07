@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-07 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -63,13 +63,15 @@ typedef struct
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static struct view node_views[MAX_NR_NODE_VIEWS];
+// Multiply with two to get an extra detailed view for each node view
+static struct view node_views[MAX_NR_NODE_VIEWS * 2];
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 static void DrawNodeView(uint16_t context);
+static void DrawDetailedNodeView(uint16_t context);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -88,8 +90,19 @@ void guiNodes_Init(void)
         node_views[view_index].next = NULL;
         node_views[view_index].parent = NULL;
         Interface_AddView(&node_views[view_index]);
-    }
 
+        sc_assert(view_index + MAX_NR_NODE_VIEWS < MAX_NR_NODE_VIEWS * 2);
+
+        node_views[view_index + MAX_NR_NODE_VIEWS].draw_function =
+            DrawDetailedNodeView;
+        node_views[view_index + MAX_NR_NODE_VIEWS].context = view_index;
+        node_views[view_index + MAX_NR_NODE_VIEWS].child = NULL;
+        node_views[view_index + MAX_NR_NODE_VIEWS].prev = NULL;
+        node_views[view_index + MAX_NR_NODE_VIEWS].next = NULL;
+        node_views[view_index + MAX_NR_NODE_VIEWS].parent = NULL;
+        Interface_AddChild(&node_views[view_index],
+                           &node_views[view_index + MAX_NR_NODE_VIEWS]);
+    }
     return;
 }
 
@@ -104,7 +117,6 @@ static void DrawNodeView(uint16_t context)
     //Add one to node index(context) since end users are more familiar
     //with indexing starting at 1.
     libUI_Print("%u", 0, 0, context + 1);
-
 
     packet = Nodes_GetLatestData(context);
 
@@ -124,20 +136,21 @@ static void DrawNodeView(uint16_t context)
     return;
 }
 
+static void DrawDetailedNodeView(uint16_t context)
+{
+    packet_frame_type *packet;
+    packet = Nodes_GetLatestData(context);
 
-
-/*
-dht22_data_type reading;
-
-DEBUG("Packet handled\r\n");
-
-//TODO: Use source address to determine index in packets
-memcpy(&packets[0], packet, sizeof(packet_frame_type));
-
-memcpy(&reading, &packet->content.data, sizeof(dht22_data_type));
-
-
-DEBUG("Temp: %u, ", (uint32_t)reading.temperature);
-DEBUG("Hum: %u\r\n", (uint32_t)reading.humidity);
-//NOTE: Return false so no ACK is sent
-*/
+    if (packet != NULL)
+    {
+        libUI_Print("RSSI: %d", 4, 2, packet->header.rssi);
+        libUI_Print("Source: 0x%02X", 4, 16, packet->header.source);
+    }
+    else
+    {
+        libUI_Print("RSSI: -", 16, 2);
+        libUI_Print("Source: -", 16, 16);
+        INFO("No valid data, context: %u", context);
+    }
+    return;
+}
