@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-07 (Last edit)
  * @brief  Implementation of input module.
  *
  * Detailed description of file.
@@ -175,7 +175,11 @@ void PushCheckAndTrigger(void)
     uint16_t adc_sample;
     bool curr_push;
 
-    libADC_GetSample(PUSH_ADC_CHANNEL, &adc_sample);
+    if (libADC_GetSample(PUSH_ADC_CHANNEL, &adc_sample) == false)
+    {
+        return;
+    }
+
     curr_push = adc_sample > 512;
 
     if (prev_push == false && curr_push == true)
