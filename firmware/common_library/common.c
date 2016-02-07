@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-30 (Last edit)
+ * @date   2016-02-07 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -52,6 +52,19 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+float_parts_type FloatToParts(float f_value)
+{
+    float_parts_type parts;
+
+    parts.integer = (int32_t)f_value;
+
+    int8_t tmp;
+    tmp = (int8_t)((f_value - parts.integer) * 10);
+    parts.fractional = tmp < 0 ? -tmp : tmp;
+
+    return parts;
+}
 
 uint16_t exponential_moving_average(uint16_t value, uint16_t average,
                                     uint16_t alpha)

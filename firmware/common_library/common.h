@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-07 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -58,9 +58,17 @@ typedef enum function_status
     TIMEOUT
 } function_status;
 
+typedef struct
+{
+    int32_t integer;
+    uint8_t fractional;
+} float_parts_type;
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+float_parts_type FloatToParts(float f_value);
 uint16_t exponential_moving_average(uint16_t value, uint16_t average,
                                     uint16_t alpha);
 void SetBit(uint8_t bit_index, bool state, uint8_t *data);
