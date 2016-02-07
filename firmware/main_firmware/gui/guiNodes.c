@@ -122,15 +122,18 @@ static void DrawNodeView(uint16_t context)
 
     if (packet != NULL)
     {
-        libUI_Print("Temperature: %uC", 16, 2,
-                    (uint32_t)((dht22_data_type *)packet->content.data)->temperature);
-        libUI_Print("Humidity: %u%%", 26, 16,
-                    (uint32_t)((dht22_data_type *)packet->content.data)->humidity);
+        float_parts_type parts;
+
+        parts = FloatToParts(((dht22_data_type *)packet->content.data)->temperature);
+        libUI_Print("Temperature: %li.%uC", 8, 2, parts.integer, parts.fractional);
+
+        parts = FloatToParts(((dht22_data_type *)packet->content.data)->humidity);
+        libUI_Print("Humidity: %li.%u%%", 18, 16, parts.integer, parts.fractional);
     }
     else
     {
-        libUI_Print("Temperature: -", 16, 2);
-        libUI_Print("Humidity: -", 26, 16);
+        libUI_Print("Temperature: -", 8, 2);
+        libUI_Print("Humidity: -", 18, 16);
         INFO("No valid data, context: %u", context);
     }
     return;
