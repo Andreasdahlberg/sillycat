@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-07 (Last edit)
  * @brief  Implementation of Nodes
  *
  * Detailed description of file.
@@ -34,6 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "libDebug.h"
+#include "Timer.h"
 #include "Nodes.h"
 #include "guiNodes.h"
 
@@ -42,23 +43,19 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define MAX_NR_NODES 3
+#define ADDRESS_OFFSET 128
+#define DATA_OUTDATED_LIMIT_MS 20000
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
-
-typedef struct
-{
-    float humidity;
-    float temperature;
-    bool status;
-} dht22_data_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
 static packet_frame_type packets[MAX_NR_NODES];
+static uint32_t last_update[MAX_NR_NODES];
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -70,9 +67,17 @@ static bool ReadingPacketHandler(packet_frame_type *packet);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+///
+/// @brief Init the Nodes module, resets all buffers and registers a packet
+///        handler function.
+///
+/// @param  None
+/// @return None
+///
 void Nodes_Init(void)
 {
     memset(packets, 0, sizeof(packets));
+    memset(last_update, 0, sizeof(last_update));
 
     if (Transceiver_SetPacketHandler(ReadingPacketHandler,
                                      TR_PACKET_TYPE_READING) == true)
@@ -82,10 +87,20 @@ void Nodes_Init(void)
     return;
 }
 
+///
+/// @brief Get the latest data packet from a specific node.
+///
+/// @param  index Index of node to get data from.
+/// @return packet_frame_type Pointer to the latest data packet, NULL if no data
+///                           exists.
+///
 packet_frame_type *Nodes_GetLatestData(uint8_t index)
 {
+    sc_assert(index < MAX_NR_NODES);
+
     //NOTE: Using total_size to determine if packet contains any data
-    if (index < MAX_NR_NODES && packets[index].header.total_size > 0)
+    if (packets[index].header.total_size > 0 &&
+            Timer_TimeDifference(last_update[index]) < DATA_OUTDATED_LIMIT_MS)
     {
         return &packets[index];
     }
@@ -99,18 +114,18 @@ packet_frame_type *Nodes_GetLatestData(uint8_t index)
 
 static bool ReadingPacketHandler(packet_frame_type *packet)
 {
-    dht22_data_type reading;
+    sc_assert(packet != NULL);
+
+    if (packet->header.source >= ADDRESS_OFFSET)
+    {
+        uint8_t index = ADDRESS_OFFSET - packet->header.source;
+        sc_assert(index < MAX_NR_NODES);
+
+        memcpy(&packets[index], packet, sizeof(packet_frame_type));
+
+        last_update[index] = Timer_GetMilliseconds();
+    }
 
     DEBUG("Packet handled\r\n");
-
-    //TODO: Use source address to determine index in packets
-    memcpy(&packets[0], packet, sizeof(packet_frame_type));
-
-    memcpy(&reading, &packet->content.data, sizeof(dht22_data_type));
-
-
-    //DEBUG("Temp: %u, ", (uint32_t)reading.temperature);
-    //DEBUG("Hum: %u\r\n", (uint32_t)reading.humidity);
-    //NOTE: Return false so no ACK is sent
     return false;
 }
