@@ -41,6 +41,19 @@ class SerialInterface(QtCore.QThread):
             return False
 
 
+    def get_ports(self):
+        """Get a list with all available COM-ports"""
+        ports = []
+        for i in range(256):
+            try:
+                s = serial.Serial(i)
+                ports.append(s.portstr)
+                s.close()
+            except serial.SerialException:
+                pass
+        return ports
+
+
     def run(self):
         """Listens for data and emits a signal for every new line"""
         self._running = True
