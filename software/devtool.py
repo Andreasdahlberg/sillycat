@@ -14,8 +14,6 @@ from DataLog import *
 from DisplayView import DisplayView
 from PacketView import PacketView
 
-
-PORT = 'com3'
 BAUDRATE = 250000
 
 LOG_PATH = 'logs'
@@ -58,35 +56,27 @@ class DevTool(QtGui.QWidget):
         self.ser = SerialInterface()
         self.initUI()
 
-    
-
         self.log = DataLog(LOG_PATH)
-
-        if self.ser.open_port(PORT, BAUDRATE) == True:
-            self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.console_view.update_console_view)
-            self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
-            self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
-
-            self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)
-            self.connect(self.ser, QtCore.SIGNAL('new_pck(QString)'), self.pv.update_packet_view)                 
-            self.connect(self.dv, QtCore.SIGNAL('new_pixel(QPoint)'), self.update_pixel_text)   
-                        
-            self.ser.start()
-        else:
-            self.console_view.setPlainText('Failed to open interface on ' + PORT)
 
         
     def initUI(self):
 
         self.console_view = ConsoleView()
-        self.console_view.appendHtml('<b>Waiting for input...<b>')
-
         self.dv = DisplayView()
         self.dv.hide()
         self.pv = PacketView()
 
         self.checkbox = QtGui.QCheckBox('Pause')
         self.checkbox.stateChanged.connect(self.console_view.toogle_pause)
+
+        self.port_select = QtGui.QComboBox();
+
+        for port in self.ser.get_ports():
+            self.port_select.addItem(port)
+
+        self.connect_button = QtGui.QPushButton('Connect')
+        self.connect_button.setCheckable(True)
+        self.connect_button.clicked[bool].connect(self.connect_clicked)        
 
         self.label = QtGui.QLabel() 
         self.label.setText('');
@@ -100,8 +90,16 @@ class DevTool(QtGui.QWidget):
         hbox.addLayout(display_vbox)
         hbox.addWidget(self.console_view)
 
+
+        connect_box = QtGui.QHBoxLayout();
+        connect_box.addWidget(self.port_select)
+        connect_box.addWidget(self.connect_button)      
+        connect_box.addStretch(1)
+        connect_box.addWidget(self.checkbox)                
+
         vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(self.checkbox)
+        vbox.addLayout(connect_box)
+     
         vbox.addLayout(hbox) 
 
         vbox.addWidget(self.pv)      
@@ -115,10 +113,41 @@ class DevTool(QtGui.QWidget):
         self.show()
 
 
+    def connect_clicked(self, pressed):
+        if pressed:
+            port = str(self.port_select.currentText()).lower()
+            print(port)
+
+            try:
+                if self.ser.open_port(port, BAUDRATE) == True:
+                    self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.console_view.update_console_view)
+                    self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
+                    self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
+
+                    self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)
+                    self.connect(self.ser, QtCore.SIGNAL('new_pck(QString)'), self.pv.update_packet_view)                 
+                    self.connect(self.dv, QtCore.SIGNAL('new_pixel(QPoint)'), self.update_pixel_text)   
+                
+                    self.ser.start()
+                    self.console_view.appendHtml('<b>Connected to ' + port + '</b>') 
+
+                else:
+                    self.connect_button.setChecked(False)
+                    self.console_view.appendHtml('<b>Failed to open interface on ' + port + '</b>')            
+            except:
+                    self.connect_button.setChecked(False)
+                    self.console_view.appendHtml('<b>Exception when opening interface on ' + port + '</b>')                 
+
+        else:
+            self.ser.stop()
+            self.console_view.appendHtml('<b>Disconnected<b>')
+
+
     def update_pixel_text(self, point):
         if (self.label.isHidden()):
             self.label.show()
         self.label.setText('X: ' + str(point.x()) + ',Y: ' + str(point.y()))
+
 
     def closeEvent(self, event):
         self.ser.stop()
