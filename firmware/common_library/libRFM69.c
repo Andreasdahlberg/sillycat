@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-05 (Last edit)
+ * @date   2016-02-13 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -84,8 +84,6 @@ typedef enum
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void WriteRegister(uint8_t address, uint8_t register_data);
-static void ReadRegister(uint8_t address, uint8_t *register_data);
 static bool IsBitSetInRegister(uint8_t address, uint8_t bit);
 
 static void PreCallback(void);
@@ -198,7 +196,7 @@ uint8_t libRFM69_WriteToFIFO(const uint8_t *data, uint8_t length)
             break;
         }
 
-        WriteRegister(REG_FIFO, data[index]);
+        libRFM69_WriteRegister(REG_FIFO, data[index]);
     }
 
     return index;
@@ -217,7 +215,7 @@ uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length)
 
     while (libRFM69_IsFIFONotEmpty() && index < max_length)
     {
-        ReadRegister(REG_FIFO, &data[index]);
+        libRFM69_ReadRegister(REG_FIFO, &data[index]);
         ++index;
     }
 
@@ -227,12 +225,7 @@ uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length)
 void libRFM69_ClearFIFO(void)
 {
     INFO("Clear FIFO");
-
-    while (libRFM69_IsFIFONotEmpty())
-    {
-        uint8_t tmp;
-        ReadRegister(REG_FIFO, &tmp);
-    }
+    libRFM69_WriteRegister(REG_IRQFLAGS2, (1 << REG_IRQFLAGS2_BIT_FIFOOVERRUN));
     return;
 }
 
@@ -240,7 +233,7 @@ libRFM69_mode_type libRFM69_GetMode(void)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_OPMODE, &register_content);
+    libRFM69_ReadRegister(REG_OPMODE, &register_content);
     return (libRFM69_mode_type)((register_content & ~REG_OPMODE_MODE_MASK) >> 2);
 }
 
@@ -248,9 +241,9 @@ void libRFM69_SetMode(libRFM69_mode_type mode)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_OPMODE, &register_content);
+    libRFM69_ReadRegister(REG_OPMODE, &register_content);
     register_content = (register_content & ~REG_OPMODE_MODE_MASK) | (mode << 2);
-    WriteRegister(REG_OPMODE, register_content);
+    libRFM69_WriteRegister(REG_OPMODE, register_content);
 
     return;
 }
@@ -276,7 +269,7 @@ bool libRFM69_IsModeReady()
 {
     uint8_t register_content;
 
-    ReadRegister(REG_IRQFLAGS1, &register_content);
+    libRFM69_ReadRegister(REG_IRQFLAGS1, &register_content);
     return (register_content & RF_IRQFLAGS1_MODEREADY) == RF_IRQFLAGS1_MODEREADY;
 }
 
@@ -284,23 +277,20 @@ bool libRFM69_IsRxReady()
 {
     uint8_t register_content;
 
-    ReadRegister(REG_IRQFLAGS1, &register_content);
+    libRFM69_ReadRegister(REG_IRQFLAGS1, &register_content);
     return (register_content & RF_IRQFLAGS1_RXREADY) == RF_IRQFLAGS1_RXREADY;
 }
 
 bool libRFM69_IsTxReady()
 {
-    uint8_t register_content;
-
-    ReadRegister(REG_IRQFLAGS1, &register_content);
-    return (register_content & RF_IRQFLAGS1_TXREADY) == RF_IRQFLAGS1_TXREADY;
+    return IsBitSetInRegister(REG_IRQFLAGS1, 5);
 }
 
 bool libRFM69_IsRSSIThresholdExceeded()
 {
     uint8_t register_content;
 
-    ReadRegister(REG_IRQFLAGS1, &register_content);
+    libRFM69_ReadRegister(REG_IRQFLAGS1, &register_content);
     return (register_content & RF_IRQFLAGS1_RSSI) == RF_IRQFLAGS1_RSSI;
 }
 
@@ -312,9 +302,9 @@ void libRFM69_SetCarrierFrequency(uint32_t frequency)
     DEBUG("Freq: %lu\r\n", frequency);
     DEBUG("Freq value: 0x%03lX\r\n", frequency_value);
 
-    WriteRegister(REG_FRFMSB, (frequency_value >> 16) & 0xFF);
-    WriteRegister(REG_FRFMID, (frequency_value >> 8) & 0xFF);
-    WriteRegister(REG_FRFLSB, frequency_value & 0xFF);
+    libRFM69_WriteRegister(REG_FRFMSB, (frequency_value >> 16) & 0xFF);
+    libRFM69_WriteRegister(REG_FRFMID, (frequency_value >> 8) & 0xFF);
+    libRFM69_WriteRegister(REG_FRFLSB, frequency_value & 0xFF);
 
     return;
 }
@@ -323,9 +313,9 @@ void libRFM69_EnableListenMode(bool enable)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_OPMODE, &register_content);
+    libRFM69_ReadRegister(REG_OPMODE, &register_content);
     register_content = (register_content & 0xBF) | (uint8_t)enable;
-    WriteRegister(REG_OPMODE, register_content);
+    libRFM69_WriteRegister(REG_OPMODE, register_content);
 
     return;
 }
@@ -334,9 +324,9 @@ void libRFM69_EnableSequencer(bool enable)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_OPMODE, &register_content);
+    libRFM69_ReadRegister(REG_OPMODE, &register_content);
     register_content = (register_content & 0x7F) | ((uint8_t)!enable << 7);
-    WriteRegister(REG_OPMODE, register_content);
+    libRFM69_WriteRegister(REG_OPMODE, register_content);
 
     return;
 }
@@ -345,9 +335,9 @@ void libRFM69_EnableEncryption(bool enable)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_PACKETCONFIG2, &register_content);
+    libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
     SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
-    WriteRegister(REG_PACKETCONFIG2, register_content);
+    libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
 
     return;
 }
@@ -356,11 +346,11 @@ void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_PACKETCONFIG1, &register_content);
+    libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
     SetBit(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
            &register_content);
 
-    WriteRegister(REG_PACKETCONFIG1, register_content);
+    libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
     return;
 }
 
@@ -369,10 +359,10 @@ void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
 {
     uint8_t register_content;
 
-    ReadRegister(REG_FIFOTHRESH, &register_content);
+    libRFM69_ReadRegister(REG_FIFOTHRESH, &register_content);
     SetBit(0x07, (bool)start_condition, &register_content);
 
-    WriteRegister(REG_FIFOTHRESH, register_content);
+    libRFM69_WriteRegister(REG_FIFOTHRESH, register_content);
     return;
 }
 
@@ -390,27 +380,27 @@ void libRFM69_GetTemperature(uint8_t *temperature)
     libRFM69_mode_type active_mode;
 
     //Save the active mode so it can be restored after the measurement is done.
-    active_mode = libRFM69_GetMode();
+    //active_mode = libRFM69_GetMode();
 
     //Enter standby mode, temperature can only be read in standby or synthesizer mode.
-    libRFM69_SetMode(RFM_STANDBY);
-    libRFM69_WaitForModeReady();
+    //libRFM69_SetMode(RFM_STANDBY);
+    //libRFM69_WaitForModeReady();
 
-    WriteRegister(REG_TEMP1, RF_TEMP1_MEAS_START);
+    libRFM69_WriteRegister(REG_TEMP1, RF_TEMP1_MEAS_START);
 
     //Wait for temperature measurement to finish. Less then 100 uS.
     do
     {
-        ReadRegister(REG_TEMP1, &register_data);
+        libRFM69_ReadRegister(REG_TEMP1, &register_data);
     }
     while (register_data & RF_TEMP1_MEAS_RUNNING);
 
-    ReadRegister(REG_TEMP2, &register_data);
+    libRFM69_ReadRegister(REG_TEMP2, &register_data);
     *temperature = register_data;
 
     //Restore mode.
-    libRFM69_SetMode(active_mode);
-    libRFM69_WaitForModeReady();
+    //libRFM69_SetMode(active_mode);
+    //libRFM69_WaitForModeReady();
 
     return;
 }
@@ -419,8 +409,8 @@ void libRFM69_SetBitRate(uint32_t bit_rate)
 {
     uint16_t bit_rate_value = (uint16_t)(RFM_FXOSC / bit_rate);
 
-    WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8));
-    WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
+    libRFM69_WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8));
+    libRFM69_WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
 
     return;
 }
@@ -430,10 +420,10 @@ uint32_t libRFM69_GetBitrate(void)
     uint16_t bit_rate_value;
     uint8_t tmp;
 
-    ReadRegister(REG_BITRATEMSB, &tmp);
+    libRFM69_ReadRegister(REG_BITRATEMSB, &tmp);
     bit_rate_value = (uint16_t)(tmp << 8);
 
-    ReadRegister(REG_BITRATELSB, &tmp);
+    libRFM69_ReadRegister(REG_BITRATELSB, &tmp);
     bit_rate_value |= tmp;
 
     if (bit_rate_value > 0)
@@ -459,23 +449,23 @@ void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering)
 
     uint8_t register_content;
 
-    ReadRegister(REG_PACKETCONFIG1, &register_content);
+    libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
     register_content = (register_content & 0xF9) |
                        (filtering << 1);
 
-    WriteRegister(REG_PACKETCONFIG1, register_content);
+    libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
     return;
 }
 
 void libRFM69_SetNodeAddress(uint8_t node_address)
 {
-    WriteRegister(REG_NODEADRS, node_address);
+    libRFM69_WriteRegister(REG_NODEADRS, node_address);
     return;
 }
 
 void libRFM69_SetBroadcastAddress(uint8_t broadcast_address)
 {
-    WriteRegister(REG_BROADCASTADRS, broadcast_address);
+    libRFM69_WriteRegister(REG_BROADCASTADRS, broadcast_address);
     return;
 }
 
@@ -483,11 +473,11 @@ void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_DATAMODUL, &register_content);
+    libRFM69_ReadRegister(REG_DATAMODUL, &register_content);
     register_content = (register_content & ~REG_DATA_MODUL_DATA_MODE_MASK) |
                        (data_mode << 5);
 
-    WriteRegister(REG_DATAMODUL, register_content);
+    libRFM69_WriteRegister(REG_DATAMODUL, register_content);
     return;
 }
 
@@ -496,11 +486,11 @@ void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
     sc_assert(modulation_type == RFM_FSK || modulation_type == RFM_OOK);
     uint8_t register_content;
 
-    ReadRegister(REG_DATAMODUL, &register_content);
+    libRFM69_ReadRegister(REG_DATAMODUL, &register_content);
     register_content = (register_content & ~REG_DATA_MODUL_MODULATION_TYPE_MASK) |
                        (modulation_type << 3);
 
-    WriteRegister(REG_DATAMODUL, register_content);
+    libRFM69_WriteRegister(REG_DATAMODUL, register_content);
     return;
 }
 
@@ -511,11 +501,11 @@ void libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 
     DEBUG("Modulation shaping: 0x%02X\r\n", modulation_shaping);
 
-    ReadRegister(REG_DATAMODUL, &register_content);
+    libRFM69_ReadRegister(REG_DATAMODUL, &register_content);
     register_content = (register_content & ~REG_DATA_MODUL_MODULATION_SHAPING_MASK)
                        | modulation_shaping;
 
-    WriteRegister(REG_DATAMODUL, register_content);
+    libRFM69_WriteRegister(REG_DATAMODUL, register_content);
     return;
 }
 
@@ -527,8 +517,8 @@ void libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
     DEBUG("Freq deviation: %u\r\n", frequency_deviation);
     DEBUG("Freq deviation value: 0x%04X\r\n", frequency_deviation_value);
 
-    WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF));
-    WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
+    libRFM69_WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF));
+    libRFM69_WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
 
     return;
 }
@@ -546,12 +536,12 @@ void libRFM69_SetPowerAmplifierMode(uint8_t mode)
 
     DEBUG("Power amplifier mode: 0x%02X\r\n", mode);
 
-    ReadRegister(REG_PALEVEL, &register_content);
+    libRFM69_ReadRegister(REG_PALEVEL, &register_content);
 
     register_content &= ~REG_PA_LEVEL_PA_MASK;
     register_content |= (mode << 5);
 
-    WriteRegister(REG_PALEVEL, register_content);
+    libRFM69_WriteRegister(REG_PALEVEL, register_content);
     return;
 }
 
@@ -567,12 +557,12 @@ void libRFM69_SetPowerLevel(uint8_t power_level)
     sc_assert(power_level <= 31);
 
     uint8_t register_content;
-    ReadRegister(REG_PALEVEL, &register_content);
+    libRFM69_ReadRegister(REG_PALEVEL, &register_content);
 
     register_content &= ~REG_PA_LEVEL_POUT_MASK;
     register_content |= power_level;
 
-    WriteRegister(REG_PALEVEL, register_content);
+    libRFM69_WriteRegister(REG_PALEVEL, register_content);
     return;
 }
 
@@ -586,11 +576,11 @@ bool libRFM69_IsHighPowerEnabled(void)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_TESTPA1, &register_content);
+    libRFM69_ReadRegister(REG_TESTPA1, &register_content);
 
     if (register_content == 0x5D)
     {
-        ReadRegister(REG_TESTPA2, &register_content);
+        libRFM69_ReadRegister(REG_TESTPA2, &register_content);
         return (register_content == 0x7C);
     }
 
@@ -616,13 +606,13 @@ void libRFM69_EnableHighPowerSetting(bool enable)
         }
 #endif
 
-        WriteRegister(REG_TESTPA1, 0x5D);
-        WriteRegister(REG_TESTPA2, 0x7C);
+        libRFM69_WriteRegister(REG_TESTPA1, 0x5D);
+        libRFM69_WriteRegister(REG_TESTPA2, 0x7C);
     }
     else
     {
-        WriteRegister(REG_TESTPA1, 0x55);
-        WriteRegister(REG_TESTPA2, 0x70);
+        libRFM69_WriteRegister(REG_TESTPA1, 0x55);
+        libRFM69_WriteRegister(REG_TESTPA2, 0x70);
     }
 
     return;
@@ -639,7 +629,7 @@ int8_t libRFM69_GetOutputPower(void)
     int8_t pout = 0;
     uint8_t register_content;
 
-    ReadRegister(REG_PALEVEL, &register_content);
+    libRFM69_ReadRegister(REG_PALEVEL, &register_content);
     register_content &= REG_PA_LEVEL_POUT_MASK;
 
     switch (libRFM69_GetPowerAmplifierMode())
@@ -682,7 +672,7 @@ uint8_t libRFM69_GetPowerAmplifierMode(void)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_PALEVEL, &register_content);
+    libRFM69_ReadRegister(REG_PALEVEL, &register_content);
     return (register_content >> 5);
 }
 
@@ -698,10 +688,10 @@ void libRFM69_EnableOCP(bool enabled)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_OCP, &register_content);
+    libRFM69_ReadRegister(REG_OCP, &register_content);
     SetBit(4, enabled, &register_content);
 
-    WriteRegister(REG_OCP, register_content);
+    libRFM69_WriteRegister(REG_OCP, register_content);
     return;
 }
 
@@ -717,15 +707,15 @@ int8_t libRFM69_GetRSSI(void)
     uint8_t register_content;
 
     //Start RSSI measurement
-    WriteRegister(REG_RSSICONFIG, 0x01);
+    libRFM69_WriteRegister(REG_RSSICONFIG, 0x01);
 
     do
     {
-        ReadRegister(REG_RSSICONFIG, &register_content);
+        libRFM69_ReadRegister(REG_RSSICONFIG, &register_content);
     }
     while (register_content == 0);
 
-    ReadRegister(REG_RSSIVALUE, &register_content);
+    libRFM69_ReadRegister(REG_RSSIVALUE, &register_content);
 
     return (-1 * (int8_t)(register_content >> 1));
 }
@@ -740,7 +730,7 @@ bool libRFM69_ClearFIFOOverrun(void)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_IRQFLAGS2, &register_content);
+    libRFM69_ReadRegister(REG_IRQFLAGS2, &register_content);
 
     bool status;
     status = IsBitSet(REG_IRQFLAGS2_BIT_FIFOOVERRUN, &register_content);
@@ -748,7 +738,7 @@ bool libRFM69_ClearFIFOOverrun(void)
     if (status)
     {
         SetBit(REG_IRQFLAGS2_BIT_FIFOOVERRUN, true, &register_content);
-        WriteRegister(REG_IRQFLAGS2, register_content);
+        libRFM69_WriteRegister(REG_IRQFLAGS2, register_content);
     }
     return status;
 }
@@ -783,11 +773,11 @@ void libRFM69_SetSyncWordSize(uint8_t size)
 
     uint8_t register_content;
 
-    ReadRegister(REG_SYNCCONFIG, &register_content);
+    libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
     register_content &= (0xC7);
 
     register_content |= ((size - 1) << 3);
-    WriteRegister(REG_SYNCCONFIG, register_content);
+    libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
 
     return;
 }
@@ -800,8 +790,8 @@ void libRFM69_SetSyncWordSize(uint8_t size)
 ///
 void libRFM69_SetPreambleLength(uint16_t length)
 {
-    WriteRegister(REG_PREAMBLEMSB, (length >> 8));
-    WriteRegister(REG_PREAMBLELSB, (length & 0x00FF));
+    libRFM69_WriteRegister(REG_PREAMBLEMSB, (length >> 8));
+    libRFM69_WriteRegister(REG_PREAMBLELSB, (length & 0x00FF));
     return;
 }
 
@@ -816,10 +806,10 @@ uint16_t libRFM69_GetPreambleLength(void)
     uint16_t length;
     uint8_t register_content;
 
-    ReadRegister(REG_PREAMBLEMSB, &register_content);
+    libRFM69_ReadRegister(REG_PREAMBLEMSB, &register_content);
     length = (uint16_t)(register_content << 8);
 
-    ReadRegister(REG_PREAMBLELSB, &register_content);
+    libRFM69_ReadRegister(REG_PREAMBLELSB, &register_content);
     length |= register_content;
 
     return length;
@@ -835,7 +825,7 @@ uint8_t libRFM69_GetSyncWordSize(void)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_SYNCCONFIG, &register_content);
+    libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
 
     //From RFM69HW datasheet, table 28: sync word size = RegSyncConfig[5:2] + 1
     return ((register_content >> 3) & 0x07) + 1;
@@ -873,7 +863,7 @@ bool libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
     //Write new sync word if all checks passed.
     for (index = 0; index < length; ++index)
     {
-        WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]);
+        libRFM69_WriteRegister(REG_SYNCVALUE1 + index, sync_word[index]);
     }
 
     return true;
@@ -897,7 +887,7 @@ uint8_t libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t buffer_size)
     {
         for (; index < sync_word_size; ++index)
         {
-            ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]);
+            libRFM69_ReadRegister(REG_SYNCVALUE1 + index, &sync_word[index]);
         }
     }
     return index;
@@ -913,7 +903,7 @@ uint8_t libRFM69_GetSyncWord(uint8_t *sync_word, uint8_t buffer_size)
 uint8_t libRFM69_GetChipVersion(void)
 {
     uint8_t register_content;
-    ReadRegister(REG_VERSION, &register_content);
+    libRFM69_ReadRegister(REG_VERSION, &register_content);
 
     return register_content;
 }
@@ -930,17 +920,19 @@ void libRFM69_DumpRegisterValues(void)
     uint8_t register_address;
     uint8_t register_content;
 
+    DEBUG("****Register content****\r\n");
+
     for (register_address = 0; register_address < 0x4F; ++register_address)
     {
-        ReadRegister(register_address, &register_content);
+        libRFM69_ReadRegister(register_address, &register_content);
         DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", register_address,
               register_content);
     }
 
-    ReadRegister(REG_TESTPA1, &register_content);
+    libRFM69_ReadRegister(REG_TESTPA1, &register_content);
     DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA1, register_content);
 
-    ReadRegister(REG_TESTPA2, &register_content);
+    libRFM69_ReadRegister(REG_TESTPA2, &register_content);
     DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA2, register_content);
     return;
 }
@@ -956,9 +948,9 @@ void libRFM69_EnableSyncWordGeneration(bool enabled)
 {
     uint8_t register_content;
 
-    ReadRegister(REG_SYNCCONFIG, &register_content);
+    libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
     SetBit(7, enabled, &register_content);
-    WriteRegister(REG_SYNCCONFIG, register_content);
+    libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
 
     return;
 }
@@ -974,9 +966,29 @@ void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
 {
     uint8_t register_content;
 
-    ReadRegister(REG_SYNCCONFIG, &register_content);
+    libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
     SetBit(6, (bool)fill_condition, &register_content);
-    WriteRegister(REG_SYNCCONFIG, register_content);
+    libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
+
+    return;
+}
+
+void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
+{
+    sc_assert(address <= REG_TESTPA2);
+
+    libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
+    libSPI_WriteByte(register_data, NULL, &PostCallback);
+
+    return;
+}
+
+void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data)
+{
+    sc_assert(address <= REG_TESTPA2);
+
+    libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
+    libSPI_ReadByte(register_data, NULL, &PostCallback);
 
     return;
 }
@@ -998,26 +1010,6 @@ static void PostCallback(void)
     return;
 }
 
-static void WriteRegister(uint8_t address, uint8_t register_data)
-{
-    sc_assert(address <= REG_TESTPA2);
-
-    libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
-    libSPI_WriteByte(register_data, NULL, &PostCallback);
-
-    return;
-}
-
-static void ReadRegister(uint8_t address, uint8_t *register_data)
-{
-    sc_assert(address <= REG_TESTPA2);
-
-    libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
-    libSPI_ReadByte(register_data, NULL, &PostCallback);
-
-    return;
-}
-
 ///
 /// @brief Check if a bit is set in a register. If something fails this
 //         function will return true!
@@ -1034,6 +1026,6 @@ static bool IsBitSetInRegister(uint8_t address, uint8_t bit)
 
     uint8_t register_content;
 
-    ReadRegister(address, &register_content);
+    libRFM69_ReadRegister(address, &register_content);
     return ((register_content & (1 << bit)) > 0);
 }
