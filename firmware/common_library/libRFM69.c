@@ -367,6 +367,25 @@ void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
 }
 
 ///
+/// @brief Set the inter packet rx delay. Defines the delay between
+///        FIFO empty and the start of a new RSSI phase for next
+///        packet. Must match the transmitters PA ramp-down time.
+///
+/// @param  val Inter packet Rx delay
+/// @return None
+///
+void libRFM69_SetPacketRxDelay(uint8_t val)
+{
+    uint8_t register_content;
+
+    libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
+    register_content = (register_content & 0x0F) | (val << 4);
+
+    libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
+    return;
+}
+
+///
 /// @brief Get the chip temperature. This function changes the mode to
 ///        standby while the measurement is in progress, the previous mode
 ///        is then restored.

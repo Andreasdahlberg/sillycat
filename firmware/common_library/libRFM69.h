@@ -172,6 +172,7 @@ void libRFM69_SetNodeAddress(uint8_t node_address);
 void libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
 void libRFM69_EnableHighPowerSetting(bool enable);
 void libRFM69_SetPowerLevel(uint8_t power_level);
+void libRFM69_SetPacketRxDelay(uint8_t val);
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data);
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 
