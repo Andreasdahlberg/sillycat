@@ -160,6 +160,8 @@ bool libRFM69_IsHighPowerEnabled(void);
 bool libRFM69_IsRxReady();
 bool libRFM69_IsTxReady();
 bool libRFM69_IsRSSIThresholdExceeded();
+void libRFM69_SetRSSIThreshold(int8_t threshold);
+int8_t libRFM69_GetRSSIThreshold(void);
 bool libRFM69_IsFIFOFull(void);
 bool libRFM69_IsFIFONotEmpty(void);
 bool libRFM69_IsFIFOLevel(void);

@@ -334,6 +334,33 @@ bool libRFM69_IsRSSIThresholdExceeded()
     return (register_content & RF_IRQFLAGS1_RSSI) == RF_IRQFLAGS1_RSSI;
 }
 
+///
+/// @brief Set the RSSI trigger level for RSSI interrupt.
+///
+/// @return uint8_t RSSI threshold
+/// @return None
+///
+void libRFM69_SetRSSIThreshold(int8_t threshold)
+{
+    libRFM69_WriteRegister(REG_RSSITHRESH, (uint8_t)(threshold * -1) << 1);
+    return;
+}
+
+///
+/// @brief Get the RSSI trigger level for RSSI interrupt.
+///
+/// @param  None
+/// @return int8_t RSSI threshold
+///
+int8_t libRFM69_GetRSSIThreshold(void)
+{
+    uint8_t register_content;
+
+    libRFM69_ReadRegister(REG_RSSITHRESH, &register_content);
+
+    return ((int8_t)(register_content >> 1) * -1);
+}
+
 
 void libRFM69_SetCarrierFrequency(uint32_t frequency)
 {
