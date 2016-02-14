@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-13 (Last edit)
+ * @date   2016-02-14 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -173,6 +173,7 @@ void libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
 void libRFM69_EnableHighPowerSetting(bool enable);
 void libRFM69_SetPowerLevel(uint8_t power_level);
 void libRFM69_SetPacketRxDelay(uint8_t val);
+void libRFM69_RestartRx(void);
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data);
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 

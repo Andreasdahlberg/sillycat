@@ -373,6 +373,23 @@ void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
 }
 
 ///
+/// @brief Force Rx restart.
+///
+/// @param  None
+/// @return None
+///
+void libRFM69_RestartRx(void)
+{
+    uint8_t register_content;
+
+    libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
+    register_content = (register_content | (1 << 2));
+
+    libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
+    return;
+}
+
+///
 /// @brief Set the inter packet rx delay. Defines the delay between
 ///        FIFO empty and the start of a new RSSI phase for next
 ///        packet. Must match the transmitters PA ramp-down time.
