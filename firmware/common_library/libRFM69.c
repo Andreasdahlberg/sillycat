@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-13 (Last edit)
+ * @date   2016-02-14 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -229,12 +229,18 @@ void libRFM69_ClearFIFO(void)
     return;
 }
 
+///
+/// @brief Get the active operating mode.
+///
+/// @param  None
+/// @return libRFM69_mode_type Operating mode (0-4)
+///
 libRFM69_mode_type libRFM69_GetMode(void)
 {
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_OPMODE, &register_content);
-    return (libRFM69_mode_type)((register_content & ~REG_OPMODE_MODE_MASK) >> 2);
+    return (libRFM69_mode_type)((register_content & REG_OPMODE_MODE_MASK) >> 2);
 }
 
 void libRFM69_SetMode(libRFM69_mode_type mode)
