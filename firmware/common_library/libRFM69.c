@@ -176,6 +176,40 @@ bool libRFM69_IsOCPEnabled(void)
 }
 
 ///
+/// @brief Enabled/disabled CRC auto clear
+///
+/// @param  enabled Enabled(True): Clear FIFO and restart new packet reception.
+///                                No PayloadReady interrupt issued.
+///                 Disabled(False): Do not clear FIFO. PayloadReady interrupt issued.
+/// @return None
+///
+void libRFM69_EnableCRCAutoClear(bool enable)
+{
+    uint8_t register_content;
+
+    libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
+    register_content = (register_content & 0xF7) | ((uint8_t)!enable << 3);
+    libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
+    return;
+}
+
+///
+/// @brief Enabled/disabled CRC calculation for both Tx and Rx.
+///
+/// @param  enabled Enabled/disable
+/// @return None
+///
+void libRFM69_EnableCRC(bool enable)
+{
+    uint8_t register_content;
+
+    libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
+    register_content = (register_content & 0xEF) | ((uint8_t)enable << 4);
+    libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
+    return;
+}
+
+///
 /// @brief Write data to FIFO.
 ///
 /// @param  data Pointer to buffer with data to write.

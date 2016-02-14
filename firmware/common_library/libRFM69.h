@@ -167,6 +167,8 @@ bool libRFM69_IsFIFOOverrun(void);
 bool libRFM69_IsPacketSent(void);
 bool libRFM69_IsPayloadReady(void);
 bool libRFM69_IsCRCOk(void);
+void libRFM69_EnableCRC(bool enable);
+void libRFM69_EnableCRCAutoClear(bool enable);
 void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering);
 void libRFM69_SetNodeAddress(uint8_t node_address);
 void libRFM69_SetBroadcastAddress(uint8_t broadcast_address);
