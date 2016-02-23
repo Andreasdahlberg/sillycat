@@ -77,18 +77,26 @@ class DevTool(QtGui.QWidget):
         self.connect_button.setCheckable(True)
         self.connect_button.clicked[bool].connect(self.connect_clicked)        
 
-        self.label = QtGui.QLabel() 
-        self.label.setText('');
-        self.label.hide()
+        self.pixel_label = QtGui.QLabel() 
+        self.pixel_label.setText('X: 0, Y: 0');
+        self.pixel_label.hide()
+
+        self.save_display_button = QtGui.QPushButton('Save image')
+        self.save_display_button.clicked.connect(self.dv.save_view_to_file)
+        self.save_display_button.hide()
+
+        self.display_hbox = QtGui.QHBoxLayout()
+        self.display_hbox.addWidget(self.pixel_label)    
+        self.display_hbox.addWidget(self.save_display_button)
 
         display_vbox = QtGui.QVBoxLayout()
         display_vbox.addWidget(self.dv)
-        display_vbox.addWidget(self.label)
+        display_vbox.addLayout(self.display_hbox)
+        display_vbox.addStretch(1)
 
         hbox = QtGui.QHBoxLayout()
         hbox.addLayout(display_vbox)
         hbox.addWidget(self.console_view)
-
 
         connect_box = QtGui.QHBoxLayout();
         connect_box.addWidget(self.port_select)
@@ -115,7 +123,8 @@ class DevTool(QtGui.QWidget):
         self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
         self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
 
-        self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)
+        self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.show_display_widgets)
+        self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)        
         self.connect(self.ser, QtCore.SIGNAL('new_pck(QString)'), self.pv.update_packet_view)                 
         self.connect(self.dv, QtCore.SIGNAL('new_pixel(QPoint)'), self.update_pixel_text)            
 
@@ -142,10 +151,16 @@ class DevTool(QtGui.QWidget):
             self.console_view.appendHtml('<b>Disconnected<b>')
 
 
+    def show_display_widgets(self, image_data):
+        if (self.save_display_button.isHidden()):
+            self.save_display_button.show()
+        
+        if (self.pixel_label.isHidden()):
+            self.pixel_label.show()                 
+
+
     def update_pixel_text(self, point):
-        if (self.label.isHidden()):
-            self.label.show()
-        self.label.setText('X: ' + str(point.x()) + ',Y: ' + str(point.y()))
+        self.pixel_label.setText('X: ' + str(point.x()) + ',Y: ' + str(point.y()))
 
 
     def closeEvent(self, event):

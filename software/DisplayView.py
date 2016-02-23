@@ -67,11 +67,7 @@ class DisplayView(QtGui.QLabel):
         if y_pos > 30:
             y_pos = 30            
 
-
-
         scaled_point = QtCore.QPoint(x_pos, y_pos)
-
-
         self.emit(QtCore.SIGNAL('new_pixel(QPoint)'), scaled_point)
 
 
@@ -94,7 +90,7 @@ class DisplayView(QtGui.QLabel):
         return pixmap   
 
 
-    def save_view_to_file(self, filename="display.png"):
+    def save_view_to_file(self, state, filename="display.png"):
         self._pixmap.save(filename, 'PNG')
 
 
