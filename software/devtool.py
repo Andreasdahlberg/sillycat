@@ -54,9 +54,8 @@ class DevTool(QtGui.QWidget):
     def __init__(self):
         super(DevTool, self).__init__()
         self.ser = SerialInterface()
+        self.log = DataLog(LOG_PATH)        
         self.initUI()
-
-        self.log = DataLog(LOG_PATH)
 
         
     def initUI(self):
@@ -112,6 +111,14 @@ class DevTool(QtGui.QWidget):
         self.setWindowIcon(QtGui.QIcon(DEV_ICON))        
         self.show()
 
+        self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.console_view.update_console_view)
+        self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
+        self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
+
+        self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)
+        self.connect(self.ser, QtCore.SIGNAL('new_pck(QString)'), self.pv.update_packet_view)                 
+        self.connect(self.dv, QtCore.SIGNAL('new_pixel(QPoint)'), self.update_pixel_text)            
+
 
     def connect_clicked(self, pressed):
         if pressed:
@@ -119,15 +126,7 @@ class DevTool(QtGui.QWidget):
             print(port)
 
             try:
-                if self.ser.open_port(port, BAUDRATE) == True:
-                    self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.console_view.update_console_view)
-                    self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.print_text)
-                    self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'), self.log.handle_signal)      
-
-                    self.connect(self.ser, QtCore.SIGNAL('new_vram(QByteArray)'), self.dv.update_display_view)
-                    self.connect(self.ser, QtCore.SIGNAL('new_pck(QString)'), self.pv.update_packet_view)                 
-                    self.connect(self.dv, QtCore.SIGNAL('new_pixel(QPoint)'), self.update_pixel_text)   
-                
+                if self.ser.open_port(port, BAUDRATE) == True:                
                     self.ser.start()
                     self.console_view.appendHtml('<b>Connected to ' + port + '</b>') 
 
