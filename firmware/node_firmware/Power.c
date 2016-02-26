@@ -104,20 +104,16 @@ void Power_Update(void)
 
             if (libPower_IsCharging() == true)
             {
-                event_type event = {0};
-
                 INFO("Charging started");
-                event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 state = POWER_CHARGING;
             }
             else if (libPower_IsBatteryVoltageValid() == true
                      && libPower_GetBatteryVoltage() < LOW_VOLTAGE_MV)
             {
-                event_type event = {0};
-
                 INFO("Low battery voltage");
-                event = Event_New(EVENT_BATTERY_LOW);
+                event_type event = Event_New(EVENT_BATTERY_LOW);
                 Event_Trigger(&event);
                 state = POWER_LOW;
             }
@@ -126,20 +122,16 @@ void Power_Update(void)
         case POWER_LOW:
             if (libPower_IsCharging() == true)
             {
-                event_type event = {0};
-
                 INFO("Charging started");
-                event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 state = POWER_CHARGING;
             }
             else if (libPower_IsBatteryVoltageValid() == true
                      && libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
             {
-                event_type event = {0};
-
                 WARNING("Critical battery voltage");
-                event = Event_New(EVENT_BATTERY_CRITICAL);
+                event_type event = Event_New(EVENT_BATTERY_CRITICAL);
                 Event_Trigger(&event);
                 state = POWER_CRITICAL;
             }
@@ -148,10 +140,8 @@ void Power_Update(void)
         case POWER_CRITICAL:
             if (libPower_IsCharging() == true)
             {
-                event_type event = {0};
-
                 INFO("Charging started");
-                event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 state = POWER_CHARGING;
             }
@@ -160,10 +150,8 @@ void Power_Update(void)
         case POWER_CHARGING:
             if (libPower_IsCharging() == false)
             {
-                event_type event = {0};
-
                 INFO("Charging stopped");
-                event = Event_New(EVENT_BATTERY_CHARGING_STOPPED);
+                event_type event = Event_New(EVENT_BATTERY_CHARGING_STOPPED);
                 Event_Trigger(&event);
                 state = POWER_CONNECTED;
             }
@@ -172,20 +160,16 @@ void Power_Update(void)
         case POWER_CONNECTED:
             if (libPower_IsCharging() == true)
             {
-                event_type event = {0};
-
                 INFO("Charging started");
-                event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 state = POWER_CHARGING;
             }
 
             if (libPower_IsChargerConnected() == false)
             {
-                event_type event = {0};
-
                 INFO("Charger disconnected");
-                event = Event_New(EVENT_BATTERY_CHARGER_DISCONNECTED);
+                event_type event = Event_New(EVENT_BATTERY_CHARGER_DISCONNECTED);
                 Event_Trigger(&event);
                 state = POWER_NORMAL;
             }

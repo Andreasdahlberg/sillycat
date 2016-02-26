@@ -180,7 +180,6 @@ static bool IsTimeForSleep(void)
 static void NotifyAndEnterSleep(void)
 {
     rtc_time_type time;
-    event_type event = {0};
 
     RTC_GetCurrentTime(&time);
     DEBUG("Sleep: %u:%u:%u\r\n", time.hour, time.minute, time.second);
@@ -190,7 +189,7 @@ static void NotifyAndEnterSleep(void)
     RTC_SetAlarmTime(&time);
     RTC_EnableAlarm(true);
 
-    event = Event_New(EVENT_SLEEP);
+    event_type event = Event_New(EVENT_SLEEP);
     Event_Trigger(&event);
 
     //Enter sleep mode, execution will continue from this point
