@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-07 (Last edit)
+ * @date   2016-02-27 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -75,8 +75,8 @@ void SetBit(uint8_t bit_index, bool state, uint8_t *data);
 bool IsBitSet(uint8_t bit_index, const uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
 uint16_t DecimalToBCD(uint8_t decimal_data);
-int GetFreeRam(void);
 void SoftReset(void) __attribute__((noreturn));
 bool IsGlobalInteruptEnabled(void);
+uint16_t StackCount(void);
 
 #endif /* COMMON_H_ */
