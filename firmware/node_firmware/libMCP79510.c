@@ -36,6 +36,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "libSPI.h"
 #include "libMCP79510.h"
+#include "MCP79510Registers.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

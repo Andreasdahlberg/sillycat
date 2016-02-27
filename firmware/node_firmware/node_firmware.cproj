@@ -294,6 +294,9 @@
     <Compile Include="libPower.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="MCP79510Registers.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="node_firmware.c">
       <SubType>compile</SubType>
     </Compile>
