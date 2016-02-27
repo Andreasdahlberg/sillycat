@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-02-27 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -152,9 +152,10 @@ int main(void)
 
         if (IsTimeForSleep() == true)
         {
+            DEBUG("Unused stack: %u\r\n", StackCount());
+            sc_assert(StackCount() > 0);
             NotifyAndEnterSleep();
         }
-
     }
     sc_assert_fail();
     SoftReset();
