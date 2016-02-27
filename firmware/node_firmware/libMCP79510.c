@@ -46,7 +46,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define SS  DDC0
 #define SPIMODE 1
 
-//#define SRAM_SIZE 256
+#define SRAM_SIZE 64
 
 #define GetDecimalRegisterValue(address) BCDToDecimal(ReadRegister(address))
 
@@ -268,6 +268,73 @@ void libMCP79510_EnableOscillator(bool enabled)
 
     WriteRegister(REG_TC_SEC, register_content);
     return;
+}
+
+///
+/// @brief  Write data to SRAM.
+///
+/// Write data to SRAM. The SRAM is powered by the RTC battery so data is
+/// persistent between power cycles.
+///
+/// @param  address Address in flash to write
+/// @param  *data Pointer to data to write
+/// @param  length Number of bytes to write
+/// @return false  If write failed
+/// @return SUCCESS If write succeeded
+///
+bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
+                             uint8_t length)
+{
+    bool status = false;
+
+    if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
+    {
+        libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
+        libSPI_WriteByte(address, NULL, NULL);
+
+        uint8_t index;
+        for (index = 0; index < length; ++index)
+        {
+            //TODO: Verify that address is auto incremented for write.
+            libSPI_WriteByte(data[index], NULL, NULL);
+        }
+        PostCallback();
+        status = true;
+    }
+    return status;
+}
+
+///
+/// @brief  Read data from SRAM.
+///
+/// Read data from SRAM. The SRAM is powered by the RTC battery so data is
+/// persistent between power cycles.
+///
+/// @param  address Address in flash to read
+/// @param  *data Pointer to buffer where data will be stored
+/// @param  length Number of bytes to read
+/// @return false  If read failed
+/// @return SUCCESS If read succeeded
+///
+bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
+{
+    bool status = false;
+
+    if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
+    {
+        libSPI_WriteByte(INST_READ, &PreCallback, NULL);
+        libSPI_WriteByte(address, NULL, NULL);
+
+        uint8_t index;
+        for (index = 0; index < length; ++index)
+        {
+            //SRAM address is auto incremented after each read
+            libSPI_ReadByte(&data[index], NULL, NULL);
+        }
+        PostCallback();
+        status = true;
+    }
+    return status;
 }
 
 //////////////////////////////////////////////////////////////////////////

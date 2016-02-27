@@ -55,5 +55,8 @@ void libMCP79510_GetYear(uint8_t *year);
 void libMCP79510_Enable24HourMode(bool enabled);
 bool libMCP79510_Is24HourMode(void);
 void libMCP79510_EnableOscillator(bool enabled);
+bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
+                             uint8_t length);
+bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
 
 #endif /* LIBMCP79510_H_ */
