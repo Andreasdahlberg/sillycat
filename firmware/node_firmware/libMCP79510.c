@@ -276,11 +276,10 @@ void libMCP79510_EnableOscillator(bool enabled)
 /// Write data to SRAM. The SRAM is powered by the RTC battery so data is
 /// persistent between power cycles.
 ///
-/// @param  address Address in flash to write
-/// @param  *data Pointer to data to write
-/// @param  length Number of bytes to write
-/// @return false  If write failed
-/// @return SUCCESS If write succeeded
+/// @param  address Address in flash to write. Virtual address starting at zero.
+/// @param  *data Pointer to data to write.
+/// @param  length Number of bytes to write.
+/// @return bool True if address and length is valid, otherwise false.
 ///
 bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
                              uint8_t length)
@@ -290,7 +289,7 @@ bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
         libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
-        libSPI_WriteByte(address, NULL, NULL);
+        libSPI_WriteByte(SRAM_ADDRESS + address, NULL, NULL);
 
         uint8_t index;
         for (index = 0; index < length; ++index)
@@ -310,11 +309,10 @@ bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
 /// Read data from SRAM. The SRAM is powered by the RTC battery so data is
 /// persistent between power cycles.
 ///
-/// @param  address Address in flash to read
-/// @param  *data Pointer to buffer where data will be stored
-/// @param  length Number of bytes to read
-/// @return false  If read failed
-/// @return SUCCESS If read succeeded
+/// @param  address Address in flash to read. Virtual address starting at zero.
+/// @param  *data Pointer to buffer where data will be stored.
+/// @param  length Number of bytes to read.
+/// @return bool True if address and length is valid, otherwise false.
 ///
 bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
@@ -323,7 +321,7 @@ bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
         libSPI_WriteByte(INST_READ, &PreCallback, NULL);
-        libSPI_WriteByte(address, NULL, NULL);
+        libSPI_WriteByte(SRAM_ADDRESS + address, NULL, NULL);
 
         uint8_t index;
         for (index = 0; index < length; ++index)

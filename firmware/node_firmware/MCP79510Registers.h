@@ -85,6 +85,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REG_PU_DATE     0x1E
 #define REG_PU_MONTH    0x1F
 
+#define SRAM_ADDRESS 0x20
+
 #define REG_TC_SEC_OSC_BIT 0x07
 #define REG_TC_HOUR_MODE_BIT 0x06
 
