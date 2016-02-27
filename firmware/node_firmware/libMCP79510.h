@@ -1,3 +1,12 @@
+/**
+ * @file   libMCP79510.h
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2016-02-27 (Last edit)
+ * @brief  Header of libMCP79510
+ *
+ * Detailed description of file.
+ */
+
 /*
 This file is part of SillyCat firmware.
 
@@ -15,64 +24,94 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LIBMCP79510_H_
 #define LIBMCP79510_H_
 
-#include "common.h"
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 //Instructions
-#define EEREAD	0x03	//Read data from EE memory array beginning at selected address
-#define EEWRITE	0x02	//Write data to EE memory array beginning at selected address
-#define EEWRDI	0x04	//Reset the write enable latch (disable write operations)
-#define EEWREN	0x06	//Set the write enable latch (enable write operations)
-#define SRREAD	0x05	//Read STATUS register
-#define SRWRITE	0x01	//Write STATUS register
-#define READ	0x13	//Read RTCC/SRAM array beginning at selected address
-#define WRITE	0x12	//Write RTCC/SRAM data to memory array beginning at selected address
-#define UNLOCK	0x14	//Unlock ID Locations
-#define IDWRITE 0x32	//Write to the ID Locations
-#define IDREAD	0x33	//Read the ID Locations
-#define CLRRAM	0x54	//Clear RAM Location to ‘0’
+#define INST_EEREAD  0x03    //Read data from EE memory array beginning at selected address
+#define INST_EEWRITE 0x02    //Write data to EE memory array beginning at selected address
+#define INST_EEWRDI  0x04    //Reset the write enable latch (disable write operations)
+#define INST_EEWREN  0x06    //Set the write enable latch (enable write operations)
+#define INST_SRREAD  0x05    //Read STATUS register
+#define INST_SRWRITE 0x01    //Write STATUS register
+#define INST_READ    0x13    //Read RTCC/SRAM array beginning at selected address
+#define INST_WRITE   0x12    //Write RTCC/SRAM data to memory array beginning at selected address
+#define INST_UNLOCK  0x14    //Unlock ID Locations
+#define INST_IDWRITE 0x32    //Write to the ID Locations
+#define INST_IDREAD  0x33    //Read the ID Locations
+#define INST_CLRRAM  0x54    //Clear RAM Location to ‘0’
 
 //Time and configuration(TC) registers
-#define TC_SEC_CENT		0x00	//Hundredths of seconds
-#define TC_SEC			0x01	//Seconds
-#define TC_MIN			0x02	//Minutes
-#define TC_HOUR			0x03	//Hours
-#define TC_DAY			0x04	//Day
-#define TC_DATE			0x05	//Date
-#define TC_MONTH		0x06	//Month
-#define TC_YEAR			0x07	//Year
-#define TC_CONTROL		0x08	//Control register
-#define TC_CALIBRATION	0x09	//Calibration
+#define REG_TC_SEC_CENT     0x00    //Hundredths of seconds
+#define REG_TC_SEC          0x01    //Seconds
+#define REG_TC_MIN          0x02    //Minutes
+#define REG_TC_HOUR         0x03    //Hours
+#define REG_TC_DAY          0x04    //Day
+#define REG_TC_DATE         0x05    //Date
+#define REG_TC_MONTH        0x06    //Month
+#define REG_TC_YEAR         0x07    //Year
+#define REG_TC_CONTROL      0x08    //Control register
+#define REG_TC_CALIBRATION  0x09    //Calibration
 
 //Alarm 0 Registers
-#define ALARM0_SEC		0x0C
-#define ALARM0_MIN		0x0D
-#define ALARM0_HOUR		0x0E
-#define ALARM0_DAY		0x0F
-#define ALARM0_DATE		0x10
-#define ALARM0_MONTH	0x11
+#define REG_ALARM0_SEC      0x0C
+#define REG_ALARM0_MIN      0x0D
+#define REG_ALARM0_HOUR     0x0E
+#define REG_ALARM0_DAY      0x0F
+#define REG_ALARM0_DATE     0x10
+#define REG_ALARM0_MONTH    0x11
 
 //Alarm 1 Registers
-#define ALARM1_SEC_CENT	0x12
-#define ALARM1_SEC		0x13
-#define ALARM1_MIN		0x14
-#define ALARM1_HOUR		0x15
-#define ALARM1_DAY		0x16
-#define ALARM1_DATE		0x17
+#define REG_ALARM1_SEC_CENT 0x12
+#define REG_ALARM1_SEC      0x13
+#define REG_ALARM1_MIN      0x14
+#define REG_ALARM1_HOUR     0x15
+#define REG_ALARM1_DAY      0x16
+#define REG_ALARM1_DATE     0x17
 
 //Power-Down Time-Stamp Registers
-#define PD_MIN		0x18
-#define PD_HOUR		0x19
-#define PD_DATE		0x1A
-#define PD_MONTH	0x1B
+#define REG_PD_MIN      0x18
+#define REG_PD_HOUR     0x19
+#define REG_PD_DATE     0x1A
+#define REG_PD_MONTH    0x1B
 
 //Power-Up Time-Stamp Registers
-#define PU_MIN		0x1C
-#define PU_HOUR		0x1D
-#define PU_DATE		0x1E
-#define PU_MONTH	0x1F
+#define REG_PU_MIN      0x1C
+#define REG_PU_HOUR     0x1D
+#define REG_PU_DATE     0x1E
+#define REG_PU_MONTH    0x1F
+
+#define REG_TC_SEC_OSC_BIT 0x07
+
+#define REG_TC_HOUR_MODE_BIT 0x06
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+void libMCP79510_Init(void);
+void libMCP79510_HWInit(void);
+void libMCP79510_GetHundredthSecond(uint8_t *hsec);
+void libMCP79510_GetSecond(uint8_t *sec);
+void libMCP79510_GetMinute(uint8_t *minute);
+void libMCP79510_GetHour(uint8_t *hour);
+void libMCP79510_GetDay(uint8_t *day);
+void libMCP79510_GetDate(uint8_t *date);
+void libMCP79510_GetYear(uint8_t *year);
+void libMCP79510_Enable24HourMode(bool enabled);
+bool libMCP79510_Is24HourMode(void);
+void libMCP79510_EnableOscillator(bool enabled);
 
 #endif /* LIBMCP79510_H_ */
