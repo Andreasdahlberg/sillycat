@@ -89,5 +89,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define REG_TC_SEC_OSC_BIT 0x07
 #define REG_TC_HOUR_MODE_BIT 0x06
+#define REG_TC_MONTH_LP_BIT 0x05
 
 #endif /* MCP79510REGISTERS_H_ */

@@ -49,6 +49,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define SRAM_SIZE 64
 
 #define GetDecimalRegisterValue(address) BCDToDecimal(ReadRegister(address))
+#define SetDecimalRegisterValue(address, value) WriteRegister(address, DecimalToBCD(value))
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -115,6 +116,20 @@ void libMCP79510_GetHundredthSecond(uint8_t *hsec)
 }
 
 ///
+/// @brief Set hundredth of second.
+///
+/// @param  hsec Hundredth of second to set.
+/// @return None
+///
+void libMCP79510_SetHundredthSecond(uint8_t hsec)
+{
+    sc_assert(hsec < 100);
+
+    SetDecimalRegisterValue(REG_TC_SEC_CENT, hsec);
+    return;
+}
+
+///
 /// @brief Get second.
 ///
 /// @param  *sec Pointer to variable where the second will be stored.
@@ -131,6 +146,23 @@ void libMCP79510_GetSecond(uint8_t *sec)
 }
 
 ///
+/// @brief Set second.
+///
+/// @param  sec Second to set.
+/// @return None
+///
+void libMCP79510_SetSecond(uint8_t sec)
+{
+    sc_assert(sec < 60);
+
+    uint8_t register_content;
+    register_content = ReadRegister(REG_TC_SEC);
+
+    WriteRegister(REG_TC_SEC, DecimalToBCD(sec) | (register_content & 0x80));
+    return;
+}
+
+///
 /// @brief Get minute.
 ///
 /// @param  *minute Pointer to variable where the minute will be stored.
@@ -139,6 +171,20 @@ void libMCP79510_GetSecond(uint8_t *sec)
 void libMCP79510_GetMinute(uint8_t *minute)
 {
     *minute = GetDecimalRegisterValue(REG_TC_MIN);
+    return;
+}
+
+///
+/// @brief Set minute.
+///
+/// @param  minute Minute to set.
+/// @return None
+///
+void libMCP79510_SetMinute(uint8_t minute)
+{
+    sc_assert(minute < 60);
+
+    SetDecimalRegisterValue(REG_TC_MIN, minute);
     return;
 }
 
@@ -168,6 +214,34 @@ void libMCP79510_GetHour(uint8_t *hour)
 }
 
 ///
+/// @brief Set hour.
+///
+/// @param  hour Hour to set.
+/// @return None
+///
+void libMCP79510_SetHour(uint8_t hour)
+{
+    //TODO: check after hour mode is known?
+    sc_assert(hour < 24);
+
+    uint8_t register_content = ReadRegister(REG_TC_HOUR);
+    uint8_t new_content;
+
+    //Check if 24-hour mode is used.
+    if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+    {
+        new_content = (register_content & 0xC0) | DecimalToBCD(hour);
+    }
+    else
+    {
+        new_content = (register_content & 0xE0) | DecimalToBCD(hour);
+    }
+
+    WriteRegister(REG_TC_HOUR, new_content);
+    return;
+}
+
+///
 /// @brief Get day.
 ///
 /// @param  *day Pointer to variable where the day will be stored.
@@ -184,6 +258,23 @@ void libMCP79510_GetDay(uint8_t *day)
 }
 
 ///
+/// @brief Set day.
+///
+/// @param  day Day to set.
+/// @return None
+///
+void libMCP79510_SetDay(uint8_t day)
+{
+    sc_assert(day < 8);
+
+    uint8_t register_content;
+    register_content = ReadRegister(REG_TC_DAY);
+
+    WriteRegister(REG_TC_DAY, DecimalToBCD(day) | (register_content & 0xF8));
+    return;
+}
+
+///
 /// @brief Get date.
 ///
 /// @param  *date Pointer to variable where the date will be stored.
@@ -196,7 +287,54 @@ void libMCP79510_GetDate(uint8_t *date)
 }
 
 ///
-/// @brief Get year.
+/// @brief Set date.
+///
+/// @param  date Date to set.
+/// @return None
+///
+void libMCP79510_SetDate(uint8_t date)
+{
+    sc_assert(date < 32);
+
+    SetDecimalRegisterValue(REG_TC_DATE, date);
+    return;
+}
+
+///
+/// @brief Get month.
+///
+/// @param  *month Pointer to variable where the month will be stored.
+/// @return None
+///
+void libMCP79510_GetMonth(uint8_t *month)
+{
+    uint8_t register_content;
+    register_content = ReadRegister(REG_TC_MONTH);
+    register_content &= 0x1F;
+
+    *month = BCDToDecimal(register_content);
+    return;
+}
+
+///
+/// @brief Set month.
+///
+/// @param  month Month to set.
+/// @return None
+///
+void libMCP79510_SetMonth(uint8_t month)
+{
+    sc_assert(month < 13);
+
+    uint8_t register_content;
+    register_content = ReadRegister(REG_TC_MONTH);
+
+    WriteRegister(REG_TC_MONTH, DecimalToBCD(month) | (register_content & 0xE0));
+    return;
+}
+
+///
+/// @brief Get year(number of years since 2000).
 ///
 /// @param  *year Pointer to variable where the year will be stored.
 /// @return None
@@ -204,6 +342,20 @@ void libMCP79510_GetDate(uint8_t *date)
 void libMCP79510_GetYear(uint8_t *year)
 {
     *year = GetDecimalRegisterValue(REG_TC_YEAR);
+    return;
+}
+
+///
+/// @brief Set year.
+///
+/// @param  year Year to set, number of years since 2000.
+/// @return None
+///
+void libMCP79510_SetYear(uint8_t year)
+{
+    sc_assert(year < 100);
+
+    SetDecimalRegisterValue(REG_TC_YEAR, year);
     return;
 }
 
@@ -268,6 +420,50 @@ void libMCP79510_EnableOscillator(bool enabled)
 
     WriteRegister(REG_TC_SEC, register_content);
     return;
+}
+
+///
+/// @brief Check if the active year is a leap year.
+///
+/// @param  None
+/// @return bool True if leap year, otherwise false.
+///
+bool libMCP79510_IsLeapYear(void)
+{
+    uint8_t register_content;
+
+    register_content = ReadRegister(REG_TC_MONTH);
+    return IsBitSet(REG_TC_MONTH_LP_BIT, &register_content);
+}
+
+///
+/// @brief Enable an alarm
+///
+/// @param  Index of alarm to enable, 1 or 2
+/// @return None
+///
+void libMCP79510_EnableAlarm(bool enable, uint8_t alarm)
+{
+    sc_assert(alarm == 1 || alarm == 2);
+
+    uint8_t register_data =
+        /*
+        if (libRFM69_ReadRegister(REG_CONTROL, &register_data) == true)
+        {
+            if (enable == true)
+            {
+                //TODO: Check status
+                libRFM69_WriteRegister(REG_ALARM_1_DAY_DATE, 0x80);
+                register_data |= (1 << (alarm - 1));
+            }
+            else
+            {
+                register_data &= ~(1 << (alarm - 1));
+            }
+            return libRFM69_WriteRegister(REG_CONTROL, register_data);
+        }
+        return false;
+        */
 }
 
 ///

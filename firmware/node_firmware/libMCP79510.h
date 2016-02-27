@@ -46,15 +46,25 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void libMCP79510_Init(void);
 void libMCP79510_HWInit(void);
 void libMCP79510_GetHundredthSecond(uint8_t *hsec);
+void libMCP79510_SetHundredthSecond(uint8_t hsec);
 void libMCP79510_GetSecond(uint8_t *sec);
+void libMCP79510_SetSecond(uint8_t sec);
 void libMCP79510_GetMinute(uint8_t *minute);
+void libMCP79510_SetMinute(uint8_t minute);
 void libMCP79510_GetHour(uint8_t *hour);
+void libMCP79510_SetHour(uint8_t hour);
 void libMCP79510_GetDay(uint8_t *day);
+void libMCP79510_SetDay(uint8_t day);
 void libMCP79510_GetDate(uint8_t *date);
+void libMCP79510_SetDate(uint8_t date);
+void libMCP79510_GetMonth(uint8_t *month);
+void libMCP79510_SetMonth(uint8_t month);
 void libMCP79510_GetYear(uint8_t *year);
+void libMCP79510_SetYear(uint8_t year);
 void libMCP79510_Enable24HourMode(bool enabled);
 bool libMCP79510_Is24HourMode(void);
 void libMCP79510_EnableOscillator(bool enabled);
+bool libMCP79510_IsLeapYear(void);
 bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
                              uint8_t length);
 bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
