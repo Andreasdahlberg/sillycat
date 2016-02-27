@@ -437,36 +437,6 @@ bool libMCP79510_IsLeapYear(void)
 }
 
 ///
-/// @brief Enable an alarm
-///
-/// @param  Index of alarm to enable, 1 or 2
-/// @return None
-///
-void libMCP79510_EnableAlarm(bool enable, uint8_t alarm)
-{
-    sc_assert(alarm == 1 || alarm == 2);
-
-    uint8_t register_data =
-        /*
-        if (libRFM69_ReadRegister(REG_CONTROL, &register_data) == true)
-        {
-            if (enable == true)
-            {
-                //TODO: Check status
-                libRFM69_WriteRegister(REG_ALARM_1_DAY_DATE, 0x80);
-                register_data |= (1 << (alarm - 1));
-            }
-            else
-            {
-                register_data &= ~(1 << (alarm - 1));
-            }
-            return libRFM69_WriteRegister(REG_CONTROL, register_data);
-        }
-        return false;
-        */
-}
-
-///
 /// @brief  Write data to SRAM.
 ///
 /// Write data to SRAM. The SRAM is powered by the RTC battery so data is
