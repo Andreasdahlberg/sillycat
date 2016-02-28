@@ -1,7 +1,7 @@
 /**
  * @file   MCP79510Registers.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-27 (Last edit)
+ * @date   2016-02-28 (Last edit)
  * @brief  Registers and bit defines for MCP79510.
  *
  * Detailed description of file.
@@ -88,7 +88,19 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define SRAM_ADDRESS 0x20
 
 #define REG_TC_SEC_OSC_BIT 0x07
+
 #define REG_TC_HOUR_MODE_BIT 0x06
+
 #define REG_TC_MONTH_LP_BIT 0x05
+
+#define REG_TC_DAY_OSCON_BIT    0x05
+#define REG_TC_DAY_VBAT_BIT     0x04
+#define REG_TC_DAY_VBATEN_BIT   0x03
+
+#define REG_TC_CONTROL_EXTOSC_BIT   0x03
+#define REG_TC_CONTROL_ALM0_BIT     0x04
+#define REG_TC_CONTROL_ALM1_BIT     0x05
+#define REG_TC_CONTROL_SQWE_BIT     0x06
+#define REG_TC_CONTROL_OUT_BIT      0x07
 
 #endif /* MCP79510REGISTERS_H_ */

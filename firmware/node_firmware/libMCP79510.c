@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-27 (Last edit)
+ * @date   2016-02-28 (Last edit)
  * @brief  Implementation of MCP79510-library.
  *
  * Detailed description of file.
@@ -437,6 +437,88 @@ bool libMCP79510_IsLeapYear(void)
 }
 
 ///
+/// @brief Enable an alarm
+///
+/// @param  Index of alarm to enable, 1 or 2
+/// @return None
+///
+void libMCP79510_EnableAlarm(bool enable, uint8_t alarm)
+{
+    sc_assert(alarm < 3);
+
+    uint8_t register_data = ReadRegister(REG_TC_CONTROL);
+
+    if (enable == true)
+    {
+        register_data |= alarm << 4;
+    }
+    else
+    {
+        register_data &= ~(alarm << 4);
+    }
+
+    WriteRegister(REG_TC_CONTROL, register_data);
+    return;
+}
+
+///
+/// @brief Enable the square wave output.
+///
+/// Enables the divided output from the crystal oscillator.
+///
+/// @param  enabled Set to true for enabling the output.
+/// @return None
+///
+void libMCP79510_EnableSquareWave(bool enable)
+{
+    uint8_t register_data = ReadRegister(REG_TC_CONTROL);
+
+    SetBit(REG_TC_CONTROL_SQWE_BIT, enable, &register_data);
+    WriteRegister(REG_TC_CONTROL, register_data);
+
+    return;
+}
+
+///
+/// @brief Check if oscillator is running.
+///
+/// This flag is set and cleared by hardware. If this flag is set, the oscillator is
+/// running; if clear, the oscillator is not running. This flag does not indicate that
+/// the oscillator is running at the correct frequency. The flag will wait 32 oscillator
+/// cycles before the bit is set.
+///
+/// @param  None
+/// @return bool True if oscillator is running, otherwise false.
+///
+bool libMCP79510_IsOscillatorRunning(void)
+{
+    uint8_t register_content;
+
+    register_content = ReadRegister(REG_TC_DAY);
+    return IsBitSet(REG_TC_DAY_OSCON_BIT, &register_content);
+}
+
+///
+/// @brief Clear the external battery switched flag.
+///
+/// This flag is set by hardware when the VCC fails and the VBAT is used to power
+/// the oscillator and the RTCC registers. This flag is cleared by software.
+///
+/// @param  None
+/// @return None
+///
+void libMCP79510_ClearBatterySwitchFlag(void)
+{
+    uint8_t register_content;
+
+    register_content = ReadRegister(REG_TC_DAY);
+    ClearBit(register_content, REG_TC_DAY_VBAT_BIT);
+
+    WriteRegister(REG_TC_DAY, register_content);
+    return;
+}
+
+///
 /// @brief  Write data to SRAM.
 ///
 /// Write data to SRAM. The SRAM is powered by the RTC battery so data is
@@ -499,6 +581,49 @@ bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
         status = true;
     }
     return status;
+}
+
+///
+/// @brief Clear SRAM.
+///
+/// Clear SRAM by reseting all locations to 0x00.
+///
+/// @param  None
+/// @return None
+///
+void libMCP79510_ClearSRAM(void)
+{
+    libSPI_WriteByte(INST_CLRRAM, &PreCallback, NULL);
+    libSPI_WriteByte(0x00, NULL, &PostCallback); //Dummy byte
+    return;
+}
+
+///
+/// @brief Get unique ID.
+///
+/// Get the unique EUI-48/68 id. ID could be preprogrammed from the factory
+/// or defined by the user application.
+///
+/// @param  *eui Pointer to buffer where the ID will be stored.
+/// @param  length Length of ID.
+/// @return None
+///
+void libMCP79510_GetEUI(uint8_t *eui, size_t length)
+{
+    sc_assert(length < 7);
+
+    uint8_t address_offset = 6 - length;
+    libSPI_WriteByte(INST_IDREAD, &PreCallback, NULL);
+    libSPI_WriteByte(address_offset, NULL, NULL);
+
+    uint8_t idx;
+    for (idx = 0; idx < length; ++idx)
+    {
+        libSPI_ReadByte(&eui[idx], NULL, NULL);
+    }
+
+    PostCallback();
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-27 (Last edit)
+ * @date   2016-02-28 (Last edit)
  * @brief  Header of libMCP79510
  *
  * Detailed description of file.
@@ -65,8 +65,14 @@ void libMCP79510_Enable24HourMode(bool enabled);
 bool libMCP79510_Is24HourMode(void);
 void libMCP79510_EnableOscillator(bool enabled);
 bool libMCP79510_IsLeapYear(void);
+void libMCP79510_EnableAlarm(bool enable, uint8_t alarm);
+void libMCP79510_EnableSquareWave(bool enable);
+bool libMCP79510_IsOscillatorRunning(void);
+void libMCP79510_ClearBatterySwitchFlag(void);
 bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
                              uint8_t length);
 bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
+void libMCP79510_ClearSRAM(void);
+void libMCP79510_GetEUI(uint8_t *eui, size_t length);
 
 #endif /* LIBMCP79510_H_ */
