@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-14 (Last edit)
+ * @date   2016-03-02 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -86,6 +86,18 @@ typedef enum
     RFM_ADDRESS_FILTER_ADDRESS,
     RFM_ADDRESS_FILTER_ADDRESS_BROADCAST,
 } libRFM69_address_filtering_type;
+
+typedef enum
+{
+    RFM_CLKOUT_32MHZ = 0,
+    RFM_CLKOUT_16MHZ,
+    RFM_CLKOUT_8MHZ,
+    RFM_CLKOUT_4MHZ,
+    RFM_CLKOUT_2MHZ,
+    RFM_CLKOUT_1MHZ,
+    RFM_CLKOUT_RC,
+    RFM_CLKOUT_OFF,
+} libRFM69_clkout_freq_type;
 
 #ifndef NODE_ADDRESS
 #define NODE_ADDRESS 0xAA
@@ -178,6 +190,7 @@ void libRFM69_EnableHighPowerSetting(bool enable);
 void libRFM69_SetPowerLevel(uint8_t power_level);
 void libRFM69_SetPacketRxDelay(uint8_t val);
 void libRFM69_RestartRx(void);
+void libRFM69_SetClockOutFrequency(libRFM69_clkout_freq_type frequency);
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data);
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 

@@ -1142,6 +1142,21 @@ void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
     return;
 }
 
+///
+/// @brief Set frequency of the clock output.
+///
+/// @param frequency Frequency to set.
+/// @return None
+///
+void libRFM69_SetClockOutFrequency(libRFM69_clkout_freq_type frequency)
+{
+    sc_assert(frequency <= RFM_CLKOUT_OFF);
+
+    uint8_t register_content;
+    libRFM69_ReadRegister(REG_DIOMAPPING2, &register_content);
+    libRFM69_WriteRegister(REG_DIOMAPPING2, (register_content & 0xF8) | frequency);
+}
+
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address <= REG_TESTDAGC);
