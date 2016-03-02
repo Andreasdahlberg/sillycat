@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-14 (Last edit)
+ * @date   2016-03-02 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -560,18 +560,45 @@ void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering)
     return;
 }
 
+///
+/// @brief Set the node address.
+///
+/// @param  node_address Address
+/// @return None
+///
 void libRFM69_SetNodeAddress(uint8_t node_address)
 {
     libRFM69_WriteRegister(REG_NODEADRS, node_address);
     return;
 }
 
+///
+/// @brief Set the broadcast address.
+///
+/// Broadcast address is used when with address filtering to send
+/// to all devices in the network.
+///
+/// @param  broadcast_address Address
+/// @return None
+///
 void libRFM69_SetBroadcastAddress(uint8_t broadcast_address)
 {
     libRFM69_WriteRegister(REG_BROADCASTADRS, broadcast_address);
     return;
 }
 
+///
+/// @brief Set the data mode.
+///
+/// Data processing mode:
+/// 0 - Packet mode
+/// 1 - reserved
+/// 2 - Continuous mode with bit synchronizer
+/// 3 - Continuous mode without bit synchronizer
+///
+/// @param  data_mode Data mode to set.
+/// @return None
+///
 void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
 {
     uint8_t register_content;
@@ -584,6 +611,12 @@ void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
     return;
 }
 
+///
+/// @brief Set the modulation type.
+///
+/// @param  modulation_type FSK or OOK.
+/// @return None
+///
 void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
 {
     sc_assert(modulation_type == RFM_FSK || modulation_type == RFM_OOK);
@@ -597,6 +630,24 @@ void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
     return;
 }
 
+///
+/// @brief Set the modulation shaping.
+///
+/// Data shaping:
+/// in FSK:
+/// 0 - no shaping
+/// 1 - Gaussian filter, BT = 1.0
+/// 2 - Gaussian filter, BT = 0.5
+/// 3 - Gaussian filter, BT = 0.3
+/// in OOK:
+/// 0 - no shaping
+/// 1 - filtering with fcutoff = BR
+/// 2 - filtering with fcutoff = 2*BR
+/// 3 - reserved
+///
+/// @param  modulation_shaping The modulation shaping value.
+/// @return None
+///
 void libRFM69_SetModulationShaping(uint8_t modulation_shaping)
 {
     sc_assert(modulation_shaping < 0x04);
@@ -612,8 +663,17 @@ void libRFM69_SetModulationShaping(uint8_t modulation_shaping)
     return;
 }
 
+///
+/// @brief Set the frequency deviation.
+///
+/// @param  frequency_deviation The frequency deviation in hertz.
+/// @return None
+///
 void libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
 {
+    //Minimum frequency according to the RFM69HW datasheet.
+    sc_assert(frequency_deviation > 600);
+
     uint16_t frequency_deviation_value = (uint16_t)((float)frequency_deviation /
                                          RFM_FSTEP);
 
@@ -812,14 +872,20 @@ int8_t libRFM69_GetRSSI(void)
     //Start RSSI measurement
     libRFM69_WriteRegister(REG_RSSICONFIG, 0x01);
 
+    uint32_t timer = Timer_GetMilliseconds();
     do
     {
         libRFM69_ReadRegister(REG_RSSICONFIG, &register_content);
+
+        if (Timer_TimeDifference(timer) > 500)
+        {
+            ERROR("Timeout while waiting for RSSI.");
+            return 0;
+        }
     }
     while (register_content == 0);
 
     libRFM69_ReadRegister(REG_RSSIVALUE, &register_content);
-
     return (-1 * (int8_t)(register_content >> 1));
 }
 
@@ -1078,7 +1144,7 @@ void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
 
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 {
-    sc_assert(address <= REG_TESTPA2);
+    sc_assert(address <= REG_TESTDAGC);
 
     libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
     libSPI_WriteByte(register_data, NULL, &PostCallback);
@@ -1088,7 +1154,7 @@ void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data)
 {
-    sc_assert(address <= REG_TESTPA2);
+    sc_assert(address <= REG_TESTDAGC);
 
     libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
     libSPI_ReadByte(register_data, NULL, &PostCallback);
