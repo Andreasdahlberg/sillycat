@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-02 (Last edit)
+ * @date   2016-03-03 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -99,6 +99,23 @@ typedef enum
     RFM_CLKOUT_OFF,
 } libRFM69_clkout_freq_type;
 
+typedef enum
+{
+    RFM_LNA_ZIN_50OHM = 0,
+    RFM_LNA_ZIN_200OHM,
+} libRFM69_lna_zin_type;
+
+typedef enum
+{
+    RFM_LNA_GAIN_AUTO = 0,
+    RFM_LNA_GAIN_G1,
+    RFM_LNA_GAIN_G2,
+    RFM_LNA_GAIN_G3,
+    RFM_LNA_GAIN_G4,
+    RFM_LNA_GAIN_G5,
+    RFM_LNA_GAIN_G6,
+} libRFM69_lna_gain_type;
+
 #ifndef NODE_ADDRESS
 #define NODE_ADDRESS 0xAA
 #endif
@@ -191,6 +208,9 @@ void libRFM69_SetPowerLevel(uint8_t power_level);
 void libRFM69_SetPacketRxDelay(uint8_t val);
 void libRFM69_RestartRx(void);
 void libRFM69_SetClockOutFrequency(libRFM69_clkout_freq_type frequency);
+void libRFM69_SetLNAGain(libRFM69_lna_gain_type gain);
+void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance);
+
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data);
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 

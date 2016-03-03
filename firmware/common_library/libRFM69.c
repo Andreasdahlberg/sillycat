@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-02 (Last edit)
+ * @date   2016-03-03 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -1155,6 +1155,46 @@ void libRFM69_SetClockOutFrequency(libRFM69_clkout_freq_type frequency)
     uint8_t register_content;
     libRFM69_ReadRegister(REG_DIOMAPPING2, &register_content);
     libRFM69_WriteRegister(REG_DIOMAPPING2, (register_content & 0xF8) | frequency);
+}
+
+///
+/// @brief Set LNA gain setting.
+///
+/// LNA gain setting:
+/// AUTO = gain set by the internal AGC loop
+/// G1 = highest gain
+/// G2 = highest gain - 6 dB
+/// G3 = highest gain - 12 dB
+/// G4 = highest gain - 24 dB
+/// G5 = highest gain - 36 dB
+/// G6 = highest gain - 48 dB
+///
+/// @param gain Gain to set.
+/// @return None
+///
+void libRFM69_SetLNAGain(libRFM69_lna_gain_type gain)
+{
+    sc_assert(gain <= RFM_LNA_GAIN_G6);
+
+    uint8_t register_content;
+    libRFM69_ReadRegister(REG_LNA, &register_content);
+    libRFM69_WriteRegister(REG_LNA, (register_content & 0xF8) | gain);
+}
+
+///
+/// @brief Set the LNA input impedance.
+///
+/// @param impedance Impedance to set.
+/// @return None
+///
+void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance)
+{
+    sc_assert(impedance <= RFM_LNA_ZIN_200OHM);
+
+    uint8_t register_content;
+    libRFM69_ReadRegister(REG_LNA, &register_content);
+    SetBit(7, impedance, &register_content);
+    libRFM69_WriteRegister(REG_LNA, register_content);
 }
 
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
