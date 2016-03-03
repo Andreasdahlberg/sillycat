@@ -1098,11 +1098,20 @@ void libRFM69_DumpRegisterValues(void)
               register_content);
     }
 
+    libRFM69_ReadRegister(REG_TESTLNA, &register_content);
+    DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTLNA, register_content);
+
     libRFM69_ReadRegister(REG_TESTPA1, &register_content);
     DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA1, register_content);
 
     libRFM69_ReadRegister(REG_TESTPA2, &register_content);
     DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTPA2, register_content);
+
+    libRFM69_ReadRegister(REG_TESTDAGC, &register_content);
+    DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTDAGC, register_content);
+
+    libRFM69_ReadRegister(REG_TESTAFC, &register_content);
+    DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTAFC, register_content);
     return;
 }
 #endif
@@ -1199,7 +1208,7 @@ void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance)
 
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 {
-    sc_assert(address <= REG_TESTDAGC);
+    sc_assert(address <= REG_TESTAFC);
 
     libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
     libSPI_WriteByte(register_data, NULL, &PostCallback);
@@ -1209,7 +1218,7 @@ void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data)
 {
-    sc_assert(address <= REG_TESTDAGC);
+    sc_assert(address <= REG_TESTAFC);
 
     libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
     libSPI_ReadByte(register_data, NULL, &PostCallback);
