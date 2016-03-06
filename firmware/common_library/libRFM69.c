@@ -288,7 +288,7 @@ void libRFM69_SetMode(libRFM69_mode_type mode)
     return;
 }
 
-bool libRFM69_WaitForModeReady()
+bool libRFM69_WaitForModeReady(void)
 {
     bool status = true;
     uint32_t timeout_timer = Timer_GetMilliseconds();
@@ -305,7 +305,7 @@ bool libRFM69_WaitForModeReady()
     return status;
 }
 
-bool libRFM69_IsModeReady()
+bool libRFM69_IsModeReady(void)
 {
     uint8_t register_content;
 
@@ -313,7 +313,7 @@ bool libRFM69_IsModeReady()
     return (register_content & RF_IRQFLAGS1_MODEREADY) == RF_IRQFLAGS1_MODEREADY;
 }
 
-bool libRFM69_IsRxReady()
+bool libRFM69_IsRxReady(void)
 {
     uint8_t register_content;
 
@@ -321,17 +321,30 @@ bool libRFM69_IsRxReady()
     return (register_content & RF_IRQFLAGS1_RXREADY) == RF_IRQFLAGS1_RXREADY;
 }
 
-bool libRFM69_IsTxReady()
+bool libRFM69_IsTxReady(void)
 {
     return IsBitSetInRegister(REG_IRQFLAGS1, 5);
 }
 
-bool libRFM69_IsRSSIThresholdExceeded()
+bool libRFM69_IsRSSIThresholdExceeded(void)
 {
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_IRQFLAGS1, &register_content);
     return (register_content & RF_IRQFLAGS1_RSSI) == RF_IRQFLAGS1_RSSI;
+}
+
+///
+/// @brief Check if RX timeout flag is set.
+///
+/// Set when a Rx timeout occurs and cleared when leaving Rx or FIFO is emptied.
+///
+/// @return None
+/// @return bool True if timeout has occurred, otherwise false.
+///
+bool libRFM69_IsRxTimeoutFlagSet(void)
+{
+    return IsBitSetInRegister(REG_IRQFLAGS1, 2);
 }
 
 ///
@@ -1204,6 +1217,63 @@ void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance)
     libRFM69_ReadRegister(REG_LNA, &register_content);
     SetBit(7, impedance, &register_content);
     libRFM69_WriteRegister(REG_LNA, register_content);
+}
+
+///
+/// @brief Enabled improved AFC routine for signals with modulation index
+///        lower than 2.
+///
+/// @param enabled True or False
+/// @return None
+///
+void libRFM69_EnableAFCLowBeta(bool enabled)
+{
+    uint8_t register_content;
+
+    libRFM69_ReadRegister(REG_AFCCTRL, &register_content);
+    SetBit(5, enabled, &register_content);
+    libRFM69_WriteRegister(REG_AFCCTRL, register_content);
+
+    return;
+}
+
+///
+/// @brief Check if AFC low beta is enabled.
+///
+/// @param None
+/// @return bool True if enabled, otherwise false.
+///
+bool libRFM69_IsAFCLowBetaEnabled(void)
+{
+    return IsBitSetInRegister(REG_AFCCTRL, 5);
+}
+
+///
+/// @brief Enable Continuous-Time DAGC,
+///
+/// In addition to the automatic gain control, the RFM69HW is capable of continuously
+/// adjusting its gain in the digital domain, after the analog to digital conversion
+/// has occurred.
+///
+/// @param enabled True or False
+/// @return None
+///
+void libRFM69_EnableContinuousDAGC(bool enabled)
+{
+    uint8_t register_content;
+
+    if (enabled)
+    {
+        register_content = libRFM69_IsAFCLowBetaEnabled() == true ?
+                           RF_DAGC_IMPROVED_LOWBETA1 : RF_DAGC_IMPROVED_LOWBETA0;
+    }
+    else
+    {
+        register_content = RF_DAGC_NORMAL;
+    }
+
+    libRFM69_WriteRegister(REG_TESTDAGC, register_content);
+    return;
 }
 
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
