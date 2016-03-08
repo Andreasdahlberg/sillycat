@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2016-03-08 (Last edit)
  * @brief  Implementation of UI-library.
  *
  * Detailed description of file.
@@ -45,6 +45,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define PRINT_BUFFER_SIZE 24
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -75,7 +77,8 @@ void libUI_SetFont(FONT_INFO *font)
     return;
 }
 
-void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end, uint8_t y_end)
+void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end,
+                    uint8_t y_end)
 {
     //TODO: Fix this function, does not follow code style!
     int dx = abs(x_end - x_start), sx = x_start < x_end ? 1 : -1;
@@ -104,7 +107,8 @@ void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end, uint8_t y_e
     return;
 }
 
-void libUI_DrawRectangle(uint8_t x_start, uint8_t y_start, uint8_t width, uint8_t height)
+void libUI_DrawRectangle(uint8_t x_start, uint8_t y_start, uint8_t width,
+                         uint8_t height)
 {
     libUI_DrawLine(x_start, y_start, x_start + width, y_start);
     libUI_DrawLine(x_start, y_start, x_start, y_start + height);
@@ -117,7 +121,8 @@ void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
 {
     int x = radius;
     int y = 0;
-    int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+    int decisionOver2 = 1 -
+                        x;   // Decision criterion divided by 2 evaluated at x=r, y=0
 
     while (x >= y)
     {
@@ -155,14 +160,15 @@ void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
 void libUI_Print_P(const char *text, uint8_t x_pos, uint8_t y_pos, ...)
 {
     va_list args;
-    //TODO: Find another safe solution for this, these buffers is too large!
-    char buffer[24];
-    char format[24];
-
-    strncpy_P(format, text, 24);
+    char buffer[PRINT_BUFFER_SIZE];
 
     va_start(args, y_pos);
-    vsprintf(buffer, format, args);
+
+    vsnprintf_P(buffer, sizeof(buffer), text, args);
+
+    //Make sure that the buffer is null terminated.
+    buffer[sizeof(buffer) - 1] = '\n';
+
     libUI_PrintText(buffer, x_pos, y_pos);
     va_end(args);
     return;
@@ -193,7 +199,8 @@ void libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos)
                     byte_index = (data_row * current_font->widthPages) + data_column;
                     for (bit_index = 0; bit_index < 8; ++bit_index)
                     {
-                        if ((pgm_read_byte(&(current_font->data[char_offset + byte_index])) & (1 << (7 - bit_index))) > 0)
+                        if ((pgm_read_byte(&(current_font->data[char_offset + byte_index])) & (1 <<
+                                (7 - bit_index))) > 0)
                         {
                             libDisplay_SetPixel(x_pos + bit_index + (data_column << 3), y_pos + data_row);
                         }
