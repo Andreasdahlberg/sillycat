@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-27 (Last edit)
+ * @date   2016-03-08 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -110,6 +110,8 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
 
 void SetBit(uint8_t bit_index, bool state, uint8_t *data)
 {
+    sc_assert(bit_index < 8);
+
     if (state == true)
     {
         *data |= (1 << bit_index);
