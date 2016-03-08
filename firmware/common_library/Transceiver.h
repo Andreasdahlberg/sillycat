@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-13 (Last edit)
+ * @date   2016-03-08 (Last edit)
  * @brief  Header for Transceiver interface.
  *
  * Detailed description of file.
@@ -93,7 +93,7 @@ bool Transceiver_Send(void);
 bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             packet_content_type *content,
                             transceiver_callback_type callback);
-bool Transceiver_SetPacketHandler(transceiver_packet_handler_type
+void Transceiver_SetPacketHandler(transceiver_packet_handler_type
                                   packet_handler,
                                   packet_type_type packet_type);
 void Transceiver_EventHandler(const event_type *event);
