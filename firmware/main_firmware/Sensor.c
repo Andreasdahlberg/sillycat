@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-03-08 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -131,7 +131,7 @@ void Sensor_Update(void)
 
         if (sensor_reading.header == READING_HEADER)
         {
-            sensor_reading.average = exponential_moving_average(sensor_reading.value,
+            sensor_reading.average = GetExponentialMovingAverage(sensor_reading.value,
                                      sensor_reading.average,
                                      current_alpha);
 

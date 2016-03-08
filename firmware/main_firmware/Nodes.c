@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-07 (Last edit)
+ * @date   2016-03-08 (Last edit)
  * @brief  Implementation of Nodes
  *
  * Detailed description of file.
@@ -79,11 +79,9 @@ void Nodes_Init(void)
     memset(packets, 0, sizeof(packets));
     memset(last_update, 0, sizeof(last_update));
 
-    if (Transceiver_SetPacketHandler(ReadingPacketHandler,
-                                     TR_PACKET_TYPE_READING) == true)
-    {
-        guiNodes_Init();
-    }
+    Transceiver_SetPacketHandler(ReadingPacketHandler, TR_PACKET_TYPE_READING);
+
+    guiNodes_Init();
     return;
 }
 
