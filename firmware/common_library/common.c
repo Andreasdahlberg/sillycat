@@ -74,8 +74,18 @@ float_parts_type FloatToParts(float f_value)
     return parts;
 }
 
-uint16_t exponential_moving_average(uint16_t value, uint16_t average,
-                                    uint16_t alpha)
+///
+/// @brief Calculate an exponential moving average.
+///
+/// @param  value New value to add to an existing average.
+/// @param  average The existing average value.
+/// @param  alpha Smoothing factor, a higher alpha discounts old values faster.
+///               Use the macro CALCULATE_ALPHA to determine this value based on
+///               sample frequency and sample window.
+/// @return uint16_t Average value.
+///
+uint16_t GetExponentialMovingAverage(uint16_t value, uint16_t average,
+                                     uint16_t alpha)
 {
     uint32_t tmp = (uint32_t)alpha * (uint32_t)value + (uint32_t)(65536 - alpha) *
                    (uint32_t)average;

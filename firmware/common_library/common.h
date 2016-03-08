@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-27 (Last edit)
+ * @date   2016-03-08 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -46,6 +46,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //Valid if sample_window >> sample_freq
 #define CALCULATE_ALPHA(sample_freq, sample_window) ((uint32_t)131070 / ((uint32_t)sample_window / (uint32_t)sample_freq + 1))
 
+#define SetBitD(data, bit) data |= (1 << bit)
+#define ClearBit(data, bit) data &= ~(1 << bit)
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -69,8 +72,8 @@ typedef struct
 //////////////////////////////////////////////////////////////////////////
 
 float_parts_type FloatToParts(float f_value);
-uint16_t exponential_moving_average(uint16_t value, uint16_t average,
-                                    uint16_t alpha);
+uint16_t GetExponentialMovingAverage(uint16_t value, uint16_t average,
+                                     uint16_t alpha);
 void SetBit(uint8_t bit_index, bool state, uint8_t *data);
 bool IsBitSet(uint8_t bit_index, const uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
