@@ -1,7 +1,7 @@
 /**
  * @file   Power.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-24 (Last edit)
+ * @date   2016-03-14 (Last edit)
  * @brief  Header of Power
  *
  * Detailed description of file.
@@ -45,5 +45,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void Power_Init(void);
 void Power_Update(void);
+void Power_WakeUp(const event_type *event);
 
 #endif /* POWER_H_ */

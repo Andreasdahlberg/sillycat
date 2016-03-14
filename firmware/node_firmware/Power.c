@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-03-14 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -65,11 +65,13 @@ typedef enum
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static power_state_type state = POWER_INIT;
+static power_state_type battery_state;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+static void BatteryMonitoringSM(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -83,7 +85,7 @@ static power_state_type state = POWER_INIT;
 ///
 void Power_Init(void)
 {
-    state = POWER_NORMAL;
+    battery_state = POWER_NORMAL;
 
     return;
 }
@@ -96,18 +98,41 @@ void Power_Init(void)
 ///
 void Power_Update(void)
 {
-    sc_assert(state != POWER_INIT);
+    BatteryMonitoringSM();
+    return;
+}
 
-    switch (state)
+
+///
+/// @brief Handle wake up event.
+///
+/// @param  *event Pointer to triggered event
+/// @return None
+///
+void Power_WakeUp(const event_type *event)
+{
+    sc_assert(event != NULL);
+
+    DEBUG("Battery voltage: %u\r\n", libPower_GetBatteryVoltage());
+    DEBUG("Charger connected: %u\r\n", (uint8_t)libPower_IsChargerConnected());
+    DEBUG("Charging: %u\r\n", (uint8_t)libPower_IsCharging());
+    return;
+}
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+static void BatteryMonitoringSM(void)
+{
+    switch (battery_state)
     {
         case POWER_NORMAL:
-
             if (libPower_IsCharging() == true)
             {
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
-                state = POWER_CHARGING;
+                battery_state = POWER_CHARGING;
             }
             else if (libPower_IsBatteryVoltageValid() == true
                      && libPower_GetBatteryVoltage() < LOW_VOLTAGE_MV)
@@ -115,7 +140,7 @@ void Power_Update(void)
                 INFO("Low battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_LOW);
                 Event_Trigger(&event);
-                state = POWER_LOW;
+                battery_state = POWER_LOW;
             }
             break;
 
@@ -125,7 +150,7 @@ void Power_Update(void)
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
-                state = POWER_CHARGING;
+                battery_state = POWER_CHARGING;
             }
             else if (libPower_IsBatteryVoltageValid() == true
                      && libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
@@ -133,7 +158,7 @@ void Power_Update(void)
                 WARNING("Critical battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_CRITICAL);
                 Event_Trigger(&event);
-                state = POWER_CRITICAL;
+                battery_state = POWER_CRITICAL;
             }
             break;
 
@@ -143,7 +168,7 @@ void Power_Update(void)
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
-                state = POWER_CHARGING;
+                battery_state = POWER_CHARGING;
             }
             break;
 
@@ -153,7 +178,7 @@ void Power_Update(void)
                 INFO("Charging stopped");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STOPPED);
                 Event_Trigger(&event);
-                state = POWER_CONNECTED;
+                battery_state = POWER_CONNECTED;
             }
             break;
 
@@ -163,7 +188,7 @@ void Power_Update(void)
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
-                state = POWER_CHARGING;
+                battery_state = POWER_CHARGING;
             }
 
             if (libPower_IsChargerConnected() == false)
@@ -171,7 +196,7 @@ void Power_Update(void)
                 INFO("Charger disconnected");
                 event_type event = Event_New(EVENT_BATTERY_CHARGER_DISCONNECTED);
                 Event_Trigger(&event);
-                state = POWER_NORMAL;
+                battery_state = POWER_NORMAL;
             }
             break;
 
