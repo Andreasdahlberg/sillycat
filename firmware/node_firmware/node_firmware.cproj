@@ -276,6 +276,18 @@
     <Compile Include="libDS3234.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Flash.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Flash.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libFlash.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="libFlash.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="libLED.c">
       <SubType>compile</SubType>
     </Compile>
