@@ -8,6 +8,8 @@ Excellon 2, Absolute, Inch, 2.4
 
 DEFINITION COPPER LAYERS
 Copper Top
+Copper Inner 1
+Copper Inner 2
 Copper Bottom
 
 
@@ -18,6 +20,8 @@ remote_node - Copper Top-Copper Bottom.drl   Copper Top .. Copper Bottom
 
 TOOL     SIZE   TYPE  COUNT
    1   0.0595    PTH      5
-   2   0.0236    PTH     82
-   3   0.0400    PTH      2
-   4   0.1142   NPTH      1
+   2   0.0140    PTH     42
+   3   0.0236    PTH     67
+   4   0.0400    PTH      2
+   5   0.1142   NPTH      1
+   6   0.0394    PTH      9
