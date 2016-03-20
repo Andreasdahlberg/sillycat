@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-03-20 (Last edit)
  * @brief  Implementation of libPower
  *
  * Detailed description of file.
@@ -48,6 +48,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define R1_RESISTANCE 5600.0
 #define R2_RESISTANCE 100000.0
 
+// Defines for approximation of maximum output current.
+#define K_CONST ((uint32_t)91660)
+#define M_CONST ((int32_t)-70810000)
+#define VIN_MIN 1800
+#define VIN_MAX 3500
+
 #define CONNECTED_PIN PINC1
 #define CHARGING_PIN PINC4
 
@@ -59,7 +65,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void EnableLowLevelInterupt(bool enable);
+static void EnableLowLevelInterupt(bool enable);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -201,13 +207,43 @@ bool libPower_IsBatteryVoltageValid(void)
     return libADC_IsChannelValid(0x07);
 }
 
+///
+/// @brief Get an approximation of the maximum output power from
+///        the buck-boost converter at the specified input voltage.
+///
+///        Note: The approximation works best in the normal operating
+///              range(1.8V to 2.8V).
+///
+/// @param  vin Input voltage in mV
+/// @return uint32_t Max output current in mA
+///
+uint32_t libPower_ApproximateMaxIout(uint16_t vin)
+{
+    uint32_t iout_max;
+
+    if (vin < VIN_MIN)
+    {
+        iout_max = 0;
+    }
+    else if (vin > VIN_MAX)
+    {
+        iout_max = 240;
+    }
+    else
+    {
+        iout_max = (K_CONST * vin + M_CONST) / 1000000;
+    }
+
+    return iout_max;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Change to edge interupt?
+//TODO: Change to edge interrupt?
 //NOTE: This function does not touch the global interrupt enable!
-void EnableLowLevelInterupt(bool enable)
+static void EnableLowLevelInterupt(bool enable)
 {
     if (enable == true)
     {
