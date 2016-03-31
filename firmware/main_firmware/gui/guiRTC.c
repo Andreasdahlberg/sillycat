@@ -44,6 +44,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+//TODO: Read from config
+#define UTC_OFFSET_MIN 60
+#define DST_OFFSET_MIN 60
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -61,6 +65,7 @@ static struct view clock_and_date_view;
 
 static void DrawClockView(uint16_t context __attribute__ ((unused)));
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
+static void AdjustTimeForView(rtc_time_type *time);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -103,23 +108,37 @@ void guiRTC_Init(void)
 
 static void DrawClockView(uint16_t context __attribute__ ((unused)))
 {
-    uint8_t min;
-    uint8_t hour;
+    rtc_time_type time;
+    RTC_GetCurrentTime(&time);
 
-    RTC_GetMinutes(&min);
-    RTC_GetHour(&hour);
+    AdjustTimeForView(&time);
 
-    libUI_Print("%02u:%02u", 49, 11, hour, min);
+    libUI_Print("%02u:%02u", 49, 11, time.hour, time.minute);
     return;
 }
 
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
 {
     rtc_time_type time;
-
     RTC_GetCurrentTime(&time);
+
+    AdjustTimeForView(&time);
 
     libUI_Print("20%02u-%02u-%02u", 31, 2, time.year, time.month, time.date);
     libUI_Print("%02u:%02u:%02u", 40, 16, time.hour, time.minute, time.second);
+    return;
+}
+
+static void AdjustTimeForView(rtc_time_type *time)
+{
+    RTC_AddMinutes(time, UTC_OFFSET_MIN);
+
+    uint8_t day;
+    RTC_GetDay(&day);
+
+    if (RTC_IsDaylightSavingActive(time, day))
+    {
+        RTC_AddMinutes(time, DST_OFFSET_MIN);
+    }
     return;
 }
