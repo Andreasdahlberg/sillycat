@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2016-03-31 (Last edit)
  * @brief  Implementation of guiRTC
  *
  * Detailed description of file.
@@ -35,10 +35,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 
 #include "libDebug.h"
-#include "libDS3234.h"
 #include "libUI.h"
 #include "Interface.h"
 #include "guiRTC.h"
+#include "RTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -66,6 +66,14 @@ static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+///
+/// @brief Init the clock views
+///
+/// Init clock views and add them to the user interface.
+///
+/// @param  None
+/// @return None
+///
 void guiRTC_Init(void)
 {
     clock_view.draw_function = DrawClockView;
@@ -98,8 +106,8 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)))
     uint8_t min;
     uint8_t hour;
 
-    libDS3234_GetMinutes(&min);
-    libDS3234_GetHour(&hour);
+    RTC_GetMinutes(&min);
+    RTC_GetHour(&hour);
 
     libUI_Print("%02u:%02u", 49, 11, hour, min);
     return;
@@ -107,21 +115,11 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)))
 
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
 {
-    uint8_t year;
-    uint8_t month;
-    uint8_t date;
-    uint8_t hour;
-    uint8_t min;
-    uint8_t sec;
+    rtc_time_type time;
 
-    libDS3234_GetYear(&year);
-    libDS3234_GetMonth(&month);
-    libDS3234_GetDate(&date);
-    libUI_Print("20%02u-%02u-%02u", 31, 2, year, month, date);
+    RTC_GetCurrentTime(&time);
 
-    libDS3234_GetMinutes(&min);
-    libDS3234_GetHour(&hour);
-    libDS3234_GetSeconds(&sec);
-    libUI_Print("%02u:%02u:%02u", 40, 16, hour, min, sec);
+    libUI_Print("20%02u-%02u-%02u", 31, 2, time.year, time.month, time.date);
+    libUI_Print("%02u:%02u:%02u", 40, 16, time.hour, time.minute, time.second);
     return;
 }
