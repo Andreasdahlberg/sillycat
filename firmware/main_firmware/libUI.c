@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-08 (Last edit)
+ * @date   2016-04-03 (Last edit)
  * @brief  Implementation of UI-library.
  *
  * Detailed description of file.
@@ -167,7 +167,7 @@ void libUI_Print_P(const char *text, uint8_t x_pos, uint8_t y_pos, ...)
     vsnprintf_P(buffer, sizeof(buffer), text, args);
 
     //Make sure that the buffer is null terminated.
-    buffer[sizeof(buffer) - 1] = '\n';
+    buffer[sizeof(buffer) - 1] = '\0';
 
     libUI_PrintText(buffer, x_pos, y_pos);
     va_end(args);
