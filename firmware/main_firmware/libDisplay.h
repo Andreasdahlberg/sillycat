@@ -46,6 +46,7 @@ void libDisplay_Reset(void);
 void libDisplay_Flush(void);
 void libDisplay_SetPixel(uint8_t x, uint8_t y);
 void libDisplay_SetBrightness(uint8_t brightness);
+void libDisplay_Rotate(bool state);
 
 #ifdef DEBUG_ENABLE
 void libDisplay_DumpVRAMToUART(void);

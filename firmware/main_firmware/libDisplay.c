@@ -49,6 +49,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define VRAM_COLUMNS 128
 #define VRAM_SIZE (VRAM_PAGES * VRAM_COLUMNS)
 
+#define DISPLAY_HEIGHT 32
+#define DISPLAY_WIDTH 128
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -58,6 +61,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 static uint8_t VRAM[VRAM_PAGES][VRAM_COLUMNS];
+static bool dislay_rotated;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -80,6 +84,8 @@ void libDisplay_Init(void)
 #ifndef DEBUG_ENABLE
     libNHD223_Init();
 #endif
+
+    dislay_rotated = false;
     libDisplay_ClearVRAM();
     return;
 }
@@ -167,6 +173,12 @@ void libDisplay_SetPixel(uint8_t x, uint8_t y)
     uint8_t page_index;
     uint8_t page_offset;
 
+    if (dislay_rotated == true)
+    {
+        x = DISPLAY_WIDTH - x - 1;
+        y = DISPLAY_HEIGHT - y - 1;
+    }
+
     //Shift 3 bits to the right to divide by 8(page height) and floor value
     page_index = (y >> 3);
     page_offset = (y - (page_index << 3));
@@ -213,6 +225,21 @@ void libDisplay_Flush(void)
 void libDisplay_ClearVRAM()
 {
     memset(VRAM, 0x00, VRAM_SIZE);
+}
+
+///
+/// @brief Rotate display contents.
+///
+/// Rotate display contents. VRAM is cleared after rotation.
+///
+/// @param  state Set to true if contents should be rotated.
+/// @return None
+///
+void libDisplay_Rotate(bool state)
+{
+    dislay_rotated = state;
+    libDisplay_ClearVRAM();
+    return;
 }
 
 #ifdef DEBUG_ENABLE
