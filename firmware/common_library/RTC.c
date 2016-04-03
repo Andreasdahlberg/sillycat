@@ -86,14 +86,16 @@ static const uint8_t days_in_months[12] = {DAYS_IN_JAN,
 /// @param  *timestamp Pointer to char array where timestamp will be stored
 /// @return None
 ///
-void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp)
+void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp,
+                         size_t size)
 {
     sc_assert(time != NULL);
     sc_assert(timestamp != NULL);
 
-    sprintf(timestamp, TIMESTAMP_FORMAT, time->year, time->month, time->date,
-            time->hour, time->minute, time->second);
+    snprintf(timestamp, size, TIMESTAMP_FORMAT, time->year, time->month, time->date,
+             time->hour, time->minute, time->second);
 
+    timestamp[size] = '\0';
     return;
 }
 

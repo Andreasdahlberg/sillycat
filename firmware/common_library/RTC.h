@@ -95,7 +95,8 @@ bool RTC_SetCurrentTime(const rtc_time_type *time);
 bool RTC_SetAlarmTime(const rtc_time_type *time);
 #endif
 
-void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp);
+void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp,
+                         size_t size);
 bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day);
 bool RTC_IsLeapYear(uint16_t year);
 void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds);
