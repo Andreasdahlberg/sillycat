@@ -1,10 +1,10 @@
 /**
  * @file   libNHD223.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-04-03 (Last edit)
  * @brief  Implementation of NHD223-library.
  *
- * Detailed description of file.
+ * Low level interface for the NHD?2.23 graphic OLED display module.
  */
 
 /*
@@ -24,15 +24,15 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-//TODO: Define this in one place
-#define F_CPU 8000000UL // 8 MHz
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <util/delay.h>
+//NOTE: Include before all other headers
 #include "common.h"
+
+#include <util/delay.h>
+
 #include "libNHD223.h"
 #include "libSPI.h"
 #include "libDebug.h"
@@ -64,9 +64,7 @@ typedef struct
     uint8_t height;
     uint8_t width;
     uint8_t pages;
-
 } display_properties_type;
-
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -76,20 +74,26 @@ typedef struct
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void ClearDisplay();
-static bool WriteByte(uint8_t data);
-static void selectDevice(bool state);
-static void enableDataLatch(bool state);
-static void enableCommandMode(bool state);
-static void enableControlPin(bool state, uint8_t pin_index);
+static void ClearDisplay();
+static void WriteByte(uint8_t data);
+static void SelectDevice(bool state);
+static void EnableDataLatch(bool state);
+static void EnableCommandMode(bool state);
+static void EnableControlPin(bool state, uint8_t pin_index);
 static void enableReset(bool state);
-void setDataDirection(data_direction_type direction);
+static void setDataDirection(data_direction_type direction);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libNHD223_Init()
+///
+/// @brief Init display hardware and clear the display.
+///
+/// @param  None
+/// @return None
+///
+void libNHD223_Init(void)
 {
     //Configure data pins as outputs and pull low
     DDRD = 0xFF;
@@ -101,115 +105,162 @@ void libNHD223_Init()
     libNHD223_ResetDisplay();
     ClearDisplay();
     libNHD223_ResetDisplay();
-    selectDevice(false);
-    enableDataLatch(false);
+    SelectDevice(false);
+    EnableDataLatch(false);
 
     libNHD223_SetColumnAddressRange(0, 127);
     libNHD223_SetPageAddressRange(0, 3);
+
+    return;
 }
 
-void libNHD223_Update()
-{
-}
-
-
-bool libNHD223_WriteCommand(uint8_t command)
+///
+/// @brief Write command to display.
+///
+/// @param  command Command to write.
+/// @return None
+///
+void libNHD223_WriteCommand(uint8_t command)
 {
     //Set write mode
-    enableControlPin(false, READWRITE);
+    EnableControlPin(false, READWRITE);
 
-    enableCommandMode(true);
+    EnableCommandMode(true);
 
     WriteByte(command);
-    return true;
+    return;
 }
 
-
-bool libNHD223_WriteData(uint8_t data)
+///
+/// @brief Write data to display.
+///
+/// @param  data Data to write.
+/// @return None
+///
+void libNHD223_WriteData(uint8_t data)
 {
     //Set write mode
-    enableControlPin(false, READWRITE);
+    EnableControlPin(false, READWRITE);
 
-    enableCommandMode(false);
+    EnableCommandMode(false);
 
     WriteByte(data);
-    return true;
+    return;
 }
 
-
-void libNHD223_ResetDisplay()
+///
+/// @brief Reset the display.
+///
+/// Reset the display by pulling the reset pin high for 5 us.
+/// This function is blocking.
+///
+/// @param  None
+/// @return None
+///
+void libNHD223_ResetDisplay(void)
 {
     enableReset(true);
     _delay_us(5);
     enableReset(false);
+    return;
 }
 
-
-bool libNHD223_SetPageAddress(uint8_t page_address)
+///
+/// @brief Set the active page address.
+///
+/// @param  page_address Page address to set.
+/// @return None
+///
+void libNHD223_SetPageAddress(uint8_t page_address)
 {
-    bool status = false;
+    sc_assert(page_address < MAX_PAGES);
 
-    if (page_address < MAX_PAGES)
-    {
-        status = libNHD223_WriteCommand(SSD1305_SET_PAGE | page_address);
-    }
-
-    return status;
+    libNHD223_WriteCommand(SSD1305_SET_PAGE | page_address);
+    return ;
 }
 
-bool libNHD223_SetPageAddressRange(uint8_t start_page, uint8_t end_page)
+///
+/// @brief Set the page address range.
+///
+/// @param  start_page Address to starting page.
+/// @param  end_page Address to ending page.
+/// @return None
+///
+void libNHD223_SetPageAddressRange(uint8_t start_page, uint8_t end_page)
 {
-    bool status = false;
+    sc_assert(start_page <= end_page);
 
-    //if (start_page <= end_page && end_page < MAX_PAGES)
-    //{
     libNHD223_WriteCommand(SSD1305_SETSTARTPAGE);
     libNHD223_WriteCommand(start_page);
     libNHD223_WriteCommand(end_page);
-    status = true;
-    //}
-    return status;
+
+    return;
 }
 
+///
+/// @brief Set the column address range.
+///
+/// @param  start_address Address to starting column.
+/// @param  end_address Address to ending column.
+/// @return None
+///
 void libNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address)
 {
+    sc_assert(start_address <= end_address);
+
     libNHD223_WriteCommand(SSD1305_SETSTARTCOLUMN);
     libNHD223_WriteCommand(start_address);
     libNHD223_WriteCommand(end_address);
+
+    return;
 }
 
+///
+/// @brief Set the active column address.
+///
+/// @param  column_address Column address to set.
+/// @return None
+///
 void libNHD223_SetColumnAddress(uint8_t column_address)
 {
     libNHD223_WriteCommand(SSD1305_SETLOWCOLUMN | (column_address & 0x0F));
     libNHD223_WriteCommand(SSD1305_SETHIGHCOLUMN | ((column_address >> 4) & 0x0F));
+    return;
 }
 
-bool libNHD223_ReadByte(uint8_t *data)
+///
+/// @brief Read a byte from display memory.
+///
+/// @param  *data Pointer to byte where the result will be stored.
+/// @return None
+///
+//TODO: Fix this function, not working properly.
+void libNHD223_ReadByte(uint8_t *data)
 {
+    sc_assert(data != NULL);
 
     setDataDirection(INPUT);
-    selectDevice(true);
-    enableCommandMode(false);
-    enableControlPin(true, READWRITE);
+    SelectDevice(true);
+    EnableCommandMode(false);
+    EnableControlPin(true, READWRITE);
 
+    EnableDataLatch(true);
+    EnableDataLatch(false);
+    EnableDataLatch(true);
+    EnableDataLatch(false);
 
-    enableDataLatch(true);
-    enableDataLatch(false);
-    enableDataLatch(true);
-    enableDataLatch(false);
-
-    enableControlPin(false, READWRITE);
-    selectDevice(false);
+    EnableControlPin(false, READWRITE);
+    SelectDevice(false);
     *data = PIND;
 
-    return true;
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void ClearDisplay()
+void ClearDisplay(void)
 {
     uint8_t page;
     uint8_t column;
@@ -223,24 +274,25 @@ void ClearDisplay()
             libNHD223_WriteData(0x00);
         }
     }
+
+    return;
 }
 
-bool WriteByte(uint8_t data)
+static void WriteByte(uint8_t data)
 {
 
     setDataDirection(OUTPUT);
-    enableDataLatch(true);
-    selectDevice(true);
+    EnableDataLatch(true);
+    SelectDevice(true);
 
     PORTD = data;
-    selectDevice(false);
-    enableDataLatch(false);
+    SelectDevice(false);
+    EnableDataLatch(false);
 
-
-    return true;
+    return;
 }
 
-void setDataDirection(data_direction_type direction)
+static void setDataDirection(data_direction_type direction)
 {
     if (direction == INPUT)
     {
@@ -252,35 +304,40 @@ void setDataDirection(data_direction_type direction)
         DDRD = 0xFF;
         PORTD = 0x00;
     }
+    return;
 }
 
-static void enableCommandMode(bool state)
+static void EnableCommandMode(bool state)
 {
     //0: Command, 1: Data
-    enableControlPin(!state, REGSELECT);
+    EnableControlPin(!state, REGSELECT);
+
+    return;
 }
 
-
-static void enableDataLatch(bool state)
+static void EnableDataLatch(bool state)
 {
-    enableControlPin(state, ENABLE);
+    EnableControlPin(state, ENABLE);
+    return;
 }
 
 static void enableReset(bool state)
 {
     //Reset is active low
-    enableControlPin(!state, RESET);
+    EnableControlPin(!state, RESET);
+    return;
 }
 
 
-static void selectDevice(bool state)
+static void SelectDevice(bool state)
 {
     //CS is active low
-    enableControlPin(!state, CHIPSELECT);
+    EnableControlPin(!state, CHIPSELECT);
+    return;
 }
 
 
-static void enableControlPin(bool state, uint8_t pin_index)
+static void EnableControlPin(bool state, uint8_t pin_index)
 {
     if (state == false)
     {
@@ -290,5 +347,6 @@ static void enableControlPin(bool state, uint8_t pin_index)
     {
         PORTC |= (1 << pin_index);
     }
+    return;
 }
 
