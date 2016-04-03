@@ -1,7 +1,7 @@
 /**
  * @file   libDisplay.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2016-04-03 (Last edit)
  * @brief  Header of display-library.
  *
  * Detailed description of file.
@@ -37,17 +37,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libDisplay_Init();
-void libDisplay_On();
-void libDisplay_Off();
-void libDisplay_Clear();
-void libDisplay_ClearVRAM();
-void libDisplay_Reset();
-void libDisplay_Flush();
+void libDisplay_Init(void);
+void libDisplay_On(void);
+void libDisplay_Off(void);
+void libDisplay_Clear(void);
+void libDisplay_ClearVRAM(void);
+void libDisplay_Reset(void);
+void libDisplay_Flush(void);
 void libDisplay_SetPixel(uint8_t x, uint8_t y);
 void libDisplay_SetBrightness(uint8_t brightness);
-void libDisplay_SetFont(FONT_INFO *font);
-void libDisplay_PrintText(char *buffer, uint8_t x_pos, uint8_t y_pos);
+
+#ifdef DEBUG_ENABLE
 void libDisplay_DumpVRAMToUART(void);
+#endif
 
 #endif /* LIBDISPLAY_H_ */
