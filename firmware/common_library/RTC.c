@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-04-03 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -132,6 +132,12 @@ bool RTC_GetCurrentTime(rtc_time_type *time)
             RTC_GetSeconds(&time->second));
 }
 
+///
+/// @brief Set the current time.
+///
+/// @param  *time Pointer to struct with time to set.
+/// @return bool true, if new time was set successfully.
+///
 bool RTC_SetCurrentTime(const rtc_time_type *time)
 {
     return (RTC_SetYear(time->year) &&
@@ -142,6 +148,12 @@ bool RTC_SetCurrentTime(const rtc_time_type *time)
             RTC_SetSeconds(time->second));
 }
 
+///
+/// @brief Set an alarm time.
+///
+/// @param  *time Pointer to struct with alarm time to set.
+/// @return bool true, if new alarm time was set successfully.
+///
 bool RTC_SetAlarmTime(const rtc_time_type *time)
 {
     return (RTC_SetAlarmHour(time->hour) &&
@@ -150,7 +162,15 @@ bool RTC_SetAlarmTime(const rtc_time_type *time)
 }
 #endif
 
-//TODO: Fix edge cases!
+///
+/// @brief Check if daylight time savings is active.
+///
+/// IMPORTENT: Only valid for DST in Sweden!
+///
+/// @param  *time Pointer to struct with current time.
+/// @param  week_day Index of current week day, starting at Monday=1.
+/// @return bool true if DST is active, otherwise false.
+///
 bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day)
 {
     sc_assert(time != NULL);
@@ -183,12 +203,19 @@ bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day)
             next_sunday -= DAYS_IN_WEEK;
         }
 
+        //TODO: Fix edge cases!
         dst_active = ((time->month == MARCH && time->date > next_sunday) ||
                       (time->month == OCTOBER && time->date < next_sunday));
     }
     return dst_active;
 }
 
+///
+/// @brief Check if a year is a leap year.
+///
+/// @param  year Year to check.
+/// @return bool true if leap year, otherwise false.
+///
 bool RTC_IsLeapYear(uint16_t year)
 {
     bool is_leap_year = false;
@@ -205,6 +232,13 @@ bool RTC_IsLeapYear(uint16_t year)
     return is_leap_year;
 }
 
+///
+/// @brief Add seconds to time.
+///
+/// @param  *time Pointer to struct with time.
+/// @param  seconds Number of seconds to add.
+/// @return None
+///
 void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds)
 {
     sc_assert(time != NULL);
@@ -220,6 +254,13 @@ void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds)
     return;
 }
 
+///
+/// @brief Add minutes to time.
+///
+/// @param  *time Pointer to struct with time.
+/// @param  minutes Number of minutes to add.
+/// @return None
+///
 void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes)
 {
     sc_assert(time != NULL);
@@ -235,6 +276,13 @@ void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes)
     return;
 }
 
+///
+/// @brief Add hours to time.
+///
+/// @param  *time Pointer to struct with time.
+/// @param  hours Number of hours to add.
+/// @return None
+///
 void RTC_AddHours(rtc_time_type *time, uint8_t hours)
 {
     sc_assert(time != NULL);
@@ -250,6 +298,13 @@ void RTC_AddHours(rtc_time_type *time, uint8_t hours)
     return;
 }
 
+///
+/// @brief Add days to time.
+///
+/// @param  *time Pointer to struct with time.
+/// @param  days Number of days to add.
+/// @return None
+///
 void RTC_AddDays(rtc_time_type *time, uint8_t days)
 {
     sc_assert(time != NULL);
@@ -275,6 +330,13 @@ void RTC_AddDays(rtc_time_type *time, uint8_t days)
     return;
 }
 
+///
+/// @brief Add months to time.
+///
+/// @param  *time Pointer to struct with time.
+/// @param  months Number of months to add.
+/// @return None
+///
 void RTC_AddMonths(rtc_time_type *time, uint8_t months)
 {
     sc_assert(time != NULL);
@@ -285,15 +347,22 @@ void RTC_AddMonths(rtc_time_type *time, uint8_t months)
 
     if (carry > 0)
     {
-        RTC_AddYear(time, carry);
+        RTC_AddYears(time, carry);
     }
     return;
 }
 
-void RTC_AddYear(rtc_time_type *time, uint8_t year)
+///
+/// @brief Add years to time.
+///
+/// @param  *time Pointer to struct with time.
+/// @param  years Number of years to add.
+/// @return None
+///
+void RTC_AddYears(rtc_time_type *time, uint8_t years)
 {
     sc_assert(time != NULL);
-    time->year += year;
+    time->year += years;
 
     sc_assert(time->year < 100);
     return;
