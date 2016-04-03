@@ -49,6 +49,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAX_PAGES 8
 
+#define EnableCommandMode(state) EnableControlPin(!state, REGSELECT)
+#define EnableDataLatch(state)  EnableControlPin(state, ENABLE)
+#define EnableReset(state)  EnableControlPin(!state, RESET)
+#define SelectDevice(state) EnableControlPin(!state, CHIPSELECT)
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -76,12 +81,8 @@ typedef struct
 
 static void ClearDisplay();
 static void WriteByte(uint8_t data);
-static void SelectDevice(bool state);
-static void EnableDataLatch(bool state);
-static void EnableCommandMode(bool state);
 static void EnableControlPin(bool state, uint8_t pin_index);
-static void enableReset(bool state);
-static void setDataDirection(data_direction_type direction);
+static void SetDataDirection(data_direction_type direction);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -159,9 +160,9 @@ void libNHD223_WriteData(uint8_t data)
 ///
 void libNHD223_ResetDisplay(void)
 {
-    enableReset(true);
+    EnableReset(true);
     _delay_us(5);
-    enableReset(false);
+    EnableReset(false);
     return;
 }
 
@@ -239,7 +240,7 @@ void libNHD223_ReadByte(uint8_t *data)
 {
     sc_assert(data != NULL);
 
-    setDataDirection(INPUT);
+    SetDataDirection(INPUT);
     SelectDevice(true);
     EnableCommandMode(false);
     EnableControlPin(true, READWRITE);
@@ -280,8 +281,7 @@ void ClearDisplay(void)
 
 static void WriteByte(uint8_t data)
 {
-
-    setDataDirection(OUTPUT);
+    SetDataDirection(OUTPUT);
     EnableDataLatch(true);
     SelectDevice(true);
 
@@ -292,7 +292,7 @@ static void WriteByte(uint8_t data)
     return;
 }
 
-static void setDataDirection(data_direction_type direction)
+static void SetDataDirection(data_direction_type direction)
 {
     if (direction == INPUT)
     {
@@ -307,36 +307,6 @@ static void setDataDirection(data_direction_type direction)
     return;
 }
 
-static void EnableCommandMode(bool state)
-{
-    //0: Command, 1: Data
-    EnableControlPin(!state, REGSELECT);
-
-    return;
-}
-
-static void EnableDataLatch(bool state)
-{
-    EnableControlPin(state, ENABLE);
-    return;
-}
-
-static void enableReset(bool state)
-{
-    //Reset is active low
-    EnableControlPin(!state, RESET);
-    return;
-}
-
-
-static void SelectDevice(bool state)
-{
-    //CS is active low
-    EnableControlPin(!state, CHIPSELECT);
-    return;
-}
-
-
 static void EnableControlPin(bool state, uint8_t pin_index)
 {
     if (state == false)
@@ -349,4 +319,3 @@ static void EnableControlPin(bool state, uint8_t pin_index)
     }
     return;
 }
-
