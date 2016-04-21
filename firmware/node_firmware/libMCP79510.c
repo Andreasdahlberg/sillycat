@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-28 (Last edit)
+ * @date   2016-04-21 (Last edit)
  * @brief  Implementation of MCP79510-library.
  *
  * Detailed description of file.
@@ -42,11 +42,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Verify SS pin
-#define SS  DDC0
-#define SPIMODE 1
+#define MFP DD3
+#define SS  DDD4
+#define SPIMODE 0
 
 #define SRAM_SIZE 64
+#define EUI_MAX_SIZE 8
 
 #define GetDecimalRegisterValue(address) BCDToDecimal(ReadRegister(address))
 #define SetDecimalRegisterValue(address, value) WriteRegister(address, DecimalToBCD(value))
@@ -67,6 +68,7 @@ static uint8_t ReadRegister(uint8_t address);
 static void WriteRegister(uint8_t address, uint8_t register_data);
 static void PreCallback(void);
 static void PostCallback(void);
+static void DumpRegisterValues(void) __attribute__((unused));
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -96,10 +98,13 @@ void libMCP79510_Init(void)
 ///
 void libMCP79510_HWInit(void)
 {
-    //Set SS as output
-    DDRC |= (1 << SS);
-    //Pull SS high to release device
-    PORTC |= (1 << SS);
+    //Set SS as output and pull high to release device.
+    DDRD |= (1 << SS);
+    PORTD |= (1 << SS);
+
+    //Set MFP as input with an pull-up active.
+    DDRD &= ~(1 << MFP);
+    PORTD |= (1 << MFP);
     return;
 }
 
@@ -610,11 +615,10 @@ void libMCP79510_ClearSRAM(void)
 ///
 void libMCP79510_GetEUI(uint8_t *eui, size_t length)
 {
-    sc_assert(length < 7);
+    sc_assert(length <= EUI_MAX_SIZE);
 
-    uint8_t address_offset = 6 - length;
     libSPI_WriteByte(INST_IDREAD, &PreCallback, NULL);
-    libSPI_WriteByte(address_offset, NULL, NULL);
+    libSPI_WriteByte(EUI_MAX_SIZE - length, NULL, NULL);
 
     uint8_t idx;
     for (idx = 0; idx < length; ++idx)
@@ -629,6 +633,32 @@ void libMCP79510_GetEUI(uint8_t *eui, size_t length)
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+///
+/// @brief Dump all register values.
+///
+/// @param  None
+/// @return None
+///
+static void DumpRegisterValues(void)
+{
+    uint8_t address;
+
+    DEBUG("****MCP79510 REGISTERS****\r\n");
+    for (address = REG_TC_SEC_CENT; address <= REG_PU_MONTH; ++address)
+    {
+        //Skip reserved registers
+        if (address != 0x0A && address != 0x0B)
+        {
+            uint8_t register_content;
+
+            register_content = ReadRegister(address);
+            DEBUG("REG ADDR: 0x%02X	REG VALUE: 0x%02X\r\n", address,
+                  register_content);
+        }
+    }
+    return;
+}
 
 ///
 /// @brief Write value to register.
@@ -659,7 +689,7 @@ static uint8_t ReadRegister(uint8_t address)
 
     uint8_t register_data;
 
-    libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
+    libSPI_WriteByte(INST_READ, &PreCallback, NULL);
     libSPI_WriteByte(address, NULL, NULL);
     libSPI_ReadByte(&register_data, NULL, &PostCallback);
     return register_data;
@@ -674,7 +704,7 @@ static uint8_t ReadRegister(uint8_t address)
 static void PreCallback(void)
 {
     libSPI_SetMode(SPIMODE);
-    PORTC &= ~(1 << SS); //Pull SS low to select device
+    PORTD &= ~(1 << SS); //Pull SS low to select device
     return;
 }
 
@@ -688,6 +718,6 @@ static void PreCallback(void)
 ///
 static void PostCallback(void)
 {
-    PORTC |= (1 << SS); //Pull SS high to release device
+    PORTD |= (1 << SS); //Pull SS high to release device
     return;
 }

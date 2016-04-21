@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2016-04-21 (Last edit)
  * @brief  Header of RTC HAL
  *
  * Detailed description of file.
@@ -31,41 +31,42 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "libDS3234.h"
+#include "libMCP79510.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
 #define RTC_ALARM_INDEX 1
+#define RTC_IsAlarmsSupported() false
 
-#define RTC_InitHW()    libDS3234_HWInit()
-#define RTC_Init()      libDS3234_Init()
+#define RTC_InitHW()    libMCP79510_HWInit()
+#define RTC_Init()      libMCP79510_Init()
 
-#define RTC_GetYear(year)           libDS3234_GetYear(year)
-#define RTC_GetMonth(month)         libDS3234_GetMonth(month)
-#define RTC_GetDate(date)           libDS3234_GetDate(date)
-#define RTC_GetHour(hour)           libDS3234_GetHour(hour)
-#define RTC_GetMinutes(minutes)     libDS3234_GetMinutes(minutes)
-#define RTC_GetSeconds(seconds)     libDS3234_GetSeconds(seconds)
-#define RTC_GetDay(day)             libDS3234_GetDay(day)
-#define RTC_GetHourMode(hour_mode)  libDS3234_GetHourMode(hour_mode)
+#define RTC_GetYear(year)           libMCP79510_GetYear(year)
+#define RTC_GetMonth(month)         libMCP79510_GetMonth(month)
+#define RTC_GetDate(date)           libMCP79510_GetDate(date)
+#define RTC_GetHour(hour)           libMCP79510_GetHour(hour)
+#define RTC_GetMinutes(minutes)     libMCP79510_GetMinute(minutes)
+#define RTC_GetSeconds(seconds)     libMCP79510_GetSecond(seconds)
+#define RTC_GetDay(day)             libMCP79510_GetDay(day)
+#define RTC_GetHourMode(hour_mode)  //TODO: Fix this!
 
-#define RTC_SetMinutes(minutes) libDS3234_SetMinutes(minutes)
-#define RTC_SetSeconds(seconds) libDS3234_SetSeconds(seconds)
-#define RTC_SetHour(hour)       libDS3234_SetHour(hour)
-#define RTC_SetYear(year)       libDS3234_SetYear(year)
-#define RTC_SetMonth(month)     libDS3234_SetMonth(month)
-#define RTC_SetDate(date)       libDS3234_SetDate(date)
-#define RTC_SetDay(day)         libDS3234_SetDay(day)
+#define RTC_SetMinutes(minutes) libMCP79510_SetMinute(minutes)
+#define RTC_SetSeconds(seconds) libMCP79510_SetSecond(seconds)
+#define RTC_SetHour(hour)       libMCP79510_SetHour(hour)
+#define RTC_SetYear(year)       libMCP79510_SetYear(year)
+#define RTC_SetMonth(month)     libMCP79510_SetMonth(month)
+#define RTC_SetDate(date)       libMCP79510_SetDate(date)
+#define RTC_SetDay(day)         libMCP79510_SetDay(day)
 
-#define RTC_SetAlarmDate(date)          libDS3234_SetAlarmDate(date, RTC_ALARM_INDEX)
-#define RTC_SetAlarmHour(hour)          libDS3234_SetAlarmHour(hour, RTC_ALARM_INDEX)
-#define RTC_SetAlarmMinutes(minutes)    libDS3234_SetAlarmMinutes(minutes, RTC_ALARM_INDEX)
-#define RTC_SetAlarmSeconds(seconds)    libDS3234_SetAlarmSeconds(seconds)
+#define RTC_SetAlarmDate(date)
+#define RTC_SetAlarmHour(hour)
+#define RTC_SetAlarmMinutes(minutes)
+#define RTC_SetAlarmSeconds(seconds)
 
-#define RTC_ClearAlarm() libDS3234_ClearAlarmFlag(1)
-#define RTC_EnableAlarm(enable) libDS3234_EnableAlarm(enable, 1)
+#define RTC_ClearAlarm() //TODO: Fix this!
+#define RTC_EnableAlarm(enable) libMCP79510_EnableAlarm(enable, RTC_ALARM_INDEX)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
