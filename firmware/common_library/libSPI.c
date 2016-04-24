@@ -44,6 +44,19 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define MISO    DDB4
 #define SCK     DDB5
 
+#define SPI_Read(result) \
+    SPDR = 0x00; \
+    while (!(SPSR & (1 << SPIF))) \
+    {\
+    }\
+    result = SPDR
+
+#define SPI_Write(data) \
+    SPDR = data; \
+    while (!(SPSR & (1 << SPIF))) \
+    { \
+    }
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -116,10 +129,7 @@ void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
         pre_write();
     }
 
-    SPDR = data_byte;
-    while (!(SPSR & (1 << SPIF)))
-    {
-    }
+    SPI_Write(data_byte);
 
     if (post_write != NULL)
     {
@@ -144,11 +154,7 @@ void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_read,
         pre_read();
     }
 
-    SPDR = 0x00; //Dummy data to enable SPI-clock
-    while (!(SPSR & (1 << SPIF)))
-    {
-    }
-    *data_byte = SPDR;
+    SPI_Read(*data_byte);
 
     if (post_read != NULL)
     {
@@ -180,11 +186,8 @@ void libSPI_Read(void *buffer, size_t length, libSPI_callback_type pre_read,
     uint8_t *buffer_ptr = (uint8_t *)buffer;
     for (idx = 0; idx < length; ++idx)
     {
-        SPDR = 0x00; //Dummy data to enable SPI-clock
-        while (!(SPSR & (1 << SPIF)))
-        {
-        }
-        *buffer_ptr = SPDR;
+
+        SPI_Read(*buffer_ptr);
         ++buffer_ptr;
     }
 
