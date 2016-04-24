@@ -139,6 +139,41 @@ void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
 }
 
 ///
+/// @brief Perform a blocking write.
+///
+/// @param  data Pointer to data to write.
+/// @param  length Number of bytes to write.
+/// @param  pre_write Pointer to function called before writing
+/// @param  post_write Pointer to function called after writing
+/// @return None
+///
+void libSPI_Write(void *data, size_t length, libSPI_callback_type pre_write,
+                  libSPI_callback_type post_write)
+{
+    sc_assert(data != NULL);
+
+    if (pre_write != NULL)
+    {
+        pre_write();
+    }
+
+    uint8_t idx;
+    uint8_t *data_ptr = (uint8_t *)data;
+    for (idx = 0; idx < length; ++idx)
+    {
+        SPI_Write(*data_ptr);
+        ++data_ptr;
+
+    }
+
+    if (post_write != NULL)
+    {
+        post_write();
+    }
+    return;
+}
+
+///
 /// @brief Perform a blocking read of a single byte.
 ///
 /// @param  data_byte Pointer to byte where the read byte will be stored

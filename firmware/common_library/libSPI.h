@@ -64,6 +64,8 @@ bool libSPI_SetMode(uint8_t mode);
 bool SetActiveSlave(bool state);
 void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
                       libSPI_callback_type post_write);
+void libSPI_Write(void *data, size_t length, libSPI_callback_type pre_write,
+                  libSPI_callback_type post_write);
 void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_write,
                      libSPI_callback_type post_write);
 void libSPI_Read(void *buffer, size_t length, libSPI_callback_type pre_read,
