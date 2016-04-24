@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-11 (Last edit)
+ * @date   2016-04-24 (Last edit)
  * @brief  Header for SPI-library.
  *
  * Detailed description of file.
@@ -66,5 +66,7 @@ void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
                       libSPI_callback_type post_write);
 void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_write,
                      libSPI_callback_type post_write);
+void libSPI_Read(void *buffer, size_t length, libSPI_callback_type pre_read,
+                 libSPI_callback_type post_read);
 
 #endif /* LIBSPI_H_ */

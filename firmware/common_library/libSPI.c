@@ -158,6 +158,44 @@ void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_read,
 }
 
 ///
+/// @brief Perform a blocking read.
+///
+/// @param  buffer Pointer to buffer where the data will be stored.
+/// @param  length Number of bytes to read.
+/// @param  pre_read Pointer to function called before reading
+/// @param  post_read Pointer to function called after reading
+/// @return None
+///
+void libSPI_Read(void *buffer, size_t length, libSPI_callback_type pre_read,
+                 libSPI_callback_type post_read)
+{
+    sc_assert(buffer != NULL);
+
+    if (pre_read != NULL)
+    {
+        pre_read();
+    }
+
+    size_t idx;
+    uint8_t *buffer_ptr = (uint8_t *)buffer;
+    for (idx = 0; idx < length; ++idx)
+    {
+        SPDR = 0x00; //Dummy data to enable SPI-clock
+        while (!(SPSR & (1 << SPIF)))
+        {
+        }
+        *buffer_ptr = SPDR;
+        ++buffer_ptr;
+    }
+
+    if (post_read != NULL)
+    {
+        post_read();
+    }
+    return;
+}
+
+///
 /// @brief Get the status of the SPI-bus
 ///
 /// @param None
