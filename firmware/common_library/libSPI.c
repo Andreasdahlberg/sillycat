@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-04-24 (Last edit)
  * @brief  Implementation of SPI-library.
  *
  * Detailed description of file.
@@ -137,7 +137,7 @@ void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
 /// @return None
 ///
 void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_read,
-                     libSPI_callback_type post__read)
+                     libSPI_callback_type post_read)
 {
     if (pre_read != NULL)
     {
@@ -150,9 +150,9 @@ void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_read,
     }
     *data_byte = SPDR;
 
-    if (post__read != NULL)
+    if (post_read != NULL)
     {
-        post__read();
+        post_read();
     }
     return;
 }
