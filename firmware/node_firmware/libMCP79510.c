@@ -1,8 +1,8 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-21 (Last edit)
- * @brief  Implementation of MCP79510-library.
+ * @date   2016-05-07 (Last edit)
+ * @brief  Implementation of MCP79510-driver.
  *
  * Detailed description of file.
  */
@@ -83,6 +83,7 @@ static void DumpRegisterValues(void) __attribute__((unused));
 void libMCP79510_Init(void)
 {
     libMCP79510_HWInit();
+    libMCP79510_EnableSquareWave(false);
     libMCP79510_EnableOscillator(true);
 
     INFO("Init done");
@@ -135,6 +136,22 @@ void libMCP79510_SetHundredthSecond(uint8_t hsec)
 }
 
 ///
+/// @brief Set alarm hundredth of second.
+///
+/// Hundredth of second precision is only available for alarm 1.
+///
+/// @param  hsec Hundredth of second to set alarm to.
+/// @return None
+///
+void libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
+{
+    sc_assert(hsec < 100);
+
+    SetDecimalRegisterValue(REG_ALARM1_SEC_CENT, hsec);
+    return;
+}
+
+///
 /// @brief Get second.
 ///
 /// @param  *sec Pointer to variable where the second will be stored.
@@ -168,6 +185,26 @@ void libMCP79510_SetSecond(uint8_t sec)
 }
 
 ///
+/// @brief Set alarm second.
+///
+/// @param  sec Alarm second to set.
+/// @param  alarm_index Alarm index, 0 or 1.
+/// @return None
+///
+void libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
+{
+    sc_assert(sec < 60);
+    sc_assert(alarm_index < 2);
+
+    uint8_t register_address;
+
+    register_address = (alarm_index == 0) ? REG_ALARM0_SEC :
+                       REG_ALARM1_SEC;
+    SetDecimalRegisterValue(register_address, sec);
+    return;
+}
+
+///
 /// @brief Get minute.
 ///
 /// @param  *minute Pointer to variable where the minute will be stored.
@@ -190,6 +227,26 @@ void libMCP79510_SetMinute(uint8_t minute)
     sc_assert(minute < 60);
 
     SetDecimalRegisterValue(REG_TC_MIN, minute);
+    return;
+}
+
+///
+/// @brief Set alarm minute.
+///
+/// @param  minute Alarm minute to set.
+/// @param  alarm_index Alarm index, 0 or 1.
+/// @return None
+///
+void libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
+{
+    sc_assert(minute < 60);
+    sc_assert(alarm_index < 2);
+
+    uint8_t register_address;
+
+    register_address = (alarm_index == 0) ? REG_ALARM0_MIN :
+                       REG_ALARM1_MIN;
+    SetDecimalRegisterValue(register_address, minute);
     return;
 }
 
@@ -243,6 +300,38 @@ void libMCP79510_SetHour(uint8_t hour)
     }
 
     WriteRegister(REG_TC_HOUR, new_content);
+    return;
+}
+
+///
+/// @brief Set alarm hour.
+///
+/// @param  hour Alarm hour to set.
+/// @param  alarm_index Alarm index, 0 or 1.
+/// @return None
+///
+void libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
+{
+    //TODO: check after hour mode is known?
+    sc_assert(hour < 24);
+    sc_assert(alarm_index < 2);
+
+    uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_HOUR :
+                               REG_ALARM1_HOUR;
+    uint8_t register_content = ReadRegister(register_address);
+    uint8_t new_content;
+
+    //Check if 24-hour mode is used.
+    if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+    {
+        new_content = (register_content & 0xC0) | DecimalToBCD(hour);
+    }
+    else
+    {
+        new_content = (register_content & 0xE0) | DecimalToBCD(hour);
+    }
+
+    WriteRegister(register_address, new_content);
     return;
 }
 
@@ -302,6 +391,26 @@ void libMCP79510_SetDate(uint8_t date)
     sc_assert(date < 32);
 
     SetDecimalRegisterValue(REG_TC_DATE, date);
+    return;
+}
+
+///
+/// @brief Set alarm date.
+///
+/// @param  date Alarm date to set.
+/// @param  alarm_index Alarm index, 0 or 1.
+/// @return None
+///
+void libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
+{
+    sc_assert(date < 32);
+    sc_assert(alarm_index < 2);
+
+    uint8_t register_address;
+    register_address = (alarm_index == 0) ? REG_ALARM0_DATE :
+                       REG_ALARM1_DATE;
+
+    SetDecimalRegisterValue(register_address, date);
     return;
 }
 
@@ -393,7 +502,7 @@ void libMCP79510_Enable24HourMode(bool enabled)
 ///
 /// @param  None
 /// @return false  If 24-mode is inactive and 12-hour mode is used.
-/// @return true If 24-mode is active
+/// @return true If 24-mode is active.
 ///
 bool libMCP79510_Is24HourMode(void)
 {
@@ -442,24 +551,24 @@ bool libMCP79510_IsLeapYear(void)
 }
 
 ///
-/// @brief Enable an alarm
+/// @brief Enable an alarm.
 ///
-/// @param  Index of alarm to enable, 1 or 2
+/// @param  Index of alarm to enable, 0 or 1.
 /// @return None
 ///
-void libMCP79510_EnableAlarm(bool enable, uint8_t alarm)
+void libMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
 {
-    sc_assert(alarm < 3);
+    sc_assert(alarm_index < 2);
 
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
 
     if (enable == true)
     {
-        register_data |= alarm << 4;
+        SetBitD(register_data, (REG_TC_CONTROL_ALM0_BIT + alarm_index));
     }
     else
     {
-        register_data &= ~(alarm << 4);
+        ClearBit(register_data, (REG_TC_CONTROL_ALM0_BIT + alarm_index));
     }
 
     WriteRegister(REG_TC_CONTROL, register_data);
@@ -520,6 +629,30 @@ void libMCP79510_ClearBatterySwitchFlag(void)
     ClearBit(register_content, REG_TC_DAY_VBAT_BIT);
 
     WriteRegister(REG_TC_DAY, register_content);
+    return;
+}
+
+///
+/// @brief Clear the alarm flag.
+///
+/// Must be cleared after an alarm has triggered.
+///
+/// @param  Index of alarm flag to clear, 0 or 1.
+/// @return None
+///
+void libMCP79510_ClearAlarmFlag(uint8_t alarm_index)
+{
+    sc_assert(alarm_index < 2);
+
+    uint8_t register_address;
+    register_address = (alarm_index == 0) ? REG_ALARM0_DAY :
+                       REG_ALARM1_DAY;
+
+    uint8_t register_content;
+    register_content = ReadRegister(register_address);
+
+    ClearBit(register_content, REG_ALARM_DAY_ALM0IF_BIT);
+    WriteRegister(register_address, register_content);
     return;
 }
 

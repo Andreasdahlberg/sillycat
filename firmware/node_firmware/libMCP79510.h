@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-28 (Last edit)
+ * @date   2016-05-07 (Last edit)
  * @brief  Header of libMCP79510
  *
  * Detailed description of file.
@@ -47,16 +47,21 @@ void libMCP79510_Init(void);
 void libMCP79510_HWInit(void);
 void libMCP79510_GetHundredthSecond(uint8_t *hsec);
 void libMCP79510_SetHundredthSecond(uint8_t hsec);
+void libMCP79510_SetAlarmHundredthSecond(uint8_t hsec);
 void libMCP79510_GetSecond(uint8_t *sec);
 void libMCP79510_SetSecond(uint8_t sec);
+void libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index);
 void libMCP79510_GetMinute(uint8_t *minute);
 void libMCP79510_SetMinute(uint8_t minute);
+void libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index);
 void libMCP79510_GetHour(uint8_t *hour);
 void libMCP79510_SetHour(uint8_t hour);
+void libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index);
 void libMCP79510_GetDay(uint8_t *day);
 void libMCP79510_SetDay(uint8_t day);
 void libMCP79510_GetDate(uint8_t *date);
 void libMCP79510_SetDate(uint8_t date);
+void libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index);
 void libMCP79510_GetMonth(uint8_t *month);
 void libMCP79510_SetMonth(uint8_t month);
 void libMCP79510_GetYear(uint8_t *year);
@@ -69,6 +74,7 @@ void libMCP79510_EnableAlarm(bool enable, uint8_t alarm);
 void libMCP79510_EnableSquareWave(bool enable);
 bool libMCP79510_IsOscillatorRunning(void);
 void libMCP79510_ClearBatterySwitchFlag(void);
+void libMCP79510_ClearAlarmFlag(uint8_t alarm_index);
 bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
                              uint8_t length);
 bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);

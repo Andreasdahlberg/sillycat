@@ -1,7 +1,7 @@
 /**
  * @file   MCP79510Registers.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-28 (Last edit)
+ * @date   2016-05-07 (Last edit)
  * @brief  Registers and bit defines for MCP79510.
  *
  * Detailed description of file.
@@ -102,5 +102,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REG_TC_CONTROL_ALM1_BIT     0x05
 #define REG_TC_CONTROL_SQWE_BIT     0x06
 #define REG_TC_CONTROL_OUT_BIT      0x07
+
+#define REG_ALARM_DAY_ALM0IF_BIT    0x03
+#define REG_ALARM_DAY_ALM0C0_BIT    0x04
+#define REG_ALARM_DAY_ALM0C1_BIT    0x05
+#define REG_ALARM_DAY_ALM0C2_BIT    0x06
 
 #endif /* MCP79510REGISTERS_H_ */

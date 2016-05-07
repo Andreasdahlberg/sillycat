@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-21 (Last edit)
+ * @date   2016-05-07 (Last edit)
  * @brief  Header of RTC HAL
  *
  * Detailed description of file.
@@ -38,7 +38,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define RTC_ALARM_INDEX 1
-#define RTC_IsAlarmsSupported() false
+#define RTC_IsAlarmsSupported() true
 
 #define RTC_InitHW()    libMCP79510_HWInit()
 #define RTC_Init()      libMCP79510_Init()
@@ -60,12 +60,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_SetDate(date)       libMCP79510_SetDate(date)
 #define RTC_SetDay(day)         libMCP79510_SetDay(day)
 
-#define RTC_SetAlarmDate(date)
-#define RTC_SetAlarmHour(hour)
-#define RTC_SetAlarmMinutes(minutes)
-#define RTC_SetAlarmSeconds(seconds)
+#define RTC_SetAlarmDate(date)          libMCP79510_SetAlarmDate(date, RTC_ALARM_INDEX)
+#define RTC_SetAlarmHour(hour)          libMCP79510_SetAlarmHour(hour, RTC_ALARM_INDEX)
+#define RTC_SetAlarmMinutes(minutes)    libMCP79510_SetAlarmMinute(minutes, RTC_ALARM_INDEX)
+#define RTC_SetAlarmSeconds(seconds)    libMCP79510_SetAlarmSeconds(seconds, RTC_ALARM_INDEX)
 
-#define RTC_ClearAlarm() //TODO: Fix this!
+#define RTC_ClearAlarm()        libMCP79510_ClearAlarmFlag(RTC_ALARM_INDEX)
 #define RTC_EnableAlarm(enable) libMCP79510_EnableAlarm(enable, RTC_ALARM_INDEX)
 
 //////////////////////////////////////////////////////////////////////////
