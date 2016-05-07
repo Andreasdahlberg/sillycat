@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-20 (Last edit)
+ * @date   2016-05-07 (Last edit)
  * @brief  Implementation of libPower
  *
  * Detailed description of file.
@@ -92,9 +92,6 @@ void libPower_Init(void)
 
     PORTC  |= (1 << CONNECTED_PIN);
     PORTC  |= (1 << CHARGING_PIN);
-
-    DDRD &= ~(1 << DDD3);
-    PORTD |= (1 << DDD3);
 
     //Disable TWI(I2C) and Timer 2
     PRR = ((1 << PRTWI) | (1 << PRTIM2));
