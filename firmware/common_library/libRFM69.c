@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-03 (Last edit)
+ * @date   2016-05-08 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -37,15 +37,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 #include "libDebug.h"
 #include "RFM69Registers.h"
+#include "RFM69_HAL.h"
 
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define SS DDB2
-#define SPI_MODE 0
 
 #define REG_OPMODE_MODE_MASK 0x1C
 
@@ -60,6 +58,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RFM_FSTEP (float)61.03515625 // FSTEP = FXOSC / 2^19
 
 #define WAIT_TIMEOUT_MS 10
+#define POR_TIME_MS 10
+#define RESET_TIMING_US 110
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -79,6 +79,8 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+static uint32_t reset_time_ms;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -101,24 +103,30 @@ static void PostCallback(void);
 ///
 void libRFM69_Init(void)
 {
-    libRFM69_HWInit();
+    libRFM69_InitHW();
+    libRFM69_Reset();
 
-    //TODO: Fix this in a better way(power on delay required!)
+    //TODO: Remove
     _delay_ms(15);
     return;
 }
 
 ///
-/// @brief Set the SS pin as output and pull high. This function should
-///        be called as early as possible in a systems with several SPI-devices.
+/// @brief Init required IO-pins. This function should be called as
+///        early as possible in a systems with several SPI-devices.
 ///
 /// @param  None
 /// @return None
 ///
-void libRFM69_HWInit(void)
+void libRFM69_InitHW(void)
 {
-    DDRB |= (1 << SS);
-    PORTB |= (1 << SS); //Pull SS high to release device
+    InitReset();
+
+    InitCS();
+    PullCS(); //Pull SS high to release device
+
+    InitIO();
+
     return;
 }
 
@@ -132,6 +140,35 @@ void libRFM69_Update(void)
 {
     sc_assert_fail();
     return;
+}
+
+///
+/// @brief Reset the RFM69 module.
+///
+/// Use libRFM69_IsPowerUpDone() to check if the module is ready to use again.
+///
+/// @param  None
+/// @return None
+///
+void libRFM69_Reset(void)
+{
+    PullReset();
+    _delay_us(RESET_TIMING_US);
+    ReleaseReset();
+
+    reset_time_ms = Timer_GetMilliseconds();
+    return;
+}
+
+///
+/// @brief Check if RFM69HW module is ready to use after power on/reset.
+///
+/// @param  None
+/// @return None
+///
+bool libRFM69_IsPowerUpDone(void)
+{
+    return (Timer_TimeDifference(reset_time_ms) > POR_TIME_MS);
 }
 
 //TODO: Use remove these functions and use macros!
@@ -1302,14 +1339,15 @@ void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data)
 
 static void PreCallback(void)
 {
-    libSPI_SetMode(SPI_MODE);
-    PORTB &= ~(1 << SS); //Pull SS low to select device
+    libSPI_SetMode(SPIMODE);
+
+    PullCS(); //Select device
     return;
 }
 
 static void PostCallback(void)
 {
-    PORTB |= (1 << SS); //Pull SS high to release device
+    ReleaseCS(); //Release device
     return;
 }
 

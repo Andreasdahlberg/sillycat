@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-03 (Last edit)
+ * @date   2016-05-08 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -145,12 +145,14 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 
 void libRFM69_Init(void);
-void libRFM69_HWInit(void);
+void libRFM69_InitHW(void);
 void libRFM69_Update(void);
 void libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 bool libRFM69_IsModeReady(void);
+bool libRFM69_IsPowerUpDone(void);
 bool libRFM69_WaitForModeReady(void);
+void libRFM69_Reset(void);
 void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
 void libRFM69_GetTemperature(uint8_t *temperature);
