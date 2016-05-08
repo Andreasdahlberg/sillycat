@@ -117,5 +117,5 @@ static void SendCallback(bool status)
     event = Event_New(EVENT_RHT_SENT);
 
     Event_Trigger(&event);
-    INFO("Sensor callback: %u\r\n", (uint8_t)status);
+    INFO("Sensor callback: %u", (uint8_t)status);
 }
