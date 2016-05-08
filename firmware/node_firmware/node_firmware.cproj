@@ -258,6 +258,9 @@
       <SubType>compile</SubType>
       <Link>Utility\sc_assert.h</Link>
     </Compile>
+    <Compile Include="Flash_HAL.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="LED.c">
       <SubType>compile</SubType>
     </Compile>
@@ -268,12 +271,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="libDHT22.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libDS3234.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libDS3234.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Flash.c">
@@ -320,6 +317,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Regdefault.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="RFM69_HAL.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="RTC_HAL.h">

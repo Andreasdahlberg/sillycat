@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-27 (Last edit)
+ * @date   2016-05-08 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -40,6 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libRFM69.h"
 #include "libDHT22.h"
 #include "libPower.h"
+#include "libFlash.h"
 
 #include "Timer.h"
 #include "LED.h"
@@ -50,6 +51,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RTC.h"
 #include "Power.h"
 #include "Event.h"
+#include "Flash.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -80,11 +82,11 @@ static sleep_status_type sleep_status = {0};
 static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
 static void RHTSent(const event_type *event __attribute__ ((unused)));
+//static void PrintEUI(uint8_t *eui, uint8_t length);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
 
 int main(void)
 {
@@ -93,8 +95,9 @@ int main(void)
     wdt_disable();
 
     //Init hardware early to ensure all CS are disabled.
-    libRFM69_HWInit();
+    libRFM69_InitHW();
     RTC_InitHW();
+    libFlash_InitHW();
 
     libDebug_Init();
     INFO("Node unit started");
@@ -102,10 +105,12 @@ int main(void)
 
     libADC_Init();
     Timer_Init();
-    libSPI_Init(1);
+    libSPI_Init(0);
     libADC_Enable(true);
     libDHT22_Init();
     libPower_Init();
+    libFlash_Init();
+    //Flash_Init();
 
     LED_Init();
     Config_Load();
@@ -123,11 +128,12 @@ int main(void)
     Power_Init();
 
     Event_AddListener(Sensor_WakeUp, EVENT_WAKEUP);
+    Event_AddListener(Power_WakeUp, EVENT_WAKEUP);
     Event_AddListener(LED_EventHandler, EVENT_ALL);
-    //Event_AddListener(Transceiver_EventHandler, EVENT_ALL);
+    Event_AddListener(Transceiver_EventHandler, EVENT_ALL);
     Event_AddListener(RHTSent, EVENT_RHT_SENT);
 
-    //Since RTC-alarms are persistent between restarts so we need to make
+    //Since RTC-alarms are persistent between restarts we need to make
     //sure that they are disabled.
     RTC_EnableAlarm(false);
 
@@ -138,17 +144,16 @@ int main(void)
 #endif
 
     INFO("Start up done");
-
     sleep_status.last_sleep_time = Timer_GetMilliseconds();
 
     while (1)
     {
         libADC_Update();
+        Power_Update();
         libDHT22_Update();
         Sensor_Update();
         Transceiver_Update();
         LED_Update();
-        Power_Update();
 
         if (IsTimeForSleep() == true)
         {
@@ -183,7 +188,7 @@ static void NotifyAndEnterSleep(void)
     rtc_time_type time;
 
     RTC_GetCurrentTime(&time);
-    DEBUG("Sleep: %u:%u:%u\r\n", time.hour, time.minute, time.second);
+    INFO("Sleep: %u:%u:%u", time.hour, time.minute, time.second);
 
     //TODO: Compensate for time awake
     RTC_AddSeconds(&time, Config_GetReportInterval());
@@ -196,8 +201,8 @@ static void NotifyAndEnterSleep(void)
     //Enter sleep mode, execution will continue from this point
     //after sleep is done.
     libPower_Sleep();
-    RTC_ClearAlarm();
     RTC_EnableAlarm(false);
+    RTC_ClearAlarm();
 
     sleep_status.last_sleep_time = Timer_GetMilliseconds();
     sleep_status.sleep_now = false;
@@ -206,7 +211,22 @@ static void NotifyAndEnterSleep(void)
     Event_Trigger(&event);
 
     RTC_GetCurrentTime(&time);
-    DEBUG("Wake: %u:%u:%u\r\n", time.hour, time.minute, time.second);
+    INFO("Wake: %u:%u:%u", time.hour, time.minute, time.second);
 
     return;
 }
+/*
+static void PrintEUI(uint8_t *eui, uint8_t length)
+{
+    DEBUG("EUI: ");
+
+    uint8_t idx;
+    for (idx = 0; idx < length; ++idx)
+    {
+        DEBUG("%02X", eui[idx]);
+    }
+
+    DEBUG("\r\n");
+    return;
+}
+*/
