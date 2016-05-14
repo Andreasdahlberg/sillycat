@@ -83,7 +83,7 @@ static void DumpRegisterValues(void);
 ///
 void libDS3234_Init(void)
 {
-    libDS3234_HWInit();
+    libDS3234_InitHW();
 
     // Clear control register, this makes sure that the oscillator is running
     // when power is removed.
@@ -100,7 +100,7 @@ void libDS3234_Init(void)
 /// @param  None
 /// @return None
 ///
-void libDS3234_HWInit(void)
+void libDS3234_InitHW(void)
 {
     //Set SS as output
     DDRC |= (1 << SS);

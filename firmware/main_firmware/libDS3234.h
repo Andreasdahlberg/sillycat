@@ -37,37 +37,37 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define REG_SECONDS				0x00
-#define REG_MINUTES				0x01
-#define REG_HOUR				0x02
-#define REG_DAY					0x03
-#define REG_DATE				0x04
-#define REG_MONTH_CENTURY		0x05
-#define REG_YEAR				0x06
-#define REG_ALARM_1_SECONDS		0x07
-#define REG_ALARM_1_MINUTES		0x08
-#define REG_ALARM_1_HOURS		0x09
-#define REG_ALARM_1_DAY_DATE	0x0A
-#define REG_ALARM_2_MINUTES		0x0B
-#define REG_ALARM_2_HOURS		0x0C
-#define REG_ALARM_2_DAY_DATE	0x0D
-#define REG_CONTROL				0x0E
-#define REG_CONTROL_STATUS		0x0F
-#define REG_AGING_OFFSET		0x10
-#define REG_TEMP_MSB			0x11
-#define REG_TEMP_LSB			0x12
-#define REG_DISABLE_TEMP		0x13
-#define REG_SRAM_ADDRESS		0x18
-#define REG_SRAM_DATA			0x19
+#define REG_SECONDS             0x00
+#define REG_MINUTES             0x01
+#define REG_HOUR                0x02
+#define REG_DAY                 0x03
+#define REG_DATE                0x04
+#define REG_MONTH_CENTURY       0x05
+#define REG_YEAR                0x06
+#define REG_ALARM_1_SECONDS     0x07
+#define REG_ALARM_1_MINUTES     0x08
+#define REG_ALARM_1_HOURS       0x09
+#define REG_ALARM_1_DAY_DATE    0x0A
+#define REG_ALARM_2_MINUTES     0x0B
+#define REG_ALARM_2_HOURS       0x0C
+#define REG_ALARM_2_DAY_DATE    0x0D
+#define REG_CONTROL             0x0E
+#define REG_CONTROL_STATUS      0x0F
+#define REG_AGING_OFFSET        0x10
+#define REG_TEMP_MSB            0x11
+#define REG_TEMP_LSB            0x12
+#define REG_DISABLE_TEMP        0x13
+#define REG_SRAM_ADDRESS        0x18
+#define REG_SRAM_DATA           0x19
 
-#define READ_ADDRESS	0x00
-#define WRITE_ADDRESS	0x80
+#define READ_ADDRESS    0x00
+#define WRITE_ADDRESS   0x80
 
-#define MONTH_MASK		0x1F
-#define HOUR_MASK		0x1F
+#define MONTH_MASK      0x1F
+#define HOUR_MASK       0x1F
 
-#define HOUR_MODE_BIT	0x06
-#define HOUR_AM_PM_BIT	0x05
+#define HOUR_MODE_BIT   0x06
+#define HOUR_AM_PM_BIT  0x05
 
 #define CONREG_EOSC     0x08
 #define CONREG_BBSQW    0x07
@@ -93,7 +93,7 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 
 void libDS3234_Init(void);
-void libDS3234_HWInit(void);
+void libDS3234_InitHW(void);
 bool libDS3234_ClearAlarmFlag(uint8_t alarm);
 bool libDS3234_EnableAlarm(bool enable, uint8_t alarm);
 

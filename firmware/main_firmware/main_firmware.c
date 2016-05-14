@@ -50,6 +50,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Timer.h"
 #include "Transceiver.h"
 #include "Nodes.h"
+#include "Config.h"
 
 #include "guiRTC.h"
 #include "guiSensor.h"
@@ -83,8 +84,8 @@ int main(void)
 
     wdt_disable();
 
-    libDS3234_HWInit();
-    libRFM69_HWInit();
+    libDS3234_InitHW();
+    libRFM69_InitHW();
 
     libDebug_Init();
     INFO("Main unit started");
@@ -97,15 +98,12 @@ int main(void)
     libADC_Enable(true);
     Sensor_Init();
     libInput_Init();
-
-
+    Config_Load();
     Transceiver_Init();
     Interface_Init();
-
     //NOTE: The first init called will be the root view.
     guiRTC_Init();
     guiSensor_Init();
-
     Nodes_Init();
 
     libInput_SetCallbacks(Interface_NextView, Interface_PreviousView,
