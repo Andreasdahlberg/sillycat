@@ -35,6 +35,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libUART.h"
 #include "FIFO.h"
+#include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -177,7 +178,7 @@ bool UART_WaitForTx(uint32_t timeout_ms)
     bool status = true;
     uint32_t start_time_ms = Timer_GetMilliseconds();
 
-    while (!FIFO_IsEmpty(tx_buffer))
+    while (!FIFO_IsEmpty(&uart_tx_fifo))
     {
         if (timeout_ms != 0 && Timer_TimeDifference(start_time_ms) > timeout_ms)
         {
