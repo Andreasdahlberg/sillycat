@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-08 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -113,7 +113,7 @@ void Sensor_Init(void)
 {
     current_alpha = (uint16_t)CALCULATE_ALPHA(SAMPLE_FREQUENCY_MS / 1000,
                     AVERAGE_WINDOW_S);
-    DEBUG("Smoothing alpha: %u", current_alpha);
+    DEBUG("Smoothing alpha: %u\r\n", current_alpha);
 
     libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, true);
     INFO("Init done");
