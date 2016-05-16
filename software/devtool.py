@@ -160,6 +160,9 @@ class DevTool(QtGui.QWidget):
 
 
     def update_pixel_text(self, point):
+
+        self.dv.set_pixel(int(point.x()), int(point.y()))
+
         self.pixel_label.setText('X: ' + str(point.x()) + ',Y: ' + str(point.y()))
 
 

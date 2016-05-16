@@ -42,10 +42,10 @@ def create_bitmap_image(rows, w):
         b"".join([bytes(row+pad) for row in reversed(rows)]))
 
 
-
 class DisplayPixmap(QtGui.QLabel):
     def __init__(self):
         super(DisplayPixmap, self).__init__()
+
 
 class DisplayView(QtGui.QLabel):
     def __init__(self):
@@ -54,6 +54,9 @@ class DisplayView(QtGui.QLabel):
         self.setPixmap(self._pixmap)
 
         self.setMouseTracking(True)
+
+        self.pos_x = 0
+        self.pos_y = 0
 
 
     def mouseMoveEvent(self, event):
@@ -69,6 +72,20 @@ class DisplayView(QtGui.QLabel):
 
         scaled_point = QtCore.QPoint(x_pos, y_pos)
         self.emit(QtCore.SIGNAL('new_pixel(QPoint)'), scaled_point)
+
+
+    def set_pixel(self, x, y):
+        self.pos_x = x
+        self.pos_y = y
+
+        px = self._pixmap.copy()
+
+        p = QtGui.QPainter(px)
+        p.setPen(QtGui.QColor(255, 255, 255))
+        p.drawPoint(self.pos_x, self.pos_y)
+        p.end()   
+
+        self.setPixmap(px.scaled(384, 93))
 
 
     def add_color(self, pixmap):
@@ -96,7 +113,15 @@ class DisplayView(QtGui.QLabel):
 
     def update_display_view(self, image_data):
         self._pixmap.loadFromData(self.format_image_data(bytes(image_data)))
-        self.setPixmap(self.add_color(self._pixmap).scaled(384, 93))
+        
+        px = self.add_color(self._pixmap).copy()
+
+        p = QtGui.QPainter(px)
+        p.setPen(QtGui.QColor(255, 255, 255))
+        p.drawPoint(self.pos_x, self.pos_y)
+        p.end()           
+
+        self.setPixmap(px.scaled(384, 93))
 
         if (self.isHidden()):
             self.show()
