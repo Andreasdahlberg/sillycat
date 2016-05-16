@@ -244,13 +244,29 @@
       <SubType>compile</SubType>
       <Link>Transceiver.h</Link>
     </Compile>
+    <Compile Include="..\common_library\UART.c">
+      <SubType>compile</SubType>
+      <Link>UART.c</Link>
+    </Compile>
+    <Compile Include="..\common_library\UART.h">
+      <SubType>compile</SubType>
+      <Link>UART.h</Link>
+    </Compile>
     <Compile Include="..\utility\ErrorHandler.c">
       <SubType>compile</SubType>
-      <Link>ErrorHandler.c</Link>
+      <Link>utility\ErrorHandler.c</Link>
     </Compile>
     <Compile Include="..\utility\ErrorHandler.h">
       <SubType>compile</SubType>
-      <Link>ErrorHandler.h</Link>
+      <Link>utility\ErrorHandler.h</Link>
+    </Compile>
+    <Compile Include="..\utility\FIFO.c">
+      <SubType>compile</SubType>
+      <Link>utility\FIFO.c</Link>
+    </Compile>
+    <Compile Include="..\utility\FIFO.h">
+      <SubType>compile</SubType>
+      <Link>utility\FIFO.h</Link>
     </Compile>
     <Compile Include="..\utility\sc_assert.h">
       <SubType>compile</SubType>
@@ -363,6 +379,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="gui" />
+    <Folder Include="utility" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
