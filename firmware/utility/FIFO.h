@@ -1,7 +1,7 @@
 /**
  * @file   FIFO.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-1 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Header of FIFO
  *
  * Detailed description of file.
@@ -39,7 +39,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define FIFO_New(data, size) (fifo_type){(uint8_t *)data, 0, 0, size, (sizeof(data) / size)}
+#define FIFO_New(data) (fifo_type){(uint8_t *)data, 0, 0, (sizeof(data) / sizeof(*data)), sizeof(*data)}
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -47,12 +47,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct
 {
-	uint8_t *data;
-	uint8_t head;
-	uint8_t tail;
+    uint8_t *data;
+    uint8_t head;
+    uint8_t tail;
     uint8_t size;
     uint8_t item_size;
-}fifo_type;
+} fifo_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
