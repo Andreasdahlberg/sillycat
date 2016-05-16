@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Header of Debug-library.
  *
  * Detailed description of file.
@@ -33,7 +33,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/pgmspace.h>
 
-#include "libUART.h"
 #include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -61,5 +60,5 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void libDebug_Init(void);
 void libDebug_Print_P(const char *text, ...);
 void libDebug_Sleep(const event_type *event __attribute__ ((unused)));
-
+void libDebug_WakeUp(const event_type *event __attribute__ ((unused)));
 #endif /* LIBDEBUG_H_ */

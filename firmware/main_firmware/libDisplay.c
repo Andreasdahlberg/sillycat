@@ -1,7 +1,7 @@
 /**
  * @file   libDisplay.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Implementation of display-library.
  *
  * Detailed description of file.
@@ -39,7 +39,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDisplay.h"
 #include "libNHD223.h"
 #include "libADC.h"
-#include "libUART.h"
+#include "UART.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -253,13 +253,19 @@ void libDisplay_DumpVRAMToUART(void)
 {
     uint8_t page;
 
-    //TODO: Send VRAM asynchronous
-    libUART_SendArray((uint8_t *)"<VRAM>", 6);
+    UART_Write("<VRAM>", 6);
     for (page = 0; page < VRAM_PAGES; ++page)
     {
-        libUART_SendArray(VRAM[page], VRAM_COLUMNS);
+        uint8_t cnt = 0;
+
+        while (cnt != VRAM_COLUMNS)
+        {
+            cnt += UART_Write(&(VRAM[page][cnt]), VRAM_COLUMNS - cnt);
+        }
     }
-    libUART_SendArray((uint8_t *)"\r\n", 2);
+    UART_Write("\r\n", 2);
+
+    return;
 }
 #endif
 

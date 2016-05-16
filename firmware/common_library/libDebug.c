@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -37,12 +37,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdarg.h>
 
 #include "libDebug.h"
+#include "UART.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
 #define OUT_BUFFER_SIZE 80
+#define WAIT_TIMEOUT_MS 10
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -69,7 +71,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void libDebug_Init(void)
 {
 #ifdef DEBUG_ENABLE
-    libUART_Init();
+    UART_Init();
+    UART_Enable(true);
 #endif
     INFO("Init done");
     return;
@@ -94,7 +97,7 @@ void libDebug_Print_P(const char *text, ...)
     //Make sure that the output always is null terminated.
     buffer[OUT_BUFFER_SIZE - 1] = '\n';
 
-    libUART_SendArray((uint8_t *)buffer, strlen(buffer));
+    UART_Write((uint8_t *)buffer, strlen(buffer));
     va_end(args);
     return;
 }
@@ -109,7 +112,22 @@ void libDebug_Sleep(const event_type *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
-    libUART_WaitForEmptyBuffer();
+    UART_WaitForTx(WAIT_TIMEOUT_MS);
+    UART_Enable(false);
+    return;
+}
+
+///
+/// @brief Enable UART after sleep
+///
+/// @param  *event Pointer to triggered event
+/// @return None
+///
+void libDebug_WakeUp(const event_type *event __attribute__ ((unused)))
+{
+    sc_assert(event != NULL);
+
+    UART_Enable(true);
     return;
 }
 
