@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-18 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -28,10 +28,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+//NOTE: Include common.h before all other headers
+#include "common.h"
+
 #include <string.h>
 #include <stdio.h>
 
-#include "common.h"
 #include "libDebug.h"
 #include "libUI.h"
 
@@ -117,11 +119,14 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 
     if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
     {
-        libUI_Print("Temperature: %uC", 10, 10, reading.value / 10);
+        uint8_t temperature_integer = (uint8_t)(reading.value / 10);
+
+        libUI_Print("Temperature: %u.%uC", 6, 10, temperature_integer,
+                    reading.value % 10);
     }
     else
     {
-        libUI_Print("Temperature: --", 10, 10);
+        libUI_Print("Temperature: --", 6, 10);
     }
     return;
 }
