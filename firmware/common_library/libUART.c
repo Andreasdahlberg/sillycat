@@ -1,7 +1,7 @@
 /**
  * @file   libUART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-05-16 (Last edit)
  * @brief  Implementation of libUART functions
  *
  * Detailed description of file.
@@ -28,7 +28,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+//NOTE: Include before all other headers
+#include "common.h"
+
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include "libUART.h"
 
@@ -36,7 +40,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define UBRRn 1     //Baud:250K, Fosc: 8 MHz, Error: 0%
+#define DIV_MUL 16
+
+#define CalculateUBRRn(baud) (((F_CPU * 10 / (DIV_MUL * baud) - 10) + 5) / 10)
+#define CalculateBaudRate(ubrrn) (F_CPU / (DIV_MUL * (ubrrn + 1)))
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -46,9 +53,39 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
+static libUART_isr_callback rx_handler;
+static libUART_isr_callback tx_handler;
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//INTERUPT SERVICE ROUTINES
+//////////////////////////////////////////////////////////////////////////
+
+ISR(USART_RX_vect)
+{
+    uint8_t data = UDR0;
+    if (rx_handler != NULL)
+    {
+        rx_handler(&data);
+    }
+}
+
+ISR(USART_UDRE_vect)
+{
+    uint8_t data;
+
+    if (tx_handler != NULL && tx_handler(&data))
+    {
+        UDR0 = data;
+    }
+    else
+    {
+        UCSR0B &= ~(1<<UDRIE0);
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -62,62 +99,85 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 ///
 void libUART_Init(void)
 {
-    //Set baud rate
-    UBRR0H = (uint8_t)(UBRRn >> 8);
-    UBRR0L = (uint8_t)UBRRn;
-
-    //Enable RX & TX
-    UCSR0B = (1 << RXEN0) | (1 << TXEN0);
-
     //Set frame format: 1 stop bit 8 data
     UCSR0C =  (3 << UCSZ00);
     return;
 }
 
 ///
-/// @brief Send an array via UART
+/// @brief Set handler functions for Rx and Tx.
 ///
-/// @param  data Pointer to array with data to send
-/// @param  len Length of array
+/// NULL can be used to remove a handler.
+///
+/// @param  rx_callback Pointer to rx handler.
+/// @param  tx_callback Pointer to tx handler.
 /// @return None
 ///
-void libUART_SendArray(uint8_t *data, uint8_t len)
+void libUART_SetCallbacks(libUART_isr_callback rx_callback,
+                          libUART_isr_callback tx_callback)
 {
-    uint8_t byte_counter;
+    rx_handler = rx_callback;
+    tx_handler = tx_callback;
+    return;
+}
 
-    for (byte_counter = 0; byte_counter < len; ++byte_counter)
+///
+/// @brief Enable/disable the UART interface.
+///
+/// @param  enable True to enable, otherwise false.
+/// @return None
+///
+void libUART_Enable(bool enable)
+{
+    if (enable == true)
     {
-        libUART_SendByte(data[byte_counter]);
+        //PRR &= ~(1 << PRUSART0);
+        UCSR0B |= ((1 << RXEN0) | (1 << TXEN0) | (1<<RXCIE0));
+    }
+    else
+    {
+        UCSR0B &= ~((1 << RXEN0) | (1 << TXEN0) | (1<<RXCIE0));
+        //PRR |= (1 << PRUSART0);
     }
     return;
 }
 
 ///
-/// @brief Send a byte via UART
+/// @brief Start a Tx transfer.
 ///
-/// @param  data Byte to send
-/// @return None
-///
-void libUART_SendByte(uint8_t data)
-{
-    libUART_WaitForEmptyBuffer();
-
-    //put data in buffer
-    UDR0 = data;
-    return;
-}
-
-///
-/// @brief Wait for empty transmit buffer
+/// When a Tx transfer is started the Tx handler is called to get data.
 ///
 /// @param  None
 /// @return None
 ///
-void libUART_WaitForEmptyBuffer(void)
+void libUART_StartTx(void)
 {
-    //wait for empty transmit buffer
-    while (!(UCSR0A & (1 << UDRE0)))
-    {
-    }
+    UCSR0B |= (1<<UDRIE0);
     return;
+}
+
+///
+/// @brief Set baud rate.
+///
+/// NOTE: Remember to check the error rate with the selected baud rate
+///       and the crystal frequency.
+///
+/// @param  baud Baud rate to set.
+/// @return bool True if baud rate is valid, otherwise false.
+///
+bool libUART_SetBaudRate(uint32_t baud)
+{
+    bool status = false;
+    uint32_t tmp = DIV_MUL * baud;
+
+    //Check for overflow and invalid baud rate
+    if (tmp <= F_CPU && tmp > baud)
+    {
+        uint16_t UBRRn = CalculateUBRRn(baud);
+        UBRR0H = (uint8_t)(UBRRn >> 8);
+        UBRR0L = (uint8_t)UBRRn;
+        status = true;
+    }
+
+    return status;
 }

@@ -1,8 +1,8 @@
 /**
- * @file   libUART.h
+ * @file   UART.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2016-05-16 (Last edit)
- * @brief  Header of libUART
+ * @brief  Header of UART module
  *
  * Detailed description of file.
  */
@@ -24,31 +24,31 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBUART_H_
-#define LIBUART_H_
+#ifndef UART_H_
+#define UART_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
-#include <stdbool.h>
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef bool (*libUART_isr_callback)(uint8_t *data);
-
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libUART_Init(void);
-void libUART_SetCallbacks(libUART_isr_callback rx_callback,
-                          libUART_isr_callback tx_callback);
-bool libUART_SetBaudRate(uint32_t baud);
-void libUART_Enable(bool enable);
-void libUART_StartTx(void);
+void UART_Init(void);
+void UART_Enable(bool enable);
+size_t UART_Write(const void *data, size_t length);
+size_t UART_Read(void *data, size_t length);
+bool UART_WaitForTx(uint32_t timeout_ms);
 
-#endif /* LIBUART_H_ */
+#endif /* UART_H_ */
