@@ -32,6 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 
 #include "libDebug.h"
+#include "libFlash.h"
 #include "Flash.h"
 
 //////////////////////////////////////////////////////////////////////////
