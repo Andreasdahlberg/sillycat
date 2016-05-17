@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-06 (Last edit)
+ * @date   2016-05-17 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -29,10 +29,20 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define ERRORHANDLER_H_
 
 //////////////////////////////////////////////////////////////////////////
-//DEFINES
+//INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
 #include "sc_assert.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
+#ifdef DEBUG_ENABLE
+#define ErrorHandler_PrintLog() ErrorHandler_DumpLog()
+#else
+#define ErrorHandler_PrintLog()
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS

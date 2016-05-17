@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-06 (Last edit)
+ * @date   2016-05-17 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -102,7 +102,7 @@ void ErrorHandler_Init(void)
         {
             current_index = index;
             current_id = ++prev_id;
-            DEBUG("Error log index: %u\r\n", index);
+            DEBUG("Current error log index: %u\r\n", index);
             return;
         }
         prev_id = id;

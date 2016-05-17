@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-05-17 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -51,6 +51,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Transceiver.h"
 #include "Nodes.h"
 #include "Config.h"
+#include "ErrorHandler.h"
 
 #include "guiRTC.h"
 #include "guiSensor.h"
@@ -90,7 +91,7 @@ int main(void)
     libDebug_Init();
     INFO("Main unit started");
     INFO("Last reset: 0x%02X", mcu_status);
-
+    ErrorHandler_Init();
     libADC_Init();
     Timer_Init();
     libSPI_Init(1);
@@ -101,7 +102,7 @@ int main(void)
     Config_Load();
     Transceiver_Init();
     Interface_Init();
-    //NOTE: The first init called will be the root view.
+    //NOTE: The first gui init called will be the root view.
     guiRTC_Init();
     guiSensor_Init();
     Nodes_Init();
@@ -110,6 +111,10 @@ int main(void)
                           Interface_ActivateView);
 
     INFO("Start up done");
+    DEBUG("Node ID: 0x%02X\r\n", Config_GetNodeId());
+    DEBUG("Node role: 0x%02X\r\n", Config_GetNodeRole());
+
+    ErrorHandler_PrintLog();
 
     while (1)
     {
