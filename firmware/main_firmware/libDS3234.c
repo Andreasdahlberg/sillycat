@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-05-17 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -68,7 +68,7 @@ static void PreCallback(void);
 static void PostCallback(void);
 
 #ifdef DEBUG_ENABLE
-static void DumpRegisterValues(void);
+static void DumpRegisterValues(void) __attribute__((unused));
 #endif
 
 //////////////////////////////////////////////////////////////////////////
