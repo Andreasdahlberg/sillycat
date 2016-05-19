@@ -373,6 +373,9 @@
     <Compile Include="main_firmware.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Sensor_Calibration.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SSD1305_Commands.h">
       <SubType>compile</SubType>
     </Compile>
