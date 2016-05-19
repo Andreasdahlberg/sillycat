@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2016-05-19 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -41,6 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDS3234.h"
 
 #include "Sensor.h"
+#include "Sensor_Calibration.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -116,6 +117,7 @@ void Sensor_Init(void)
     DEBUG("Smoothing alpha: %u\r\n", current_alpha);
 
     libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, true);
+    libADC_EnableInput(SENSOR_INTERNAL_TEMPERATURE, true);
     INFO("Init done");
 }
 
@@ -157,9 +159,6 @@ void Sensor_Update(void)
         }
 
         Sensor_SaveReading(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading);
-        //SendReading(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading);
-
-        DEBUG("TEMP: %u\r\n", sensor_reading.value);
         sample_timer = Timer_GetMilliseconds();
     }
 }
@@ -212,14 +211,20 @@ function_status Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
 
             case SENSOR_INTERNAL_TEMPERATURE:
                 tmp_value = *sensor_value;
-                tmp_value *= 3133;
-                tmp_value -= -280277;
-                *sensor_value = (uint16_t)tmp_value / 1000;
+                tmp_value *= SUPPLY_VOLTAGE_mV;
+                tmp_value = tmp_value >> 10;
+                tmp_value -= 289; // Offset between mV and temp from Table 23-2 in datasheet.
+
+#ifdef INTERNAL_TEMP_SENSOR_CALIBRATED
+                tmp_value = tmp_value * INTERNAL_TEMP_CALIBRATION_K +
+                            INTERNAL_TEMP_CALIBRATION_M;
+#endif
+                *sensor_value = (uint16_t)(tmp_value);
                 status = SUCCESS;
                 break;
 
             default:
-                WARNING("Unknown sensor type");
+                sc_assert_fail();
                 break;
         }
     }
