@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-17 (Last edit)
+ * @date   2016-05-19 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -60,6 +60,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define LOW_STACK_LIMIT 100 // ~5% left of total memory
+#define HICH_MCU_TEMP_LIMIT 75 // ~10% below max operating temperature
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -71,6 +74,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+void CheckHealth(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -116,6 +121,8 @@ int main(void)
 
     ErrorHandler_PrintLog();
 
+    uint32_t check_timer = Timer_GetMilliseconds();
+
     while (1)
     {
         libADC_Update();
@@ -124,8 +131,40 @@ int main(void)
 
         Transceiver_Update();
         Interface_Update();
+
+        if (Timer_TimeDifference(check_timer) > 1000)
+        {
+            CheckHealth();
+            check_timer = Timer_GetMilliseconds();
+        }
+
     }
 
     CRITICAL("Main loop exit");
     SoftReset();
+}
+
+void CheckHealth(void)
+{
+    static bool memory_low_flag = false;
+    static bool high_mcu_temp_flag = false;
+
+    uint16_t unused_memory = StackCount();
+    if (!memory_low_flag && unused_memory < LOW_STACK_LIMIT)
+    {
+        ErrorHandler_LogError(LOW_STACK, unused_memory);
+        memory_low_flag = true;
+        WARNING("Low memory: %u", unused_memory);
+    }
+
+    uint16_t mcu_temperature;
+    Sensor_GetSensorValue(SENSOR_INTERNAL_TEMPERATURE, &mcu_temperature);
+    if (!high_mcu_temp_flag && mcu_temperature > HICH_MCU_TEMP_LIMIT)
+    {
+        ErrorHandler_LogError(HICH_MCU_TEMP_LIMIT, (uint8_t)mcu_temperature);
+        high_mcu_temp_flag = true;
+        WARNING("High MCU temperature: %u", mcu_temperature);
+    }
+
+    sc_assert(unused_memory > 0);
 }
