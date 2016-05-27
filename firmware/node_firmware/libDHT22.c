@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-05-27 (Last edit)
  * @brief  Implementation of low level functions for the DHT22 RHT sensor
  *
  * Detailed description of file.
@@ -34,7 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "libdht22.h"
+#include "libDHT22.h"
 #include "libDebug.h"
 #include "Timer.h"
 
