@@ -1,7 +1,7 @@
 /**
  * @file   Config.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-08 (Last edit)
+ * @date   2016-01-16 (Last edit)
  * @brief  Header of config
  *
  * Detailed description of file.
@@ -30,9 +30,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define CONFIG_EUI_ENABLED 1
-#define CONFIG_EUI_LENGTH 6
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS

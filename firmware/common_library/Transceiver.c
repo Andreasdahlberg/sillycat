@@ -123,7 +123,7 @@ void Transceiver_Init(void)
     libRFM69_SetPacketRxDelay(3);
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
-    libRFM69_SetPreambleLength(14);
+    libRFM69_SetPreambleLength(8);
     libRFM69_SetLNAGain(RFM_LNA_GAIN_AUTO);
     libRFM69_SetLNAInputImpedance(RFM_LNA_ZIN_200OHM);
     libRFM69_EnableAFCLowBeta(false);
@@ -150,13 +150,13 @@ void Transceiver_Init(void)
     libRFM69_SetClockOutFrequency(RFM_CLKOUT_OFF);
     libRFM69_EnableOCP(false);
     libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
-    libRFM69_SetPowerLevel(28);
+    libRFM69_SetPowerLevel(31);
     libRFM69_EnableHighPowerSetting(false);
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
 
     memset(&packet_frame, 0, sizeof(packet_frame));
-    transceiver_state = TR_STATE_LISTENING;
+    transceiver_state = TR_STATE_IDLE;
 
     INFO("Transceiver initiated");
     return;

@@ -533,11 +533,11 @@ void libRFM69_GetTemperature(uint8_t *temperature)
     libRFM69_mode_type active_mode;
 
     //Save the active mode so it can be restored after the measurement is done.
-    active_mode = libRFM69_GetMode();
+    //active_mode = libRFM69_GetMode();
 
     //Enter standby mode, temperature can only be read in standby or synthesizer mode.
-    libRFM69_SetMode(RFM_STANDBY);
-    libRFM69_WaitForModeReady();
+    //libRFM69_SetMode(RFM_STANDBY);
+    //libRFM69_WaitForModeReady();
 
     libRFM69_WriteRegister(REG_TEMP1, RF_TEMP1_MEAS_START);
 
@@ -552,8 +552,8 @@ void libRFM69_GetTemperature(uint8_t *temperature)
     *temperature = register_data;
 
     //Restore mode.
-    libRFM69_SetMode(active_mode);
-    libRFM69_WaitForModeReady();
+    //libRFM69_SetMode(active_mode);
+    //libRFM69_WaitForModeReady();
 
     return;
 }
