@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-17 (Last edit)
+ * @date   2016-06-07 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -52,6 +52,8 @@ enum
 {
     POWERON = 1,
     ASSFAIL,
+    LOW_STACK,
+    HIGH_MCU_TEMP
 };
 
 //////////////////////////////////////////////////////////////////////////
