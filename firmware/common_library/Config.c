@@ -56,6 +56,8 @@ typedef struct
     uint8_t node_role;
 } config_type;
 
+typedef void (*id_function)(void *buffer, size_t length);
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
@@ -71,11 +73,16 @@ static config_type EEMEM nvm_config =
     2,
 };
 
+#if CONFIG_EUI_ENABLED
+static uint8_t eui[CONFIG_EUI_LENGTH];
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 static bool ValidateConfig(config_type *config);
+static id_function get_id;
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -84,6 +91,14 @@ static bool ValidateConfig(config_type *config);
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+//typedef void (*event_callback)(const event_type *event);
+
+
+void Config_Init(void)
+{
+
+}
 
 ///
 /// @brief Save the active configuration to NVM
@@ -194,6 +209,13 @@ uint8_t Config_GetNodeRole(void)
 {
     return active_config.node_role;
 }
+
+#if CONFIG_EUI_ENABLED
+uint8_t *Config_GetEUI(void)
+{
+
+}
+#endif
 
 ///
 /// @brief Set the network id in the active configuration

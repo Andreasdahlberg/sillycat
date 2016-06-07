@@ -112,7 +112,7 @@ int main(void)
     libFlash_Init();
     //Flash_Init();
 
-    LED_Init();
+    //LED_Init();
     Config_Load();
     RTC_Init();
     ErrorHandler_Init();
@@ -136,6 +136,7 @@ int main(void)
     //Since RTC-alarms are persistent between restarts we need to make
     //sure that they are disabled.
     RTC_EnableAlarm(false);
+    RTC_ClearAlarm();
 
 #ifdef DEBUG_ENABLE
     //Add debug listener last to ensure all debug prints are flushed
@@ -153,10 +154,12 @@ int main(void)
         libDHT22_Update();
         Sensor_Update();
         Transceiver_Update();
-        LED_Update();
+        //LED_Update();
 
         if (IsTimeForSleep() == true)
         {
+
+            INFO("Battery voltage: %lu", libPower_GetBatteryVoltage());
             DEBUG("Unused stack: %u\r\n", StackCount());
             sc_assert(StackCount() > 0);
             NotifyAndEnterSleep();
@@ -215,7 +218,7 @@ static void NotifyAndEnterSleep(void)
 
     return;
 }
-/*
+
 static void PrintEUI(uint8_t *eui, uint8_t length)
 {
     DEBUG("EUI: ");
@@ -229,4 +232,3 @@ static void PrintEUI(uint8_t *eui, uint8_t length)
     DEBUG("\r\n");
     return;
 }
-*/

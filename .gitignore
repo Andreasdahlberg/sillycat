@@ -75,3 +75,4 @@ hardware/pcb/power_block@2014-11-09-1323.ewnet
 __pycache__
 /firmware/main_firmware/template.c
 /firmware/main_firmware/template.h
+*~
