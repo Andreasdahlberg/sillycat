@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-17 (Last edit)
+ * @date   2016-06-07 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -205,7 +205,7 @@ void ErrorHandler_DumpLog(void)
 {
     uint8_t index;
 
-    DEBUG("****Error log****\r\n");
+    DEBUG("<LOG>\r\n");
     for (index = 0; index < sizeof(error_log) / sizeof(*error_log); ++index)
     {
         error_message_type entry;
@@ -213,16 +213,15 @@ void ErrorHandler_DumpLog(void)
 
         if (entry.id == 0)
         {
+            DEBUG("</LOG>\r\n");
             return;
         }
 
-        DEBUG("Index: %u\r\n", index);
-        DEBUG("Id: %u\r\n", entry.id);
-        DEBUG("Code: %u\r\n", entry.code);
-        DEBUG("Info: %u\r\n", entry.information);
-        DEBUG("Timestamp: %lu\r\n", entry.timestamp);
-        DEBUG("*****************\r\n");
+        DEBUG("%u,%lu,%u,", index, entry.id, entry.code);
+        DEBUG("%u,%lu\r\n", entry.information, entry.timestamp);
+
     }
+    DEBUG("</LOG>\r\n");
     return;
 }
 #endif
