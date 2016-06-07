@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-07 (Last edit)
+ * @date   2016-06-07 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -48,6 +48,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAX_NR_NODE_VIEWS 3
 
+#define BATT_INDICATOR_X 1
+#define BATT_INDICATOR_Y 26
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -72,6 +75,7 @@ static struct view node_views[MAX_NR_NODE_VIEWS * 2];
 
 static void DrawNodeView(uint16_t context);
 static void DrawDetailedNodeView(uint16_t context);
+static void DrawBatteryIndicator(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -155,5 +159,16 @@ static void DrawDetailedNodeView(uint16_t context)
         libUI_Print("Source: -", 16, 16);
         INFO("No valid data, context: %u", context);
     }
+    return;
+}
+
+static void DrawBatteryIndicator(void)
+{
+
+    libUI_DrawRectangle(BATT_INDICATOR_X, BATT_INDICATOR_Y, 6, 3);
+
+    libUI_DrawLine(BATT_INDICATOR_X + 7, BATT_INDICATOR_Y + 1, BATT_INDICATOR_X + 7,
+                   BATT_INDICATOR_Y + 2);
+
     return;
 }
