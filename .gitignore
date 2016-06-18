@@ -1,77 +1,42 @@
-*.ms13 (Security copy)
-*.ewprj (Security copy)
-*.log
-hardware/pcb/remote_node@2014-09-05-2213.ewnet
-hardware/pcb/remote_node@2014-09-05-2236.ewnet
-hardware/pcb/remote_node@2014-09-05-2326.ewnet
-hardware/pcb/remote_node@2014-09-05-2327.ewnet
-hardware/pcb/remote_node@2014-09-05-2329.ewnet
-hardware/pcb/remote_node@2014-09-05-2331.ewnet
-hardware/pcb/remote_node@2014-09-06-1157.ewnet
-hardware/pcb/remote_node@2014-09-06-1325.ewnet
-hardware/exterior/standard_components/~$Battery.SLDPRT
-hardware/exterior/standard_components/~$battery_holder_body.SLDPRT
-hardware/exterior/standard_components/~$end_plug.SLDPRT
-hardware/exterior/standard_components/~$end_plug_pin.SLDPRT
-hardware/exterior/standard_components/~$spring.SLDPRT
-hardware/exterior/standard_components/~$spring_pin.SLDPRT
-hardware/exterior/~$battery_assembly.SLDASM
-hardware/exterior/~$casing.SLDPRT
-hardware/exterior/~$casing_lower.SLDPRT
-hardware/exterior/casing_lower_ear.SLDPRT
-hardware/pcb/remote_node@2014-09-11-2049.ewnet
-hardware/pcb/remote_node@2014-09-12-1654.ewnet
-hardware/pcb/remote_node@2014-09-12-1919.ewnet
-hardware/pcb/remote_node_bak.ewprj
-hardware/pcb/remote_node@2014-09-15-1817.ewnet
-hardware/pcb/remote_node@2014-09-15-1819.ewnet
-hardware/pcb/remote_node@2014-09-15-1832.ewnet
-hardware/pcb/remote_node@2014-09-16-2109.ewnet
-hardware/pcb/remote_node@2014-09-16-2126.ewnet
-hardware/pcb/simulations/remote_node@2014-09-17-2114.ewnet
-hardware/pcb/simulations/remote_node@2014-09-17-2110.ewnet
-hardware/pcb/simulations/remote_node@2014-09-17-2111.ewnet
-hardware/pcb/remote_node@2014-09-21-1638.ewnet
-*.zip
-hardware/exterior/~$dht11_body.SLDPRT
-hardware/exterior/~$dht11_pcb.SLDPRT
-hardware/exterior/~$dht_assembly.SLDASM
-hardware/exterior/standard_components/~$1206_led_blue.SLDPRT
-hardware/exterior/standard_components/~$cap1206.SLDPRT
-hardware/exterior/standard_components/~$micro USB.SLDASM
-hardware/exterior/standard_components/~$micro usb.SLDPRT
-hardware/exterior/standard_components/~$micro usb02.SLDPRT
-hardware/exterior/standard_components/~$resistor_1206.SLDPRT
-hardware/exterior/standard_components/~$SMA-angled.SLDPRT
-hardware/exterior/standard_components/~$TQFP-32.SLDPRT
-hardware/exterior/~$board.SLDPRT
-hardware/exterior/~$pcb_assembly.SLDASM
-hardware/exterior/~$rfm69hw.SLDPRT
-hardware/exterior/standard_components/~$Antena.SLDASM
-hardware/exterior/~$casing_assembly.SLDASM
-hardware/exterior/~$casing_lower_ear.SLDPRT
-hardware/exterior/~$end_cover_usb.SLDPRT
-hardware/exterior/~$casing_upper.SLDPRT
-hardware/exterior/~$led_diffuser.SLDPRT
-hardware/exterior/~$node_assembly.SLDASM
-hardware/exterior/~$casing_3d_printer_ready.SLDASM
-hardware/exterior/~$end_plug_cover.SLDPRT
-hardware/exterior/~$pcb.SLDPRT
-hardware/pcb/remote_node@2014-10-02-1819.ewnet
-hardware/pcb/remote_node@2014-10-02-1855.ewnet
-*.d
+# Object files
 *.o
-firmware/sillycat_firmware/Debug/sillycat_firmware.elf
-firmware/sillycat_firmware/Debug/sillycat_firmware.hex
-firmware/sillycat_firmware/Debug/sillycat_firmware.eep
-firmware/sillycat_firmware/Debug/sillycat_firmware.lss
-firmware/sillycat_firmware/Debug/sillycat_firmware.map
-firmware/sillycat_firmware/Debug/sillycat_firmware.srec
-hardware/pcb/remote_node@2014-11-09-1320.ewnet
-hardware/pcb/remote_node@2014-11-09-1326.ewnet
-hardware/pcb/remote_node@2014-11-09-1330.ewnet
-hardware/pcb/Ultiboard Exports/remote_node - Drill Symbols-Copper Top-Copper Bottom.gbr
-hardware/pcb/power_block@2014-11-09-1323.ewnet
-__pycache__
-/firmware/main_firmware/template.c
-/firmware/main_firmware/template.h
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+
+*.map
+
+# Build directory
+**/build
+
+# Scons files
+.sconf_temp
+.sconsign.dblite
