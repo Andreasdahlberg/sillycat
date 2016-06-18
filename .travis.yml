@@ -1,9 +1,9 @@
-language: python
-python:
-  - 3.4
-install: "pip install -r requirements.txt"
-script:
- - if [[ $TRAVIS_PYTHON_VERSION == '3.4' ]]; then python -m unittest discover -s software; fi
+language: c
+before_install:
+  - sudo apt-get update -qq
+install:
+  - sudo apt-get install -qq gcc-avr binutils-avr avr-libc scons
+script: scons -C firmware build-node-release build-main-release
 notifications:
   email: 
     - andreas.dahlberg90@gmail.com
