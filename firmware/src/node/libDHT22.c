@@ -34,7 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "libdht22.h"
+#include "libDHT22.h"
 #include "libDebug.h"
 #include "Timer.h"
 
