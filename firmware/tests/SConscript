@@ -1,0 +1,21 @@
+
+import os
+
+Import(['test_env', 'project_name'])
+
+#SConscript(Glob('*/SConscript'), exports = 'env')
+
+template = os.path.join('site_scons', 'site_tools', 'find_tests_template.c')
+script = os.path.join('site_scons', 'site_tools', 'generate_cmocka_test_suit.py')
+path = os.path.join('tests', 'utility')
+commmand = 'python {} {} {}'.format(script, template, path)
+
+test_runner_source = test_env.Command('run_test_utility.c', 'utility', commmand)
+
+test_source = Glob('utility/*.c')
+implementation_source = Glob('#utility/*.c')
+test_source.append(implementation_source)
+
+test_runner = test_env.Program('run_utility_tests', test_source)
+Requires(test_runner, test_runner_source)
+

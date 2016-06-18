@@ -19,7 +19,7 @@ uint32_t __wrap_libTimer_GetMilliseconds(void)
 	return mock_type(uint32_t);
 }
 
-static void test_TimeDifference_zero(void **state)
+void test_Timer_TimeDifference_zero(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);   
     will_return(__wrap_libTimer_GetMilliseconds, 500); 
@@ -30,7 +30,7 @@ static void test_TimeDifference_zero(void **state)
     return;
 }
 
-static void test_TimeDifference_nonzero(void **state)
+void test_Timer_TimeDifference_nonzero(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 100);   
     will_return(__wrap_libTimer_GetMilliseconds, 500);  
@@ -41,7 +41,7 @@ static void test_TimeDifference_nonzero(void **state)
     return;    
 }
 
-static void test_TimeDifference_wraparound(void **state)
+void test_Timer_TimeDifference_wraparound(void **state)
 {
     uint32_t timestamp = (0xFFFFFFFF - 100);
 
@@ -54,7 +54,7 @@ static void test_TimeDifference_wraparound(void **state)
     return;
 }
 
-static void test_GetSeconds_exact(void **state)
+void test_Timer_GetSeconds_exact(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 2000);
@@ -64,7 +64,7 @@ static void test_GetSeconds_exact(void **state)
     return;
 }
 
-static void test_GetSeconds_ceil(void **state)
+void test_Timer_GetSeconds_ceil(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 500);  
@@ -76,7 +76,7 @@ static void test_GetSeconds_ceil(void **state)
     return;
 }
 
-static void test_GetSeconds_floor(void **state)
+void test_Timer_GetSeconds_floor(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 499);
@@ -88,14 +88,16 @@ static void test_GetSeconds_floor(void **state)
     return;
 }
 
+#if 0
 int main(void) {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_TimeDifference_zero),
-        cmocka_unit_test(test_TimeDifference_nonzero), 
-        cmocka_unit_test(test_TimeDifference_wraparound),
-        cmocka_unit_test(test_GetSeconds_exact), 
-        cmocka_unit_test(test_GetSeconds_ceil),  
-        cmocka_unit_test(test_GetSeconds_floor), 
+        cmocka_unit_test(test_Timer_TimeDifference_zero),
+        cmocka_unit_test(test_Timer_TimeDifference_nonzero), 
+        cmocka_unit_test(test_Timer_TimeDifference_wraparound),
+        cmocka_unit_test(test_Timer_GetSeconds_exact), 
+        cmocka_unit_test(test_Timer_GetSeconds_ceil),  
+        cmocka_unit_test(test_Timer_GetSeconds_floor), 
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
+#endif

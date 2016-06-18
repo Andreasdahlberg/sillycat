@@ -1,8 +1,8 @@
 /**
- * @file   Flash.h
+ * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-15 (Last edit)
- * @brief  Header of flash module.
+ * @date   2016-05-17 (Last edit)
+ * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
  */
@@ -25,39 +25,47 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-#ifndef FLASH_H_
-#define FLASH_H_
+#ifndef ERRORHANDLER_H_
+#define ERRORHANDLER_H_
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include "sc_assert.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#ifdef DEBUG_ENABLE
+#define ErrorHandler_PrintLog() ErrorHandler_DumpLog()
+#else
+#define ErrorHandler_PrintLog()
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef void (*flash_callback_type)(uint8_t context);
-
-typedef struct
+enum
 {
-    uint32_t density;
-    uint32_t sector_size;
-} flash_sfdp_info_type;
+    POWERON = 1,
+    ASSFAIL,
+    LOW_STACK
+};
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void Flash_Init(void);
-void Flash_Service(void);
-bool Flash_Write(uint32_t address, void *data, size_t length,
-                 flash_callback_type callback);
-bool Flash_Read(uint32_t address, void *data, size_t length,
-                flash_callback_type callback);
-void Flash_EraseAll(void);
-void Flash_EraseSector(void);
-void Flash_Reset(void);
-void Flash_DeepPowerDown(void);
-bool Flash_IsIdle(void);
+void ErrorHandler_Init(void);
+void ErrorHandler_LogError(uint8_t code, uint8_t information);
+void ErrorHandler_PointOfNoReturn(void) __attribute__((noreturn));
+void ErrorHandler_AssertFail(const char *__file, int __lineno,
+                             const char *__sexp) __attribute__((noreturn));
+#ifdef DEBUG_ENABLE
+void ErrorHandler_DumpLog(void);
+#endif
 
-#endif /* FLASH_H_ */
+#endif /* ERRORHANDLER_H_ */

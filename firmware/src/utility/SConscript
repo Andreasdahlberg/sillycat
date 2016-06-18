@@ -1,0 +1,9 @@
+
+import os
+
+Import(['*'])
+
+source = Glob('*.c')
+objects = env.Object(source)
+
+Return('objects')

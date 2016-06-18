@@ -1,7 +1,7 @@
 /**
  * @file   CRC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-22 (Last edit)
+ * @date   2016-05-24 (Last edit)
  * @brief  Implementation of functions to calculate CRC.
  *
  * Detailed description of file.
@@ -29,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include "CRC.h"
-#include "sc_assert.h"
+#include "assert.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -62,7 +62,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 /// @return uint16_t CRC-16 value of data.
 uint16_t CalculateCRC_16(void *data, size_t length)
 {
-	sc_assert(data != NULL);
+	assert(data != NULL);
 
 	uint16_t crc = CRC_INIT_VALUE;
 	uint8_t *ptr = (uint8_t*)data;

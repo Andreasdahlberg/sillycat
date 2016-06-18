@@ -1,0 +1,14 @@
+
+import os
+
+Import(['*'])
+
+source = Glob('*.c')
+
+#env.Append(CPPPATH=['#src/utility', '#src/common_library'])
+
+objects = env.Object(source=source)
+
+Return('objects')
+
+

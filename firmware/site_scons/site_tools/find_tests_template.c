@@ -1,0 +1,29 @@
+/**
+ * @file   $file
+ * @date   $date (Generated)
+ * @brief  Application for running all detected tests.
+ *
+ * This is a auto-generated file, please do not edit manually!
+ */
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+
+$test_includes
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+int main(void) {
+    const struct CMUnitTest tests[] = {
+$unit_tests
+    };
+    return cmocka_run_group_tests(tests, NULL, NULL);
+}

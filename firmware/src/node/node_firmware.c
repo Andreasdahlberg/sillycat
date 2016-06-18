@@ -40,7 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libRFM69.h"
 #include "libDHT22.h"
 #include "libPower.h"
-#include "libFlash.h"
+//#include "libFlash.h"
 
 #include "Timer.h"
 #include "LED.h"
@@ -51,7 +51,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RTC.h"
 #include "Power.h"
 #include "Event.h"
-#include "Flash.h"
+//#include "Flash.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -97,7 +97,7 @@ int main(void)
     //Init hardware early to ensure all CS are disabled.
     libRFM69_InitHW();
     RTC_InitHW();
-    libFlash_InitHW();
+    //libFlash_InitHW();
 
     libDebug_Init();
     INFO("Node unit started");
@@ -109,7 +109,7 @@ int main(void)
     libADC_Enable(true);
     libDHT22_Init();
     libPower_Init();
-    libFlash_Init();
+    //libFlash_Init();
     //Flash_Init();
 
     LED_Init();

@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
+ * @date   2016-04-17 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -108,6 +108,7 @@ void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp,
 ///
 bool RTC_GetTimeStamp(uint32_t *timestamp)
 {
+    sc_assert(timestamp != NULL);
     rtc_time_type time;
 
     if (RTC_GetCurrentTime(&time) == true)
@@ -126,12 +127,15 @@ bool RTC_GetTimeStamp(uint32_t *timestamp)
 ///
 bool RTC_GetCurrentTime(rtc_time_type *time)
 {
-    return (RTC_GetYear(&time->year) &&
-            RTC_GetMonth(&time->month) &&
-            RTC_GetDate(&time->date) &&
-            RTC_GetHour(&time->hour) &&
-            RTC_GetMinutes(&time->minute) &&
-            RTC_GetSeconds(&time->second));
+    sc_assert(time != NULL);
+
+    RTC_GetYear(&time->year);
+    RTC_GetMonth(&time->month);
+    RTC_GetDate(&time->date);
+    RTC_GetHour(&time->hour);
+    RTC_GetMinutes(&time->minute);
+    RTC_GetSeconds(&time->second);
+    return true;
 }
 
 ///
@@ -142,12 +146,15 @@ bool RTC_GetCurrentTime(rtc_time_type *time)
 ///
 bool RTC_SetCurrentTime(const rtc_time_type *time)
 {
-    return (RTC_SetYear(time->year) &&
-            RTC_SetMonth(time->month) &&
-            RTC_SetDate(time->date) &&
-            RTC_SetHour(time->hour) &&
-            RTC_SetMinutes(time->minute) &&
-            RTC_SetSeconds(time->second));
+    sc_assert(time != NULL);
+
+    RTC_SetYear(time->year);
+    RTC_SetMonth(time->month);
+    RTC_SetDate(time->date);
+    RTC_SetHour(time->hour);
+    RTC_SetMinutes(time->minute);
+    RTC_SetSeconds(time->second);
+    return true;
 }
 
 ///
@@ -158,9 +165,12 @@ bool RTC_SetCurrentTime(const rtc_time_type *time)
 ///
 bool RTC_SetAlarmTime(const rtc_time_type *time)
 {
-    return (RTC_SetAlarmHour(time->hour) &&
-            RTC_SetAlarmMinutes(time->minute) &&
-            RTC_SetAlarmSeconds(time->second));
+    sc_assert(time != NULL);
+
+    RTC_SetAlarmHour(time->hour);
+    RTC_SetAlarmMinutes(time->minute);
+    RTC_SetAlarmSeconds(time->second);
+    return true;
 }
 #endif
 

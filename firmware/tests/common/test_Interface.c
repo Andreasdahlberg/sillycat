@@ -52,13 +52,13 @@ static int setup(void **state)
     return 0;
 }
 
-static void test_GetRootView_None(void **state)
+void test_GetRootView_None(void **state)
 {
     assert_null(Interface_GetRootView());
     return;
 }
 
-static void test_GetRootView_OneView(void **state)
+void test_GetRootView_OneView(void **state)
 {
     struct view *test_view;
     Interface_Init();
@@ -68,7 +68,7 @@ static void test_GetRootView_OneView(void **state)
     return;
 }
 
-static void test_GetRootView_TwoViews(void **state)
+void test_GetRootView_TwoViews(void **state)
 {
     Interface_AddView(&test_views[0]);
     Interface_AddView(&test_views[1]);
@@ -76,7 +76,7 @@ static void test_GetRootView_TwoViews(void **state)
     return;
 }
 
-static void test_GetRootView_OneViewWithOneChild(void **state)
+void test_GetRootView_OneViewWithOneChild(void **state)
 {
     Interface_AddChild(&test_views[0], &test_views[1]);
     Interface_AddView(&test_views[0]);
@@ -84,7 +84,7 @@ static void test_GetRootView_OneViewWithOneChild(void **state)
     return;
 }
 
-static void test_AddView_NullWithRootView(void **state)
+void test_AddView_NullWithRootView(void **state)
 {
     struct view *root_view;
 
@@ -98,21 +98,21 @@ static void test_AddView_NullWithRootView(void **state)
     return;
 }
 
-static void test_AddView_NullWithoutRootView(void **state)
+void test_AddView_NullWithoutRootView(void **state)
 {
     Interface_AddView(NULL);
     assert_null(Interface_GetRootView());
     return;
 }
 
-static void test_AddView_OneView(void **state)
+void test_AddView_OneView(void **state)
 {
     Interface_AddView(view_ptr(0));
     assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
     return;
 }
 
-static void test_AddView_SeveralViews(void **state)
+void test_AddView_SeveralViews(void **state)
 {
 
     Interface_AddView(&test_views[0]);
@@ -126,13 +126,13 @@ static void test_AddView_SeveralViews(void **state)
     return;
 }
 
-static void test_RemoveView_Null(void **state)
+void test_RemoveView_Null(void **state)
 {
     //TODO: Fix this test
     Interface_RemoveView(NULL);
 }
 
-static void test_RemoveView_RootViewAlone(void **state)
+void test_RemoveView_RootViewAlone(void **state)
 {
     Interface_AddView(&test_views[0]);
     Interface_RemoveView(&test_views[0]);
@@ -140,7 +140,7 @@ static void test_RemoveView_RootViewAlone(void **state)
     assert_null(Interface_GetRootView());
 }
 
-static void test_RemoveView_RootViewWithOneSibling(void **state)
+void test_RemoveView_RootViewWithOneSibling(void **state)
 {
     Interface_AddView(&test_views[0]);
     Interface_AddView(&test_views[1]);    
@@ -149,7 +149,7 @@ static void test_RemoveView_RootViewWithOneSibling(void **state)
     assert_ptr_equal(Interface_GetRootView(), &test_views[1]);
 }
 
-static void test_RemoveView_RootViewWithChild(void **state)
+void test_RemoveView_RootViewWithChild(void **state)
 {
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddView(view_ptr(0));
@@ -158,7 +158,7 @@ static void test_RemoveView_RootViewWithChild(void **state)
     assert_null(Interface_GetRootView());
 }
 
-static void test_RemoveView_ViewWithPrevSibling(void **state)
+void test_RemoveView_ViewWithPrevSibling(void **state)
 {
     struct view *test_view;
 
@@ -170,7 +170,7 @@ static void test_RemoveView_ViewWithPrevSibling(void **state)
     assert_null(test_view->next);
 }
 
-static void test_RemoveView_ViewWithPrevAndNextSibling(void **state)
+void test_RemoveView_ViewWithPrevAndNextSibling(void **state)
 {
     struct view *test_view;
 
@@ -183,7 +183,7 @@ static void test_RemoveView_ViewWithPrevAndNextSibling(void **state)
     assert_ptr_equal(test_views[2].prev, &test_views[0]);    
 }
 
-static void test_RemoveView_ChildViewWithSibling(void **state)
+void test_RemoveView_ChildViewWithSibling(void **state)
 {
 
     Interface_AddSibling(view_ptr(1), view_ptr(2)); 
@@ -194,32 +194,32 @@ static void test_RemoveView_ChildViewWithSibling(void **state)
     assert_ptr_equal(view_ptr(0)->child, view_ptr(2));  
 }
 
-static void test_AddChild_NullChildWithNoExistingChild(void **state)
+void test_AddChild_NullChildWithNoExistingChild(void **state)
 {
     Interface_AddChild(view_ptr(0), NULL);
     assert_null(view_ptr(0)->child);  
 }
 
-static void test_AddChild_NullChildWithExistingChild(void **state)
+void test_AddChild_NullChildWithExistingChild(void **state)
 {
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddChild(view_ptr(0), NULL);
     assert_ptr_equal(view_ptr(0)->child, view_ptr(1));  
 }
 
-static void test_AddChild_NullParentWithNoExistingChild(void **state)
+void test_AddChild_NullParentWithNoExistingChild(void **state)
 {
     Interface_AddChild(NULL, view_ptr(0));
     //TODO: What to assert here, is no exception good enough?
 }
 
-static void test_AddChild_OneChild(void **state)
+void test_AddChild_OneChild(void **state)
 {
     Interface_AddChild(view_ptr(0), view_ptr(1));
     assert_ptr_equal(view_ptr(0)->child, view_ptr(1));  
 }
 
-static void test_AddChild_TwoChildren(void **state)
+void test_AddChild_TwoChildren(void **state)
 {
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddChild(view_ptr(0), view_ptr(2));
@@ -228,13 +228,13 @@ static void test_AddChild_TwoChildren(void **state)
     assert_ptr_equal(view_ptr(1)->next, view_ptr(2));       
 }
 
-static void test_NextView_NoRootView(void **state)
+void test_NextView_NoRootView(void **state)
 {
     Interface_NextView();
     assert_null(Interface_GetActiveView());    
 }
 
-static void test_NextView_OneView(void **state)
+void test_NextView_OneView(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
 
@@ -244,7 +244,7 @@ static void test_NextView_OneView(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(0));    
 }
 
-static void test_NextView_TwoViews(void **state)
+void test_NextView_TwoViews(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
 
@@ -255,13 +255,13 @@ static void test_NextView_TwoViews(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(1));    
 }
 
-static void test_PreviousView_NoRootView(void **state)
+void test_PreviousView_NoRootView(void **state)
 {
     Interface_PreviousView();
     assert_null(Interface_GetActiveView());    
 }
 
-static void test_PreviousView_OneView(void **state)
+void test_PreviousView_OneView(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
 
@@ -271,7 +271,7 @@ static void test_PreviousView_OneView(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(0));    
 }
 
-static void test_PreviousView_TwoViews(void **state)
+void test_PreviousView_TwoViews(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
@@ -284,13 +284,13 @@ static void test_PreviousView_TwoViews(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(0));    
 }
 
-static void test_ActivateView_NoRootView(void **state)
+void test_ActivateView_NoRootView(void **state)
 {
     Interface_ActivateView();
     assert_null(Interface_GetActiveView());    
 }
 
-static void test_ActivateView_ActivateOnceWithNoChild(void **state)
+void test_ActivateView_ActivateOnceWithNoChild(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
 
@@ -300,7 +300,7 @@ static void test_ActivateView_ActivateOnceWithNoChild(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(0));    
 }
 
-static void test_ActivateView_ActivateOnceWithChild(void **state)
+void test_ActivateView_ActivateOnceWithChild(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
 
@@ -311,7 +311,7 @@ static void test_ActivateView_ActivateOnceWithChild(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(1));    
 }
 
-static void test_ActivateView_ActivateTwiceWithChild(void **state)
+void test_ActivateView_ActivateTwiceWithChild(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0); 
     will_return(__wrap_libTimer_GetMilliseconds, 0);     
@@ -324,7 +324,7 @@ static void test_ActivateView_ActivateTwiceWithChild(void **state)
     assert_ptr_equal(Interface_GetActiveView(), view_ptr(0));    
 }
 
-static void test_Update_NoRootView(void **state)
+void test_Update_NoRootView(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
@@ -334,7 +334,7 @@ static void test_Update_NoRootView(void **state)
     assert_int_equal(libUI_Updated_called, 0);
 }
 
-static void test_Update_ViewWithNoDrawFunction(void **state)
+void test_Update_ViewWithNoDrawFunction(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
@@ -345,7 +345,7 @@ static void test_Update_ViewWithNoDrawFunction(void **state)
     assert_int_equal(libUI_Updated_called, 0);
 }
 
-static void test_Update_ViewWithDrawFunction(void **state)
+void test_Update_ViewWithDrawFunction(void **state)
 {
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
@@ -360,7 +360,7 @@ static void test_Update_ViewWithDrawFunction(void **state)
     assert_int_equal(DummyDrawView_context, 1);
 }
 
-static void test_Update_AutoRefresh(void **state)
+void test_Update_AutoRefresh(void **state)
 {
     //First update
     will_return(__wrap_libTimer_GetMilliseconds, 0);
@@ -392,7 +392,7 @@ static void test_Update_AutoRefresh(void **state)
     assert_int_equal(libUI_Updated_called, 2);
 }
 
-static void test_Update_ForcedRefresh(void **state)
+void test_Update_ForcedRefresh(void **state)
 {
     //First update
     will_return(__wrap_libTimer_GetMilliseconds, 0);
@@ -425,6 +425,7 @@ static void test_Update_ForcedRefresh(void **state)
     assert_int_equal(libUI_Updated_called, 2);
 }
 
+#if 0
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup(test_GetRootView_None, setup),
@@ -464,3 +465,4 @@ int main(void) {
     };
     return cmocka_run_group_tests(tests, setup, NULL);
 }
+#endif

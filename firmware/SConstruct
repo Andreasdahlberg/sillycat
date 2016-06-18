@@ -1,0 +1,133 @@
+# -*- coding: utf-8 -*
+#
+# This file is part of SillyCat Development Tools.
+#
+# SillyCat Development Tools is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# SillyCat Development Tools is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
+
+__author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
+
+import os
+import sys
+
+colors = {}
+colors['cyan']   = '\033[96m'
+colors['purple'] = '\033[95m'
+colors['blue']   = '\033[94m'
+colors['green']  = '\033[92m'
+colors['yellow'] = '\033[93m'
+colors['red']    = '\033[91m'
+colors['end']    = '\033[0m'
+
+compile_source_message = '{}Compiling {}==> {}$TARGET{}'.format(
+    colors['green'], colors['end'], colors['blue'], colors['end'])
+
+flashing_message = '{}Flashing {}==> {}$SOURCE{}'.format(
+    colors['yellow'], colors['end'], colors['blue'], colors['end'])
+
+linking_message = '{}Linking {}==> {}$TARGET{}'.format(
+    colors['purple'], colors['end'], colors['blue'], colors['end'])
+
+hex_message = '{}Generating HEX {}==> {}$TARGET{}'.format(
+    colors['cyan'], colors['end'], colors['blue'], colors['end'])
+
+PROJECT_NAME = 'sillycat'
+
+#Target variables
+mcu_vars = Variables('mcu_target.py')
+mcu_vars.Add('MCU', 'Target processor')
+mcu_vars.Add('F_CPU', 'Target frequency in Hz')
+mcu_vars.Add('PORT', 'Port for the programmer')
+mcu_vars.Add('TOOL', 'The programmer to use')
+mcu_vars.Add('OPTIMIZATION', 'The optimization level to use for compilation(0, 1, 2, 3, s)', 's')
+mcu_vars.Add('STD', 'The C Dialect to use', 'c99')
+
+avr_ccflags = [
+    '-std=${STD}',
+    '-mmcu=${MCU}',
+    '-O${OPTIMIZATION}',
+    '-Wextra',
+    '-Wall',
+    '-pedantic',
+    '-ffunction-sections',
+    '-fdata-sections'
+]
+
+avr_cppdefines = {
+  'F_CPU' : '${F_CPU}UL', 
+}
+
+common_env = Environment(
+    tools=['avr'],
+    CC = 'avr-gcc',
+    variables = mcu_vars,
+    CCFLAGS = avr_ccflags,
+    CPPDEFINES = avr_cppdefines,
+    ENV = {'PATH' : os.environ['PATH'],
+        'TERM' : os.environ['TERM'],
+        'HOME' : os.environ['HOME']}
+)
+
+if ARGUMENTS.get('VERBOSE') != 'true':
+    common_env['CCCOMSTR'] = compile_source_message
+    common_env['AVRDUDE_ELF_COMSTR'] = linking_message
+    common_env['AVRDUDE_HEX_COMSTR'] = hex_message
+    flash_quell = '-q -q'    
+else:
+    flash_quell = ''
+
+
+Help(mcu_vars.GenerateHelpText(common_env))
+
+TARGETS = ['node', 'main']
+
+MODES = {
+    'debug': ['DEBUG_ENABLE'],
+    'release': ['NDEBUG']
+}
+
+
+Help('\nTargets:\n')
+for target in TARGETS:
+    for mode in MODES:
+        env = common_env.Clone()
+        env.Append(CPPDEFINES=MODES[mode])
+
+        hex, elf = env.SConscript('src/SConscript',
+            duplicate=0,
+            variant_dir='build/{}/{}'.format(mode, target),
+            exports={'env': env, 'project_name': PROJECT_NAME, 'mode': mode, 'target': target})
+
+        alias_build_name = 'build-{}-{}'.format(target, mode)
+        Alias(alias_build_name, hex)
+
+        flash_cmd = 'avrdude -c {} -p {} -P {} -Uflash:w:{} -B 0.5 {}'.format(
+            env['TOOL'], env['MCU'], env['PORT'],'${SOURCE}', flash_quell)
+
+        flash_name = 'flash-{}-{}'.format(target, mode)
+        flash = Command(flash_name, hex,  Action(flash_cmd, flashing_message))
+
+        build_help_text = '    {}: Build {} in {} mode.\n'.format(alias_build_name, target, mode)
+        Help(build_help_text)
+
+        flash_help_text = '    {}: Flash {} in {} mode.\n'.format(flash_name, target, mode)
+        Help(flash_help_text)
+
+        size_cmd = 'avr-size {} --mcu={} -C'.format(elf[0], env['MCU'])
+        size_name = 'size-{}-{}'.format(target, mode)
+        size = Command(size_name, elf,  size_cmd)
+
+        size_help_text = '    {}: Get section sizes and total size for {} in {} mode.\n'.format(size_name, target, mode)
+        Help(size_help_text)
+
+        Help('\n')
