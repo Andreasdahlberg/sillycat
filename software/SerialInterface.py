@@ -20,7 +20,9 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
 import serial
+import glob
 from PyQt4 import QtCore
+from DevToolUtil import platform_is_windows
 
 
 class SerialInterface(QtCore.QThread):
@@ -43,15 +45,21 @@ class SerialInterface(QtCore.QThread):
 
     def get_ports(self):
         """Get a list with all available COM-ports"""
-        ports = []
-        for i in range(256):
+
+        if platform_is_windows():
+            ports = range(256)
+        else:
+            ports = glob.glob ('/dev/tty[A-Za-z]*')
+
+        open_ports = []
+        for port_name in ports:
             try:
-                s = serial.Serial(i)
-                ports.append(s.portstr)
+                s = serial.Serial(port_name)
+                open_ports.append(s.portstr)
                 s.close()
             except serial.SerialException:
                 pass
-        return ports
+        return open_ports
 
 
     def run(self):

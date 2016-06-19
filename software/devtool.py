@@ -6,13 +6,13 @@ import os
 import serial
 from collections import deque
 import ctypes
-import platform
 
 from PyQt4 import QtGui, QtCore
 from SerialInterface import *
 from DataLog import *
 from DisplayView import DisplayView
 from PacketView import PacketView
+from DevToolUtil import platform_is_windows
 
 BAUDRATE = 250000
 
@@ -131,8 +131,7 @@ class DevTool(QtGui.QWidget):
 
     def connect_clicked(self, pressed):
         if pressed:
-            port = str(self.port_select.currentText()).lower()
-            print(port)
+            port = str(self.port_select.currentText())
 
             try:
                 if self.ser.open_port(port, BAUDRATE) == True:                
@@ -181,10 +180,6 @@ class DevTool(QtGui.QWidget):
     def print_text(self, text):
         print(text)
         
-      
-def platform_is_windows():
-    return platform.system().lower() == 'windows'
-
 
 def main():
     if platform_is_windows():
