@@ -30,6 +30,9 @@ class DataLog():
 		self.trigger_map = {'<WARNING>': logging.warning, '<ERROR>': logging.error,
 							'<INFO>': logging.info, '<CRITICAL>': logging.critical}
 
+		if not os.path.isdir(path):
+			os.makedirs(path)
+
 		log_file = os.path.join(path, self.get_filename())
 		logging.basicConfig(filename=log_file, level=logging.INFO,
 							format='%(asctime)s; <%(levelname)s> %(message)s')
