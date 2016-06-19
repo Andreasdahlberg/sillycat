@@ -33,6 +33,7 @@
 *.su
 
 *.map
+*.pyc
 
 # Build directory
 **/build
