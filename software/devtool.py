@@ -6,7 +6,7 @@ import os
 import serial
 from collections import deque
 import ctypes
-
+import platform
 
 from PyQt4 import QtGui, QtCore
 from SerialInterface import *
@@ -181,10 +181,15 @@ class DevTool(QtGui.QWidget):
     def print_text(self, text):
         print(text)
         
-        
+      
+def platform_is_windows():
+    return platform.system().lower() == 'windows'
+
+
 def main():
-    myappid = 'sillycat.software.devtool.10' 
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    if platform_is_windows():
+        myappid = 'sillycat.software.devtool.10' 
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     app = QtGui.QApplication(sys.argv)
     ex = DevTool()
@@ -192,4 +197,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()    
+    main()
