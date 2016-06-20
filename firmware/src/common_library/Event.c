@@ -1,7 +1,7 @@
 /**
  * @file   Event.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-06-20 (Last edit)
  * @brief  Implementation of Events
  *
  * Detailed description of file.
@@ -94,8 +94,6 @@ void Event_Trigger(const event_type *event)
                 listener_pool[index].id == EVENT_ALL)
         {
             sc_assert(listener_pool[index].callback != NULL);
-
-            DEBUG("Notify listener: %u\r\n", index);
             listener_pool[index].callback(event);
         }
     }
