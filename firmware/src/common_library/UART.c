@@ -1,7 +1,7 @@
 /**
  * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2016-06-20 (Last edit)
  * @brief  Implementation of UART module.
  *
  * Detailed description of file.
@@ -183,6 +183,7 @@ bool UART_WaitForTx(uint32_t timeout_ms)
         if (timeout_ms != 0 && Timer_TimeDifference(start_time_ms) > timeout_ms)
         {
             status = false;
+            break;
         }
     }
     return status;
