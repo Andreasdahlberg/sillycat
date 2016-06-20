@@ -16,9 +16,8 @@ from DevToolUtil import platform_is_windows
 
 BAUDRATE = 250000
 
-LOG_PATH = 'logs'
-DEV_ICON = os.path.join('icons', 'dev_tool_icon.png')
-
+LOG_PATH = os.path.join(sys.path[0], 'logs')
+DEV_ICON = os.path.join(sys.path[0], 'icons', 'dev_tool_icon.png')
 
 class ConsoleView(QtGui.QPlainTextEdit):
     def __init__(self):
