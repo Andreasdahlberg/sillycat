@@ -141,6 +141,7 @@ int main(void)
     //Add debug listener last to ensure all debug prints are flushed
     //before sleep.
     Event_AddListener(libDebug_Sleep, EVENT_SLEEP);
+    Event_AddListener(libDebug_WakeUp, EVENT_WAKEUP);    
 #endif
 
     INFO("Start up done");
