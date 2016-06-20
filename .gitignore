@@ -35,8 +35,9 @@
 *.map
 *.pyc
 
-# Build directory
+# Generated directories
 **/build
+**/logs
 
 # Scons files
 .sconf_temp
