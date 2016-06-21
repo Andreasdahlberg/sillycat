@@ -35,6 +35,9 @@
 *.map
 *.pyc
 
+# Backup files
+*~
+
 # Generated directories
 **/build
 **/logs
