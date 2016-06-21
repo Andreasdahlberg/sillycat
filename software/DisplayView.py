@@ -48,7 +48,7 @@ class DisplayPixmap(QtGui.QLabel):
 
 
 class DisplayView(QtGui.QLabel):
-    def __init__(self):
+    def __init__(self, path):
         super(DisplayView, self).__init__()
         self._pixmap = QtGui.QPixmap()
         self.setPixmap(self._pixmap)
@@ -58,6 +58,8 @@ class DisplayView(QtGui.QLabel):
         self.pos_x = 0
         self.pos_y = 0
 
+        self.path = path
+        
 
     def mouseMoveEvent(self, event):
         mouse_position = event.pos(); 
@@ -108,7 +110,10 @@ class DisplayView(QtGui.QLabel):
 
 
     def save_view_to_file(self, state, filename="display.png"):
-        self._pixmap.save(filename, 'PNG')
+        if not os.path.isdir(self.path):
+            os.makedirs(self.path)
+
+        self._pixmap.save(os.path.join(self.path, filename), 'PNG')
 
 
     def update_display_view(self, image_data):

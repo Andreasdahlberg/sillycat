@@ -17,6 +17,7 @@ from DevToolUtil import platform_is_windows
 BAUDRATE = 250000
 
 LOG_PATH = os.path.join(sys.path[0], 'logs')
+SCREENSHOT_PATH = os.path.join(sys.path[0], 'screenshots')
 DEV_ICON = os.path.join(sys.path[0], 'icons', 'dev_tool_icon.png')
 
 class ConsoleView(QtGui.QPlainTextEdit):
@@ -60,7 +61,7 @@ class DevTool(QtGui.QWidget):
     def initUI(self):
 
         self.console_view = ConsoleView()
-        self.dv = DisplayView()
+        self.dv = DisplayView(SCREENSHOT_PATH)
         self.dv.hide()
         self.pv = PacketView()
 
