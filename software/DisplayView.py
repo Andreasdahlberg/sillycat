@@ -20,6 +20,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
 import os
+import time
 import math, struct
 
 from PyQt4 import QtGui, QtCore
@@ -109,10 +110,13 @@ class DisplayView(QtGui.QLabel):
         return pixmap   
 
 
-    def save_view_to_file(self, state, filename="display.png"):
+    def save_view_to_file(self, state, name="display"):
         if not os.path.isdir(self.path):
             os.makedirs(self.path)
 
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        filename = '{}_{}.png'.format(name, timestamp)
+        
         self._pixmap.save(os.path.join(self.path, filename), 'PNG')
 
 
