@@ -41,6 +41,7 @@
 # Generated directories
 **/build
 **/logs
+**/screenshots
 
 # Scons files
 .sconf_temp
