@@ -1,7 +1,7 @@
 /**
  * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-20 (Last edit)
+ * @date   2016-06-21 (Last edit)
  * @brief  Implementation of UART module.
  *
  * Detailed description of file.
@@ -195,24 +195,16 @@ bool UART_WaitForTx(uint32_t timeout_ms)
 
 bool AddToRXBuffer(uint8_t *data)
 {
-    bool status = true;
+    bool status;
 
-    if(FIFO_Push(&uart_rx_fifo, data) == false)
-    {
-        //TODO: place warning here
-        status = false;
-    }
+    status = FIFO_Push(&uart_rx_fifo, data);
     return status;
 }
 
 bool GetFromTXBuffer(uint8_t *data)
 {
-    bool status = true;
+    bool status;
 
-    if(FIFO_Pop(&uart_tx_fifo, data) == false)
-    {
-        //TODO: place warning here
-        status = false;
-    }
+    status = FIFO_Pop(&uart_tx_fifo, data);
     return status;
 }
