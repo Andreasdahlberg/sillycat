@@ -44,7 +44,7 @@ def exists(env):
 
 def _get_elf_builder():
     return SCons.Builder.Builder(
-        action=SCons.Action.Action('${CC} -mmcu=${MCU} -O${OPTIMIZATION} -Xlinker -Map=${TARGET}.map -Wl,--gc-sections -o ${TARGET} ${SOURCES}', '${AVRDUDE_ELF_COMSTR}')
+        action=SCons.Action.Action('${CC} -mmcu=${MCU} -O${OPTIMIZATION} -Wl,--gc-sections -o ${TARGET} ${SOURCES}', '${AVRDUDE_ELF_COMSTR}')
     )
 
 
