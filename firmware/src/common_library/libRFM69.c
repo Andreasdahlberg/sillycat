@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-08 (Last edit)
+ * @date   2016-06-29 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -60,6 +60,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define WAIT_TIMEOUT_MS 10
 #define POR_TIME_MS 10
 #define RESET_TIMING_US 110
+
+#define TEMPERATURE_CALIBRATION_OFFSET (-90)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -524,20 +526,20 @@ void libRFM69_SetPacketRxDelay(uint8_t val)
 ///        standby while the measurement is in progress, the previous mode
 ///        is then restored.
 ///
-/// @param  mode The power amplifier mode, value between 2 and 4.
+/// @param  *temperature Pointer to variable where the temperature will be stored.
 /// @return None
 ///
-void libRFM69_GetTemperature(uint8_t *temperature)
+void libRFM69_GetTemperature(int8_t *temperature)
 {
     uint8_t register_data;
     libRFM69_mode_type active_mode;
 
     //Save the active mode so it can be restored after the measurement is done.
-    //active_mode = libRFM69_GetMode();
+    active_mode = libRFM69_GetMode();
 
     //Enter standby mode, temperature can only be read in standby or synthesizer mode.
-    //libRFM69_SetMode(RFM_STANDBY);
-    //libRFM69_WaitForModeReady();
+    libRFM69_SetMode(RFM_STANDBY);
+    libRFM69_WaitForModeReady();
 
     libRFM69_WriteRegister(REG_TEMP1, RF_TEMP1_MEAS_START);
 
@@ -549,11 +551,11 @@ void libRFM69_GetTemperature(uint8_t *temperature)
     while (register_data & RF_TEMP1_MEAS_RUNNING);
 
     libRFM69_ReadRegister(REG_TEMP2, &register_data);
-    *temperature = register_data;
+    *temperature = (int8_t)(~register_data + TEMPERATURE_CALIBRATION_OFFSET);
 
     //Restore mode.
-    //libRFM69_SetMode(active_mode);
-    //libRFM69_WaitForModeReady();
+    libRFM69_SetMode(active_mode);
+    libRFM69_WaitForModeReady();
 
     return;
 }

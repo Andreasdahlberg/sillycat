@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-08 (Last edit)
+ * @date   2016-06-29 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -155,7 +155,7 @@ bool libRFM69_WaitForModeReady(void);
 void libRFM69_Reset(void);
 void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
-void libRFM69_GetTemperature(uint8_t *temperature);
+void libRFM69_GetTemperature(int8_t *temperature);
 void libRFM69_SetBitRate(uint32_t bit_rate);
 void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
 void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
