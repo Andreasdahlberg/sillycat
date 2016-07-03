@@ -1,7 +1,7 @@
 /**
  * @file   libADC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-07-06 (Last edit)
  * @brief  Implementation of ADC-library.
  *
  * Detailed description of file.
@@ -123,14 +123,14 @@ void libADC_Update(void)
             break;
 
         case LIBADC_NEW_SAMPLE:
-            while (adc_inputs[current_input].active != true &&
-                    current_input < MAX_ADC_INPUTS)
+            while (current_input < MAX_ADC_INPUTS &&
+                   adc_inputs[current_input].active == false)
             {
                 ++current_input;
             }
 
-            if (adc_inputs[current_input].active == true &&
-                    current_input < MAX_ADC_INPUTS)
+            if (current_input < MAX_ADC_INPUTS &&
+                adc_inputs[current_input].active == true)
             {
                 SelectInput(current_input);
                 //Start a new conversion
