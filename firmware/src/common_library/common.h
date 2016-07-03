@@ -41,7 +41,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define F_CPU 8000000UL // 8 MHz
 #define SUPPLY_VOLTAGE_mV 3300
 
 //Valid if sample_window >> sample_freq
