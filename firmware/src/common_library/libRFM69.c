@@ -929,7 +929,7 @@ int8_t libRFM69_GetRSSI(void)
     {
         libRFM69_ReadRegister(REG_RSSICONFIG, &register_content);
 
-        if (Timer_TimeDifference(timer) > 500)
+        if (Timer_TimeDifference(timer) > 50)
         {
             ERROR("Timeout while waiting for RSSI.");
             return 0;
