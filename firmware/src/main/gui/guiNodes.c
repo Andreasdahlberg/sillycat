@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-07 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -127,12 +127,21 @@ static void DrawNodeView(uint16_t context)
     if (packet != NULL)
     {
         float_parts_type parts;
+        uint8_t *data_ptr;
+        bool battery_is_low = false;
 
-        parts = FloatToParts(((dht22_data_type *)packet->content.data)->temperature);
+        data_ptr = packet->content.data;
+
+        parts = FloatToParts(((dht22_data_type *)data_ptr)->temperature);
         libUI_Print("Temperature: %li.%uC", 8, 2, parts.integer, parts.fractional);
 
-        parts = FloatToParts(((dht22_data_type *)packet->content.data)->humidity);
+        parts = FloatToParts(((dht22_data_type *)data_ptr)->humidity);
         libUI_Print("Humidity: %li.%u%%", 18, 16, parts.integer, parts.fractional);
+
+        if (battery_is_low == true)
+        {
+            DrawBatteryIndicator();
+        }
     }
     else
     {

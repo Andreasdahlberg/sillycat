@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-17 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -175,6 +175,11 @@ void ErrorHandler_AssertFail(const char *__file, int __lineno,
     expression[sizeof(expression) / sizeof(*expression) - 1] = '\0';
 
     DEBUG("<ERROR> Failed assert: %s:%u (%s)\r\n", file, __lineno, expression);
+    
+    #ifndef DEBUG_ENABLE
+        UNUSED(__lineno);
+    #endif
+
     ErrorHandler_PointOfNoReturn();
 }
 

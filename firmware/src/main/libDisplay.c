@@ -1,7 +1,7 @@
 /**
  * @file   libDisplay.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Implementation of display-library.
  *
  * Detailed description of file.
@@ -114,6 +114,8 @@ void libDisplay_SetBrightness(uint8_t brightness)
 #ifndef DEBUG_ENABLE
     libNHD223_WriteCommand(0x81);
     libNHD223_WriteCommand(brightness);
+#else
+    UNUSED(brightness);    
 #endif
     return;
 }

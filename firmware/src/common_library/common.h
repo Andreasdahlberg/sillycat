@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-08 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -49,6 +49,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define SetBitD(data, bit) data |= (1 << bit)
 #define ClearBit(data, bit) data &= ~(1 << bit)
+
+#define UNUSED(var) (void)var
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS

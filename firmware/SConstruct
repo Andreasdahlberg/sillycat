@@ -58,7 +58,6 @@ avr_ccflags = [
     '-O${OPTIMIZATION}',
     '-Wextra',
     '-Wall',
-    '-pedantic',
     '-ffunction-sections',
     '-fdata-sections'
 ]
