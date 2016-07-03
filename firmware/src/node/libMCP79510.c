@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-07 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Implementation of MCP79510-driver.
  *
  * Detailed description of file.
@@ -68,7 +68,10 @@ static uint8_t ReadRegister(uint8_t address);
 static void WriteRegister(uint8_t address, uint8_t register_data);
 static void PreCallback(void);
 static void PostCallback(void);
+
+#ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void) __attribute__((unused));
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -767,6 +770,7 @@ void libMCP79510_GetEUI(uint8_t *eui, size_t length)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+#ifdef DEBUG_ENABLE
 ///
 /// @brief Dump all register values.
 ///
@@ -792,6 +796,7 @@ static void DumpRegisterValues(void)
     }
     return;
 }
+#endif
 
 ///
 /// @brief Write value to register.

@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -58,7 +58,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void SendCallback(bool status);
+static void SendCallback(bool status __attribute__ ((unused)));
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -99,7 +99,7 @@ void Sensor_Update(void)
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void Sensor_WakeUp(const event_type *event)
+void Sensor_WakeUp(const event_type *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
@@ -111,11 +111,12 @@ void Sensor_WakeUp(const event_type *event)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static void SendCallback(bool status)
+static void SendCallback(bool status __attribute__ ((unused)))
 {
     event_type event;
     event = Event_New(EVENT_RHT_SENT);
 
     Event_Trigger(&event);
     INFO("Sensor callback: %u", (uint8_t)status);
+    return;
 }

@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-14 (Last edit)
+ * @date   2016-07-03 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -109,7 +109,7 @@ void Power_Update(void)
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void Power_WakeUp(const event_type *event)
+void Power_WakeUp(const event_type *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
