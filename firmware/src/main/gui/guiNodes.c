@@ -128,6 +128,7 @@ static void DrawNodeView(uint16_t context)
     {
         float_parts_type parts;
         uint8_t *data_ptr;
+        bool battery_is_low = false;
 
         data_ptr = packet->content.data;
 
@@ -136,6 +137,11 @@ static void DrawNodeView(uint16_t context)
 
         parts = FloatToParts(((dht22_data_type *)data_ptr)->humidity);
         libUI_Print("Humidity: %li.%u%%", 18, 16, parts.integer, parts.fractional);
+
+        if (battery_is_low == true)
+        {
+            DrawBatteryIndicator();
+        }
     }
     else
     {
