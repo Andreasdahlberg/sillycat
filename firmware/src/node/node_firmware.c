@@ -126,7 +126,12 @@ int main(void)
     Sensor_Init();
     Transceiver_Init();
     Power_Init();
-
+    
+#ifdef DEBUG_ENABLE
+    //IMPORTENT: The debug wakeup must be called first to enable debug prints
+    //           in the other wakeup functions.
+    Event_AddListener(libDebug_WakeUp, EVENT_WAKEUP);
+#endif    
     Event_AddListener(Sensor_WakeUp, EVENT_WAKEUP);
     Event_AddListener(Power_WakeUp, EVENT_WAKEUP);
     Event_AddListener(LED_EventHandler, EVENT_ALL);
@@ -140,8 +145,7 @@ int main(void)
 #ifdef DEBUG_ENABLE
     //Add debug listener last to ensure all debug prints are flushed
     //before sleep.
-    Event_AddListener(libDebug_Sleep, EVENT_SLEEP);
-    Event_AddListener(libDebug_WakeUp, EVENT_WAKEUP);    
+    Event_AddListener(libDebug_Sleep, EVENT_SLEEP);  
 #endif
 
     INFO("Start up done");
