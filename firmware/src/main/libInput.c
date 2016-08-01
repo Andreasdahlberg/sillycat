@@ -54,15 +54,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define PUSH_ADC_CHANNEL 0x06
 
-#define FALLING_EDGE 0
-#define RISING_EDGE 1
-
 #define GetLatchSignal() ((INPUT_PINR & (1 << LATCH_PIN)) != 0)
 #define GetDirectionSignal() ((INPUT_PINR & (1 << DATA_PIN)) != 0)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
+
+typedef struct
+{
+    uint8_t right;
+    uint8_t left;
+} encoder_rotations_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -71,21 +74,30 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 static libinput_callback_type left_event_callback;
 static libinput_callback_type right_event_callback;
 static libinput_callback_type push_event_callback;
-
-static uint8_t previous_latch;
-
-ISR(PCINT0_vect)
-{
-
-
-}
+static encoder_rotations_type encoder_rotations;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void DirectionCheckAndTrigger(void);
 void PushCheckAndTrigger(void);
+
+//////////////////////////////////////////////////////////////////////////
+//INTERUPT SERVICE ROUTINES
+//////////////////////////////////////////////////////////////////////////
+
+ISR(PCINT0_vect)
+{
+    if (GetLatchSignal() != GetDirectionSignal())
+    {
+
+        encoder_rotations.right = 1;
+    }
+    else
+    {
+        encoder_rotations.left = 1;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -105,13 +117,15 @@ void libInput_Init(void)
     //NOTE: Using a ADC-channel for the push-button since no other pin is free.
     libADC_EnableInput(PUSH_ADC_CHANNEL, true);
 
-    previous_latch = GetLatchSignal();
-
     //Reset all callbacks
     right_event_callback = NULL;
     left_event_callback = NULL;
     push_event_callback = NULL;
 
+    //Reset pending rotations
+    encoder_rotations = (encoder_rotations_type) {0};
+
+    //Enable pin change interupt on the latch pin
     PCMSK0 |= (1 << PCINT0);
     PCICR |= (1 << PCIE0);
 
@@ -129,16 +143,17 @@ void libInput_Update(void)
 {
     PushCheckAndTrigger();
 
-    uint8_t current_latch;
-    current_latch = GetLatchSignal();
-
-    //Check for any edge on the latch signal
-    if (previous_latch != current_latch)
+    if (encoder_rotations.right > 0 && right_event_callback != NULL)
     {
-        DirectionCheckAndTrigger();
+        right_event_callback();
+        --encoder_rotations.right;
+    }
+    else if (encoder_rotations.left > 0 && left_event_callback != NULL)
+    {
+        left_event_callback();
+        --encoder_rotations.left;
     }
 
-    previous_latch = current_latch;
     return;
 }
 
@@ -166,27 +181,6 @@ void libInput_SetCallbacks(libinput_callback_type right_event,
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-void DirectionCheckAndTrigger(void)
-{
-    if (GetLatchSignal() != GetDirectionSignal())
-    {
-        DEBUG("Right\r\n");
-        if (right_event_callback != NULL)
-        {
-            right_event_callback();
-        }
-    }
-    else
-    {
-        DEBUG("Left\r\n");
-        if (left_event_callback != NULL)
-        {
-            left_event_callback();
-        }
-    }
-    return;
-}
 
 void PushCheckAndTrigger(void)
 {
