@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2016-08-01 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -147,7 +147,6 @@ static void DrawNodeView(uint16_t context)
     {
         libUI_Print("Temperature: -", 8, 2);
         libUI_Print("Humidity: -", 18, 16);
-        INFO("No valid data, context: %u", context);
     }
     return;
 }
@@ -166,7 +165,6 @@ static void DrawDetailedNodeView(uint16_t context)
     {
         libUI_Print("RSSI: -", 16, 2);
         libUI_Print("Source: -", 16, 16);
-        INFO("No valid data, context: %u", context);
     }
     return;
 }
