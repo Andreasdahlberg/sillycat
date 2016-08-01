@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-07 (Last edit)
+ * @date   2016-08-01 (Last edit)
  * @brief  Implementation of input module.
  *
  * Detailed description of file.
@@ -32,6 +32,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/atomic.h>
 #include <util/delay.h>
 #include <stdio.h>
 
@@ -45,7 +47,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define INPUT_DDR DDRB
+#define INPUT_PINR PINB
+#define LATCH_PIN DDB0
+#define DATA_PIN DDB1
+
 #define PUSH_ADC_CHANNEL 0x06
+
+#define FALLING_EDGE 0
+#define RISING_EDGE 1
+
+#define GetLatchSignal() ((INPUT_PINR & (1 << LATCH_PIN)) != 0)
+#define GetDirectionSignal() ((INPUT_PINR & (1 << DATA_PIN)) != 0)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -58,6 +71,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 static libinput_callback_type left_event_callback;
 static libinput_callback_type right_event_callback;
 static libinput_callback_type push_event_callback;
+
+static uint8_t previous_latch;
+
+ISR(PCINT0_vect)
+{
+
+
+}
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -79,15 +100,20 @@ void PushCheckAndTrigger(void);
 void libInput_Init(void)
 {
     //Set pins as inputs
-    DDRB &= ~(1 << DDB0 | 1 << DDB1);
+    INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN);
 
     //NOTE: Using a ADC-channel for the push-button since no other pin is free.
     libADC_EnableInput(PUSH_ADC_CHANNEL, true);
+
+    previous_latch = GetLatchSignal();
 
     //Reset all callbacks
     right_event_callback = NULL;
     left_event_callback = NULL;
     push_event_callback = NULL;
+
+    PCMSK0 |= (1 << PCINT0);
+    PCICR |= (1 << PCIE0);
 
     INFO("Init done");
     return;
@@ -101,25 +127,18 @@ void libInput_Init(void)
 ///
 void libInput_Update(void)
 {
-    static uint8_t prev_a = 1;
-    uint8_t curr_a;
-
     PushCheckAndTrigger();
 
-    curr_a = PINB & (1 << DDB0);
+    uint8_t current_latch;
+    current_latch = GetLatchSignal();
 
-    //Check for a falling edge on channel A
-    if (prev_a == 1 && curr_a == 0)
+    //Check for any edge on the latch signal
+    if (previous_latch != current_latch)
     {
-        //debounce_timer
-        _delay_us(20);
-        if (!(PINB & (1 << DDB0)))
-        {
-            DirectionCheckAndTrigger();
-        }
+        DirectionCheckAndTrigger();
     }
 
-    prev_a = curr_a;
+    previous_latch = current_latch;
     return;
 }
 
@@ -150,7 +169,7 @@ void libInput_SetCallbacks(libinput_callback_type right_event,
 
 void DirectionCheckAndTrigger(void)
 {
-    if (PINB & (1 << DDB1))
+    if (GetLatchSignal() != GetDirectionSignal())
     {
         DEBUG("Right\r\n");
         if (right_event_callback != NULL)
