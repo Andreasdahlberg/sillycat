@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2016-08-14 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -163,22 +163,17 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
 void ErrorHandler_AssertFail(const char *__file, int __lineno,
                              const char *__exp)
 {
-    char expression[40];
-    char file[24];
-
-    //TODO: Use libDebug_PrintP, skip these buffers!
-
-    strncpy_P(file, __file, sizeof(file));
-    file[sizeof(file) / sizeof(*file) - 1] = '\0';
-
-    strncpy_P(expression, __exp, sizeof(expression));
-    expression[sizeof(expression) / sizeof(*expression) - 1] = '\0';
-
-    DEBUG("<ERROR> Failed assert: %s:%u (%s)\r\n", file, __lineno, expression);
-    
-    #ifndef DEBUG_ENABLE
-        UNUSED(__lineno);
-    #endif
+#ifdef DEBUG_ENABLE
+    libDebug_Print_P(PSTR("<ERROR> "));
+    libDebug_Print_P(__file);
+    libDebug_Print_P(PSTR(":%u ("), __lineno);
+    libDebug_Print_P(__exp);
+    libDebug_Print_P(PSTR(")\r\n"));
+#else
+    UNUSED(__file);
+    UNUSED(__lineno);
+    UNUSED(__exp);
+#endif
 
     ErrorHandler_PointOfNoReturn();
 }
@@ -191,7 +186,7 @@ void ErrorHandler_AssertFail(const char *__file, int __lineno,
 ///
 void ErrorHandler_PointOfNoReturn(void)
 {
-    CRITICAL("Entering fail state, manual reboot is needed.");
+    CRITICAL("Entering fail state.");
 
     wdt_disable();
     while (1)
