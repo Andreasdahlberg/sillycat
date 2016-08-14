@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-29 (Last edit)
+ * @date   2016-08-14 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -1240,6 +1240,21 @@ void libRFM69_SetLNAGain(libRFM69_lna_gain_type gain)
     uint8_t register_content;
     libRFM69_ReadRegister(REG_LNA, &register_content);
     libRFM69_WriteRegister(REG_LNA, (register_content & 0xF8) | gain);
+}
+
+///
+/// @brief Get the current LNA gain.
+///
+/// The LNA gain is set either manually, or by the AGC.
+///
+/// @param None
+/// @return libRFM69_lna_gain_type LNA gain
+///
+libRFM69_lna_gain_type libRFM69_GetCurrentLNAGain(void)
+{
+    uint8_t register_content;
+    libRFM69_ReadRegister(REG_LNA, &register_content);
+    return (libRFM69_lna_gain_type)((register_content >> 3) & 0x07);
 }
 
 ///

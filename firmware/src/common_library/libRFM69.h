@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-29 (Last edit)
+ * @date   2016-08-14 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -212,6 +212,7 @@ void libRFM69_SetPacketRxDelay(uint8_t val);
 void libRFM69_RestartRx(void);
 void libRFM69_SetClockOutFrequency(libRFM69_clkout_freq_type frequency);
 void libRFM69_SetLNAGain(libRFM69_lna_gain_type gain);
+libRFM69_lna_gain_type libRFM69_GetCurrentLNAGain(void);
 void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance);
 void libRFM69_EnableAFCLowBeta(bool enabled);
 bool libRFM69_IsAFCLowBetaEnabled(void);
