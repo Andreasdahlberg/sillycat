@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-08 (Last edit)
+ * @date   2016-08-14 (Last edit)
  * @brief  Implementation of Nodes
  *
  * Detailed description of file.
@@ -116,7 +116,7 @@ static bool ReadingPacketHandler(packet_frame_type *packet)
 
     if (packet->header.source >= ADDRESS_OFFSET)
     {
-        uint8_t index = ADDRESS_OFFSET - packet->header.source;
+        uint8_t index = packet->header.source - ADDRESS_OFFSET;
         sc_assert(index < MAX_NR_NODES);
 
         memcpy(&packets[index], packet, sizeof(packet_frame_type));
