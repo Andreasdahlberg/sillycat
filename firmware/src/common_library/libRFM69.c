@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-14 (Last edit)
+ * @date   2016-08-28 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include before all other headers
 #include "common.h"
 
+#include <limits.h>
 #include <util/delay.h>
 
 #include "libRFM69.h"
@@ -62,6 +63,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RESET_TIMING_US 110
 
 #define TEMPERATURE_CALIBRATION_OFFSET (-90)
+
+#define CalculateTimeoutValue(timeout_ms, bit_rate) (((uint32_t)timeout_ms << 10) / (((uint32_t)16000 << 10) / bit_rate))
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -570,7 +573,7 @@ void libRFM69_SetBitRate(uint32_t bit_rate)
     return;
 }
 
-uint32_t libRFM69_GetBitrate(void)
+uint32_t libRFM69_GetBitRate(void)
 {
     uint16_t bit_rate_value;
     uint8_t tmp;
@@ -1328,6 +1331,60 @@ void libRFM69_EnableContinuousDAGC(bool enabled)
 
     libRFM69_WriteRegister(REG_TESTDAGC, register_content);
     return;
+}
+
+///
+/// @brief Set timeout time for RSSI detection (RssiValue > RssiThreshold).
+///
+/// @param timeout_ms Time after switching to Rx mode to timeout. Set to 0 to
+///                   disable the timeout.
+/// @return None
+///
+bool libRFM69_SetRxTimeout(uint16_t timeout_ms)
+{
+    bool status = false;
+    uint32_t timeout_reg;
+    uint32_t bit_rate = libRFM69_GetBitRate();
+
+    // Check if bit rate is greater then zero to prevent division by zero.
+    if (bit_rate != 0)
+    {
+        timeout_reg = CalculateTimeoutValue(timeout_ms, bit_rate);
+        status = timeout_reg <= UCHAR_MAX;
+    }
+
+    if (status)
+    {
+        libRFM69_WriteRegister(REG_RXTIMEOUT1, (uint8_t)timeout_reg);
+    }
+    return status;
+}
+
+///
+/// @brief Set timeout time for payload ready.
+///
+/// @param timeout_ms Time after RSSi detection to payload ready to timeout. Set to 0 to
+///                   disable the timeout.
+/// @return None
+///
+bool libRFM69_SetRSSIThresholdTimeout(uint16_t timeout_ms)
+{
+    bool status = false;
+    uint32_t timeout_reg;
+    uint32_t bit_rate = libRFM69_GetBitRate();
+
+    // Check if bit rate is greater then zero to prevent division by zero.
+    if (bit_rate != 0)
+    {
+        timeout_reg = CalculateTimeoutValue(timeout_ms, bit_rate);
+        status = timeout_reg <= UCHAR_MAX;
+    }
+
+    if (status)
+    {
+        libRFM69_WriteRegister(REG_RXTIMEOUT2, (uint8_t)timeout_reg);
+    }
+    return status;
 }
 
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)

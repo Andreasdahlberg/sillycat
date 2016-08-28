@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-14 (Last edit)
+ * @date   2016-08-28 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -157,6 +157,7 @@ void libRFM69_SetCarrierFrequency(uint32_t frequency);
 void libRFM69_EnableSequencer(bool enable);
 void libRFM69_GetTemperature(int8_t *temperature);
 void libRFM69_SetBitRate(uint32_t bit_rate);
+uint32_t libRFM69_GetBitRate(void);
 void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
 void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
 void libRFM69_SetModulationShaping(uint8_t modulation_shaping);
@@ -192,6 +193,8 @@ bool libRFM69_IsRxReady(void);
 bool libRFM69_IsTxReady(void);
 bool libRFM69_IsRSSIThresholdExceeded(void);
 bool libRFM69_IsRxTimeoutFlagSet(void);
+bool libRFM69_SetRxTimeout(uint16_t timeout_ms);
+bool libRFM69_SetRSSIThresholdTimeout(uint16_t timeout_ms);
 void libRFM69_SetRSSIThreshold(int8_t threshold);
 int8_t libRFM69_GetRSSIThreshold(void);
 bool libRFM69_IsFIFOFull(void);
