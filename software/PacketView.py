@@ -19,12 +19,13 @@
 __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
-
+import os
+import time
 from PyQt4 import QtGui, QtCore
 
 
 class PacketView(QtGui.QTableWidget):
-    def __init__(self):
+    def __init__(self, path):
         super(PacketView, self).__init__()
 
         self.setColumnCount(8)
@@ -32,6 +33,8 @@ class PacketView(QtGui.QTableWidget):
 
         self.setHorizontalHeaderLabels(['Target', 'Source', 'Ack', 'RSSI', 'Packet size', 'Timestamp', 'Type', 'Data size'])
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+
+        self._path = path
 
 
     def update_packet_view(self, text):
@@ -43,3 +46,22 @@ class PacketView(QtGui.QTableWidget):
         for value in text.split(','):
             self.setItem(row_index, col_index, QtGui.QTableWidgetItem(value))
             col_index = col_index + 1
+        self.export_to_csv('test')            
+
+
+    def export_to_csv(self, name, separator=',', end_of_line='\n'):
+        if not os.path.isdir(self._path):
+            os.makedirs(self._path)
+
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        filename = '{}_{}.csv'.format(name, timestamp)
+        
+        output_file = open(os.path.join(self._path, filename), 'w')
+
+        for row_index in range(0, self.rowCount()):
+            for column_index in range(0, self.columnCount()):
+                column_data = self.item(row_index, column_index).text()
+                output_file.write(column_data + separator)
+
+            output_file.write(end_of_line)
+        output_file.close()

@@ -18,6 +18,7 @@ BAUDRATE = 250000
 
 LOG_PATH = os.path.join(sys.path[0], 'logs')
 SCREENSHOT_PATH = os.path.join(sys.path[0], 'screenshots')
+EXPORT_PATH = os.path.join(sys.path[0], 'exports')
 DEV_ICON = os.path.join(sys.path[0], 'icons', 'dev_tool_icon.png')
 
 class ConsoleView(QtGui.QPlainTextEdit):
@@ -63,7 +64,7 @@ class DevTool(QtGui.QWidget):
         self.console_view = ConsoleView()
         self.dv = DisplayView(SCREENSHOT_PATH)
         self.dv.hide()
-        self.pv = PacketView()
+        self.pv = PacketView(EXPORT_PATH)
 
         self.checkbox = QtGui.QCheckBox('Pause')
         self.checkbox.stateChanged.connect(self.console_view.toogle_pause)
