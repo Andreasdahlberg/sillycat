@@ -42,6 +42,7 @@
 **/build
 **/logs
 **/screenshots
+**/exports
 
 # Scons files
 .sconf_temp
