@@ -1,1 +1,2 @@
 pyserial
+python3-pyqt4
