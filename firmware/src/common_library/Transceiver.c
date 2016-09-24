@@ -243,8 +243,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
 /// @param  packet_type Packet type.
 /// @return None
 ///
-void Transceiver_SetPacketHandler(transceiver_packet_handler_type
-                                  packet_handler,
+void Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
                                   packet_type_type packet_type)
 {
     sc_assert(packet_type < TR_PACKET_NR_TYPES);
@@ -298,7 +297,7 @@ void Transceiver_EventHandler(const event_type *event)
 static bool IsActive(void)
 {
     return (transceiver_state == TR_STATE_SENDING ||
-        libRFM69_IsPayloadReady() || PacketToSend());
+            libRFM69_IsPayloadReady() || PacketToSend());
 }
 
 static bool IsPacketTypeValid(packet_type_type packet_type)
