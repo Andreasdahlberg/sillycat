@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-09-23 (Last edit)
+ * @date   2016-09-24 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -47,6 +47,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define ResetPacketFrame(packet_frame) packet_frame.header.target = 0
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -146,7 +148,7 @@ void Transceiver_Init(void)
     libRFM69_EnableCRC(true);
     libRFM69_EnableCRCAutoClear(true);
     libRFM69_SetRxTimeout(0);
-    libRFM69_SetRSSIThresholdTimeout(850);    
+    libRFM69_SetRSSIThresholdTimeout(850);
     libRFM69_SetClockOutFrequency(RFM_CLKOUT_OFF);
     libRFM69_EnableOCP(false);
     libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
@@ -155,8 +157,9 @@ void Transceiver_Init(void)
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
 
-    memset(&packet_frame_tx, 0, sizeof(packet_frame_tx));
-    memset(&packet_frame_rx, 0, sizeof(packet_frame_rx));    
+    ResetPacketFrame(packet_frame_tx);
+    ResetPacketFrame(packet_frame_rx);
+
     transceiver_state = TR_STATE_LISTENING;
 
     INFO("Transceiver initiated");
@@ -395,7 +398,7 @@ static transceiver_state_type ListeningStateMachine(void)
                 libRFM69_WaitForModeReady();
 
                 HandlePayload();
-                INFO("Next state: TR_STATE_LISTENING_INIT");                
+                INFO("Next state: TR_STATE_LISTENING_INIT");
                 state = TR_STATE_LISTENING_INIT;
 
                 INFO("PacketToSend %u", PacketToSend());
