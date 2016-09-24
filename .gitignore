@@ -47,3 +47,6 @@
 # Scons files
 .sconf_temp
 .sconsign.dblite
+
+# Sublime files
+*.sublime-workspace
