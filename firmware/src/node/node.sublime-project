@@ -1,0 +1,39 @@
+{
+    "folders":
+    [
+        {
+            "path": "."
+        },
+        {
+            "path": "../utility"
+        },
+        {
+            "path": "../common_library"
+        }
+    ],
+
+    "settings":
+    {
+        "AStyleFormatter":
+        {
+            "options_c":
+            {
+                "use_only_additional_options": true,
+                "additional_options_file": "../../.astylerc"                
+            },
+        }
+    },
+    "build_systems":
+    [
+        {
+            "name": "Scons build-debug",
+            "cmd": ["scons", "build-node-debug", "-u"],
+            "env": {"TERM": "sublime"}
+        },
+        {
+            "name": "Scons build-release",
+            "cmd": ["scons", "build-node-release", "-u"],
+            "env": {"TERM": "sublime"}
+        }                 
+    ]    
+}
