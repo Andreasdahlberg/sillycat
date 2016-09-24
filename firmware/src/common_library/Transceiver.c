@@ -58,8 +58,7 @@ typedef enum
 {
     TR_STATE_NO_INIT = 0,
     TR_STATE_LISTENING,
-    TR_STATE_SENDING,
-    TR_STATE_SLEEPING
+    TR_STATE_SENDING
 } transceiver_state_type;
 
 typedef enum
@@ -174,41 +173,14 @@ void Transceiver_Init(void)
 ///
 void Transceiver_Update(void)
 {
-#if TRX_VERBOSE
-    static uint32_t timer = 0;
-
-    if (Timer_TimeDifference(timer) > 1000)
-    {
-        DEBUG("IsRxReady: %u\r\n", libRFM69_IsRxReady());
-        DEBUG("IsRSSIThresholdExceeded: %u\r\n", libRFM69_IsRSSIThresholdExceeded());
-        DEBUG("IsRxTimeoutFlagSet: %u\r\n", libRFM69_IsRxTimeoutFlagSet());
-        DEBUG("GetRSSIThreshold: %i\r\n", libRFM69_GetRSSIThreshold());
-        DEBUG("GetBitRate: %lu\r\n", libRFM69_GetBitRate());
-
-        timer = Timer_GetMilliseconds();
-    }
-#endif
-
     switch (transceiver_state)
     {
-        case TR_STATE_NO_INIT:
-            WARNING("Transceiver not initialized");
-            Transceiver_Init();
-            break;
-
         case TR_STATE_LISTENING:
             transceiver_state = ListeningStateMachine();
             break;
 
         case TR_STATE_SENDING:
             transceiver_state = SendingStateMachine();
-            break;
-
-        case TR_STATE_SLEEPING:
-            if (!IsActive() && libRFM69_IsModeReady() && libRFM69_GetMode() != RFM_SLEEP)
-            {
-                libRFM69_SetMode(RFM_SLEEP);
-            }
             break;
 
         default:
