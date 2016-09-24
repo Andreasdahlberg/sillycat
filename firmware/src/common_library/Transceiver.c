@@ -298,7 +298,7 @@ void Transceiver_EventHandler(const event_type *event)
 static bool IsActive(void)
 {
     return (transceiver_state == TR_STATE_SENDING ||
-            transceiver_state == TR_STATE_SENDING);
+        libRFM69_IsPayloadReady() || PacketToSend());
 }
 
 static bool IsPacketTypeValid(packet_type_type packet_type)
