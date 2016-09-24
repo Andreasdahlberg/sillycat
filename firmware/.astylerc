@@ -1,5 +1,6 @@
 --style=allman
 --indent=spaces=4
+--indent-switches
 --align-pointer=name
 --align-reference=name 
 --max-code-length=80
