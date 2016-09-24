@@ -11,6 +11,6 @@ deploy:
   provider: releases
   api_key:
     secure: K8BvdsaiqY26FYiPTu3YpWwNw0/EUs5TI80A2Wq5jiXzB/+ra6eOnEh03W+dNhNABwXPczOgFJFaJpYbmSb1mOGOLus/UUn3M6LBcuUuCZs/votLw9SpvtypEIlnnbAE/Z2HzEa0atxRnNJGuWujFQczLMgisxDZl3Eiwey1DVkwHZFJZP+h5lBXIGrNv9qZc8UZb6JIUI8qjHfWLcIGiuVY4uzn0Foa97EgeJIEdO4zB8JlyUT7QFq+vvCpiTKA2/uo6sOPQWHymya9LPtagwQdG8fpXsTNeHBvd3mV70HtWcT8YReMvI4LfUuvK4yJvFDplUzCgAJogo7T5hfnDs/EEvDRjZ2SguVLiQnLOqZtZEHkTrzIcXjdtSLuoteAXVjG/EPYPBuzdquBDa2gX3xL0OV2K+7i21G2quZvcJ1BXRkvthkNdr1M9m8/OJjmd/E99IUczrm37LWGHn0hyqG7eUTqTb3F11QuCWzkhxPG5r4Mpa8dnj0sd7xCkei3BwDpUY8P8O8RFL1AbXz94T1ua6er38CH1tA5ONfFCUSEG+/lAIp+8FNarv/NdO0MHCBVLJK1ZieXGIR4RrztDVOiM+zOaKBRlA7gXmqqM9zuNRUR/YDu6f/P+d6Gb1akrC0PW8vOZuXGTSPG+o666/BvLka248moQ8bzyZ3jKoM=
-  file: build/release/main/main/main_release.elf
+  file: firmware/build/release/main/main/main_release.elf
   on:
     repo: Andreasdahlberg/sillycat
