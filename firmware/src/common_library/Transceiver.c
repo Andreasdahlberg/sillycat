@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-09-24 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -209,6 +209,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
                             transceiver_callback_type callback)
 {
     sc_assert(content != NULL);
+    sc_assert(target != 0);
 
     bool status = false;
     packet_frame_type *frame_ptr;
@@ -221,7 +222,7 @@ bool Transceiver_SendPacket(uint8_t target, bool request_ack,
         frame_ptr->header.target = target;
         frame_ptr->header.source = Config_GetNodeId();
         frame_ptr->header.ack = request_ack;
-        frame_ptr->header.rssi = 0;//libRFM69_GetRSSI(); //TODO: Fix this!
+        frame_ptr->header.rssi = libRFM69_GetRSSI();
         frame_ptr->header.total_size = sizeof(packet_header_type) + 8 +
                                        content->size; //TODO: sizeof or define!
 
