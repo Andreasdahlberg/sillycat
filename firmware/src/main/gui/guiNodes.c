@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-01 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -39,6 +39,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Interface.h"
 #include "Nodes.h"
+#include "RTC.h"
 
 #include "guiNodes.h"
 
@@ -59,8 +60,8 @@ typedef struct
 {
     float humidity;
     float temperature;
-    bool status;
-} dht22_data_type;
+    rtc_time_type timestamp;
+} sensor_data_type;
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -132,10 +133,10 @@ static void DrawNodeView(uint16_t context)
 
         data_ptr = packet->content.data;
 
-        parts = FloatToParts(((dht22_data_type *)data_ptr)->temperature);
+        parts = FloatToParts(((sensor_data_type *)data_ptr)->temperature);
         libUI_Print("Temperature: %li.%uC", 8, 2, parts.integer, parts.fractional);
 
-        parts = FloatToParts(((dht22_data_type *)data_ptr)->humidity);
+        parts = FloatToParts(((sensor_data_type *)data_ptr)->humidity);
         libUI_Print("Humidity: %li.%u%%", 18, 16, parts.integer, parts.fractional);
 
         if (battery_is_low == true)
