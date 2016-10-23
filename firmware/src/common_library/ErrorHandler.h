@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-17 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -23,7 +23,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 
 #ifndef ERRORHANDLER_H_
 #define ERRORHANDLER_H_
@@ -52,7 +51,8 @@ enum
 {
     POWERON = 1,
     ASSFAIL,
-    LOW_STACK
+    LOW_STACK,
+    RTC_FAIL
 };
 
 //////////////////////////////////////////////////////////////////////////
