@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -38,13 +38,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Sensor.h"
 #include "Timer.h"
-#include "RTC.h"
 #include "LED.h"
 #include "Transceiver.h"
+#include "FIFO.h"
+#include "ErrorHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define READING_BUFFER_SIZE 4
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -54,43 +57,85 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
+static dht22_data_type reading_buffer[READING_BUFFER_SIZE];
+static fifo_type reading_fifo;
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
-
-static void SendCallback(bool status __attribute__ ((unused)));
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+///
+/// @brief Init the sensor module.
+///
+/// @param  None
+/// @return None
+///
 void Sensor_Init(void)
 {
+    reading_fifo = FIFO_New(reading_buffer);
+
     INFO("Init done");
 }
 
+///
+/// @brief Update the internal state of the sensor module.
+///
+/// @param  None
+/// @return None
+///
 void Sensor_Update(void)
 {
     if (libDHT22_IsReadingValid())
     {
-        dht22_data_type sample;
-        packet_content_type sample_packet;
+        dht22_data_type dht22_reading;
+        dht22_reading = libDHT22_GetSensorReading();
 
-        sample = libDHT22_GetSensorReading();
-        INFO("Temperature: %uC", (uint32_t)sample.temperature);
-        INFO("Humidity: %u%%", (uint32_t)sample.humidity);
+        // No need to check the reading status since it is already done in
+        // the call to libDHT22_IsReadingValid().
 
-        rtc_time_type timestamp;
-        RTC_GetCurrentTime(&timestamp);
+        sensor_data_type reading;
+        reading.temperature = dht22_reading.temperature;
+        reading.humidity = dht22_reading.humidity;
+        if (!RTC_GetCurrentTime(&reading.timestamp))
+        {
+            // Log error and continue, an invalid timestamp is not critical.
+            ErrorHandler_LogError(RTC_FAIL, 0);
 
-        sample_packet.type = TR_PACKET_TYPE_READING;
-        sample_packet.size = sizeof(dht22_data_type) + 1;
-        sample_packet.timestamp = timestamp;
-        memcpy(sample_packet.data, (uint8_t *)&sample, sizeof(dht22_data_type));
+            ERROR("Failed to get timestamp.");
+        }
 
-        LED_ChangeState(LED_STATE_SENDING);
-        Transceiver_SendPacket(0xAA, false, &sample_packet, SendCallback);
+        // Discard the oldest reading if the buffer is full.
+        if (FIFO_IsFull(&reading_fifo))
+        {
+            sensor_data_type dummy_reading;
+            FIFO_Pop(&reading_fifo, &dummy_reading);
+
+            WARNING("FIFO is full, discarding oldest entry.");
+        }
+        FIFO_Push(&reading_fifo, &reading);
+
+        event_type event;
+        event = Event_New(EVENT_RHT_AVAILABLE);
+        Event_Trigger(&event);
     }
+    return;
+}
+
+///
+/// @brief Get a sensor reading from the reading FIFO.
+///
+/// @param  *reading Pointer to struct where the reading will be stored.
+/// @return bool True if a reading is available.
+///
+bool Sensor_GetReading(sensor_data_type *reading)
+{
+    sc_assert(reading != NULL);
+
+    return FIFO_Pop(&reading_fifo, reading);
 }
 
 ///
@@ -110,13 +155,3 @@ void Sensor_WakeUp(const event_type *event __attribute__ ((unused)))
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-static void SendCallback(bool status __attribute__ ((unused)))
-{
-    event_type event;
-    event = Event_New(EVENT_RHT_SENT);
-
-    Event_Trigger(&event);
-    INFO("Sensor callback: %u", (uint8_t)status);
-    return;
-}

@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-08 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -33,6 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/io.h>
 #include <avr/wdt.h>
+#include <string.h>
 
 #include "libDebug.h"
 #include "libADC.h"
@@ -81,8 +82,8 @@ static sleep_status_type sleep_status = {0};
 
 static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
-static void RHTSent(const event_type *event __attribute__ ((unused)));
-//static void PrintEUI(uint8_t *eui, uint8_t length);
+static void SendCallback(bool status __attribute__ ((unused)));
+static void RHTAvailable(const event_type *event __attribute__ ((unused)));
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -126,17 +127,17 @@ int main(void)
     Sensor_Init();
     Transceiver_Init();
     Power_Init();
-    
+
 #ifdef DEBUG_ENABLE
     //IMPORTENT: The debug wakeup must be called first to enable debug prints
     //           in the other wakeup functions.
     Event_AddListener(libDebug_WakeUp, EVENT_WAKEUP);
-#endif    
+#endif
     Event_AddListener(Sensor_WakeUp, EVENT_WAKEUP);
     Event_AddListener(Power_WakeUp, EVENT_WAKEUP);
     Event_AddListener(LED_EventHandler, EVENT_ALL);
     Event_AddListener(Transceiver_EventHandler, EVENT_ALL);
-    Event_AddListener(RHTSent, EVENT_RHT_SENT);
+    Event_AddListener(RHTAvailable, EVENT_RHT_AVAILABLE);
 
     //Since RTC-alarms are persistent between restarts we need to make
     //sure that they are disabled.
@@ -145,7 +146,7 @@ int main(void)
 #ifdef DEBUG_ENABLE
     //Add debug listener last to ensure all debug prints are flushed
     //before sleep.
-    Event_AddListener(libDebug_Sleep, EVENT_SLEEP);  
+    Event_AddListener(libDebug_Sleep, EVENT_SLEEP);
 #endif
 
     INFO("Start up done");
@@ -171,7 +172,31 @@ int main(void)
     SoftReset();
 }
 
-static void RHTSent(const event_type *event __attribute__ ((unused)))
+static void RHTAvailable(const event_type *event __attribute__ ((unused)))
+{
+    sensor_data_type reading;
+    if (Sensor_GetReading(&reading))
+    {
+        rtc_time_type timestamp;
+        if (!RTC_GetCurrentTime(&timestamp))
+        {
+            // Log error and continue, an invalid timestamp is not critical.
+            ErrorHandler_LogError(RTC_FAIL, 0);
+            ERROR("Failed to get timestamp.");
+        }
+
+        packet_content_type packet;
+        packet.type = TR_PACKET_TYPE_READING;
+        packet.size = sizeof(reading);
+        packet.timestamp = timestamp;
+        memcpy(packet.data, &reading, packet.size);
+
+        Transceiver_SendPacket(0xAA, false, &packet, SendCallback);
+    }
+    return;
+}
+
+static void SendCallback(bool status __attribute__ ((unused)))
 {
     sleep_status.sleep_now = true;
     return;
@@ -220,18 +245,3 @@ static void NotifyAndEnterSleep(void)
 
     return;
 }
-/*
-static void PrintEUI(uint8_t *eui, uint8_t length)
-{
-    DEBUG("EUI: ");
-
-    uint8_t idx;
-    for (idx = 0; idx < length; ++idx)
-    {
-        DEBUG("%02X", eui[idx]);
-    }
-
-    DEBUG("\r\n");
-    return;
-}
-*/

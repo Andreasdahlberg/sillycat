@@ -1,7 +1,7 @@
 /**
  * @file   Event.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Header of Event
  *
  * Detailed description of file.
@@ -53,7 +53,7 @@ typedef enum
     EVENT_BATTERY_CHARGER_DISCONNECTED,
     EVENT_BATTERY_CRITICAL,
     EVENT_BATTERY_LOW,
-    EVENT_RHT_SENT
+    EVENT_RHT_AVAILABLE
 } event_id_type;
 
 typedef struct

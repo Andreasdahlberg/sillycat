@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2016-10-23 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include "RTC.h"
 #include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -41,16 +42,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-//Using packed attribute since the struct will be stored to SRAM
-typedef struct __attribute__((packed))
+typedef struct
 {
-    uint16_t header;
-    uint16_t max;
-    uint16_t min;
-    uint16_t value;
-    uint16_t average;
-}
-sensor_sample_type;
+    float humidity;
+    float temperature;
+    rtc_time_type timestamp;
+} sensor_data_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -58,9 +55,7 @@ sensor_sample_type;
 
 void Sensor_Init(void);
 void Sensor_Update(void);
-function_status Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value);
-bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading);
-bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading);
+bool Sensor_GetReading(sensor_data_type *reading);
 void Sensor_WakeUp(const event_type *event __attribute__ ((unused)));
 
 #endif /* SENSOR_H_ */
