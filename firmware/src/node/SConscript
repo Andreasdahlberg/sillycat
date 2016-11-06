@@ -37,9 +37,10 @@ for subdir in DIRECTORIES:
 
 elf_name = '{}_{}.elf'.format(target, mode)
 hex_name = '{}_{}.hex'.format(target, mode)
+eep_name = '{}_{}.eep'.format(target, mode)
 
 elf = env.Elf(elf_name, objects) 
 hex = env.Hex(hex_name, elf)
-env.Depends(hex, elf)
+eep = env.EEPROM(eep_name, elf)
 
-Return(['hex', 'elf'])
+Return(['hex', 'elf', 'eep'])

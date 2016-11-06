@@ -46,6 +46,9 @@ linking_message = '{}Linking {}==> {}$TARGET{}'.format(
 hex_message = '{}Generating HEX {}==> {}$TARGET{}'.format(
     colors['cyan'], colors['end'], colors['blue'], colors['end'])
 
+eeprom_message = '{}Generating EEPROM {}==> {}$TARGET{}'.format(
+    colors['cyan'], colors['end'], colors['blue'], colors['end'])
+
 PROJECT_NAME = 'sillycat'
 
 #Target variables
@@ -86,7 +89,8 @@ if ARGUMENTS.get('VERBOSE') != 'true':
     common_env['CCCOMSTR'] = compile_source_message
     common_env['AVRDUDE_ELF_COMSTR'] = linking_message
     common_env['AVRDUDE_HEX_COMSTR'] = hex_message
-    flash_quell = '-q -q'    
+    common_env['AVRDUDE_EEP_COMSTR'] = eeprom_message
+    flash_quell = '-q -q'
 else:
     flash_quell = ''
 
@@ -107,13 +111,16 @@ for target in TARGETS:
         env = common_env.Clone()
         env.Append(CPPDEFINES=MODES[mode])
 
-        hex, elf = env.SConscript('src/SConscript',
+        hex, elf, eep = env.SConscript('src/SConscript',
             duplicate=0,
             variant_dir='build/{}/{}'.format(mode, target),
             exports={'env': env, 'project_name': PROJECT_NAME, 'mode': mode, 'target': target})
 
         alias_build_name = 'build-{}-{}'.format(target, mode)
         Alias(alias_build_name, hex)
+
+        alias_eeprom_name = 'eeprom-{}-{}'.format(target, mode)
+        Alias(alias_eeprom_name, eep)
 
         flash_cmd = 'avrdude -c {} -p {} -P {} -Uflash:w:{} -B 0.5 {}'.format(
             env['TOOL'], env['MCU'], env['PORT'],'${SOURCE}', flash_quell)
@@ -126,6 +133,9 @@ for target in TARGETS:
 
         flash_help_text = '    {}: Flash {} in {} mode.\n'.format(flash_name, target, mode)
         Help(flash_help_text)
+
+        eeprom_help_text = '    {}: Create EEPROM file for {} in {} mode.\n'.format(alias_eeprom_name, target, mode)
+        Help(eeprom_help_text)
 
         size_cmd = 'avr-size {} --mcu={} -C'.format(elf[0], env['MCU'])
         size_name = 'size-{}-{}'.format(target, mode)

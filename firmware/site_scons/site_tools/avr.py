@@ -35,6 +35,7 @@ def generate(env):
     env.Append(BUILDERS = {
         'Elf': _get_elf_builder(),
         'Hex': _get_hex_builder(),
+        'EEPROM': _get_eeprom_builder()
     })
 
 
@@ -51,4 +52,9 @@ def _get_elf_builder():
 def _get_hex_builder():
     return SCons.Builder.Builder(
         action=SCons.Action.Action("${OBJCOPY} -O ihex -R .eeprom ${SOURCES} ${TARGET}", '${AVRDUDE_HEX_COMSTR}')
+    )
+
+def _get_eeprom_builder():
+    return SCons.Builder.Builder(
+        action=SCons.Action.Action('${OBJCOPY} -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${SOURCES} ${TARGET}', '${AVRDUDE_EEP_COMSTR}')
     )
