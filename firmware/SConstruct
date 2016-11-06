@@ -55,7 +55,7 @@ mcu_vars.Add('F_CPU', 'Target frequency in Hz')
 mcu_vars.Add('PORT', 'Port for the programmer')
 mcu_vars.Add('TOOL', 'The programmer to use')
 mcu_vars.Add('OPTIMIZATION', 'The optimization level to use for compilation(0, 1, 2, 3, s)', 's')
-mcu_vars.Add('STD', 'The C Dialect to use', 'c99')
+mcu_vars.Add('STD', 'The C Dialect to use', 'c11')
 
 avr_ccflags = [
     '-std=${STD}',
