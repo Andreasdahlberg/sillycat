@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2016-11-07 (Last edit)
  * @brief  Header of Debug-library.
  *
  * Detailed description of file.
@@ -41,10 +41,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef DEBUG_ENABLE
 #define DEBUG(text, ...)        libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
-#define CRITICAL(text, ...)     libDebug_Print_P(PSTR("<CRITICAL> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
-#define ERROR(text, ...)        libDebug_Print_P(PSTR("<ERROR> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
-#define WARNING(text, ...)      libDebug_Print_P(PSTR("<WARNING> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
-#define INFO(text, ...)         libDebug_Print_P(PSTR("<INFO> %s() " text "\r\n"), __func__, ##__VA_ARGS__)
+#define CRITICAL(text, ...)     libDebug_Print_P(PSTR("<CRITICAL> " text "\r\n"), ##__VA_ARGS__)
+#define ERROR(text, ...)        libDebug_Print_P(PSTR("<ERROR> " text "\r\n"), ##__VA_ARGS__)
+#define WARNING(text, ...)      libDebug_Print_P(PSTR("<WARNING> " text "\r\n"), ##__VA_ARGS__)
+#define INFO(text, ...)         libDebug_Print_P(PSTR("<INFO> " text "\r\n"), ##__VA_ARGS__)
 #else
 #define DEBUG(...)
 #define CRITICAL(text, ...)
@@ -61,4 +61,5 @@ void libDebug_Init(void);
 void libDebug_Print_P(const char *text, ...);
 void libDebug_Sleep(const event_type *event __attribute__ ((unused)));
 void libDebug_WakeUp(const event_type *event __attribute__ ((unused)));
+
 #endif /* LIBDEBUG_H_ */
