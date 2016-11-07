@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-28 (Last edit)
+ * @date   2016-11-07 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -136,6 +136,8 @@ typedef enum
 
 #define RFM_FIFO_SIZE 66
 
+#define RFM_AES_KEY_LENGTH 16
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
@@ -149,6 +151,7 @@ void libRFM69_InitHW(void);
 void libRFM69_Update(void);
 void libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
+void libRFM69_SetAESKey(const uint8_t *aes_key);
 bool libRFM69_IsModeReady(void);
 bool libRFM69_IsPowerUpDone(void);
 bool libRFM69_WaitForModeReady(void);

@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-28 (Last edit)
+ * @date   2016-11-07 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -460,6 +460,24 @@ void libRFM69_EnableEncryption(bool enable)
     libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
     SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
     libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
+
+    return;
+}
+
+///
+/// @brief Set the AES key used for packet encryption.
+///
+/// @param aes_key* Pointer to AES key.
+/// @return None
+///
+void libRFM69_SetAESKey(const uint8_t *aes_key)
+{
+    sc_assert(aes_key != NULL);
+
+    for (uint8_t index = 0; index < RFM_AES_KEY_LENGTH; ++index)
+    {
+        libRFM69_WriteRegister(REG_AESKEY1 + index, aes_key[index]);
+    }
 
     return;
 }

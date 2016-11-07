@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-10-23 (Last edit)
+ * @date   2016-11-07 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -115,13 +115,13 @@ static void DumpPacket(packet_frame_type *packet);
 void Transceiver_Init(void)
 {
     libRFM69_Init();
-    //IMPORTANT: Only disable encryption during development!
     libRFM69_EnableEncryption(false);
     libRFM69_EnableSequencer(true);
     libRFM69_EnableListenMode(false);
     libRFM69_SetPacketRxDelay(1);
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
+    libRFM69_SetAddressFiltering(RFM_ADDRESS_FILTER_ADDRESS_BROADCAST);
     libRFM69_SetPreambleLength(8);
     libRFM69_SetLNAGain(RFM_LNA_GAIN_AUTO);
     libRFM69_SetLNAInputImpedance(RFM_LNA_ZIN_50OHM);
@@ -152,9 +152,7 @@ void Transceiver_Init(void)
     libRFM69_EnableOCP(false);
     libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
     libRFM69_SetPowerLevel(31);
-    libRFM69_EnableHighPowerSetting(false);
-    libRFM69_SetMode(RFM_STANDBY);
-    libRFM69_WaitForModeReady();
+    libRFM69_SetAESKey((uint8_t *)Config_GetAESKey());
 
     ResetPacketFrame(packet_frame_tx);
     ResetPacketFrame(packet_frame_rx);
