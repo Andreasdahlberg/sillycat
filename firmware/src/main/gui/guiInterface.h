@@ -1,7 +1,7 @@
 /**
  * @file   guiInterface.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-06 (Last edit)
+ * @date   2017-02-13 (Last edit)
  * @brief  Header of guiInterface
  *
  * Detailed description of file.
@@ -23,6 +23,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#ifndef GUIINTERFACE_H_
+#define GUIINTERFACE_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -46,3 +49,5 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 
 void guiInterface_DrawViewIndicator(indicator_position_type position);
+
+#endif

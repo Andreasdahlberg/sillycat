@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-29 (Last edit)
+ * @date   2017-02-13 (Last edit)
  * @brief  Header of guiNodes
  *
  * Detailed description of file.
@@ -24,6 +24,9 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef GUINODES_H_
+#define GUINODES_H_
+
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
@@ -37,3 +40,5 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 void guiNodes_Init(void);
+
+#endif

@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
+ * @date   2017-02-13 (Last edit)
  * @brief  Header of guiSensor
  *
  * Detailed description of file.
@@ -24,6 +24,9 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef GUISENSOR_H_
+#define GUISENSOR_H_
+
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
@@ -40,3 +43,5 @@ void guiSensor_Init(void);
 void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((unused)));
 void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)));
 void guiSensor_DrawSensorInformation(uint16_t context __attribute__ ((unused)));
+
+#endif

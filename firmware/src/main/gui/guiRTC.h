@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-06 (Last edit)
+ * @date   2017-02-13 (Last edit)
  * @brief  Header of guiRTC
  *
  * Detailed description of file.
@@ -24,6 +24,9 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#ifndef GUIRTC_H_
+#define GUIRTC_H_
+
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
@@ -37,3 +40,5 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 void guiRTC_Init(void);
+
+#endif
