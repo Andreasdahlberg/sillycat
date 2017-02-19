@@ -1,0 +1,118 @@
+/**
+ * @file   font.c
+ * @Author {author}
+ * @date   {date}
+ * @brief  {brief}
+ *
+ * Detailed description of file.
+ */
+
+/*
+ * THIS FILE IS GENERATED, DO NOT EDIT!
+*/
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+
+#include "font.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+static const uint8_t glyph_data[] PROGMEM =
+{{
+{glyph_data}
+}};
+
+static const glyph_info_t glyphs[] PROGMEM =
+{{
+{glyph_info}
+}};
+
+static font_info_t font =
+{{
+    .name = "{font_name}",
+#if MONO_FONT
+    .advance = {font_advance}
+#endif
+}};
+
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+///
+/// @brief Get glyph information for a specific char.
+///
+/// @param  *char Char value of glyph.
+/// @return Pointer to struct with glyph information. NULL if the glyph
+///         does not exist.
+///
+bool Font_GetGlyphInfo(char glyph_value, glyph_info_t *glyph)
+ {{
+
+    size_t glyph_offset;
+
+    switch (glyph_value)
+    {{
+{glyph_offset}
+        default:
+            return false;
+    }}
+
+    memcpy_P(glyph, &glyphs[glyph_offset], sizeof(*glyphs));
+    return true;
+}}
+
+///
+/// @brief Get the number of available glyphs.
+///
+/// @param  None
+/// @return Number of glyphs.
+///
+size_t Font_GetNumberOfGlyphs(void)
+{{
+    return (sizeof(glyphs) / sizeof(*glyphs));
+}}
+
+uint8_t Font_GetAdvance(glyph_info_t *glyph __attribute__ ((unused)))
+{{
+#if MONO_FONT
+    return font.advance;
+#else
+    return glyph->advance;
+#endif
+}}
+
+bool Font_IsMono(void)
+{{
+    return (bool)MONO_FONT;
+}}
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////

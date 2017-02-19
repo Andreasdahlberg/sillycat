@@ -1,14 +1,13 @@
 
-import os
-
 Import(['*'])
 
-source = Glob('*.c')
+font_header = env.Font(
+    source='font_template.h',
+    target='font.h')
 
-#env.Append(CPPPATH=['#src/utility', '#src/common_library'])
+font_source = env.Font(
+    source='font_template.c',
+    target='font.c')
 
-objects = env.Object(source=source)
-
+objects = env.Object(source=font_source)
 Return('objects')
-
-

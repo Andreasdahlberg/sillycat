@@ -49,6 +49,9 @@ hex_message = '{}Generating HEX {}==> {}$TARGET{}'.format(
 eeprom_message = '{}Generating EEPROM {}==> {}$TARGET{}'.format(
     colors['cyan'], colors['end'], colors['blue'], colors['end'])
 
+font_message = '{}Generating font {}==> {}$TARGET{}'.format(
+    colors['cyan'], colors['end'], colors['blue'], colors['end'])
+
 PROJECT_NAME = 'sillycat'
 
 #Target variables
@@ -71,11 +74,11 @@ avr_ccflags = [
 ]
 
 avr_cppdefines = {
-  'F_CPU' : '${F_CPU}UL', 
+  'F_CPU' : '${F_CPU}UL',
 }
 
 common_env = Environment(
-    tools=['avr'],
+    tools=['avr', 'font'],
     CC = 'avr-gcc',
     variables = mcu_vars,
     CCFLAGS = avr_ccflags,
@@ -90,6 +93,7 @@ if ARGUMENTS.get('VERBOSE') != 'true':
     common_env['AVRDUDE_ELF_COMSTR'] = linking_message
     common_env['AVRDUDE_HEX_COMSTR'] = hex_message
     common_env['AVRDUDE_EEP_COMSTR'] = eeprom_message
+    common_env['FONT_COMSTR'] = font_message
     flash_quell = '-q -q'
 else:
     flash_quell = ''

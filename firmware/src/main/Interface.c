@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2017-02-13 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -37,7 +37,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDisplay.h"
 #include "libUI.h"
 
-#include "bitmap_db.h"
 #include "Interface.h"
 #include "Timer.h"
 
@@ -83,8 +82,6 @@ void Interface_Init(void)
 {
     libDisplay_Init();
     libDisplay_On();
-
-    libUI_SetFont(&ubuntuMono_10ptFontInfo);
 
     root_view = NULL;
     active_view = NULL;

@@ -1,10 +1,11 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
- * @brief  Implementation of UI-library.
+ * @date   2017-02-19 (Last edit)
+ * @brief  Implementation of UI library.
  *
- * Detailed description of file.
+ * The UI library contains functions for drawing simple shapes and for
+ * printing text.
  */
 
 /*
@@ -40,6 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDisplay.h"
 #include "libUI.h"
+#include "font.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -55,11 +57,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static FONT_INFO *current_font;
-
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+static inline bool IsPixelBitSet(uint8_t data, uint8_t bit);
+static inline void PrintChar(const glyph_info_t *char_ptr, uint8_t x_pos,
+                             uint8_t y_pos);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -68,12 +72,6 @@ static FONT_INFO *current_font;
 void libUI_Update(void)
 {
     libDisplay_Flush();
-    return;
-}
-
-void libUI_SetFont(FONT_INFO *font)
-{
-    current_font = font;
     return;
 }
 
@@ -121,8 +119,7 @@ void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
 {
     int x = radius;
     int y = 0;
-    int decisionOver2 = 1 -
-                        x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+    int decisionOver2 = 1 - x; // Decision criterion divided by 2 evaluated at x=r, y=0
 
     while (x >= y)
     {
@@ -176,47 +173,54 @@ void libUI_Print_P(const char *text, uint8_t x_pos, uint8_t y_pos, ...)
 
 void libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos)
 {
-    uint8_t desc_offset;
-    uint16_t char_offset;
-    uint8_t byte_index;
-    uint8_t bit_index;
-    uint8_t buffer_index;
-    uint8_t data_row = 0;
-    uint8_t data_column = 0;
+    sc_assert(buffer != NULL);
+    const char *char_ptr = buffer;
 
-    //TODO: Fix this very bad code!
-    for (buffer_index = 0; buffer_index < strlen(buffer); ++buffer_index)
+    while(*char_ptr != '\0')
     {
-        if ((char)buffer[buffer_index] != ' ')
+        glyph_info_t glyph;
+        if (Font_GetGlyphInfo(*char_ptr, &glyph))
         {
-            desc_offset = (buffer[buffer_index] - (char)current_font->startChar);
-            char_offset = pgm_read_word(&current_font->charInfo[desc_offset].offset);
+            PrintChar(&glyph, x_pos, y_pos);
+            x_pos += Font_GetAdvance(&glyph);
+        }
 
-            for (data_row = 0; data_row < current_font->heightPages; ++data_row)
-            {
-                for (data_column = 0; data_column < current_font->widthPages; ++data_column)
-                {
-                    byte_index = (data_row * current_font->widthPages) + data_column;
-                    for (bit_index = 0; bit_index < 8; ++bit_index)
-                    {
-                        if ((pgm_read_byte(&(current_font->data[char_offset + byte_index])) & (1 <<
-                                (7 - bit_index))) > 0)
-                        {
-                            libDisplay_SetPixel(x_pos + bit_index + (data_column << 3), y_pos + data_row);
-                        }
-                    }
-                }
-            }
-            x_pos += (pgm_read_byte(&current_font->charInfo[desc_offset].widthBits) + 2);
-        }
-        else
-        {
-            x_pos += 6;
-        }
+        ++char_ptr;
     }
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static inline bool IsPixelBitSet(uint8_t data, uint8_t bit)
+{
+    return data & (1 << (7 - bit));
+}
+
+static inline void PrintChar(const glyph_info_t *glyph, uint8_t x_base,
+                             uint8_t y_base)
+{
+    sc_assert(glyph != NULL);
+
+    x_base += glyph->horizontal_bearing;
+
+    for (uint8_t y_pos = 0; y_pos < glyph->height; ++y_pos)
+    {
+        for (uint8_t x_pos = 0; x_pos < glyph->width; ++x_pos)
+        {
+            uint16_t bit_count = ((uint16_t)y_pos * (uint16_t)glyph->width +
+                                  (uint16_t)x_pos);
+            uint8_t byte_idx = bit_count / 8;
+            uint8_t bit_idx = bit_count % 8;
+
+            if (IsPixelBitSet(pgm_read_byte(&glyph->data[byte_idx]), bit_idx))
+            {
+                libDisplay_SetPixel(
+                    x_pos + x_base,
+                    y_pos + y_base - glyph->baseline_offset - glyph->height
+                );
+            }
+        }
+    }
+}
