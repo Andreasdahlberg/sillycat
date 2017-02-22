@@ -1,7 +1,7 @@
 language: c
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -qq gcc-avr binutils-avr avr-libc scons python3
+- sudo apt-get install -qq gcc-avr binutils-avr avr-libc scons python3 python3-setuptools
 install:
 - sudo scripts/install_freetype.sh
 script: scons -C firmware build-node-release build-main-release
