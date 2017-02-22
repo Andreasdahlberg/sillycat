@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-10-23 (Last edit)
+ * @date   2017-02-22 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -121,7 +121,7 @@ static void DrawNodeView(uint16_t context)
 
     //Add one to node index(context) since end users are more familiar
     //with indexing starting at 1.
-    libUI_Print("%u", 0, 0, context + 1);
+    libUI_Print("%u", 1, 12, context + 1);
 
     packet = Nodes_GetLatestData(context);
 
@@ -134,10 +134,10 @@ static void DrawNodeView(uint16_t context)
         data_ptr = packet->content.data;
 
         parts = FloatToParts(((sensor_data_type *)data_ptr)->temperature);
-        libUI_Print("Temperature: %li.%uC", 8, 2, parts.integer, parts.fractional);
+        libUI_Print("%li.%u C", 45, UI_DOUBLE_ROW_FIRST, parts.integer, parts.fractional);
 
         parts = FloatToParts(((sensor_data_type *)data_ptr)->humidity);
-        libUI_Print("Humidity: %li.%u%%", 18, 16, parts.integer, parts.fractional);
+        libUI_Print("%li.%u%%", 45, UI_DOUBLE_ROW_SECOND, parts.integer, parts.fractional);
 
         if (battery_is_low == true)
         {
@@ -146,8 +146,8 @@ static void DrawNodeView(uint16_t context)
     }
     else
     {
-        libUI_Print("Temperature: -", 8, 2);
-        libUI_Print("Humidity: -", 18, 16);
+        libUI_Print("--.-- C", 40, UI_DOUBLE_ROW_FIRST);
+        libUI_Print("--.-- %%", 40, UI_DOUBLE_ROW_SECOND);
     }
     return;
 }
@@ -159,13 +159,13 @@ static void DrawDetailedNodeView(uint16_t context)
 
     if (packet != NULL)
     {
-        libUI_Print("RSSI: %d", 4, 2, packet->header.rssi);
-        libUI_Print("Source: 0x%02X", 4, 16, packet->header.source);
+        libUI_Print("RSSI: %d", 4, UI_DOUBLE_ROW_FIRST, packet->header.rssi);
+        libUI_Print("Source: 0x%02X", 4, UI_DOUBLE_ROW_SECOND, packet->header.source);
     }
     else
     {
-        libUI_Print("RSSI: -", 16, 2);
-        libUI_Print("Source: -", 16, 16);
+        libUI_Print("RSSI: -", 4, UI_DOUBLE_ROW_FIRST);
+        libUI_Print("Source: -", 4, UI_DOUBLE_ROW_SECOND);
     }
     return;
 }

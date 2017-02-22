@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2017-02-22 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -36,10 +36,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libUI.h"
-
 #include "Sensor.h"
 #include "Interface.h"
-
 #include "guiSensor.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,7 +54,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 static struct view detailed_temperature_view;
 static struct view temperature_view;
-static struct view sensor_information_view;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -80,22 +77,8 @@ void guiSensor_Init(void)
     detailed_temperature_view.next = NULL;
     detailed_temperature_view.parent = NULL;
 
-    sensor_information_view.draw_function = guiSensor_DrawSensorInformation;
-    sensor_information_view.child = NULL;
-    sensor_information_view.prev = NULL;
-    sensor_information_view.next = NULL;
-    sensor_information_view.parent = NULL;
-
     Interface_AddChild(&temperature_view, &detailed_temperature_view);
-    Interface_AddChild(&temperature_view, &sensor_information_view);
     Interface_AddView(&temperature_view);
-    return;
-}
-
-void guiSensor_DrawSensorInformation(uint16_t context __attribute__ ((unused)))
-{
-    libUI_Print("Avg. period: %u min", 6, 2, (AVERAGE_WINDOW_S / 60));
-    libUI_Print("Sample time: %u sec", 6, 16, (SAMPLE_FREQUENCY_MS / 1000));
     return;
 }
 
@@ -106,10 +89,8 @@ void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
 
     Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading);
 
-    libUI_Print("max: %uC", 6, 2, reading.max / 10);
-    libUI_Print("min: %uC", 70, 2, reading.min / 10);
-    libUI_Print("now: %uC", 6, 16, reading.value / 10);
-    libUI_Print("avg: %uC", 70, 16, reading.average / 10);
+    libUI_Print("Max: %u C", 2, UI_DOUBLE_ROW_FIRST, reading.max / 10);
+    libUI_Print("Min: %u C", 2, UI_DOUBLE_ROW_SECOND, reading.min / 10);
     return;
 }
 
@@ -121,12 +102,12 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
     {
         uint8_t temperature_integer = (uint8_t)(reading.value / 10);
 
-        libUI_Print("Temperature: %u.%uC", 6, 10, temperature_integer,
+        libUI_Print("%u.%u C", 45, UI_SINGLE_ROW, temperature_integer,
                     reading.value % 10);
     }
     else
     {
-        libUI_Print("Temperature: --", 6, 10);
+        libUI_Print("Temperature: -.- C", 1, UI_SINGLE_ROW);
     }
     return;
 }

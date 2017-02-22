@@ -113,7 +113,7 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)))
 
     AdjustTimeForView(&time);
 
-    libUI_Print("%02u:%02u", 49, 20, time.hour, time.minute);
+    libUI_Print("%02u:%02u", 45, UI_SINGLE_ROW, time.hour, time.minute);
     return;
 }
 
@@ -124,8 +124,8 @@ static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
 
     AdjustTimeForView(&time);
 
-    libUI_Print("20%02u-%02u-%02u", 31, 12, time.year, time.month, time.date);
-    libUI_Print("%02u:%02u:%02u", 40, 26, time.hour, time.minute, time.second);
+    libUI_Print("20%02u-%02u-%02u", 25, UI_DOUBLE_ROW_FIRST, time.year, time.month, time.date);
+    libUI_Print("%02u:%02u:%02u", 34, UI_DOUBLE_ROW_SECOND, time.hour, time.minute, time.second);
     return;
 }
 
