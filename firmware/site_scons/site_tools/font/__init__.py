@@ -52,7 +52,7 @@ def build_function(target, source, env):
 
     generator_options = [
         'site_scons/site_tools/font/generator.py',
-        '/usr/share/fonts/truetype/ubuntu-font-family/UbuntuMono-R.ttf',
+        'site_scons/site_tools/font/fonts/ubuntu-font-family-0.83/UbuntuMono-R.ttf',
         '16',
         source[0].abspath,
         target[0].abspath,
