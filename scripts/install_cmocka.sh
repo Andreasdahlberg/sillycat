@@ -6,6 +6,6 @@ tar xf cmocka-1.1.0.tar.xz
 mkdir cmocka-1.1.0/build
 cd cmocka-1.1.0/build
 
-cmake ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 make
 make install
