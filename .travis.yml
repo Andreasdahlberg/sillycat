@@ -18,3 +18,5 @@ deploy:
     - firmware/build/release/node/node/node_release.hex
   on:
     tags: true
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
