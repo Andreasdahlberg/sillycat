@@ -4,6 +4,7 @@ before_install:
 - sudo apt-get install -qq gcc-avr binutils-avr avr-libc scons python3 python3-setuptools
 install:
 - sudo scripts/install_freetype.sh
+- sudo scripts/install_cmocka.sh
 script: scons -C firmware build-node-release build-main-release coverage
 notifications:
   email:
