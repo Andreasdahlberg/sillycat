@@ -1,7 +1,7 @@
 /**
  * @file   sc_assert.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-02-06 (Last edit)
+ * @date   2017-03-30 (Last edit)
  * @brief  Implementation of sc_assert
  *
  * Detailed description of file.
@@ -31,20 +31,29 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/pgmspace.h>
-
-#include "ErrorHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#ifndef UNIT_TESTING
+
 #if defined(NDEBUG)
-#   define sc_assert_fail() ((void)0)
-#   define sc_assert(e) ((void)0)
+#define sc_assert_fail() ((void)0)
+#define sc_assert(e) ((void)0)
 #else
-#   define sc_assert_fail() (ErrorHandler_AssertFail(PSTR(__FILE__), __LINE__, PSTR("sc_assert_fail")))
-#   define sc_assert(e) ((e) ? (void)0 : ErrorHandler_AssertFail(PSTR(__FILE__), __LINE__, PSTR(#e)))
+#include <avr/pgmspace.h>
+#include "ErrorHandler.h"
+#define sc_assert_fail() (ErrorHandler_AssertFail(PSTR(__FILE__), __LINE__, \
+    PSTR("sc_assert_fail")))
+#define sc_assert(e) ((e) ? (void)0 : ErrorHandler_AssertFail(PSTR(__FILE__), \
+    __LINE__, PSTR(#e)))
+#endif
+#else
+extern void mock_assert(const int result, const char* const expression,
+                        const char * const file, const int line);
+#define sc_assert_fail() mock_assert(0, "sc_assert_fail", __FILE__, __LINE__);
+#define sc_assert(e) mock_assert((int)(e), #e, __FILE__, __LINE__);
 #endif
 
 //////////////////////////////////////////////////////////////////////////
