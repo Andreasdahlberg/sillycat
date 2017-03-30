@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-11-07 (Last edit)
+ * @date   2017-03-30 (Last edit)
  * @brief  Header of Debug-library.
  *
  * Detailed description of file.
@@ -31,8 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/pgmspace.h>
-
 #include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -40,6 +38,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_ENABLE
+#include <avr/pgmspace.h>
+
 #define DEBUG(text, ...)        libDebug_Print_P(PSTR(text), ##__VA_ARGS__)
 #define CRITICAL(text, ...)     libDebug_Print_P(PSTR("<CRITICAL> " text "\r\n"), ##__VA_ARGS__)
 #define ERROR(text, ...)        libDebug_Print_P(PSTR("<ERROR> " text "\r\n"), ##__VA_ARGS__)
