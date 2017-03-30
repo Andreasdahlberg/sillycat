@@ -19,10 +19,31 @@ import os
 
 Import(['*'])
 
-sconscripts = ['mocks/SConscript', 'utility/SConscript']
+unit_env.Append(CPPPATH=[
+    '#src/main',
+    '#src/main/gui',
+    '#src/common_library',
+    '#tests/mocks'
+    ])
 
-objects = []
-for test in sconscripts:
-    objects.append(SConscript(test, exports={'env': env}))
+unit_env.Append(LINKFLAGS=[
+    '-Wl,--wrap=libDisplay_Init',
+    '-Wl,--wrap=libDisplay_On',
+    '-Wl,--wrap=libDisplay_ClearVRAM',
+    '-Wl,--wrap=libTimer_GetMilliseconds',
+    '-Wl,--wrap=guiInterface_DrawViewIndicator',
+    '-Wl,--wrap=libUI_Update',
+    ])
 
+source = [
+    'test_Interface.c',
+    '#src/common_library/Timer.c',
+    ]
+objects = unit_env.Object(source=source)
+
+unit_env_cov = unit_env.Clone()
+unit_env_cov.Append(CCFLAGS=['--coverage'])
+module_under_test = unit_env_cov.Object(source='#src/main/Interface.c')
+
+objects.append(module_under_test)
 Return('objects')

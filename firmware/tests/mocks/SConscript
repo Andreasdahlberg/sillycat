@@ -19,10 +19,14 @@ import os
 
 Import(['*'])
 
-sconscripts = ['mocks/SConscript', 'utility/SConscript']
+mock_env = env.Clone()
+mock_env.Append(CPPPATH=[
+    '#src/main',
+    '#src/main/gui',
+    '#src/common_library'
+    ])
 
-objects = []
-for test in sconscripts:
-    objects.append(SConscript(test, exports={'env': env}))
+source = Glob('*.c')
+objects = mock_env.Object(source=source)
 
 Return('objects')
