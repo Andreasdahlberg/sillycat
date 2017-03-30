@@ -195,8 +195,7 @@ def add_test(module_under_test):
 
 modules = [
     os.path.join('utility', 'CRC'),
-    os.path.join('utility', 'List'),
-    os.path.join('utility', 'FIFO')
+    os.path.join('utility', 'List')
 ]
 
 tests = []
