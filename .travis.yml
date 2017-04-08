@@ -7,9 +7,7 @@ before_install:
 - ls
 - pwd
 - docker pull andreasdahlberg/docker-avr
-- docker run -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
-- docker exec build git clone https://github.com/Andreasdahlberg/sillycat.git .
-- docker exec build git checkout ${TRAVIS_BRANCH}
+- docker run -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
  - docker exec build scons -C firmware build-node-release build-main-release
 notifications:
