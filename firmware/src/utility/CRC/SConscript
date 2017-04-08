@@ -19,10 +19,11 @@ import os
 
 Import(['*'])
 
-sconscripts = ['mocks/SConscript', 'utility/SConscript']
+env.Append(CPPPATH=[
+    '#src/common_library'
+    ])
 
-objects = []
-for test in sconscripts:
-    objects.append(SConscript(test, exports={'env': env}))
+source = Glob('*.c')
+objects = env.Object(source)
 
 Return('objects')

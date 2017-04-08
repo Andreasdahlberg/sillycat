@@ -54,3 +54,14 @@ void test_CRC_Calculate16_SeveralBytes(void **state __attribute__((__unused__)))
 
     assert_int_equal(crc, 0x17FB);
 }
+
+int main(void) {
+    const struct CMUnitTest tests[] = {
+       cmocka_unit_test(test_CRC_Calculate16_ZeroLength),
+       cmocka_unit_test(test_CRC_Calculate16_NullPointerZeroLength),
+       cmocka_unit_test(test_CRC_Calculate16_NullPointer),
+       cmocka_unit_test(test_CRC_Calculate16_SingleBytes),
+       cmocka_unit_test(test_CRC_Calculate16_SeveralBytes)
+    };
+    return cmocka_run_group_tests(tests, NULL, NULL);
+}

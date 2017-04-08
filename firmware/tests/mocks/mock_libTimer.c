@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "wrapper_libTimer.h"
+#include "mock_libTimer.h"
 
 void __wrap_libTimer_Init(void)
 {

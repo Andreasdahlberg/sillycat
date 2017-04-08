@@ -6,7 +6,7 @@ Import(['*'])
 source = Glob('*.c')
 
 
-env.Append(CPPPATH=['#src/utility', '#src/common_library', '#src/{}'.format(target)])
+env.Append(CPPPATH=['#src/utility/FIFO', '#src/common_library', '#src/{}'.format(target)])
 objects = env.Object(source)
 
 Return('objects')

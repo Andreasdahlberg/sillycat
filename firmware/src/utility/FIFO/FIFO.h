@@ -63,4 +63,5 @@ bool FIFO_Pop(fifo_type *fifo, void *item);
 bool FIFO_Peek(fifo_type *fifo, void *item);
 bool FIFO_IsFull(fifo_type *fifo);
 bool FIFO_IsEmpty(fifo_type *fifo);
+void FIFO_Clear(fifo_type *fifo);
 #endif /* FIFO_H_ */

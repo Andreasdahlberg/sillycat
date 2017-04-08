@@ -19,10 +19,12 @@ import os
 
 Import(['*'])
 
-sconscripts = ['mocks/SConscript', 'utility/SConscript']
+unit_env = env.Clone()
+unit_env.Append(CPPPATH=[
+    '#src/utility/FIFO'
+    ])
 
-objects = []
-for test in sconscripts:
-    objects.append(SConscript(test, exports={'env': env}))
+source = Glob('*.c')
+objects = unit_env.Object(source=source)
 
 Return('objects')

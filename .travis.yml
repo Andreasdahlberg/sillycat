@@ -1,7 +1,4 @@
-
 language: c
-services:
-  - docker
 before_install:
   - docker pull andreasdahlberg/docker-avr
   - docker run -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
@@ -20,3 +17,5 @@ deploy:
     - firmware/build/release/node/node/node_release.hex
   on:
     tags: true
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

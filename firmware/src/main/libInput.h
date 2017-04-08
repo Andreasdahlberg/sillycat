@@ -1,7 +1,7 @@
 /**
  * @file   libInput.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-29 (Last edit)
+ * @date   2017-03-30 (Last edit)
  * @brief  Header of Input module.
  *
  * Detailed description of file.
@@ -30,6 +30,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+#include <stdbool.h>
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS

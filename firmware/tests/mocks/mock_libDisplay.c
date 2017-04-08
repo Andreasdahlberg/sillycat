@@ -1,5 +1,5 @@
 
-#include "wrapper_libDisplay.h"
+#include "mock_libDisplay.h"
 
 void __wrap_libDisplay_Init(void)
 {

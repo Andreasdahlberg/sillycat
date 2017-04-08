@@ -1,7 +1,7 @@
 /**
  * @file   libUI.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-19 (Last edit)
+ * @date   2017-03-30 (Last edit)
  * @brief  Header of UI-library.
  *
  * Detailed description of file.
@@ -30,6 +30,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+#include <avr/pgmspace.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

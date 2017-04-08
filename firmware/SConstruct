@@ -52,6 +52,7 @@ eeprom_message = '{}Generating EEPROM {}==> {}$TARGET{}'.format(
 font_message = '{}Generating font {}==> {}$TARGET{}'.format(
     colors['cyan'], colors['end'], colors['blue'], colors['end'])
 
+testing_message = 'Unit testing...'
 PROJECT_NAME = 'sillycat'
 
 #Target variables
@@ -88,6 +89,14 @@ common_env = Environment(
         'HOME' : os.environ['HOME']}
 )
 
+test_env = Environment(
+    tools=['default', 'coverage'],
+    CC='gcc',
+    CCFLAGS=['-g', '-O0'],
+    CPPDEFINES='UNIT_TESTING',
+    LIBS=['cmocka', 'gcov']
+)
+
 if ARGUMENTS.get('VERBOSE') != 'true':
     common_env['CCCOMSTR'] = compile_source_message
     common_env['AVRDUDE_ELF_COMSTR'] = linking_message
@@ -95,6 +104,10 @@ if ARGUMENTS.get('VERBOSE') != 'true':
     common_env['AVRDUDE_EEP_COMSTR'] = eeprom_message
     common_env['FONT_COMSTR'] = font_message
     flash_quell = '-q -q'
+
+    test_env['CCCOMSTR'] = compile_source_message
+    test_env['LINKCOMSTR'] = linking_message
+    test_env['COVERAGE_COMSTR'] = testing_message
 else:
     flash_quell = ''
 
@@ -149,3 +162,45 @@ for target in TARGETS:
         Help(size_help_text)
 
         Help('\n')
+
+def add_test(module_under_test):
+    module_under_test_name = module_under_test.split(os.path.sep)[-1]
+
+    unit_test_dir = os.path.join('build', 'unit_tests', module_under_test_name, 'unit')
+    unit_test_sconscript = os.path.join('tests', module_under_test, 'SConscript')
+    test_object = test_env.SConscript(unit_test_sconscript,
+        variant_dir=unit_test_dir,
+        duplicate=0,
+        exports={'env': test_env, 'project_name': PROJECT_NAME}
+    )
+
+    mod_env = test_env.Clone()
+    mod_env.Append(CCFLAGS='--coverage')
+
+    module_under_test_dir = os.path.join('build', 'unit_tests', module_under_test_name, 'module')
+    module_under_test_sconscript = os.path.join('src', module_under_test, 'SConscript')
+    module_object = mod_env.SConscript(module_under_test_sconscript,
+        variant_dir=module_under_test_dir,
+        duplicate=0,
+        exports={'env': mod_env, 'project_name': PROJECT_NAME}
+    )
+
+    coverage_file = os.path.join(module_under_test_dir, '{}.gcno'.format(module_under_test_name))
+    Clean(module_object, coverage_file)
+
+    runner_name = os.path.join('build', 'unit_tests', module_under_test_name, 'TestRunner')
+    runner = test_env.Program(target=runner_name, source=[test_object, module_object])
+
+    return runner
+
+modules = [
+    os.path.join('utility', 'CRC'),
+    os.path.join('utility', 'List')
+]
+
+tests = []
+for module in modules:
+    tests.append(add_test(module))
+
+test_env.Alias('build-tests', tests)
+test_env.Coverage(source=tests, target='coverage')
