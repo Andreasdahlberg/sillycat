@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-10-23 (Last edit)
+ * @date   2017-04-23 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -191,7 +191,7 @@ static void RHTAvailable(const event_type *event __attribute__ ((unused)))
         packet.timestamp = timestamp;
         memcpy(packet.data, &reading, packet.size);
 
-        Transceiver_SendPacket(0xAA, false, &packet, SendCallback);
+        Transceiver_SendPacket(0xAA, &packet, SendCallback);
     }
     return;
 }
