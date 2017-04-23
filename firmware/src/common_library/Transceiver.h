@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-08 (Last edit)
+ * @date   2017-04-23 (Last edit)
  * @brief  Header for Transceiver interface.
  *
  * Detailed description of file.
@@ -62,7 +62,6 @@ typedef struct
     uint8_t total_size;
     uint8_t target;
     uint8_t source;
-    bool ack;
     int8_t rssi;
 } packet_header_type;
 
@@ -90,7 +89,7 @@ typedef bool (*transceiver_packet_handler_type)(packet_frame_type *packet);
 void Transceiver_Init(void);
 void Transceiver_Update(void);
 bool Transceiver_Send(void);
-bool Transceiver_SendPacket(uint8_t target, bool request_ack,
+bool Transceiver_SendPacket(uint8_t target,
                             packet_content_type *content,
                             transceiver_callback_type callback);
 void Transceiver_SetPacketHandler(transceiver_packet_handler_type

@@ -28,10 +28,10 @@ class PacketView(QtGui.QTableWidget):
     def __init__(self, path):
         super(PacketView, self).__init__()
 
-        self.setColumnCount(8)
+        self.setColumnCount(7)
         self.setRowCount(0);
 
-        self.setHorizontalHeaderLabels(['Target', 'Source', 'Ack', 'RSSI', 'Packet size', 'Timestamp', 'Type', 'Data size'])
+        self.setHorizontalHeaderLabels(['Target', 'Source', 'RSSI', 'Packet size', 'Timestamp', 'Type', 'Data size'])
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
         self._path = path
@@ -46,7 +46,6 @@ class PacketView(QtGui.QTableWidget):
         for value in text.split(','):
             self.setItem(row_index, col_index, QtGui.QTableWidgetItem(value))
             col_index = col_index + 1
-        self.export_to_csv('test')            
 
 
     def export_to_csv(self, name, separator=',', end_of_line='\n'):
@@ -55,7 +54,7 @@ class PacketView(QtGui.QTableWidget):
 
         timestamp = time.strftime("%Y%m%d%H%M%S")
         filename = '{}_{}.csv'.format(name, timestamp)
-        
+
         output_file = open(os.path.join(self._path, filename), 'w')
 
         for row_index in range(0, self.rowCount()):
