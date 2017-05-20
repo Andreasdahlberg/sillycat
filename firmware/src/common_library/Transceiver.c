@@ -442,6 +442,8 @@ static transceiver_state_type SendingStateMachine(void)
                     }
                 }
 
+                libRFM69_EnableHighPowerSetting(false);
+
                 state = TR_STATE_SENDING_INIT;
                 next_state = TR_STATE_LISTENING;
             }
