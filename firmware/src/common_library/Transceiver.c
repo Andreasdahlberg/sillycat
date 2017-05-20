@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-04-23 (Last edit)
+ * @date   2017-05-20 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -141,7 +141,7 @@ void Transceiver_Init(void)
     libRFM69_SetCarrierFrequency(868000000);
     libRFM69_EnableSyncWordGeneration(true);
     libRFM69_SetFIFOFillCondition(RFM_FIFO_FILL_AUTO);
-    libRFM69_SetRSSIThreshold(-25);
+    libRFM69_SetRSSIThreshold(-35);
     libRFM69_SetSyncWordSize(6);
     libRFM69_SetSyncWord(Config_GetNetworkId(), 6);
     libRFM69_SetTXStartCondition(RFM_TX_START_NOT_EMPTY);
