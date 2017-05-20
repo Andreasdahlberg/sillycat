@@ -223,7 +223,7 @@ bool Transceiver_SendPacket(uint8_t target,
 
         packet.header.target = target;
         packet.header.source = Config_GetNodeId();
-        packet.header.rssi = libRFM69_GetRSSI();
+        packet.header.rssi = 0;
         packet.header.total_size = sizeof(packet_header_type) + 8 +
                                    content->size; //TODO: sizeof or define!
 
@@ -334,8 +334,7 @@ static bool HandlePayload(void)
     memcpy(&packet_frame_rx.content, &data_buffer[sizeof(packet_header_type)],
            sizeof(packet_content_type));
 
-    //TODO: Fix this!
-    //packet_frame_rx.header.rssi = libRFM69_GetRSSI();
+    packet_frame_rx.header.rssi = libRFM69_GetRSSI();
 
 #ifdef DEBUG_ENABLE
     DumpPacket(&packet_frame_rx);
