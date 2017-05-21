@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-14 (Last edit)
+ * @date   2017-06-06 (Last edit)
  * @brief  Implementation of Nodes
  *
  * Detailed description of file.
@@ -36,7 +36,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "Timer.h"
 #include "Nodes.h"
-#include "guiNodes.h"
+#include "Com.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -79,9 +79,8 @@ void Nodes_Init(void)
     memset(packets, 0, sizeof(packets));
     memset(last_update, 0, sizeof(last_update));
 
-    Transceiver_SetPacketHandler(ReadingPacketHandler, TR_PACKET_TYPE_READING);
+    Com_SetPacketHandler(ReadingPacketHandler, COM_PACKET_TYPE_READING);
 
-    guiNodes_Init();
     return;
 }
 
