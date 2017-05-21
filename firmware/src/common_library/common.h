@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2017-05-21 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -50,6 +50,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define ClearBit(data, bit) data &= ~(1 << bit)
 
 #define UNUSED(var) (void)var
+
+#define ElementsIn(array) \
+    ({ \
+        _Static_assert \
+        ( \
+            ! __builtin_types_compatible_p(__typeof__(array), __typeof__(&array[0])), \
+            "ElementsIn: "  # array " is not an array" \
+        ); \
+        sizeof(array) / sizeof((array)[0]); \
+    })
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
