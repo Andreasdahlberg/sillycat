@@ -1,16 +1,16 @@
 {
-	"folders":
-	[
-		{
-			"path": "."
-		},
-		{
-			"path": "../utility"
-		},
-		{
-			"path": "../common_library"
-		}
-	],
+    "folders":
+    [
+        {
+            "path": "."
+        },
+        {
+            "path": "../utility"
+        },
+        {
+            "path": "../common_library"
+        }
+    ],
 
     "settings":
     {
@@ -19,7 +19,7 @@
             "options_c":
             {
                 "use_only_additional_options": true,
-                "additional_options_file": "${project_path}/../../.astylerc"                
+                "additional_options_file": "${project_path}/../../.astylerc"
             },
         }
     },
@@ -34,6 +34,6 @@
             "name": "Scons build-release",
             "cmd": ["scons", "build-main-release", "-u"],
             "env": {"TERM": "sublime"}
-        }                 
-    ]    
+        }
+    ]
 }
