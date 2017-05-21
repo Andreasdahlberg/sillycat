@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-04-23 (Last edit)
+ * @date   2017-06-06 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -41,7 +41,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libRFM69.h"
 #include "libDHT22.h"
 #include "libPower.h"
-//#include "libFlash.h"
 
 #include "Timer.h"
 #include "LED.h"
@@ -52,13 +51,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RTC.h"
 #include "Power.h"
 #include "Event.h"
-//#include "Flash.h"
+#include "Com.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
 #define MAX_AWAKE_TIME_MS 3000
+#define MASTER_ADDRESS 0xAA
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -82,7 +82,6 @@ static sleep_status_type sleep_status = {0};
 
 static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
-static void SendCallback(bool status __attribute__ ((unused)));
 static void RHTAvailable(const event_type *event __attribute__ ((unused)));
 
 //////////////////////////////////////////////////////////////////////////
@@ -98,9 +97,8 @@ int main(void)
     //Init hardware early to ensure all CS are disabled.
     libRFM69_InitHW();
     RTC_InitHW();
-    //libFlash_InitHW();
-
     libDebug_Init();
+
     INFO("Node unit started");
     INFO("Last reset: 0x%02X", mcu_status);
 
@@ -110,8 +108,6 @@ int main(void)
     libADC_Enable(true);
     libDHT22_Init();
     libPower_Init();
-    //libFlash_Init();
-    //Flash_Init();
 
     LED_Init();
     Config_Load();
@@ -126,6 +122,7 @@ int main(void)
 
     Sensor_Init();
     Transceiver_Init();
+    Com_Init();
     Power_Init();
 
 #ifdef DEBUG_ENABLE
@@ -159,6 +156,7 @@ int main(void)
         libDHT22_Update();
         Sensor_Update();
         Transceiver_Update();
+        Com_Update();
         LED_Update();
 
         if (IsTimeForSleep() == true)
@@ -177,28 +175,16 @@ static void RHTAvailable(const event_type *event __attribute__ ((unused)))
     sensor_data_type reading;
     if (Sensor_GetReading(&reading))
     {
-        rtc_time_type timestamp;
-        if (!RTC_GetCurrentTime(&timestamp))
-        {
-            // Log error and continue, an invalid timestamp is not critical.
-            ErrorHandler_LogError(RTC_FAIL, 0);
-            ERROR("Failed to get timestamp.");
-        }
-
-        packet_content_type packet;
-        packet.type = TR_PACKET_TYPE_READING;
-        packet.size = sizeof(reading);
-        packet.timestamp = timestamp;
-        memcpy(packet.data, &reading, packet.size);
-
-        Transceiver_SendPacket(0xAA, &packet, SendCallback);
+        Com_Send(MASTER_ADDRESS, COM_PACKET_TYPE_READING, &reading,
+                 sizeof(reading));
     }
-    return;
-}
+    else
+    {
+        WARNING("RHT event triggered with no valid reading available.");
 
-static void SendCallback(bool status __attribute__ ((unused)))
-{
-    sleep_status.sleep_now = true;
+        //Go to sleep directly instead of waiting for the sleep timeout.
+        sleep_status.sleep_now = true;
+    }
     return;
 }
 

@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-19 (Last edit)
+ * @date   2017-06-06 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -49,12 +49,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Interface.h"
 #include "Timer.h"
 #include "Transceiver.h"
+#include "Com.h"
 #include "Nodes.h"
 #include "Config.h"
 #include "ErrorHandler.h"
 
 #include "guiRTC.h"
 #include "guiSensor.h"
+#include "guiNodes.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -106,10 +108,12 @@ int main(void)
     libInput_Init();
     Config_Load();
     Transceiver_Init();
+    Com_Init();
     Interface_Init();
     //NOTE: The first gui init called will be the root view.
     guiRTC_Init();
     guiSensor_Init();
+    guiNodes_Init();
     Nodes_Init();
 
     libInput_SetCallbacks(Interface_NextView, Interface_PreviousView,
@@ -128,8 +132,8 @@ int main(void)
         libADC_Update();
         libInput_Update();
         Sensor_Update();
-
         Transceiver_Update();
+        Com_Update();
         Interface_Update();
 
         if (Timer_TimeDifference(check_timer) > 1000)

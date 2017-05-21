@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
+ * @date   2016-06-06 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.

@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-05-20 (Last edit)
+ * @date   2017-06-06 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -49,8 +49,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define ResetPacketFrame(packet_frame) packet_frame.header.target = 0
-
 #define TX_PACKET_FIFO_SIZE 3
 #define RX_PACKET_FIFO_SIZE 4
 
@@ -85,8 +83,6 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 
 static transceiver_state_type transceiver_state = TR_STATE_NO_INIT;
-static packet_frame_type packet_frame_rx;
-static transceiver_packet_handler_type packet_handlers[TR_PACKET_NR_TYPES];
 
 static packet_frame_type tx_packet_buffer[TX_PACKET_FIFO_SIZE];
 static packet_frame_type rx_packet_buffer[RX_PACKET_FIFO_SIZE];
@@ -100,7 +96,6 @@ static fifo_type rx_packet_fifo;
 
 static transceiver_state_type SendingStateMachine(void);
 static transceiver_state_type ListeningStateMachine(void);
-static bool IsPacketTypeValid(packet_type_type packet_type);
 static bool IsActive(void);
 static bool PacketToSend(void);
 
@@ -163,8 +158,6 @@ void Transceiver_Init(void)
     tx_packet_fifo = FIFO_New(tx_packet_buffer);
     rx_packet_fifo = FIFO_New(rx_packet_buffer);
 
-    ResetPacketFrame(packet_frame_rx);
-
     transceiver_state = TR_STATE_LISTENING;
 
     INFO("Transceiver initiated");
@@ -197,21 +190,32 @@ void Transceiver_Update(void)
 }
 
 ///
+/// @brief Receive a packet
+///
+/// @param  *packet Pointer to packet.
+/// @return True if a packet was available, otherwise False.
+///
+bool Transceiver_ReceivePacket(packet_frame_type *packet)
+{
+    sc_assert(packet != NULL);
+
+    bool status;
+    status = FIFO_Pop(&rx_packet_fifo, packet);
+
+    return status;
+}
+
+///
 /// @brief Send a packet.
 ///
 /// The packet is added to the send queue and is sent when the transceiver is ready.
 ///
 /// @param  target Address of target.
 /// @param  *content Pointer to packet content. A complete packet with a header
-///                 will be created from this content.
-/// @param  *callback Pointer to callback function. This function will be called
-///                  after the packet is sent. If an ack was requested the callback will
-///                  be called when the ack is received.
+///                  will be created from this content.
 /// @return None
 ///
-bool Transceiver_SendPacket(uint8_t target,
-                            packet_content_type *content,
-                            transceiver_callback_type callback)
+bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
 {
     sc_assert(content != NULL);
     sc_assert(target != 0);
@@ -227,34 +231,15 @@ bool Transceiver_SendPacket(uint8_t target,
         packet.header.total_size = sizeof(packet_header_type) + 8 +
                                    content->size; //TODO: sizeof or define!
 
-        //TODO: Use struct assignment!
         packet.content.timestamp = content->timestamp;
         packet.content.type = content->type;
         packet.content.size = content->size;
         memcpy(packet.content.data, content->data, content->size);
-        packet.callback = callback;
 
         status = FIFO_Push(&tx_packet_fifo, &packet);
     }
 
     return status;
-}
-
-///
-/// @brief Register a packet handler for a specific packet type.
-///
-/// @param  *packet_handler Pointer to packet handler function. This function will
-///                         be called when the corresponding packet type is received.
-/// @param  packet_type Packet type.
-/// @return None
-///
-void Transceiver_SetPacketHandler(transceiver_packet_handler_type packet_handler,
-                                  packet_type_type packet_type)
-{
-    sc_assert(packet_type < TR_PACKET_NR_TYPES);
-
-    packet_handlers[packet_type] = packet_handler;
-    return;
 }
 
 ///
@@ -305,11 +290,6 @@ static bool IsActive(void)
             libRFM69_IsPayloadReady() || PacketToSend());
 }
 
-static bool IsPacketTypeValid(packet_type_type packet_type)
-{
-    return (packet_type < TR_PACKET_NR_TYPES);
-}
-
 static bool PacketToSend(void)
 {
     return (!FIFO_IsEmpty(&tx_packet_fifo));
@@ -317,39 +297,31 @@ static bool PacketToSend(void)
 
 static bool HandlePayload(void)
 {
-    uint8_t length;
-    uint8_t data_buffer[RFM_FIFO_SIZE - 1];
+    packet_frame_type packet;
+    uint8_t *packet_ptr = (uint8_t *)&packet;
 
-    libRFM69_ReadFromFIFO(data_buffer, 1);
-    length = data_buffer[0];
+    // Read the first byte containing the payload length.
+    libRFM69_ReadFromFIFO(packet_ptr, 1);
+    ++packet_ptr;
 
-    if (length > RFM_FIFO_SIZE - 1)
+    if (packet.header.total_size > RFM_FIFO_SIZE - 1)
     {
-        ERROR("Size of data packet is larger then the FIFO");
+        ERROR("Size of packet is larger then the RFM69 FIFO");
+
+        libRFM69_ClearFIFO();
         return false;
     }
 
-    libRFM69_ReadFromFIFO(&data_buffer[1], length);
-    memcpy(&packet_frame_rx.header, data_buffer, sizeof(packet_header_type));
-    memcpy(&packet_frame_rx.content, &data_buffer[sizeof(packet_header_type)],
-           sizeof(packet_content_type));
+    // Read the payload.
+    libRFM69_ReadFromFIFO(packet_ptr, packet.header.total_size);
 
-    packet_frame_rx.header.rssi = libRFM69_GetRSSI();
+    packet.header.rssi = libRFM69_GetRSSI();
 
 #ifdef DEBUG_ENABLE
-    DumpPacket(&packet_frame_rx);
+    DumpPacket(&packet);
 #endif
 
-    if (IsPacketTypeValid(packet_frame_rx.content.type) &&
-            packet_handlers[packet_frame_rx.content.type] != NULL)
-    {
-        return packet_handlers[packet_frame_rx.content.type](&packet_frame_rx);
-    }
-    else
-    {
-        INFO("No packet handler for packet type %u");
-        return false;
-    }
+    return FIFO_Push(&rx_packet_fifo, &packet);
 }
 
 static transceiver_state_type ListeningStateMachine(void)
@@ -372,11 +344,14 @@ static transceiver_state_type ListeningStateMachine(void)
                 libRFM69_SetMode(RFM_STANDBY);
                 libRFM69_WaitForModeReady();
 
-                HandlePayload();
+                if (!HandlePayload())
+                {
+                    WARNING("Failed to handle packet");
+                }
+
                 INFO("Next state: TR_STATE_LISTENING_INIT");
                 state = TR_STATE_LISTENING_INIT;
 
-                INFO("PacketToSend %u", PacketToSend());
             }
             else if (libRFM69_IsRxTimeoutFlagSet())
             {
@@ -406,6 +381,7 @@ static transceiver_state_type SendingStateMachine(void)
     switch (state)
     {
         case TR_STATE_SENDING_INIT:
+            // Change to standby mode before starting to write to the FIFO.
             libRFM69_SetMode(RFM_STANDBY);
             state = TR_STATE_SENDING_WRITING;
             break;
@@ -414,34 +390,29 @@ static transceiver_state_type SendingStateMachine(void)
             if (libRFM69_IsModeReady())
             {
                 packet_frame_type packet;
-                if (!FIFO_Peek(&tx_packet_fifo, &packet))
+                if (FIFO_Pop(&tx_packet_fifo, &packet))
                 {
-                    WARNING("No packets available, aborting tx sequence.");
+                    libRFM69_WriteToFIFO((uint8_t *)&packet.header,
+                                         sizeof(packet_header_type));
+                    libRFM69_WriteToFIFO((uint8_t *)&packet.content,
+                                         packet.content.size + 8);
+
+                    libRFM69_SetMode(RFM_TRANSMITTER);
+                    libRFM69_EnableHighPowerSetting(true);
+                    state = TR_STATE_SENDING_TRANSMITTING;
                 }
-
-                libRFM69_WriteToFIFO((uint8_t *)&packet.header,
-                                     sizeof(packet_header_type));
-                libRFM69_WriteToFIFO((uint8_t *)&packet.content,
-                                     packet.content.size + 8);
-                libRFM69_SetMode(RFM_TRANSMITTER);
-                libRFM69_EnableHighPowerSetting(true);
-
-                state = TR_STATE_SENDING_TRANSMITTING;
+                else
+                {
+                    WARNING("No packets available, aborting TX sequence.");
+                    state = TR_STATE_SENDING_INIT;
+                    next_state = TR_STATE_LISTENING;
+                }
             }
             break;
 
         case TR_STATE_SENDING_TRANSMITTING:
             if (libRFM69_IsPacketSent())
             {
-                packet_frame_type packet;
-                if (FIFO_Pop(&tx_packet_fifo, &packet))
-                {
-                    if (packet.callback != NULL)
-                    {
-                        packet.callback(true);
-                    }
-                }
-
                 libRFM69_EnableHighPowerSetting(false);
 
                 state = TR_STATE_SENDING_INIT;
