@@ -36,6 +36,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 
 #include "Com.h"
+#include "ErrorHandler.h"
 #include "Timer.h"
 #include "RTC.h"
 
