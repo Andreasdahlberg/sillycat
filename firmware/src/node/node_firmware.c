@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-06 (Last edit)
+ * @date   2017-06-17 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -83,6 +83,7 @@ static sleep_status_type sleep_status = {0};
 static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
 static void RHTAvailable(const event_type *event __attribute__ ((unused)));
+static bool TimePacketHandler(packet_frame_type *packet);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -124,6 +125,8 @@ int main(void)
     Transceiver_Init();
     Com_Init();
     Power_Init();
+
+    Com_SetPacketHandler(TimePacketHandler, COM_PACKET_TYPE_TIME);
 
 #ifdef DEBUG_ENABLE
     //IMPORTENT: The debug wakeup must be called first to enable debug prints
@@ -168,6 +171,30 @@ int main(void)
     }
     sc_assert_fail();
     SoftReset();
+}
+
+static bool TimePacketHandler(packet_frame_type *packet)
+{
+    sc_assert(packet != NULL);
+
+    rtc_time_type current_time;
+    RTC_GetCurrentTime(&current_time);
+
+    uint32_t current_timestamp;
+    current_timestamp = RTC_ConvertToTimestamp(&current_time);
+
+    uint32_t received_timestamp;
+    received_timestamp = RTC_ConvertToTimestamp(&packet->content.timestamp);
+
+    if (current_timestamp != received_timestamp)
+    {
+        RTC_SetCurrentTime(&packet->content.timestamp);
+        INFO("New time set: %lu", received_timestamp);
+    }
+
+    sleep_status.sleep_now = true;
+
+    return true;
 }
 
 static void RHTAvailable(const event_type *event __attribute__ ((unused)))

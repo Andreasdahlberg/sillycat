@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-06 (Last edit)
+ * @date   2017-06-17 (Last edit)
  * @brief  Implementation of Nodes
  *
  * Detailed description of file.
@@ -121,6 +121,18 @@ static bool ReadingPacketHandler(packet_frame_type *packet)
         memcpy(&packets[index], packet, sizeof(packet_frame_type));
 
         last_update[index] = Timer_GetMilliseconds();
+    }
+
+    rtc_time_type timestamp;
+    if (RTC_GetCurrentTime(&timestamp))
+    {
+        Com_Send(packet->header.source, COM_PACKET_TYPE_TIME, &timestamp,
+                 sizeof(timestamp));
+    }
+    else
+    {
+        ErrorHandler_LogError(RTC_FAIL, 0);
+        ERROR("Failed to get timestamp.");
     }
 
     DEBUG("Packet handled\r\n");
