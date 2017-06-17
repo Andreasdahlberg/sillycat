@@ -37,6 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Timer.h"
 #include "Nodes.h"
 #include "Com.h"
+#include "ErrorHandler.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
