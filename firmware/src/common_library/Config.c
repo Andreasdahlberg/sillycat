@@ -1,7 +1,7 @@
 /**
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of Config
  *
  * Detailed description of file.
