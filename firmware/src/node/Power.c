@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -134,8 +134,7 @@ static void BatteryMonitoringSM(void)
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
-            else if (libPower_IsBatteryVoltageValid() == true
-                     && libPower_GetBatteryVoltage() < LOW_VOLTAGE_MV)
+            else if (libPower_GetBatteryVoltage() < LOW_VOLTAGE_MV)
             {
                 INFO("Low battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_LOW);
@@ -152,8 +151,7 @@ static void BatteryMonitoringSM(void)
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
-            else if (libPower_IsBatteryVoltageValid() == true
-                     && libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
+            else if (libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
             {
                 WARNING("Critical battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_CRITICAL);

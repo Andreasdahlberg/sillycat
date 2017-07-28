@@ -1,7 +1,7 @@
 /**
  * @file   libPower.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-20 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Header of libPower
  *
  * Detailed description of file.
@@ -44,7 +44,6 @@ void libPower_Sleep(void);
 bool libPower_IsChargerConnected(void);
 bool libPower_IsCharging(void);
 uint32_t libPower_GetBatteryVoltage(void);
-bool libPower_IsBatteryVoltageValid(void);
 uint32_t libPower_ApproximateMaxIout(uint16_t vin);
 
-#endif /* LIBPOWER_H_ */
+#endif

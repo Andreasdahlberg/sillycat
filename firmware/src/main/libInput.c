@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-08-01 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of input module.
  *
  * Detailed description of file.
@@ -37,10 +37,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "libADC.h"
 #include "libDebug.h"
 #include "libInput.h"
 
+#include "ADC.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,6 +67,11 @@ typedef struct
     uint8_t left;
 } encoder_rotations_type;
 
+struct module_t
+{
+    struct adc_channel_t push_channel;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
@@ -75,6 +80,7 @@ static libinput_callback_type left_event_callback;
 static libinput_callback_type right_event_callback;
 static libinput_callback_type push_event_callback;
 static encoder_rotations_type encoder_rotations;
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -115,7 +121,7 @@ void libInput_Init(void)
     INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN);
 
     //NOTE: Using a ADC-channel for the push-button since no other pin is free.
-    libADC_EnableInput(PUSH_ADC_CHANNEL, true);
+    ADC_InitChannel(&module.push_channel, PUSH_ADC_CHANNEL);
 
     //Reset all callbacks
     right_event_callback = NULL;
@@ -125,7 +131,7 @@ void libInput_Init(void)
     //Reset pending rotations
     encoder_rotations = (encoder_rotations_type) {0};
 
-    //Enable pin change interupt on the latch pin
+    //Enable pin change interrupt on the latch pin
     PCMSK0 |= (1 << PCINT0);
     PCICR |= (1 << PCIE0);
 
@@ -185,14 +191,11 @@ void libInput_SetCallbacks(libinput_callback_type right_event,
 void PushCheckAndTrigger(void)
 {
     static bool prev_push = false;
+
     uint16_t adc_sample;
+    ADC_Convert(&module.push_channel, &adc_sample, 1);
+
     bool curr_push;
-
-    if (libADC_GetSample(PUSH_ADC_CHANNEL, &adc_sample) == false)
-    {
-        return;
-    }
-
     curr_push = adc_sample > 512;
 
     if (prev_push == false && curr_push == true)

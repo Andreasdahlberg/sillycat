@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-17 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -36,12 +36,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "libDebug.h"
-#include "libADC.h"
 #include "libSPI.h"
 #include "libRFM69.h"
 #include "libDHT22.h"
 #include "libPower.h"
 
+#include "ADC.h"
 #include "Timer.h"
 #include "LED.h"
 #include "Sensor.h"
@@ -103,10 +103,9 @@ int main(void)
     INFO("Node unit started");
     INFO("Last reset: 0x%02X", mcu_status);
 
-    libADC_Init();
     Timer_Init();
+    ADC_Init();
     libSPI_Init(0);
-    libADC_Enable(true);
     libDHT22_Init();
     libPower_Init();
 
@@ -154,7 +153,6 @@ int main(void)
 
     while (1)
     {
-        libADC_Update();
         Power_Update();
         libDHT22_Update();
         Sensor_Update();

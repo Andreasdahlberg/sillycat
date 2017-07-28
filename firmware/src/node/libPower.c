@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-07 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of libPower
  *
  * Detailed description of file.
@@ -37,7 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libPower.h"
 #include "libDebug.h"
-#include "libADC.h"
+#include "ADC.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -54,12 +54,28 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define VIN_MIN 1800
 #define VIN_MAX 3500
 
+#define NR_ADC_SAMPLES 16
+#if NR_ADC_SAMPLES % 2 != 0
+#error "The number of ADC samples must be a power of 2!"
+#endif
+
 #define CONNECTED_PIN PINC1
 #define CHARGING_PIN PINC4
 
 //////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+struct module_t
+{
+    struct adc_channel_t adc_battery_channel;
+};
+
+//////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -101,7 +117,7 @@ void libPower_Init(void)
     PRR |= (1 << PRUSART0);
 #endif
 
-    libADC_EnableInput(0x07, true);
+    ADC_InitChannel(&module.adc_battery_channel, 7);
     return;
 }
 
@@ -164,11 +180,18 @@ bool libPower_IsCharging(void)
 ///
 uint32_t libPower_GetBatteryVoltage(void)
 {
-    uint16_t sample;
-    uint32_t voltage;
+    uint16_t samples[NR_ADC_SAMPLES];
+    ADC_Convert(&module.adc_battery_channel, samples, ElementsIn(samples));
 
-    libADC_GetSample(0x07, &sample);
-    voltage = ((uint32_t)sample * VREF) / 1024;
+    uint32_t sample_sum = 0;
+    for (size_t i = 0; i < ElementsIn(samples); ++i)
+    {
+        sample_sum += samples[i];
+    }
+
+    uint32_t voltage;
+    voltage = (sample_sum * VREF + (NR_ADC_SAMPLES * 1024 / 2)) /
+              (NR_ADC_SAMPLES * 1024);
 
     /*
      | VBAT
@@ -191,17 +214,6 @@ uint32_t libPower_GetBatteryVoltage(void)
     //Adjust voltage from voltage divider
     return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE +
                                         R2_RESISTANCE)));
-}
-
-///
-/// @brief Check if battery voltage reading is valid
-///
-/// @param  None
-/// @return true if valid, otherwise false
-///
-bool libPower_IsBatteryVoltageValid(void)
-{
-    return libADC_IsChannelValid(0x07);
 }
 
 ///

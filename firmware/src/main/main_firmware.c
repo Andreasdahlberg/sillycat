@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-06 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -39,12 +39,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "libDebug.h"
-#include "libADC.h"
 #include "libSPI.h"
 #include "libDS3234.h"
 #include "libRFM69.h"
 #include "libInput.h"
 
+#include "ADC.h"
 #include "Sensor.h"
 #include "Interface.h"
 #include "Timer.h"
@@ -99,11 +99,10 @@ int main(void)
     INFO("Main unit started");
     INFO("Last reset: 0x%02X", mcu_status);
     ErrorHandler_Init();
-    libADC_Init();
+    ADC_Init();
     Timer_Init();
     libSPI_Init(1);
     libDS3234_Init();
-    libADC_Enable(true);
     Sensor_Init();
     libInput_Init();
     Config_Load();
@@ -129,7 +128,6 @@ int main(void)
 
     while (1)
     {
-        libADC_Update();
         libInput_Update();
         Sensor_Update();
         Transceiver_Update();
