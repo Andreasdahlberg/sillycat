@@ -26,7 +26,7 @@ DIRECTORIES = ['../utility', '../common_library']
 Import(['*'])
 
 
-env.Append(CPPPATH=['#src/utility', '#src/node' ,'#src/common_library'])
+env.Append(CPPPATH=['#src/utility', '#src/node' ,'#src/common_library', '#src/common_library/ADC'])
 
 source = Glob('*.c')
 objects = env.Object(source=source)
@@ -39,7 +39,7 @@ elf_name = '{}_{}.elf'.format(target, mode)
 hex_name = '{}_{}.hex'.format(target, mode)
 eep_name = '{}_{}.eep'.format(target, mode)
 
-elf = env.Elf(elf_name, objects) 
+elf = env.Elf(elf_name, objects)
 hex = env.Hex(hex_name, elf)
 eep = env.EEPROM(eep_name, elf)
 

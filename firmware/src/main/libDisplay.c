@@ -1,7 +1,7 @@
 /**
  * @file   libDisplay.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of display-library.
  *
  * Detailed description of file.
@@ -38,7 +38,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDisplay.h"
 #include "libNHD223.h"
-#include "libADC.h"
 #include "UART.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -115,7 +114,7 @@ void libDisplay_SetBrightness(uint8_t brightness)
     libNHD223_WriteCommand(0x81);
     libNHD223_WriteCommand(brightness);
 #else
-    UNUSED(brightness);    
+    UNUSED(brightness);
 #endif
     return;
 }

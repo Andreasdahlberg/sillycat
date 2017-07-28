@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-19 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -36,10 +36,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/pgmspace.h>
 #include <string.h>
 
-#include "libADC.h"
 #include "libDebug.h"
 #include "libDS3234.h"
 
+#include "ADC.h"
 #include "Sensor.h"
 #include "Sensor_Calibration.h"
 #include "Timer.h"
@@ -61,10 +61,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct module_t
+{
+    struct adc_channel_t temperature_ext_channel;
+    struct adc_channel_t temperature_int_channel;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
+static struct module_t module;
 static uint16_t current_alpha;
 static sensor_sample_type sensor_reading;
 
@@ -118,9 +125,10 @@ void Sensor_Init(void)
                     AVERAGE_WINDOW_S);
     DEBUG("Smoothing alpha: %u\r\n", current_alpha);
 
-    libADC_EnableInput(SENSOR_EXTERNAL_TEMPERATURE, true);
-    libADC_EnableInput(SENSOR_INTERNAL_TEMPERATURE, true);
-    INFO("Init done");
+    ADC_InitChannel(&module.temperature_ext_channel, SENSOR_EXTERNAL_TEMPERATURE);
+    ADC_InitChannel(&module.temperature_int_channel, SENSOR_INTERNAL_TEMPERATURE);
+
+    INFO("Sensor module initialized");
 }
 
 void Sensor_Update(void)
@@ -192,45 +200,36 @@ bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading)
     return status;
 }
 
-function_status Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
+void Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
 {
-    function_status status = ERROR;
     uint32_t tmp_value;
 
-    if (libADC_GetSample(sensor, sensor_value) == SUCCESS)
+    switch (sensor)
     {
-        switch (sensor)
-        {
-            case SENSOR_EXTERNAL_LIGHT:
-                //Using raw value, do nothing
-                status = SUCCESS;
-                break;
+        case SENSOR_EXTERNAL_TEMPERATURE:
+            ADC_Convert(&module.temperature_ext_channel, sensor_value, 1);
+            *sensor_value = RawValueToTemperature(*sensor_value);
+            break;
 
-            case SENSOR_EXTERNAL_TEMPERATURE:
-                *sensor_value = RawValueToTemperature(*sensor_value);
-                status = SUCCESS;
-                break;
-
-            case SENSOR_INTERNAL_TEMPERATURE:
-                tmp_value = *sensor_value;
-                tmp_value *= SUPPLY_VOLTAGE_mV;
-                tmp_value = tmp_value >> 10;
-                tmp_value -= 289; // Offset between mV and temp from Table 23-2 in datasheet.
+        case SENSOR_INTERNAL_TEMPERATURE:
+            ADC_Convert(&module.temperature_int_channel, sensor_value, 1);
+            tmp_value = *sensor_value;
+            tmp_value *= SUPPLY_VOLTAGE_mV;
+            tmp_value = tmp_value >> 10;
+            tmp_value -= 289; // Offset between mV and temp from Table 23-2 in datasheet.
 
 #ifdef INTERNAL_TEMP_SENSOR_CALIBRATED
-                tmp_value = tmp_value * INTERNAL_TEMP_CALIBRATION_K +
-                            INTERNAL_TEMP_CALIBRATION_M;
+            tmp_value = tmp_value * INTERNAL_TEMP_CALIBRATION_K +
+                        INTERNAL_TEMP_CALIBRATION_M;
 #endif
-                *sensor_value = (uint16_t)(tmp_value);
-                status = SUCCESS;
-                break;
+            *sensor_value = (uint16_t)(tmp_value);
+            break;
 
-            default:
-                sc_assert_fail();
-                break;
-        }
+        default:
+            sc_assert_fail();
+            break;
     }
-    return status;
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////

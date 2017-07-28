@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-10-03 (Last edit)
+ * @date   2017-07-28 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -31,7 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define SENSOR_EXTERNAL_LIGHT       0x06
 #define SENSOR_EXTERNAL_TEMPERATURE 0x07
 #define SENSOR_INTERNAL_TEMPERATURE 0x08
 
@@ -59,8 +58,8 @@ sensor_sample_type;
 
 void Sensor_Init(void);
 void Sensor_Update(void);
-function_status Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value);
+void Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value);
 bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading);
 bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading);
 
-#endif /* SENSOR_H_ */
+#endif
