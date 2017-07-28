@@ -3,10 +3,17 @@ import os
 
 Import(['*'])
 
+modules = ['ADC']
+module_objects = []
+
 source = Glob('*.c')
-
-
 env.Append(CPPPATH=['#src/utility/FIFO', '#src/common_library', '#src/{}'.format(target)])
-objects = env.Object(source)
+module_objects.append(env.Object(source))
 
-Return('objects')
+for module in modules:
+    sconscript_file = os.path.join(module, 'SConscript')
+
+    module_object = SConscript(sconscript_file, exports = 'env')
+    module_objects.append(module_object)
+
+Return('module_objects')
