@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
+ * @date   2017-08-09 (Last edit)
  * @brief  Implementation of MCP79510-driver.
  *
  * Detailed description of file.
@@ -85,7 +85,6 @@ static void DumpRegisterValues(void) __attribute__((unused));
 ///
 void libMCP79510_Init(void)
 {
-    libMCP79510_HWInit();
     libMCP79510_EnableSquareWave(false);
     libMCP79510_EnableOscillator(true);
 
