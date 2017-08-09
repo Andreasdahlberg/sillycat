@@ -88,7 +88,11 @@ void libMCP79510_Init(void)
     libMCP79510_EnableSquareWave(false);
     libMCP79510_EnableOscillator(true);
 
-    INFO("Init done");
+    while(!libMCP79510_IsOscillatorRunning())
+    {
+    }
+
+    INFO("MCP79510 initialized");
     return;
 }
 
