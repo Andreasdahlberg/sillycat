@@ -127,7 +127,7 @@ void libRFM69_InitHW(void)
     InitReset();
 
     InitCS();
-    PullCS(); //Pull SS high to release device
+    ReleaseCS();
 
     InitIO();
 
