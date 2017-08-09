@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-11-07 (Last edit)
+ * @date   2017-08-09 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -108,7 +108,6 @@ static void PostCallback(void);
 ///
 void libRFM69_Init(void)
 {
-    libRFM69_InitHW();
     libRFM69_Reset();
 
     //TODO: Remove
