@@ -58,7 +58,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_FAST_READ_QUAD_IO           0xEB
 #define CMD_CONT_READ_MODE_RESET        0xFF
 #define CMD_DEEP_POWER_DOWN             0xB9
-#define CMD_RELEASE_POWER_DOWN          0xAB //TODO: id until CS is released, check in datasheet!
+#define CMD_RELEASE_POWER_DOWN          0xAB
 #define CMD_MANUFACTURER_DEVICE_ID      0x90
 #define CMD_JEDEC_ID                    0x9F
 #define CMD_READ_SFDP_REG               0x5A //TODO: Also unique id number

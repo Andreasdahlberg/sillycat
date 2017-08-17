@@ -31,6 +31,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include common.h before all other headers
 #include "common.h"
 
+#include <util/delay.h>
+
 #include "libSPI.h"
 #include "libS25FL1K.h"
 #include "libS25FL1K_reg.h"
@@ -97,6 +99,45 @@ void libS25FL1K_Reset(void)
 {
     uint8_t cmd_sequence[] = {CMD_SW_RESET_ENABLE, CMD_SW_RESET};
     libSPI_Write(cmd_sequence, sizeof(cmd_sequence), PreCallback, PostCallback);
+
+    return;
+}
+
+///
+/// @brief Put the device into deep power down state.
+///
+/// After CS is driven high, the power down state will entered within 3 µs.
+/// While in the power down state only the Release from Deep-Power-Down command,
+/// which restores the device to normal operation, will be recognized. All other
+/// commands are ignored. This includes the Read Status Register command,
+/// which is always available during normal operation. Ignoring all but one
+/// command also makes the Power Down state a useful condition for securing
+/// maximum write protection.
+///
+/// @param  None
+/// @return None
+///
+void libS25FL1K_EnterDeepPowerDown(void)
+{
+    libSPI_WriteByte(CMD_DEEP_POWER_DOWN, PreCallback, PostCallback);
+
+    return;
+}
+
+///
+/// @brief Release the device from deep power down state.
+///
+/// @param  None
+/// @return None
+///
+void libS25FL1K_ExitDeepPowerDown(void)
+{
+    libSPI_WriteByte(CMD_RELEASE_POWER_DOWN, PreCallback, PostCallback);
+
+    // After the release command has been sent, CS must be kept high until
+    // standby mode is ready. According to the S25FL1-K_00_03 datasheet, table 5.8,
+    // this can take up to 3 µs.
+    _delay_us(3);
 
     return;
 }

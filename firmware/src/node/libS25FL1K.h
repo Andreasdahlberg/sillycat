@@ -45,5 +45,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void libS25FL1K_InitHW(void);
 void libS25FL1K_Reset(void);
+void libS25FL1K_EnterDeepPowerDown(void);
+void libS25FL1K_ExitDeepPowerDown(void);
 
 #endif

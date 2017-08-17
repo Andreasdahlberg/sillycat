@@ -127,6 +127,10 @@ int main(void)
     Com_Init();
     Power_Init();
 
+    // The flash memory is not used so it's put into deep power down mode
+    // to reduce current usage.
+    libS25FL1K_EnterDeepPowerDown();
+
     Com_SetPacketHandler(TimePacketHandler, COM_PACKET_TYPE_TIME);
 
 #ifdef DEBUG_ENABLE
