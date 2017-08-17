@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*
 #
 # This file is part of SillyCat Development Tools.
@@ -14,30 +14,41 @@
 # GNU General Public License for more details.
 
 # You should have received a copy of the GNU General Public License
-# along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
+# along with SillyCat Development Tools.  If not, see
+# <http://www.gnu.org/licenses/>.
+
+import os
+import time
+from PyQt4 import QtGui
 
 __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
-import os
-import time
-from PyQt4 import QtGui, QtCore
-
 
 class PacketView(QtGui.QTableWidget):
+
     def __init__(self, path):
-        super(PacketView, self).__init__()
+        super().__init__()
 
         self.setColumnCount(7)
-        self.setRowCount(0);
+        self.setRowCount(0)
 
-        self.setHorizontalHeaderLabels(['Target', 'Source', 'RSSI', 'Packet size', 'Timestamp', 'Type', 'Data size'])
+        self.setHorizontalHeaderLabels(
+            [
+                'Target',
+                'Source',
+                'RSSI',
+                'Packet size',
+                'Timestamp',
+                'Type',
+                'Data size'
+            ])
         self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
 
         self._path = path
 
-
     def update_packet_view(self, text):
+        """Add a new row to the view from a CSV string."""
 
         row_index = self.rowCount()
         self.insertRow(row_index)
@@ -47,8 +58,9 @@ class PacketView(QtGui.QTableWidget):
             self.setItem(row_index, col_index, QtGui.QTableWidgetItem(value))
             col_index = col_index + 1
 
-
     def export_to_csv(self, name, separator=',', end_of_line='\n'):
+        """Export the contents from the view to a CSV file."""
+
         if not os.path.isdir(self._path):
             os.makedirs(self._path)
 
