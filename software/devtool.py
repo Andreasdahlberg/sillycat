@@ -105,12 +105,23 @@ class DevTool(QtGui.QWidget):
         connect_box.addStretch(1)
         connect_box.addWidget(self.checkbox)
 
+        clear_packets_button = QtGui.QPushButton('Clear')
+        clear_packets_button.clicked.connect(self.pv.setRowCount)
+        export_packets_button = QtGui.QPushButton('Export')
+        export_packets_button.clicked.connect(lambda: self.pv.export_to_csv('packets'))
+
+        packet_btn_box = QtGui.QHBoxLayout();
+        packet_btn_box.addWidget(clear_packets_button)
+        packet_btn_box.addWidget(export_packets_button)
+        packet_btn_box.addStretch(1)
+
         vbox = QtGui.QVBoxLayout()
         vbox.addLayout(connect_box)
 
         vbox.addLayout(hbox)
 
         vbox.addWidget(self.pv)
+        vbox.addLayout(packet_btn_box)
 
         self.setLayout(vbox)
 
