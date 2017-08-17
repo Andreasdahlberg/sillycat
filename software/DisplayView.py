@@ -60,10 +60,10 @@ class DisplayView(QtGui.QLabel):
         self.pos_y = 0
 
         self.path = path
-        
+
 
     def mouseMoveEvent(self, event):
-        mouse_position = event.pos(); 
+        mouse_position = event.pos();
 
         x_pos = math.floor(mouse_position.x() / 3);
         if x_pos > 127:
@@ -71,7 +71,7 @@ class DisplayView(QtGui.QLabel):
 
         y_pos = math.floor(mouse_position.y() / 3);
         if y_pos > 30:
-            y_pos = 30            
+            y_pos = 30
 
         scaled_point = QtCore.QPoint(x_pos, y_pos)
         self.emit(QtCore.SIGNAL('new_pixel(QPoint)'), scaled_point)
@@ -86,19 +86,19 @@ class DisplayView(QtGui.QLabel):
         p = QtGui.QPainter(px)
         p.setPen(QtGui.QColor(255, 255, 255))
         p.drawPoint(self.pos_x, self.pos_y)
-        p.end()   
+        p.end()
 
         self.setPixmap(px.scaled(384, 93))
 
 
     def add_color(self, pixmap):
         mask = pixmap.createMaskFromColor(QtGui.QColor(0, 0, 0), QtCore.Qt.MaskOutColor)
-        
+
         p = QtGui.QPainter(pixmap)
         p.setPen(QtGui.QColor(255, 201, 14))
 
         p.drawPixmap(pixmap.rect(), mask, mask.rect())
-        p.end() 
+        p.end()
 
         mask = pixmap.createMaskFromColor(QtGui.QColor(255, 255, 255), QtCore.Qt.MaskOutColor)
 
@@ -107,7 +107,7 @@ class DisplayView(QtGui.QLabel):
         p.drawPixmap(pixmap.rect(), mask, mask.rect())
         p.end()
 
-        return pixmap   
+        return pixmap
 
 
     def save_view_to_file(self, state, name="display"):
@@ -116,19 +116,19 @@ class DisplayView(QtGui.QLabel):
 
         timestamp = time.strftime("%Y%m%d%H%M%S")
         filename = '{}_{}.png'.format(name, timestamp)
-        
+
         self._pixmap.save(os.path.join(self.path, filename), 'PNG')
 
 
     def update_display_view(self, image_data):
         self._pixmap.loadFromData(self.format_image_data(bytes(image_data)))
-        
+
         px = self.add_color(self._pixmap).copy()
 
         p = QtGui.QPainter(px)
         p.setPen(QtGui.QColor(255, 255, 255))
         p.drawPoint(self.pos_x, self.pos_y)
-        p.end()           
+        p.end()
 
         self.setPixmap(px.scaled(384, 93))
 
