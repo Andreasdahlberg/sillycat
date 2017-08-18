@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-22 (Last edit)
+ * @date   2017-08-18 (Last edit)
  * @brief  Implementation of guiNodes
  *
  * Detailed description of file.
@@ -159,12 +159,12 @@ static void DrawDetailedNodeView(uint16_t context)
 
     if (packet != NULL)
     {
-        libUI_Print("RSSI: %d", 4, UI_DOUBLE_ROW_FIRST, packet->header.rssi);
+        libUI_Print("RSSI: %d dBm", 4, UI_DOUBLE_ROW_FIRST, packet->header.rssi);
         libUI_Print("Source: 0x%02X", 4, UI_DOUBLE_ROW_SECOND, packet->header.source);
     }
     else
     {
-        libUI_Print("RSSI: -", 4, UI_DOUBLE_ROW_FIRST);
+        libUI_Print("RSSI: - dBm", 4, UI_DOUBLE_ROW_FIRST);
         libUI_Print("Source: -", 4, UI_DOUBLE_ROW_SECOND);
     }
     return;
