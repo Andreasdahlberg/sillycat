@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-17 (Last edit)
+ * @date   2017-08-18 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -596,6 +596,24 @@ bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
         status = true;
     }
     return status;
+}
+
+///
+/// @brief Clear the entire SRAM.
+///
+/// @param  None
+/// @return None
+///
+void libDS3234_ClearSRAM(void)
+{
+    WriteRegister(REG_SRAM_ADDRESS, 0);
+    for (size_t i = 0; i < SRAM_SIZE; ++i)
+    {
+        //SRAM address is auto incremented after each write
+        WriteRegister(REG_SRAM_DATA, 0x00);
+    }
+
+    return;
 }
 
 //////////////////////////////////////////////////////////////////////////

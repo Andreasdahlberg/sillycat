@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-6 (Last edit)
+ * @date   2017-08-18 (Last edit)
  * @brief  Header of DS3234-library.
  *
  * Detailed description of file.
@@ -122,5 +122,6 @@ bool libDS3234_SetAlarmSeconds(uint8_t seconds);
 
 bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length);
 bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
+void libDS3234_ClearSRAM(void);
 
-#endif /* LIBDS3234_H_ */
+#endif
