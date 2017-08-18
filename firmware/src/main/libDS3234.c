@@ -555,15 +555,14 @@ bool libDS3234_SetHourMode(libDS3234_hour_mode_type hour_mode)
 bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
     bool status = false;
-    uint8_t index;
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
         WriteRegister(REG_SRAM_ADDRESS, address);
-        for (index = 0; index < length; ++index)
+        for (size_t i = 0; i < length; ++i)
         {
             //SRAM address is auto incremented after each write
-            WriteRegister(REG_SRAM_DATA, data[index]);
+            WriteRegister(REG_SRAM_DATA, data[i]);
         }
         status = true;
     }
@@ -583,15 +582,14 @@ bool libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
 bool libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
     bool status = false;
-    uint8_t index;
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
         WriteRegister(REG_SRAM_ADDRESS, address);
-        for (index = 0; index < length; ++index)
+        for (size_t i = 0; i < length; ++i)
         {
             //SRAM address is auto incremented after each read
-            ReadRegister(REG_SRAM_DATA, &data[index]);
+            ReadRegister(REG_SRAM_DATA, &data[i]);
         }
         status = true;
     }
@@ -645,12 +643,13 @@ static bool GetDecimalRegisterValue(uint8_t address, uint8_t *value)
 static bool SetDecimalRegisterValue(uint8_t address, uint8_t value)
 {
     bool status = false;
-    uint8_t register_data;
 
     //Only values smaller then 100 is accepted since a byte
     //only can hold two-digits of BCD data.
     if (value < 100)
     {
+        uint8_t register_data;
+
         register_data = (uint8_t)DecimalToBCD(value);
         status = WriteRegister(address, register_data);
     }
