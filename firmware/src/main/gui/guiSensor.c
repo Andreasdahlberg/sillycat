@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-22 (Last edit)
+ * @date   2017-08-20 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -86,11 +86,12 @@ void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
             unused)))
 {
     sensor_sample_type reading;
-
     Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading);
 
-    libUI_Print("Max: %u C", 2, UI_DOUBLE_ROW_FIRST, reading.max / 10);
-    libUI_Print("Min: %u C", 2, UI_DOUBLE_ROW_SECOND, reading.min / 10);
+    libUI_Print("Max: %u.%u C", 2, UI_DOUBLE_ROW_FIRST,
+                reading.max / 10,reading.max % 10);
+    libUI_Print("Min: %u.%u C", 2, UI_DOUBLE_ROW_SECOND,
+                reading.min / 10, reading.min % 10);
     return;
 }
 
