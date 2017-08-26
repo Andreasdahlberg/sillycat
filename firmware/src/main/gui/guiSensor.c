@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-20 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -31,9 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include common.h before all other headers
 #include "common.h"
 
-#include <string.h>
-#include <stdio.h>
-
 #include "libDebug.h"
 #include "libUI.h"
 #include "Sensor.h"
@@ -59,6 +56,8 @@ static struct view temperature_view;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+void ClearAction(uint16_t context __attribute__ ((unused)));
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -66,12 +65,14 @@ static struct view temperature_view;
 void guiSensor_Init(void)
 {
     temperature_view.draw_function = guiSensor_DrawTemperatureView;
+    temperature_view.action_function = NULL;
     temperature_view.child = NULL;
     temperature_view.prev = NULL;
     temperature_view.next = NULL;
     temperature_view.parent = NULL;
 
     detailed_temperature_view.draw_function = guiSensor_DrawDetailedTemperatureView;
+    detailed_temperature_view.action_function = ClearAction;
     detailed_temperature_view.child = NULL;
     detailed_temperature_view.prev = NULL;
     detailed_temperature_view.next = NULL;
@@ -116,3 +117,11 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+void ClearAction(uint16_t context __attribute__ ((unused)))
+{
+    Sensor_ClearReadings();
+    Interface_Update();
+
+    return;
+}
