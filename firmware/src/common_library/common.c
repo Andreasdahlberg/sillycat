@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-08 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -72,6 +72,23 @@ float_parts_type FloatToParts(float f_value)
     parts.fractional = tmp < 0 ? -tmp : tmp;
 
     return parts;
+}
+
+///
+/// @brief Computes the numerator/denominator and returns the quotient and remainder.
+///
+/// @param  numerator
+/// @param  denominator
+/// @return struct div_t Structure with quotient and remainder.
+///
+struct div_t Divide(int32_t numerator, int32_t denominator)
+{
+    struct div_t result;
+
+    result.quotient = numerator / denominator;
+    result.remainder = numerator % denominator;
+
+    return result;
 }
 
 ///
