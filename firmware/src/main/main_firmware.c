@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-07-28 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -115,8 +115,10 @@ int main(void)
     guiNodes_Init();
     Nodes_Init();
 
-    libInput_SetCallbacks(Interface_NextView, Interface_PreviousView,
-                          Interface_ActivateView);
+    libInput_SetCallbacks(Interface_NextView,
+                          Interface_PreviousView,
+                          Interface_ActivateView,
+                          Interface_Action);
 
     INFO("Start up done");
     DEBUG("Node ID: 0x%02X\r\n", Config_GetNodeId());
