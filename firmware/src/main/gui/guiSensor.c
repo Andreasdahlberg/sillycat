@@ -87,12 +87,18 @@ void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
             unused)))
 {
     sensor_sample_type reading;
-    Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading);
-
-    libUI_Print("Max: %u.%u C", 2, UI_DOUBLE_ROW_FIRST,
-                reading.max / 10,reading.max % 10);
-    libUI_Print("Min: %u.%u C", 2, UI_DOUBLE_ROW_SECOND,
-                reading.min / 10, reading.min % 10);
+    if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
+    {
+        libUI_Print("Max: %u.%u C", 2, UI_DOUBLE_ROW_FIRST,
+                    reading.max / 10,reading.max % 10);
+        libUI_Print("Min: %u.%u C", 2, UI_DOUBLE_ROW_SECOND,
+                    reading.min / 10, reading.min % 10);
+    }
+    else
+    {
+        libUI_Print("Max: -.- C", 2, UI_DOUBLE_ROW_FIRST);
+        libUI_Print("Min: -.- C", 2, UI_DOUBLE_ROW_SECOND);
+    }
     return;
 }
 
@@ -109,7 +115,7 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
     }
     else
     {
-        libUI_Print("Temperature: -.- C", 1, UI_SINGLE_ROW);
+        libUI_Print("-.- C", 45, UI_SINGLE_ROW);
     }
     return;
 }
