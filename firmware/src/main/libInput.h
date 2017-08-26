@@ -1,7 +1,7 @@
 /**
  * @file   libInput.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-03-30 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Header of Input module.
  *
  * Detailed description of file.
@@ -50,6 +50,7 @@ bool libInput_LeftRotation(void);
 bool libInput_Push(void);
 void libInput_SetCallbacks(libinput_callback_type right_event,
                            libinput_callback_type left_event,
-                           libinput_callback_type push_event);
+                           libinput_callback_type push_event,
+                           libinput_callback_type press_event);
 
-#endif /* LIBINPUT_H_ */
+#endif
