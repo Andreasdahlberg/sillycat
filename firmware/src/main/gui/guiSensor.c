@@ -31,6 +31,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include common.h before all other headers
 #include "common.h"
 
+#include <stdlib.h>
+
 #include "libDebug.h"
 #include "libUI.h"
 #include "Sensor.h"
@@ -89,10 +91,15 @@ void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
     sensor_sample_type reading;
     if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
     {
-        libUI_Print("Max: %u.%u C", 2, UI_DOUBLE_ROW_FIRST,
-                    reading.max / 10,reading.max % 10);
-        libUI_Print("Min: %u.%u C", 2, UI_DOUBLE_ROW_SECOND,
-                    reading.min / 10, reading.min % 10);
+        struct div_t max_temperature;
+        struct div_t min_temperature;
+        max_temperature = Divide((int32_t)reading.max, 10);
+        min_temperature = Divide((int32_t)reading.min, 10);
+
+        libUI_Print("Max: %ld.%d C", 2, UI_DOUBLE_ROW_FIRST,
+                    max_temperature.quotient, abs(max_temperature.remainder));
+        libUI_Print("Min: %ld.%d C", 2, UI_DOUBLE_ROW_SECOND,
+                    min_temperature.quotient, abs(min_temperature.remainder));
     }
     else
     {
@@ -108,10 +115,11 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 
     if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
     {
-        uint8_t temperature_integer = (uint8_t)(reading.value / 10);
+        struct div_t temperature;
+        temperature = Divide((int32_t)reading.value, 10);
 
-        libUI_Print("%u.%u C", 45, UI_SINGLE_ROW, temperature_integer,
-                    reading.value % 10);
+        libUI_Print("%ld.%d C", 45, UI_SINGLE_ROW, temperature.quotient,
+                    abs(temperature.remainder));
     }
     else
     {

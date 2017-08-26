@@ -161,13 +161,13 @@ void CheckHealth(void)
         WARNING("Low memory: %u", unused_memory);
     }
 
-    uint16_t mcu_temperature;
+    int16_t mcu_temperature;
     Sensor_GetSensorValue(SENSOR_INTERNAL_TEMPERATURE, &mcu_temperature);
     if (!high_mcu_temp_flag && mcu_temperature > HICH_MCU_TEMP_LIMIT)
     {
-        ErrorHandler_LogError(HICH_MCU_TEMP_LIMIT, (uint8_t)mcu_temperature);
+        ErrorHandler_LogError(HICH_MCU_TEMP_LIMIT, (int8_t)mcu_temperature);
         high_mcu_temp_flag = true;
-        WARNING("High MCU temperature: %u", mcu_temperature);
+        WARNING("High MCU temperature: %d", mcu_temperature);
     }
 
     sc_assert(unused_memory > 0);

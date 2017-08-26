@@ -49,7 +49,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define TABLE_OFFSET    -30
-#define TABLE_LENGTH    29
 
 #define READING_HEADER          0xAA0F
 #define READING_START_ADDRESS   0x00
@@ -76,7 +75,7 @@ static uint16_t current_alpha;
 static sensor_sample_type sensor_reading;
 
 //TODO: Generate table with better precision
-static const uint16_t mf52_table[TABLE_LENGTH] PROGMEM =
+static const uint16_t mf52_table[] PROGMEM =
 {
     54, //-30
     72, //-25
@@ -113,7 +112,7 @@ static const uint16_t mf52_table[TABLE_LENGTH] PROGMEM =
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static uint16_t RawValueToTemperature(uint16_t raw_value);
+static int16_t RawValueToTemperature(uint16_t raw_value);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -200,20 +199,21 @@ bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading)
     return status;
 }
 
-void Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
+void Sensor_GetSensorValue(uint8_t sensor, int16_t *sensor_value)
 {
-    uint32_t tmp_value;
+    int32_t tmp_value;
+    uint16_t adc_value;
 
     switch (sensor)
     {
         case SENSOR_EXTERNAL_TEMPERATURE:
-            ADC_Convert(&module.temperature_ext_channel, sensor_value, 1);
-            *sensor_value = RawValueToTemperature(*sensor_value);
+            ADC_Convert(&module.temperature_ext_channel, &adc_value, 1);
+            *sensor_value = RawValueToTemperature(adc_value);
             break;
 
         case SENSOR_INTERNAL_TEMPERATURE:
-            ADC_Convert(&module.temperature_int_channel, sensor_value, 1);
-            tmp_value = *sensor_value;
+            ADC_Convert(&module.temperature_int_channel, &adc_value, 1);
+            tmp_value = (int32_t)adc_value;
             tmp_value *= SUPPLY_VOLTAGE_mV;
             tmp_value = tmp_value >> 10;
             tmp_value -= 289; // Offset between mV and temp from Table 23-2 in datasheet.
@@ -222,7 +222,7 @@ void Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
             tmp_value = tmp_value * INTERNAL_TEMP_CALIBRATION_K +
                         INTERNAL_TEMP_CALIBRATION_M;
 #endif
-            *sensor_value = (uint16_t)(tmp_value);
+            *sensor_value = (int16_t)(tmp_value);
             break;
 
         default:
@@ -250,20 +250,29 @@ void Sensor_ClearReadings(void)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static uint16_t RawValueToTemperature(uint16_t raw_value)
+static int16_t RawValueToTemperature(uint16_t raw_value)
 {
-    uint8_t index = 0;
-    uint32_t tmp;
+    // Truncate the raw value if it's outside of the LUT.
+    if (raw_value < mf52_table[0])
+    {
+        raw_value = mf52_table[0];
+    }
+    else if (raw_value > mf52_table[ElementsIn(mf52_table) - 1])
+    {
+        raw_value = mf52_table[ElementsIn(mf52_table) - 1];
+    }
 
-    while (index < TABLE_LENGTH && pgm_read_word(&mf52_table[index]) < raw_value)
+    uint8_t index = 0;
+    while (index < ElementsIn(mf52_table) &&
+            pgm_read_word(&mf52_table[index]) < raw_value)
     {
         ++index;
     }
 
-    //TODO: Can this be solved in a better way?
-    tmp = 100 * (uint32_t)raw_value;
+    int32_t tmp;
+    tmp = 100 * (int32_t)raw_value;
     tmp /= pgm_read_word(&mf52_table[index]);
     tmp *= (TABLE_OFFSET + (index * 5));
     tmp /= 10;
-    return  (uint16_t)tmp;
+    return  (int16_t)tmp;
 }
