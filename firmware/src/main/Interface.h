@@ -1,7 +1,7 @@
 /**
  * @file   Interface.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-03-30 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Header of Interface
  *
  * Detailed description of file.
@@ -42,6 +42,7 @@ typedef void (*interface_fp)(uint16_t context);
 struct view
 {
     interface_fp draw_function;
+    interface_fp action_function;
     uint16_t context;
     struct view *parent;
     struct view *child;
@@ -63,7 +64,8 @@ void Interface_RemoveView(struct view *view);
 void Interface_NextView(void);
 void Interface_PreviousView(void);
 void Interface_ActivateView(void);
+void Interface_Action(void);
 struct view *Interface_GetRootView(void);
 struct view *Interface_GetActiveView(void);
 
-#endif /* INTERFACE_H_ */
+#endif

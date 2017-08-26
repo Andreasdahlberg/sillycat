@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-13 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -30,8 +30,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 //NOTE: Include before all other headers
 #include "common.h"
-
-#include <stdio.h>
 
 #include "libDebug.h"
 #include "libDisplay.h"
@@ -337,6 +335,22 @@ void Interface_ActivateView(void)
         refresh_flag = true;
         activity_timer = Timer_GetMilliseconds();
     }
+    return;
+}
+
+///
+/// @brief Perform any action associated with the currently active view.
+///
+/// @param  None
+/// @return None
+///
+void Interface_Action(void)
+{
+    if (active_view != NULL && active_view->action_function != NULL)
+    {
+        active_view->action_function(active_view->context);
+    }
+
     return;
 }
 
