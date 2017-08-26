@@ -127,7 +127,7 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 void ClearAction(uint16_t context __attribute__ ((unused)))
 {
     Sensor_ClearReadings();
-    Interface_Update();
+    Interface_Refresh();
 
     return;
 }
