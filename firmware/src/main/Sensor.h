@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-07-28 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -61,5 +61,6 @@ void Sensor_Update(void);
 void Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value);
 bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading);
 bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading);
+void Sensor_ClearReadings(void);
 
 #endif
