@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-07-28 (Last edit)
+ * @date   2017-08-26 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -229,6 +229,20 @@ void Sensor_GetSensorValue(uint8_t sensor, uint16_t *sensor_value)
             sc_assert_fail();
             break;
     }
+    return;
+}
+
+///
+/// @brief Clear all saved sensor readings.
+///
+/// NOTE: The entire DS3234 SRAM will be cleared!
+///
+/// @param  None
+/// @return None
+///
+void Sensor_ClearReadings(void)
+{
+    libDS3234_ClearSRAM();
     return;
 }
 
