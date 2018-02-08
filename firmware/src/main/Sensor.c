@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-08 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -30,31 +30,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 //NOTE: Include before all other headers
 #include "common.h"
-
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-#include <string.h>
-
-#include "libDebug.h"
-#include "libDS3234.h"
-
-#include "ADC.h"
-#include "Sensor.h"
-#include "Sensor_Calibration.h"
 #include "Timer.h"
+#include "Sensor.h"
+#include "libDebug.h"
+#include "driverNTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define TABLE_OFFSET    -30
-
-#define READING_HEADER          0xAA0F
-#define READING_START_ADDRESS   0x00
-#define ADDRESS_OFFSET          0
-
-#define SUPPLY_VOLTAGE_mV 3300
+#define MAX_NUMBER_OF_SENSORS 2
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -62,8 +47,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 struct module_t
 {
-    struct adc_channel_t temperature_ext_channel;
-    struct adc_channel_t temperature_int_channel;
+    struct sensor_t *sensors[MAX_NUMBER_OF_SENSORS];
+    size_t number_of_sensors;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -71,48 +56,12 @@ struct module_t
 //////////////////////////////////////////////////////////////////////////
 
 static struct module_t module;
-static uint16_t current_alpha;
-static sensor_sample_type sensor_reading;
-
-//TODO: Generate table with better precision
-static const uint16_t mf52_table[] PROGMEM =
-{
-    54, //-30
-    72, //-25
-    95, //-20
-    122, //-15
-    156, //-10
-    194, //-5
-    244, //0
-    288, //5
-    342, //10
-    398, //15
-    455, //20
-    512, //25
-    568, //30
-    620, //35
-    669, //40
-    714, //45
-    754, //50
-    790, //55
-    821, //60
-    849, //65
-    873, //70
-    893, //75
-    911, //80
-    926, //85
-    939, //90
-    950, //95
-    960, //100
-    968, //105
-    975, //110
-};
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static int16_t RawValueToTemperature(uint16_t raw_value);
+static void SetSensorValues(struct sensor_t *self, int16_t value);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -120,159 +69,102 @@ static int16_t RawValueToTemperature(uint16_t raw_value);
 
 void Sensor_Init(void)
 {
-    current_alpha = (uint16_t)CALCULATE_ALPHA(SAMPLE_FREQUENCY_MS / 1000,
-                    AVERAGE_WINDOW_S);
-    DEBUG("Smoothing alpha: %u\r\n", current_alpha);
-
-    ADC_InitChannel(&module.temperature_ext_channel, SENSOR_EXTERNAL_TEMPERATURE);
-    ADC_InitChannel(&module.temperature_int_channel, SENSOR_INTERNAL_TEMPERATURE);
+    module.number_of_sensors = 0;
 
     INFO("Sensor module initialized");
 }
 
 void Sensor_Update(void)
 {
-    static uint32_t sample_timer = 0;
-
-    if (Timer_TimeDifference(sample_timer) > SAMPLE_FREQUENCY_MS)
+    for (size_t i = 0; i < module.number_of_sensors; ++i)
     {
+        sc_assert(module.sensors[i]->Update != NULL);
 
-        Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading);
-        Sensor_GetSensorValue(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading.value);
-
-        if (sensor_reading.header == READING_HEADER)
+        module.sensors[i]->Update(module.sensors[i]);
+        if (Sensor_IsValid(module.sensors[i]))
         {
-            sensor_reading.average = GetExponentialMovingAverage(sensor_reading.value,
-                                     sensor_reading.average,
-                                     current_alpha);
+            SetSensorValues(module.sensors[i], module.sensors[i]->value);
 
-            if (sensor_reading.value > sensor_reading.max)
-            {
-                sensor_reading.max = sensor_reading.value;
-            }
-            else if (sensor_reading.value < sensor_reading.min)
-            {
-                sensor_reading.min = sensor_reading.value;
-            }
+            // TODO: Synchronize with SRAM.
         }
-        else
-        {
-            INFO("No sample found, Address: 0x%02X, Header: 0x%04X\r\n", 0x00,
-                 sensor_reading.header);
-
-            sensor_reading.header = READING_HEADER;
-            sensor_reading.max = sensor_reading.value;
-            sensor_reading.min = sensor_reading.value;
-            sensor_reading.average =
-                sensor_reading.value; //NOTE: Is this bad? extreme initial values can mess up the average.
-        }
-
-        Sensor_SaveReading(SENSOR_EXTERNAL_TEMPERATURE, &sensor_reading);
-        sample_timer = Timer_GetMilliseconds();
     }
 }
 
-bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading)
+void Sensor_Register(struct sensor_t *self)
 {
-    uint8_t address;
+    sc_assert(self != NULL);
+    sc_assert(module.number_of_sensors < ElementsIn(module.sensors));
 
-    address = READING_START_ADDRESS + (ADDRESS_OFFSET + sensor) *
-              sizeof(sensor_sample_type);
-    return libDS3234_WriteToSRAM(address, (uint8_t *)reading,
-                                 sizeof(sensor_sample_type));
+    module.sensors[module.number_of_sensors] = self;
+    ++module.number_of_sensors;
+
+    // TODO: Remove reset and read values from SRAM.
+    Sensor_Reset(self);
 }
 
-bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading)
+bool Sensor_GetValue(struct sensor_t *self, int16_t *value)
 {
-    bool status = false;
-    uint8_t address;
+    sc_assert(self != NULL);
+    sc_assert(value != NULL);
 
-    address = READING_START_ADDRESS + (ADDRESS_OFFSET + sensor) *
-              sizeof(sensor_sample_type);
-
-    if (libDS3234_ReadFromSRAM(address, (uint8_t *)reading,
-                               sizeof(sensor_sample_type)))
-    {
-        status = (bool)(reading->header == READING_HEADER);
-    }
-
-    return status;
+    *value = self->value;
+    return self->valid;
 }
 
-void Sensor_GetSensorValue(uint8_t sensor, int16_t *sensor_value)
+bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value)
 {
-    int32_t tmp_value;
-    uint16_t adc_value;
+    sc_assert(self != NULL);
+    sc_assert(value != NULL);
 
-    switch (sensor)
-    {
-        case SENSOR_EXTERNAL_TEMPERATURE:
-            ADC_Convert(&module.temperature_ext_channel, &adc_value, 1);
-            *sensor_value = RawValueToTemperature(adc_value);
-            break;
-
-        case SENSOR_INTERNAL_TEMPERATURE:
-            ADC_Convert(&module.temperature_int_channel, &adc_value, 1);
-            tmp_value = (int32_t)adc_value;
-            tmp_value *= SUPPLY_VOLTAGE_mV;
-            tmp_value = tmp_value >> 10;
-            tmp_value -= 289; // Offset between mV and temp from Table 23-2 in datasheet.
-
-#ifdef INTERNAL_TEMP_SENSOR_CALIBRATED
-            tmp_value = tmp_value * INTERNAL_TEMP_CALIBRATION_K +
-                        INTERNAL_TEMP_CALIBRATION_M;
-#endif
-            *sensor_value = (int16_t)(tmp_value);
-            break;
-
-        default:
-            sc_assert_fail();
-            break;
-    }
-    return;
+    *value = self->max;
+    return self->valid;
 }
 
-///
-/// @brief Clear all saved sensor readings.
-///
-/// NOTE: The entire DS3234 SRAM will be cleared!
-///
-/// @param  None
-/// @return None
-///
-void Sensor_ClearReadings(void)
+bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value)
 {
-    libDS3234_ClearSRAM();
-    return;
+    sc_assert(self != NULL);
+    sc_assert(value != NULL);
+
+    *value = self->min;
+    return self->valid;
+}
+
+bool Sensor_IsValid(struct sensor_t *self)
+{
+    sc_assert(self != NULL);
+
+    return self->valid;
+}
+
+void Sensor_Reset(struct sensor_t *self)
+{
+    sc_assert(self != NULL);
+
+    self->max = INT16_MIN;
+    self->min = INT16_MAX;
+    self->value = 0;
+    self->valid = false;
+
+    // TODO: Synchronize with SRAM.
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static int16_t RawValueToTemperature(uint16_t raw_value)
+static void SetSensorValues(struct sensor_t *self, int16_t value)
 {
-    // Truncate the raw value if it's outside of the LUT.
-    if (raw_value < mf52_table[0])
+    sc_assert(self != NULL);
+
+    self->value = value;
+
+    if (value > self->max)
     {
-        raw_value = mf52_table[0];
-    }
-    else if (raw_value > mf52_table[ElementsIn(mf52_table) - 1])
-    {
-        raw_value = mf52_table[ElementsIn(mf52_table) - 1];
+        self->max = value;
     }
 
-    uint8_t index = 0;
-    while (index < ElementsIn(mf52_table) &&
-            pgm_read_word(&mf52_table[index]) < raw_value)
+    if (value < self->min)
     {
-        ++index;
+        self->min = value;
     }
-
-    int32_t tmp;
-    tmp = 100 * (int32_t)raw_value;
-    tmp /= pgm_read_word(&mf52_table[index]);
-    tmp *= (TABLE_OFFSET + (index * 5));
-    tmp /= 10;
-    return  (int16_t)tmp;
 }

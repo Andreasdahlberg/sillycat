@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-08 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -37,6 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libUI.h"
 #include "Sensor.h"
 #include "Interface.h"
+#include "driverNTC.h"
 #include "guiSensor.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -53,6 +54,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 static struct view detailed_temperature_view;
 static struct view temperature_view;
+static struct sensor_t *temperature_sensor;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -82,24 +84,30 @@ void guiSensor_Init(void)
 
     Interface_AddChild(&temperature_view, &detailed_temperature_view);
     Interface_AddView(&temperature_view);
+
+    temperature_sensor = driverNTC_GetSensor(0);
     return;
 }
 
 void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
             unused)))
 {
-    sensor_sample_type reading;
-    if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
+    int16_t max_scaled;
+    int16_t min_scaled;
+
+    if (Sensor_GetMaxValue(temperature_sensor, &max_scaled) &&
+            Sensor_GetMinValue(temperature_sensor, &min_scaled))
     {
-        struct div_t max_temperature;
-        struct div_t min_temperature;
-        max_temperature = Divide((int32_t)reading.max, 10);
-        min_temperature = Divide((int32_t)reading.min, 10);
+        struct div_t max;
+        struct div_t min;
+
+        max = Divide((int32_t)max_scaled, 10);
+        min = Divide((int32_t)min_scaled, 10);
 
         libUI_Print("Max: %ld.%d C", 2, UI_DOUBLE_ROW_FIRST,
-                    max_temperature.quotient, abs(max_temperature.remainder));
+                    max.quotient, abs(max.remainder));
         libUI_Print("Min: %ld.%d C", 2, UI_DOUBLE_ROW_SECOND,
-                    min_temperature.quotient, abs(min_temperature.remainder));
+                    min.quotient, abs(min.remainder));
     }
     else
     {
@@ -111,20 +119,21 @@ void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
 
 void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 {
-    sensor_sample_type reading;
+    int16_t temperature_scaled;
 
-    if (Sensor_GetReading(SENSOR_EXTERNAL_TEMPERATURE, &reading))
+    if (Sensor_GetValue(temperature_sensor, &temperature_scaled))
     {
         struct div_t temperature;
-        temperature = Divide((int32_t)reading.value, 10);
+        temperature = Divide((int32_t)temperature_scaled, 10);
 
-        libUI_Print("%ld.%d C", 45, UI_SINGLE_ROW, temperature.quotient,
-                    abs(temperature.remainder));
+        libUI_Print("%ld.%d C", 45, UI_SINGLE_ROW,
+                    temperature.quotient, abs(temperature.remainder));
     }
     else
     {
         libUI_Print("-.- C", 45, UI_SINGLE_ROW);
     }
+
     return;
 }
 
@@ -134,7 +143,7 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
 
 void ClearAction(uint16_t context __attribute__ ((unused)))
 {
-    Sensor_ClearReadings();
+    Sensor_Reset(temperature_sensor);
     Interface_Refresh();
 
     return;

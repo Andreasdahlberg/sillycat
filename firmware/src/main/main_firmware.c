@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-08 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -54,6 +54,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Config.h"
 #include "ErrorHandler.h"
 
+#include "driverNTC.h"
+#include "driverMCUTemperature.h"
+
 #include "guiRTC.h"
 #include "guiSensor.h"
 #include "guiNodes.h"
@@ -104,6 +107,8 @@ int main(void)
     libSPI_Init(1);
     libDS3234_Init();
     Sensor_Init();
+    driverNTC_Init();
+    driverMCUTemperature_Init();
     libInput_Init();
     Config_Load();
     Transceiver_Init();
@@ -114,6 +119,9 @@ int main(void)
     guiSensor_Init();
     guiNodes_Init();
     Nodes_Init();
+
+    Sensor_Register(driverNTC_GetSensor(0));
+    Sensor_Register(driverMCUTemperature_GetSensor());
 
     libInput_SetCallbacks(Interface_NextView,
                           Interface_PreviousView,
@@ -161,13 +169,17 @@ void CheckHealth(void)
         WARNING("Low memory: %u", unused_memory);
     }
 
-    int16_t mcu_temperature;
-    Sensor_GetSensorValue(SENSOR_INTERNAL_TEMPERATURE, &mcu_temperature);
-    if (!high_mcu_temp_flag && mcu_temperature > HICH_MCU_TEMP_LIMIT)
+    int16_t temperature;
+    struct sensor_t *temperature_sensor = driverMCUTemperature_GetSensor();
+
+    if (Sensor_GetValue(temperature_sensor, &temperature))
     {
-        ErrorHandler_LogError(HICH_MCU_TEMP_LIMIT, (int8_t)mcu_temperature);
-        high_mcu_temp_flag = true;
-        WARNING("High MCU temperature: %d", mcu_temperature);
+        if (!high_mcu_temp_flag && temperature > HICH_MCU_TEMP_LIMIT)
+        {
+            ErrorHandler_LogError(HICH_MCU_TEMP_LIMIT, (int8_t)temperature);
+            high_mcu_temp_flag = true;
+            WARNING("High MCU temperature: %d", temperature);
+        }
     }
 
     sc_assert(unused_memory > 0);

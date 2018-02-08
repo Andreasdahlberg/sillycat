@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-08 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -31,36 +31,85 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define SENSOR_EXTERNAL_TEMPERATURE 0x07
-#define SENSOR_INTERNAL_TEMPERATURE 0x08
-
-#define AVERAGE_WINDOW_S    300    //5 min
-#define SAMPLE_FREQUENCY_MS 5000   //5 sec
-
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-//Using packed attribute since the struct will be stored to SRAM
-typedef struct __attribute__((packed))
+struct sensor_t
 {
-    uint16_t header;
+    void (*Update)(struct sensor_t *);
     int16_t max;
     int16_t min;
     int16_t value;
-    int16_t average;
-}
-sensor_sample_type;
+    bool valid;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the sensor module.
+ */
 void Sensor_Init(void);
+
+/**
+ * Update all sensors registered in the sensor module.
+ */
 void Sensor_Update(void);
-void Sensor_GetSensorValue(uint8_t sensor, int16_t *sensor_value);
-bool Sensor_GetReading(uint8_t sensor, sensor_sample_type *reading);
-bool Sensor_SaveReading(uint8_t sensor, sensor_sample_type *reading);
-void Sensor_ClearReadings(void);
+
+/**
+ * Register a sensor to the sensor module. This sensor will be updated when
+ * `Sensor_Update()` is called.
+ *
+ * @param self Pointer to sensor struct.
+ */
+void Sensor_Register(struct sensor_t *self);
+
+/**
+ * Get the latest value recorded for the supplied sensor.
+ *
+ * @param self  Pointer to sensor struct.
+ * @param value Pointer to variable where the value will be stored.
+ *
+ * @return True if the sensor has a valid value, otherwise false.
+ */
+bool Sensor_GetValue(struct sensor_t *self, int16_t *value);
+
+/**
+ * Get the maximum value recorded for the supplied sensor.
+ *
+ * @param self  Pointer to sensor struct.
+ * @param value Pointer to variable where the value will be stored.
+ *
+ * @return True if the sensor has a valid maximum value, otherwise false.
+ */
+bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value);
+
+/**
+ * Get the minimum value recorded for the supplied sensor.
+ *
+ * @param self  Pointer to sensor struct.
+ * @param value Pointer to variable where the value will be stored.
+ *
+ * @return True if the sensor has a valid minimum value, otherwise false.
+ */
+bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value);
+
+/**
+ * Check if the supplied sensor has a valid value.
+ *
+ * @param self Pointer to sensor struct.
+ *
+ * @return True if the sensor has a valid value, otherwise false.
+ */
+bool Sensor_IsValid(struct sensor_t *self);
+
+/**
+ * Reset the recorded values for the supplied sensor.
+ *
+ * @param self Pointer to sensor struct.
+ */
+void Sensor_Reset(struct sensor_t *self);
 
 #endif

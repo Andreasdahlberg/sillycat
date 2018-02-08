@@ -1,7 +1,7 @@
 /**
- * @file   Sensor_Calibration.h
+ * @file   driverMCUTemperature_Calibration.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-19 (Last edit)
+ * @date   2018-02-08 (Last edit)
  * @brief  Header with sensor calibration values.
  *
  * Detailed description of file.
@@ -24,17 +24,18 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#ifndef SENSORCALIBRATION_H_
-#define SENSORCALIBRATION_H_
+#ifndef DRIVERMCUTEMPERATURE_CALIBRATION_H_
+#define DRIVERMCUTEMPERATURE_CALIBRATION_H_
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define INTERNAL_TEMP_SENSOR_CALIBRATED 1
-#define INTERNAL_TEMP_CALIBRATION_K     1
-#define INTERNAL_TEMP_CALIBRATION_M     (-54)
+#ifndef MCU_TEMP_SENSOR_CALIBRATED
+#define MCU_TEMP_SENSOR_CALIBRATED      0
+#define MCU_TEMP_SENSOR_CALIBRATION_K   1
+#define MCU_TEMP_SENSOR_CALIBRATION_M   0
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -44,4 +45,4 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-#endif /* SENSORCALIBRATION_H_ */
+#endif
