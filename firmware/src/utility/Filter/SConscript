@@ -19,13 +19,13 @@ import os
 
 Import(['*'])
 
-modules = ['CRC', 'FIFO', 'List', 'Filter']
-module_objects = []
+include_path = '#{}'.format(Dir('.').srcnode().path)
+env.Append(CPPPATH=[
+    include_path,
+    '#src/common_library'
+    ])
 
-for module in modules:
-    sconscript_file = os.path.join(module, 'SConscript')
+source = Glob('*.c')
+objects = env.Object(source)
 
-    module_object = SConscript(sconscript_file, exports = 'env')
-    module_objects.append(module_object)
-
-Return('module_objects')
+Return('objects')
