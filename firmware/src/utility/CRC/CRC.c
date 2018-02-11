@@ -54,7 +54,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-uint16_t CalculateCRC_16(const void *data, size_t length)
+uint16_t CRC_16(const void *data, size_t length)
 {
     sc_assert(data != NULL);
 

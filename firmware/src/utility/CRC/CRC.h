@@ -54,6 +54,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @return CRC-16 value of data.
  */
-uint16_t CalculateCRC_16(const void *data, size_t length);
+uint16_t CRC_16(const void *data, size_t length);
 
 #endif
