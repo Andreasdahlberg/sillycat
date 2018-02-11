@@ -1,7 +1,7 @@
 /**
  * @file   CRC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-22 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  Header for functions to calculate CRC.
  *
  * Detailed description of file.
@@ -46,6 +46,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Calculate CRC-16.
+ *
+ * @param data   Pointer to data to calculate CRC for.
+ * @param length Number of bytes to calculate CRC for.
+ *
+ * @return CRC-16 value of data.
+ */
 uint16_t CalculateCRC_16(void *data, size_t length);
 
-#endif /* CRC_H_ */
+#endif
