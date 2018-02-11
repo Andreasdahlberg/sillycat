@@ -31,7 +31,6 @@
 # Debug files
 *.dSYM/
 *.su
-
 *.map
 *.pyc
 
@@ -50,4 +49,7 @@
 
 # Sublime files
 *.sublime-workspace
+
+# Misc
 *.ms14 (Security copy)
+compile_commands.json
