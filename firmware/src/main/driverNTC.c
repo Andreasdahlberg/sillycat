@@ -1,7 +1,7 @@
 /**
  * @file   driverNTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  NTC sensor driver
  *
  * Driver for NTC sensors.
@@ -35,6 +35,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "ADC.h"
 #include "Sensor.h"
 #include "Timer.h"
+#include "Filter.h"
 #include "libDebug.h"
 #include "driverNTC.h"
 
@@ -56,6 +57,7 @@ struct ntc_sensor_t
         struct adc_channel_t channel;
         uint8_t index;
     } adc;
+    struct filter_t filter;
     uint32_t timer;
 };
 
@@ -73,6 +75,7 @@ static void Update(struct sensor_t *super);
 static bool GetTemperature(struct ntc_sensor_t *self, int16_t *temperature);
 static bool ADCValueToTemperature(uint16_t adc_value, int16_t *temperature);
 static bool IsValid(uint16_t adc_value);
+static int16_t FilterTemperature(struct ntc_sensor_t *self, int16_t temperature);
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -182,7 +185,7 @@ static void Update(struct sensor_t *super)
 
         if (GetTemperature(self, &temperature))
         {
-            self->base.value = temperature;
+            self->base.value = FilterTemperature(self, temperature);
             self->base.valid = true;
         }
         else
@@ -223,4 +226,21 @@ static bool IsValid(uint16_t adc_value)
 
     return (adc_value >= offset) &&
            (adc_value - offset <= ElementsIn(ntc_lut.temperatures));
+}
+
+static int16_t FilterTemperature(struct ntc_sensor_t *self, int16_t temperature)
+{
+    if (Filter_IsInitialized(&self->filter))
+    {
+        Filter_Process(&self->filter, temperature);
+    }
+    else
+    {
+        /**
+         * Assuming a sample frequency of 10 Hz, α = 0.2 gives a cutoff of 4 Hz.
+         */
+        Filter_Init(&self->filter, temperature, FILTER_ALPHA(0.2));
+    }
+
+    return Filter_Output(&self->filter);
 }
