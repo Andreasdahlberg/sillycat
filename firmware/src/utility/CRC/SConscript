@@ -20,7 +20,10 @@ import os
 Import(['*'])
 
 include_path = '#{}'.format(Dir('.').srcnode().path)
-env.Append(CPPPATH=[include_path])
+env.Append(CPPPATH=[
+    include_path,
+    '#src/common_library'
+    ])
 
 source = Glob('*.c')
 objects = env.Object(source)
