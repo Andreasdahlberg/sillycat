@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -89,24 +89,6 @@ struct div_t Divide(int32_t numerator, int32_t denominator)
     result.remainder = numerator % denominator;
 
     return result;
-}
-
-///
-/// @brief Calculate an exponential moving average.
-///
-/// @param  value New value to add to an existing average.
-/// @param  average The existing average value.
-/// @param  alpha Smoothing factor, a higher alpha discounts old values faster.
-///               Use the macro CALCULATE_ALPHA to determine this value based on
-///               sample frequency and sample window.
-/// @return uint16_t Average value.
-///
-uint16_t GetExponentialMovingAverage(uint16_t value, uint16_t average,
-                                     uint16_t alpha)
-{
-    uint32_t tmp = (uint32_t)alpha * (uint32_t)value + (uint32_t)(65536 - alpha) *
-                   (uint32_t)average;
-    return (uint16_t)((tmp + 32768) / 65536);
 }
 
 uint8_t BCDToDecimal(uint8_t bcd_data)

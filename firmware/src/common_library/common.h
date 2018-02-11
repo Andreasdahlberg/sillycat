@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -91,8 +91,6 @@ struct div_t
 
 float_parts_type FloatToParts(float f_value);
 struct div_t Divide(int32_t numerator, int32_t denominator);
-uint16_t GetExponentialMovingAverage(uint16_t value, uint16_t average,
-                                     uint16_t alpha);
 void SetBit(uint8_t bit_index, bool state, uint8_t *data);
 bool IsBitSet(uint8_t bit_index, const uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
