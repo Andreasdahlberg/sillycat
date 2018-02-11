@@ -54,12 +54,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-uint16_t CalculateCRC_16(void *data, size_t length)
+uint16_t CalculateCRC_16(const void *data, size_t length)
 {
     sc_assert(data != NULL);
 
     uint16_t crc = CRC_INIT_VALUE;
-    uint8_t *ptr = (uint8_t *)data;
+    const uint8_t *ptr = (uint8_t *)data;
 
     size_t byte_idx;
     for (byte_idx = 0; byte_idx < length; ++byte_idx)
