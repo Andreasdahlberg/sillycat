@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -44,7 +44,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define REFRESH_RATE_MS 1000
+#define REFRESH_RATE_MS 100
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
