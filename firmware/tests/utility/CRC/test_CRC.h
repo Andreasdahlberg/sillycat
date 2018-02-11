@@ -18,4 +18,4 @@ void test_CRC_Calculate16_NullPointer(void **state __attribute__((__unused__)));
 void test_CRC_Calculate16_SingleBytes(void **state __attribute__((__unused__)));
 void test_CRC_Calculate16_SeveralBytes(void **state __attribute__((__unused__)));
 
-#endif /* TESTCRC_H_ */
+#endif
