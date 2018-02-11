@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -38,6 +38,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 struct sensor_t
 {
     void (*Update)(struct sensor_t *);
+    uint16_t id;
     int16_t max;
     int16_t min;
     int16_t value;

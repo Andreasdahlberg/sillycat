@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-02-11 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -32,7 +32,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include "Timer.h"
 #include "Sensor.h"
+#include "CRC.h"
 #include "libDebug.h"
+#include "libDS3234.h"
 #include "driverNTC.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -51,6 +53,13 @@ struct module_t
     size_t number_of_sensors;
 };
 
+struct __attribute__((packed)) sensor_statistics_t
+{
+    int16_t max;
+    int16_t min;
+    uint16_t crc;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
@@ -62,6 +71,11 @@ static struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 static void SetSensorValues(struct sensor_t *self, int16_t value);
+static void WriteValuesToSRAM(const struct sensor_t *self);
+static void ReadValuesFromSRAM(struct sensor_t *self);
+static void ResetValues(struct sensor_t *self);
+static bool IsCRCValid(const struct sensor_statistics_t *statistics);
+static void UpdateCRC(struct sensor_statistics_t *statistics);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -84,8 +98,7 @@ void Sensor_Update(void)
         if (Sensor_IsValid(module.sensors[i]))
         {
             SetSensorValues(module.sensors[i], module.sensors[i]->value);
-
-            // TODO: Synchronize with SRAM.
+            WriteValuesToSRAM(module.sensors[i]);
         }
     }
 }
@@ -96,10 +109,15 @@ void Sensor_Register(struct sensor_t *self)
     sc_assert(module.number_of_sensors < ElementsIn(module.sensors));
 
     module.sensors[module.number_of_sensors] = self;
-    ++module.number_of_sensors;
 
-    // TODO: Remove reset and read values from SRAM.
-    Sensor_Reset(self);
+    // Assign a unique ID to the sensor so it's values can be located in
+    // SRAM later on.
+    self->id = module.number_of_sensors;
+
+    ResetValues(module.sensors[module.number_of_sensors]);
+    ReadValuesFromSRAM(module.sensors[module.number_of_sensors]);
+
+    ++module.number_of_sensors;
 }
 
 bool Sensor_GetValue(struct sensor_t *self, int16_t *value)
@@ -140,12 +158,8 @@ void Sensor_Reset(struct sensor_t *self)
 {
     sc_assert(self != NULL);
 
-    self->max = INT16_MIN;
-    self->min = INT16_MAX;
-    self->value = 0;
-    self->valid = false;
-
-    // TODO: Synchronize with SRAM.
+    ResetValues(self);
+    WriteValuesToSRAM(self);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -167,4 +181,54 @@ static void SetSensorValues(struct sensor_t *self, int16_t value)
     {
         self->min = value;
     }
+}
+
+static void WriteValuesToSRAM(const struct sensor_t *self)
+{
+    uint8_t address = sizeof(struct sensor_statistics_t) * self->id;
+
+    struct sensor_statistics_t stats;
+    stats.max = self->max;
+    stats.min = self->min;
+
+    UpdateCRC(&stats);
+    libDS3234_WriteToSRAM(address, (uint8_t *)&stats, sizeof(stats));
+}
+
+static void ReadValuesFromSRAM(struct sensor_t *self)
+{
+    uint8_t address = sizeof(struct sensor_statistics_t) * self->id;
+    struct sensor_statistics_t stats;
+
+    libDS3234_ReadFromSRAM(address, (uint8_t *)&stats, sizeof(stats));
+
+    if (IsCRCValid(&stats))
+    {
+        self->max = stats.max;
+        self->min = stats.min;
+    }
+}
+
+static void ResetValues(struct sensor_t *self)
+{
+    self->max = INT16_MIN;
+    self->min = INT16_MAX;
+    self->value = 0;
+    self->valid = false;
+}
+
+static bool IsCRCValid(const struct sensor_statistics_t *statistics)
+{
+    size_t size;
+    size = sizeof(*statistics) - offsetof(__typeof__(*statistics), crc);
+
+    return CRC_16(statistics, size) == statistics->crc;
+}
+
+static void UpdateCRC(struct sensor_statistics_t *statistics)
+{
+    size_t size;
+    size = sizeof(*statistics) - offsetof(__typeof__(*statistics), crc);
+
+    statistics->crc = CRC_16(statistics, size);
 }
