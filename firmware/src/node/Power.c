@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-07-28 (Last edit)
+ * @date   2018-02-16 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -33,6 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libPower.h"
+#include "driverCharger.h"
 
 #include "Timer.h"
 #include "Power.h"
@@ -102,7 +103,6 @@ void Power_Update(void)
     return;
 }
 
-
 ///
 /// @brief Handle wake up event.
 ///
@@ -113,9 +113,9 @@ void Power_WakeUp(const event_type *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
-    DEBUG("Battery voltage: %u\r\n", libPower_GetBatteryVoltage());
-    DEBUG("Charger connected: %u\r\n", (uint8_t)libPower_IsChargerConnected());
-    DEBUG("Charging: %u\r\n", (uint8_t)libPower_IsCharging());
+    DEBUG("Battery voltage: %u\r\n", driverCharger_GetBatteryVoltage());
+    DEBUG("Charger connected: %u\r\n", (uint8_t)driverCharger_IsConnected());
+    DEBUG("Charging: %u\r\n", (uint8_t)driverCharger_IsCharging());
     return;
 }
 //////////////////////////////////////////////////////////////////////////
@@ -127,14 +127,14 @@ static void BatteryMonitoringSM(void)
     switch (battery_state)
     {
         case POWER_NORMAL:
-            if (libPower_IsCharging() == true)
+            if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
-            else if (libPower_GetBatteryVoltage() < LOW_VOLTAGE_MV)
+            else if (driverCharger_GetBatteryVoltage() < LOW_VOLTAGE_MV)
             {
                 INFO("Low battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_LOW);
@@ -144,14 +144,14 @@ static void BatteryMonitoringSM(void)
             break;
 
         case POWER_LOW:
-            if (libPower_IsCharging() == true)
+            if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
-            else if (libPower_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
+            else if (driverCharger_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
             {
                 WARNING("Critical battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_CRITICAL);
@@ -161,7 +161,7 @@ static void BatteryMonitoringSM(void)
             break;
 
         case POWER_CRITICAL:
-            if (libPower_IsCharging() == true)
+            if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
@@ -171,7 +171,7 @@ static void BatteryMonitoringSM(void)
             break;
 
         case POWER_CHARGING:
-            if (libPower_IsCharging() == false)
+            if (driverCharger_IsCharging() == false)
             {
                 INFO("Charging stopped");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STOPPED);
@@ -181,7 +181,7 @@ static void BatteryMonitoringSM(void)
             break;
 
         case POWER_CONNECTED:
-            if (libPower_IsCharging() == true)
+            if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
                 event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
@@ -189,7 +189,7 @@ static void BatteryMonitoringSM(void)
                 battery_state = POWER_CHARGING;
             }
 
-            if (libPower_IsChargerConnected() == false)
+            if (driverCharger_IsConnected() == false)
             {
                 INFO("Charger disconnected");
                 event_type event = Event_New(EVENT_BATTERY_CHARGER_DISCONNECTED);

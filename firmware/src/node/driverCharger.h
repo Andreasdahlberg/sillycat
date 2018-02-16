@@ -1,10 +1,10 @@
 /**
- * @file   libPower.h
+ * @file   driverCharger.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-16 (Last edit)
- * @brief  Implementation of a low level power functions.
+ * @date   2018-02-15 (Last edit)
+ * @brief  LTC4060 charger driver
  *
- * Detailed description of file.
+ * Driver for the LTC4060 NiMH/NICd fast battery charger.
  */
 
 /*
@@ -24,8 +24,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBPOWER_H_
-#define LIBPOWER_H_
+#ifndef DRIVERCHARGER_H_
+#define DRIVERCHARGER_H_
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -40,25 +40,42 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * Initialize the low level power module.
+ * Initialize the charger driver.
  */
-void libPower_Init(void);
+void driverCharger_Init(void);
 
 /**
- * Enter sleep mode.
+ * Check if the charger is connected.
+ *
+ * Use `driverCharger_IsCharging()` to check if the charger is actually
+ * charging the battery.
+ *
+ * @return True if charger is connected, otherwise false.
  */
-void libPower_Sleep(void);
+bool driverCharger_IsConnected(void);
 
 /**
- * Get an approximation of the maximum output current from the buck-boost
- * converter at the specified input voltage.
+ * Check if the charger is charging the battery.
  *
- * The approximation works best in the normal operating range(1.8V to 2.8V).
+ * If this functions returns true, it's implied that the charger is connected.
+ * If not charging, the battery is either fully charged or to hot.
  *
- * @param vin Buck-boost input voltage in mV.
- *
- * @return Max output current in mA.
+ * @return True if charging, otherwise false.
  */
-uint32_t libPower_GetMaxOutputCurrent(uint16_t vin);
+bool driverCharger_IsCharging(void);
+
+/**
+ * Get the current battery voltage.
+ *
+ * @return Battery voltage in mV,
+ */
+uint16_t driverCharger_GetBatteryVoltage(void);
+
+/**
+ * Get the current battery temperature.
+ *
+ * @return Battery temperature in Celsius.
+ */
+int16_t driverCharger_GetBatteryTemperature(void);
 
 #endif

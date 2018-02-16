@@ -1,10 +1,10 @@
 /**
- * @file   libPower.c
+ * @file   driverCharger.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-16 (Last edit)
- * @brief  Implementation of low level power functions.
+ * @date   2018-02-17 (Last edit)
+ * @brief  LTC4060 charger driver
  *
- * Detailed description of file.
+ * Driver for the LTC4060 NiMH/NICd fast battery charger.
  */
 
 /*
@@ -31,126 +31,123 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include before all other headers
 #include "common.h"
 
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
+#include <avr/io.h>
 
-#include "libPower.h"
+#include "driverCharger.h"
+#include "libDebug.h"
+#include "ADC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-/* Defines for approximation of maximum output current. */
-#define K_CONST ((uint32_t)91660)
-#define M_CONST ((int32_t)-70810000)
-#define VIN_MIN 1800
-#define VIN_MAX 3500
+#define VREF 3300 // mV
+#define R1_RESISTANCE 5600.0
+#define R2_RESISTANCE 100000.0
+
+#define CONNECTED_PIN PINC1
+#define CHARGING_PIN PINC4
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct module_t
+{
+    struct
+    {
+        struct adc_channel_t voltage;
+        struct adc_channel_t temperature;
+    } adc;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void EnableLowLevelInterupt(bool enable);
+void InitChargerPins(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
 //////////////////////////////////////////////////////////////////////////
 
-ISR(INT1_vect)
-{
-    /* Do nothing here. */
-}
-
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libPower_Init(void)
+void driverCharger_Init(void)
 {
-    /* Disable TWI(I2C) and Timer 2 since they are not used. */
-    PRR = ((1 << PRTWI) | (1 << PRTIM2));
+    ADC_InitChannel(&module.adc.voltage, 7);
+    ADC_InitChannel(&module.adc.temperature, 6);
 
-    /* Turn off USART if debug is disabled. */
-#ifndef DEBUG_ENABLE
-    PRR |= (1 << PRUSART0);
-#endif
+    InitChargerPins();
 
-    return;
+    INFO("LTC4060 driver initialized");
 }
 
-void libPower_Sleep(void)
+bool driverCharger_IsConnected(void)
 {
+    return ((PINC & (1 << CONNECTED_PIN)) == 0);
+}
+
+bool driverCharger_IsCharging(void)
+{
+    return ((PINC & (1 << CHARGING_PIN)) == 0);
+}
+
+uint16_t driverCharger_GetBatteryVoltage(void)
+{
+    uint16_t adc_value;
+    ADC_Convert(&module.adc.voltage, &adc_value, 1);
+
+    uint32_t voltage;
+    voltage = ((uint32_t)adc_value * VREF) / 1024;
+
     /**
-     * Do not enter sleep if global interrupts are disabled. Without this the
-     * device can not wake up again.
      *
-     * IMPORTANT: This function does not catch cases where interrupts are
-     * disabled inside an interrupt vector.
+     *  | VBAT
+     *  |
+     *  -
+     * | | R1 = 5.6 KOhm
+     * | |
+     *  -
+     *  |
+     *  ------- VSENSE
+     *  |
+     *  -
+     * | | R2 = 100 KOhm
+     * | |
+     *  -
+     *  |
+     *  | GND
      */
-    if (IsGlobalInteruptEnabled() == false)
-    {
-        sc_assert_fail();
-        return;
-    }
 
-    EnableLowLevelInterupt(true);
-
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-    sleep_enable();
-    sleep_cpu();
-    sleep_disable();
-
-    EnableLowLevelInterupt(false);
-    return;
+    /* Adjust voltage from voltage divider. */
+    return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE +
+                                        R2_RESISTANCE)));
 }
 
-uint32_t libPower_GetMaxOutputCurrent(uint16_t vin)
+int16_t driverCharger_GetBatteryTemperature(void)
 {
-    uint32_t iout_max;
-
-    if (vin < VIN_MIN)
-    {
-        iout_max = 0;
-    }
-    else if (vin > VIN_MAX)
-    {
-        iout_max = 240;
-    }
-    else
-    {
-        iout_max = (K_CONST * vin + M_CONST) / 1000000;
-    }
-
-    return iout_max;
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-/* This function does not touch the global interrupt enable! */
-static void EnableLowLevelInterupt(bool enable)
+void InitChargerPins(void)
 {
-    if (enable == true)
-    {
-        /* Enable low level sense. */
-        EICRA &= ~(1 << ISC11 | 1 << ISC10);
+    /* Set pins as inputs. */
+    DDRC &= ~(1 << CONNECTED_PIN | 1 << CHARGING_PIN);
 
-        /* Enable external interrupt 1. */
-        EIMSK |= (1 << INT1);
-    }
-    else
-    {
-        /* Disable external interrupt 1. */
-        EIMSK &= ~(1 << INT1);
-    }
-    return;
+    /* Enable pull-ups. */
+    PORTC  |= (1 << CONNECTED_PIN);
+    PORTC  |= (1 << CHARGING_PIN);
 }

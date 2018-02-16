@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-17 (Last edit)
+ * @date   2018-02-16 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -41,6 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDHT22.h"
 #include "libPower.h"
 #include "libS25FL1K.h"
+#include "driverCharger.h"
 
 #include "ADC.h"
 #include "Timer.h"
@@ -110,6 +111,7 @@ int main(void)
     libSPI_Init(0);
     libDHT22_Init();
     libPower_Init();
+    driverCharger_Init();
 
     LED_Init();
     Config_Load();
@@ -221,7 +223,7 @@ static void RHTAvailable(const event_type *event __attribute__ ((unused)))
 
 static bool IsTimeForSleep(void)
 {
-    if (libPower_IsChargerConnected() == true)
+    if (driverCharger_IsConnected())
     {
         return false;
     }
