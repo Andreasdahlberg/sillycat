@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2018-02-26 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -145,6 +145,29 @@ void Interface_AddSibling(struct view *sibling_view, struct view *new_view)
         new_view->prev = view_ptr;
         view_ptr->next = new_view;
     }
+    return;
+}
+
+///
+/// @brief Initialize a new view
+///
+/// @param  *view Pointer to view
+/// @param  *draw_function Pointer to view draw function
+/// @param  context View context
+/// @return None
+///
+void Interface_InitView(struct view *view,
+                        interface_fp draw_function,
+                        uint16_t context)
+{
+    view->draw_function = draw_function;
+    view->action_function = NULL;
+    view->context = context;
+    view->child = NULL;
+    view->prev = NULL;
+    view->next = NULL;
+    view->parent = NULL;
+
     return;
 }
 
