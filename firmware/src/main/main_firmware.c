@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-03-04 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -53,6 +53,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Nodes.h"
 #include "Config.h"
 #include "ErrorHandler.h"
+#include "PacketHandler.h"
 
 #include "driverNTC.h"
 #include "driverMCUTemperature.h"
@@ -85,6 +86,8 @@ void CheckHealth(void);
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static struct node_t node;
 
 int main(void)
 {
@@ -122,6 +125,11 @@ int main(void)
 
     Sensor_Register(driverNTC_GetSensor(0));
     Sensor_Register(driverMCUTemperature_GetSensor());
+
+    Node_Init(&node, 128);
+    Nodes_Add(&node);
+
+    Com_SetPacketHandler(PacketHandler_HandleReadingPacket, COM_PACKET_TYPE_READING);
 
     libInput_SetCallbacks(Interface_NextView,
                           Interface_PreviousView,

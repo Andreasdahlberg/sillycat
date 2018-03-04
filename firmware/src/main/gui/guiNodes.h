@@ -1,10 +1,8 @@
 /**
  * @file   guiNodes.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-13 (Last edit)
- * @brief  Header of guiNodes
- *
- * Detailed description of file.
+ * @date   2018-03-04 (Last edit)
+ * @brief  Implementation of GUI for remote nodes.
  */
 
 /*

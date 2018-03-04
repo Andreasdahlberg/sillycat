@@ -1,10 +1,8 @@
 /**
  * @file   Nodes.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-06 (Last edit)
- * @brief  Header of Nodes
- *
- * Detailed description of file.
+ * @date   2018-03-04 (Last edit)
+ * @brief  Implementation of an interface for handling a collection of nodes.
  */
 
 /*
@@ -31,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "Transceiver.h"
+#include "Node.h"
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -41,7 +39,25 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the node collection.
+ */
 void Nodes_Init(void);
-packet_frame_type *Nodes_GetLatestData(uint8_t index);
 
-#endif /* NODES_H_ */
+/**
+ * Add a node to the collection.
+ *
+ * @param node_p Pointer to node struct.
+ */
+void Nodes_Add(struct node_t *node_p);
+
+/**
+ * Get a node matching the supplied ID.
+ *
+ * @param id Node ID.
+ *
+ * @return Pointer to node struct if ID is valid, otherwise NULL.
+ */
+struct node_t *Nodes_GetNodeFromID(uint8_t id);
+
+#endif
