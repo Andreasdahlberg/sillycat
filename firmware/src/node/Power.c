@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-16 (Last edit)
+ * @date   2018-03-04 (Last edit)
  * @brief  Implementation of Power manager
  *
  * Detailed description of file.
@@ -136,7 +136,7 @@ static void BatteryMonitoringSM(void)
             }
             else if (driverCharger_GetBatteryVoltage() < LOW_VOLTAGE_MV)
             {
-                INFO("Low battery voltage");
+                INFO("Low battery voltage[%u mV]", driverCharger_GetBatteryVoltage());
                 event_type event = Event_New(EVENT_BATTERY_LOW);
                 Event_Trigger(&event);
                 battery_state = POWER_LOW;
