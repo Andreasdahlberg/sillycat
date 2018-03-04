@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-14 (Last edit)
+ * @date   2018-03-04 (Last edit)
  * @brief  Header of libDht22
  *
  * Detailed description of file.
@@ -54,4 +54,4 @@ bool libDHT22_IsIdle(void);
 void libDHT22_StartReading(void);
 bool libDHT22_IsReadingValid(void);
 
-#endif /* LIBDHT22_H_ */
+#endif
