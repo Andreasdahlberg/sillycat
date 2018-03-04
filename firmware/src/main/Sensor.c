@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2018-03-04 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -92,9 +92,11 @@ void Sensor_Update(void)
 {
     for (size_t i = 0; i < module.number_of_sensors; ++i)
     {
-        sc_assert(module.sensors[i]->Update != NULL);
+        if (module.sensors[i]->Update != NULL)
+        {
+            module.sensors[i]->Update(module.sensors[i]);
+        }
 
-        module.sensors[i]->Update(module.sensors[i]);
         if (Sensor_IsValid(module.sensors[i]))
         {
             SetSensorValues(module.sensors[i], module.sensors[i]->value);
