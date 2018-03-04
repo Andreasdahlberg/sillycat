@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-16 (Last edit)
+ * @date   2018-03-04 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -59,7 +59,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define MAX_AWAKE_TIME_MS 3000
+#define MAX_AWAKE_TIME_MS 1000
 #define MASTER_ADDRESS 0xAA
 
 //////////////////////////////////////////////////////////////////////////
