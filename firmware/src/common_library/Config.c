@@ -48,7 +48,7 @@ typedef struct
 {
     uint16_t version;
     uint8_t network_id[6];
-    char aes_key[17]; //TODO: Store in flash+WP? This is not secure. Store null?
+    char aes_key[17];
     uint32_t report_interval_s;
     uint8_t node_id;
     uint8_t node_role;
