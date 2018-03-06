@@ -3,8 +3,6 @@
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-03-06 (Last edit)
  * @brief  Implementation of Config
- *
- * Detailed description of file.
  */
 
 /*
@@ -85,12 +83,6 @@ static bool ValidateConfig(config_type *config);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Save the active configuration to NVM
-///
-/// @param  None
-/// @return bool true if active configuration was valid, otherwise false
-///
 bool Config_Save(void)
 {
     bool status = false;
@@ -105,12 +97,6 @@ bool Config_Save(void)
     return status;
 }
 
-///
-/// @brief Load an configuration from NVM into the active configuration
-///
-/// @param  None
-/// @return bool true if the NVM configuration was valid, otherwise false
-///
 bool Config_Load(void)
 {
     bool status = false;
@@ -129,106 +115,52 @@ bool Config_Load(void)
     return status;
 }
 
-///
-/// @brief Get the configuration version of the active configuration
-///
-/// @param  None
-/// @return uint16_t Configuration version
-///
 uint16_t Config_GetVersion(void)
 {
     return active_config.version;
 }
 
-///
-/// @brief Get a pointer to the network id in the active configuration
-///
-/// @param  None
-/// @return uint8_t* Pointer to network id
-///
 uint8_t *Config_GetNetworkId(void)
 {
     return active_config.network_id;
 }
 
-///
-/// @brief Get a pointer to the AES-key in the active configuration
-///
-/// @param  None
-/// @return char* Pointer to AES-key
-///
 char *Config_GetAESKey(void)
 {
     return active_config.aes_key;
 }
 
-///
-/// @brief Get the report interval from the active configuration
-///
-/// @param  None
-/// @return uint32_t Report interval in seconds
-///
 uint32_t Config_GetReportInterval(void)
 {
     return active_config.report_interval_s;
 }
 
-///
-/// @brief Get the node id from the active configuration
-///
-/// @param  None
-/// @return uint8_t Node id
-///
 uint8_t Config_GetNodeId(void)
 {
     return active_config.node_id;
 }
 
-///
-/// @brief Get the node role from the active configuration
-///
-/// @param  None
-/// @return uint8_t Node role, (master=1, node=2, listener=3)
-///
 uint8_t Config_GetNodeRole(void)
 {
     return active_config.node_role;
 }
 
-///
-/// @brief Set the network id in the active configuration
-///
-/// @param  network_id Pointer to network id
-/// @return None
-///
-void Config_SetNetworkId(const uint8_t *network_id)
+void Config_SetNetworkId(const uint8_t *network_id_p)
 {
-    sc_assert(network_id != NULL);
+    sc_assert(network_id_p != NULL);
 
-    memcpy(active_config.network_id, network_id, sizeof(active_config.network_id));
+    memcpy(active_config.network_id, network_id_p, sizeof(active_config.network_id));
     return;
 }
 
-///
-/// @brief Set the AES-key in the active configuration
-///
-/// @param  aes_key Pointer to AES-key
-/// @return None
-///
-void Config_SetAESKey(const char *aes_key)
+void Config_SetAESKey(const char *aes_key_p)
 {
-    sc_assert(aes_key != NULL);
+    sc_assert(aes_key_p != NULL);
 
-    memcpy(active_config.aes_key, aes_key, sizeof(active_config.aes_key));
+    memcpy(active_config.aes_key, aes_key_p, sizeof(active_config.aes_key));
     return;
 }
 
-///
-/// @brief Set the report interval in the active configuration
-///
-/// @param  report_interval Report interval in seconds
-/// @return None
-///
 void Config_SetReportInterval(uint32_t report_interval)
 {
     sc_assert(report_interval > 0);
@@ -237,12 +169,6 @@ void Config_SetReportInterval(uint32_t report_interval)
     return;
 }
 
-///
-/// @brief Set the node role in the active configuration
-///
-/// @param  node_role Node role (master=1, node=2, listener=3)
-/// @return None
-///
 void Config_SetNodeRole(uint8_t node_role)
 {
     sc_assert(node_role > 0);
