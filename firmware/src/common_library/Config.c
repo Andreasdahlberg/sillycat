@@ -1,7 +1,7 @@
 /**
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-07-28 (Last edit)
+ * @date   2018-03-06 (Last edit)
  * @brief  Implementation of Config
  *
  * Detailed description of file.
@@ -170,7 +170,7 @@ char *Config_GetAESKey(void)
 ///
 uint32_t Config_GetReportInterval(void)
 {
-    return 10;//active_config.report_interval_s;
+    return active_config.report_interval_s;
 }
 
 ///
