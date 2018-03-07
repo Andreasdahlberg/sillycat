@@ -2,7 +2,8 @@
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-03-06 (Last edit)
- * @brief  Implementation of Config
+ * @brief  Implementation of a module handling storage and validation of
+ *         configuration data.
  */
 
 /*
