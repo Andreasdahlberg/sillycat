@@ -89,13 +89,6 @@ uint32_t Config_GetReportInterval(void);
 uint8_t Config_GetNodeId(void);
 
 /**
- * Get the node role from the active configuration.
- *
- * @return  Node ID.
- */
-uint8_t Config_GetNodeRole(void);
-
-/**
  * Set the network ID in the active configuration.
  *
  * @param network_id Pointer to network ID.
@@ -115,12 +108,5 @@ void Config_SetAESKey(const char *aes_key_p);
  * @param report_interval Report interval in seconds.
  */
 void Config_SetReportInterval(uint32_t report_interval);
-
-/**
- * Set the node role in the active configuration.
- *
- * @param node_role Node role (master=1, node=2, listener=3).
- */
-void Config_SetNodeRole(uint8_t node_role);
 
 #endif

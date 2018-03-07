@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-03-07 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -138,7 +138,6 @@ int main(void)
 
     INFO("Start up done");
     DEBUG("Node ID: 0x%02X\r\n", Config_GetNodeId());
-    DEBUG("Node role: 0x%02X\r\n", Config_GetNodeRole());
 
     ErrorHandler_PrintLog();
 

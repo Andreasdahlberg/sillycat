@@ -1,7 +1,7 @@
 /**
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-06 (Last edit)
+ * @date   2018-03-07 (Last edit)
  * @brief  Implementation of a module handling storage and validation of
  *         configuration data.
  */
@@ -52,7 +52,6 @@ typedef struct
     char aes_key[17];
     uint32_t report_interval_s;
     uint8_t node_id;
-    uint8_t node_role;
 } config_type;
 
 //////////////////////////////////////////////////////////////////////////
@@ -66,8 +65,7 @@ static config_type EEMEM nvm_config =
     {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF},
     "1DUMMYKEYFOOBAR1",
     60,
-    128,
-    2,
+    128
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -141,11 +139,6 @@ uint8_t Config_GetNodeId(void)
     return active_config.node_id;
 }
 
-uint8_t Config_GetNodeRole(void)
-{
-    return active_config.node_role;
-}
-
 void Config_SetNetworkId(const uint8_t *network_id_p)
 {
     sc_assert(network_id_p != NULL);
@@ -170,14 +163,6 @@ void Config_SetReportInterval(uint32_t report_interval)
     return;
 }
 
-void Config_SetNodeRole(uint8_t node_role)
-{
-    sc_assert(node_role > 0);
-
-    active_config.node_role = node_role;
-    return;
-}
-
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -186,6 +171,5 @@ static bool ValidateConfig(config_type *config)
 {
     sc_assert(config != NULL);
 
-    return (config->node_id != 0 &&
-            (config->node_role > 0 && config->node_role < 4));
+    return (config->node_id != 0);
 }
