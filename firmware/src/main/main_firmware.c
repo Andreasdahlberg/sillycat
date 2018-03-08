@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-07 (Last edit)
+ * @date   2018-03-08 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -113,7 +113,14 @@ int main(void)
     driverNTC_Init();
     driverMCUTemperature_Init();
     libInput_Init();
-    Config_Load();
+
+    if (!Config_Load())
+    {
+        CRITICAL("Corrupt device configuration");
+        ErrorHandler_LogError(CORRUPT_CONFIG, 0);
+        ErrorHandler_PointOfNoReturn();
+    }
+
     Transceiver_Init();
     Com_Init();
     Interface_Init();
