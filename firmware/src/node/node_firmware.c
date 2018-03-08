@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-03-08 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -114,9 +114,15 @@ int main(void)
     driverCharger_Init();
 
     LED_Init();
-    Config_Load();
     RTC_Init();
     ErrorHandler_Init();
+
+    if (!Config_Load())
+    {
+        CRITICAL("Corrupt device configuration");
+        ErrorHandler_LogError(CORRUPT_CONFIG, 0);
+        ErrorHandler_PointOfNoReturn();
+    }
 
     //NOTE: Log reset reasons, during normal conditions the device should never restart.
     //      Disabled during development to prevent filling the error log.
