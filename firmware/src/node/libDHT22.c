@@ -116,7 +116,7 @@ void libDHT22_Init(void)
     init_time = Timer_GetMilliseconds();
     sensor_reading.status = false;
 
-    INFO("Init done");
+    INFO("DHT22 RHT sensor initialized");
     return;
 }
 
