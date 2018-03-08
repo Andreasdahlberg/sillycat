@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-10-23 (Last edit)
+ * @date   2018-03-08 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -68,4 +68,4 @@ void ErrorHandler_AssertFail(const char *__file, int __lineno,
 void ErrorHandler_DumpLog(void);
 #endif
 
-#endif /* ERRORHANDLER_H_ */
+#endif
