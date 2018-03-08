@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2018-03-08 (Last edit)
  * @brief  Implementation of low level functions for the DHT22 RHT sensor
  *
  * Detailed description of file.
@@ -43,7 +43,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define DATAPIN DDB0
-#define POWERUP_DELAY_MS 1000 //Time after power up before reading can stary
+#define POWERUP_DELAY_MS 1000
 #define LOW_HIGH_LIMIT 100
 #define REQUEST_READING_TIME_MS 2
 #define READING_TIMEOUT_MS 6
