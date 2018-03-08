@@ -52,7 +52,8 @@ enum
     POWERON = 1,
     ASSFAIL,
     LOW_STACK,
-    RTC_FAIL
+    RTC_FAIL,
+    CORRUPT_CONFIG
 };
 
 //////////////////////////////////////////////////////////////////////////
