@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-03-09 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -155,27 +155,17 @@ void Node_Update(struct node_t *self_p, void *data_p, size_t length)
     sc_assert(self_p != NULL);
     sc_assert(data_p != NULL);
 
-    if (length >= 2 * sizeof(float))
+    if (length >= 2 * sizeof(uint16_t))
     {
         uint8_t *content_p = (uint8_t *)data_p;
 
-        /** TODO: Get rid of float, use scaled integer. */
-
-        float humidity;
-        memcpy(&humidity, content_p, sizeof(humidity));
-        humidity *= 10;
-
-        content_p += sizeof(humidity);
-
-        float temperature;
-        memcpy(&temperature, content_p, sizeof(temperature));
-        temperature *= 10;
-
-        self_p->sensor.temperature.value = (int16_t)temperature;
-        self_p->sensor.temperature.valid = true;
-
-        self_p->sensor.humidity.value = (int16_t)humidity;
+        memcpy(&self_p->sensor.humidity.value, content_p, sizeof(uint16_t));
         self_p->sensor.humidity.valid = true;
+
+        content_p += sizeof(uint16_t);
+
+        memcpy(&self_p->sensor.temperature.value, content_p, sizeof(uint16_t));
+        self_p->sensor.temperature.valid = true;
     }
     else
     {

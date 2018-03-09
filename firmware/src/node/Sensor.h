@@ -44,8 +44,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct
 {
-    float humidity;
-    float temperature;
+    uint16_t humidity;
+    uint16_t temperature;
     rtc_time_type timestamp;
 } sensor_data_type;
 

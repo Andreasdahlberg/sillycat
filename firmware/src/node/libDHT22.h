@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-03-09 (Last edit)
  * @brief  Header of libDht22
  *
  * Detailed description of file.
@@ -38,8 +38,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 typedef struct
 {
-    float humidity;
-    float temperature;
+    uint16_t humidity;
+    uint16_t temperature;
     bool status;
 } dht22_data_type;
 

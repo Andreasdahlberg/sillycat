@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-03-09 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "libDebug.h"
 #include "libUI.h"
@@ -128,14 +129,32 @@ static void DrawNodeView(uint16_t context)
         struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
         struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
 
-        int16_t temperature;
-        int16_t humidity;
+        int16_t temperature_scaled;
+        int16_t humidity_scaled;
 
-        Sensor_GetValue(temperature_sensor_p, &temperature);
-        Sensor_GetValue(humidity_sensor_p, &humidity);
+        Sensor_GetValue(temperature_sensor_p, &temperature_scaled);
+        Sensor_GetValue(humidity_sensor_p, &humidity_scaled);
 
-        libUI_Print("%li.%u C", 45, UI_DOUBLE_ROW_FIRST, temperature / 10, 0);
-        libUI_Print("%li.%u %%", 45, UI_DOUBLE_ROW_SECOND, humidity / 10, 0);
+        struct div_t temperature;
+        struct div_t humidity;
+
+        temperature = Divide((int32_t)temperature_scaled, 10);
+        humidity = Divide((int32_t)humidity_scaled, 10);
+
+        libUI_Print(
+            "%ld.+%d C",
+            45,
+            UI_DOUBLE_ROW_FIRST,
+            temperature.quotient,
+            abs(temperature.remainder)
+        );
+        libUI_Print(
+            "%ld.+%d %%",
+            45,
+            UI_DOUBLE_ROW_SECOND,
+            humidity.quotient,
+            abs(humidity.remainder)
+        );
 
         if (!Node_IsBatteryOk(node_p))
         {
@@ -175,13 +194,26 @@ static void DrawTemperatureMaxMinView(uint16_t context)
     if (node_p != NULL && Node_IsActive(node_p))
     {
         struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
-        int16_t temperature;
+        int16_t temperature_scaled;
+        struct div_t temperature;
 
-        Sensor_GetMaxValue(temperature_sensor_p, &temperature);
-        libUI_Print("Max: %li.%u C", 2, UI_DOUBLE_ROW_FIRST, temperature / 10, 0);
+        Sensor_GetMaxValue(temperature_sensor_p, &temperature_scaled);
+        temperature = Divide((int32_t)temperature_scaled, 10);
+        libUI_Print(
+            "Max: %ld.%d C",
+            2,
+            UI_DOUBLE_ROW_FIRST,
+            temperature.quotient,
+            abs(temperature.remainder));
 
-        Sensor_GetMinValue(temperature_sensor_p, &temperature);
-        libUI_Print("Min: %li.%u C", 2, UI_DOUBLE_ROW_SECOND, temperature / 10, 0);
+        Sensor_GetMinValue(temperature_sensor_p, &temperature_scaled);
+        temperature = Divide((int32_t)temperature_scaled, 10);
+        libUI_Print(
+            "Min: %ld.%d C",
+            2,
+            UI_DOUBLE_ROW_SECOND,
+            temperature.quotient,
+            abs(temperature.remainder));
     }
     else
     {
@@ -197,13 +229,25 @@ static void DrawHumidityMaxMinView(uint16_t context)
     if (node_p != NULL && Node_IsActive(node_p))
     {
         struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
-        int16_t humidity;
+        int16_t humidity_scaled;
+        struct div_t humidity;
 
-        Sensor_GetMaxValue(humidity_sensor_p, &humidity);
-        libUI_Print("Max: %li.%u %%", 2, UI_DOUBLE_ROW_FIRST, humidity / 10, 0);
+        Sensor_GetMaxValue(humidity_sensor_p, &humidity_scaled);
+        humidity = Divide((int32_t)humidity_scaled, 10);
+        libUI_Print(
+            "Max: %ld.%d %%",
+            2, UI_DOUBLE_ROW_FIRST,
+            humidity.quotient,
+            abs(humidity.remainder));
 
-        Sensor_GetMinValue(humidity_sensor_p, &humidity);
-        libUI_Print("Min: %li.%u %%", 2, UI_DOUBLE_ROW_SECOND, humidity / 10, 0);
+        Sensor_GetMinValue(humidity_sensor_p, &humidity_scaled);
+        humidity = Divide((int32_t)humidity_scaled, 10);
+        libUI_Print(
+            "Min: %ld.%d %%",
+            2,
+            UI_DOUBLE_ROW_SECOND,
+            humidity.quotient,
+            abs(humidity.remainder));
     }
     else
     {

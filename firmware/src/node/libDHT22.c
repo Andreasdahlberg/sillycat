@@ -1,7 +1,7 @@
 /**
  * @file   libDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-08 (Last edit)
+ * @date   2018-03-09 (Last edit)
  * @brief  Implementation of low level functions for the DHT22 RHT sensor
  *
  * Detailed description of file.
@@ -85,7 +85,7 @@ static volatile uint16_t pulse_timings[EXPECTED_NR_PULSES];
 //////////////////////////////////////////////////////////////////////////
 
 static void DecodeTimings(void);
-static float ConvertToFloat(uint8_t integral, uint8_t fractional);
+static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional);
 static bool IsDataValid(uint8_t *data);
 static dht_state_type ReadingStateMachine(void);
 
@@ -298,19 +298,9 @@ static dht_state_type ReadingStateMachine(void)
     return next_dht_state;
 }
 
-///
-/// @brief Convert integral and fractional part into float
-///
-/// @param  integral The integral part of the float
-/// @param  fractional The fractional part of the float
-/// @return float The resulting float
-///
-static float ConvertToFloat(uint8_t integral, uint8_t fractional)
+static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional)
 {
-    float data = (integral << 8);
-    data += fractional;
-    data /= 10;
-    return data;
+    return (integral << 8) + (fractional);
 }
 
 ///
@@ -342,8 +332,8 @@ static void DecodeTimings(void)
 
     if (IsDataValid(data) == true)
     {
-        sensor_reading.humidity = ConvertToFloat(data[0], data[1]);
-        sensor_reading.temperature = ConvertToFloat(data[2], data[3]);
+        sensor_reading.humidity = ConvertToScaledInteger(data[0], data[1]);
+        sensor_reading.temperature = ConvertToScaledInteger(data[2], data[3]);
         sensor_reading.status = true;
     }
     else
