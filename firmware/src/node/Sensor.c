@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-10-23 (Last edit)
+ * @date   2018-03-09 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
