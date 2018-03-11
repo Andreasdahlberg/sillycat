@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-26 (Last edit)
+ * @date   2018-03-11 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -253,6 +253,19 @@ void Interface_AddChild(struct view *parent_view, struct view *child_view)
 
         child_view->parent = parent_view;
     }
+    return;
+}
+
+///
+/// @brief Add action on long press to view.
+///
+/// @param  *view Pointer to view
+/// @param  *action_function Pointer to view action function
+/// @return None
+///
+void Interface_AddAction(struct view *view, interface_fp action_function)
+{
+    view->action_function = action_function;
     return;
 }
 

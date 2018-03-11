@@ -1,7 +1,7 @@
 /**
  * @file   Interface.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-26 (Last edit)
+ * @date   2018-03-11 (Last edit)
  * @brief  Header of Interface
  *
  * Detailed description of file.
@@ -62,6 +62,7 @@ void Interface_InitView(struct view *view,
                         uint16_t context);
 void Interface_AddView(struct view *new_view);
 void Interface_AddChild(struct view *parent_view, struct view *child_view);
+void Interface_AddAction(struct view *view, interface_fp action_function);
 void Interface_AddSibling(struct view *sibling_view, struct view *new_view);
 void Interface_RemoveView(struct view *view);
 void Interface_NextView(void);
