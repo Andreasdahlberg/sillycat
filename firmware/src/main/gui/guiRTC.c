@@ -1,10 +1,8 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-03-31 (Last edit)
- * @brief  Implementation of guiRTC
- *
- * Detailed description of file.
+ * @date   2018-03-11 (Last edit)
+ * @brief  Implementation of GUI for displaying the current time.
  */
 
 /*
@@ -28,23 +26,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
-#include <string.h>
-#include <stdio.h>
-
 #include "libDebug.h"
 #include "libUI.h"
 #include "Interface.h"
-#include "guiRTC.h"
 #include "RTC.h"
+#include "guiRTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Read from config
 #define UTC_OFFSET_MIN 60
 #define DST_OFFSET_MIN 60
 
@@ -52,12 +44,20 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct module_t
+{
+    struct
+    {
+        struct view overview;
+        struct view details;
+    } view;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static struct view clock_view;
-static struct view clock_and_date_view;
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -71,34 +71,15 @@ static void AdjustTimeForView(rtc_time_type *time);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Init the clock views
-///
-/// Init clock views and add them to the user interface.
-///
-/// @param  None
-/// @return None
-///
 void guiRTC_Init(void)
 {
-    clock_view.draw_function = DrawClockView;
-    clock_view.context = 0;
-    clock_view.child = NULL;
-    clock_view.prev = NULL;
-    clock_view.next = NULL;
-    clock_view.parent = NULL;
+    Interface_InitView(&module.view.overview, DrawClockView, 0);
+    Interface_AddView(&module.view.overview);
 
-    clock_and_date_view.draw_function = DrawDetailedTimeView;
-    clock_and_date_view.context = 0;
-    clock_and_date_view.child = NULL;
-    clock_and_date_view.prev = NULL;
-    clock_and_date_view.next = NULL;
-    clock_and_date_view.parent = NULL;
+    Interface_InitView(&module.view.details, DrawDetailedTimeView, 0);
+    Interface_AddChild(&module.view.overview, &module.view.details);
 
-    Interface_AddChild(&clock_view, &clock_and_date_view);
-    Interface_AddView(&clock_view);
-
-    INFO("Init done");
+    INFO("Initialized RTC view.");
     return;
 }
 
@@ -129,16 +110,16 @@ static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
     return;
 }
 
-static void AdjustTimeForView(rtc_time_type *time)
+static void AdjustTimeForView(rtc_time_type *time_p)
 {
-    RTC_AddMinutes(time, UTC_OFFSET_MIN);
+    RTC_AddMinutes(time_p, UTC_OFFSET_MIN);
 
     uint8_t day;
     RTC_GetDay(&day);
 
-    if (RTC_IsDaylightSavingActive(time, day))
+    if (RTC_IsDaylightSavingActive(time_p, day))
     {
-        RTC_AddMinutes(time, DST_OFFSET_MIN);
+        RTC_AddMinutes(time_p, DST_OFFSET_MIN);
     }
     return;
 }

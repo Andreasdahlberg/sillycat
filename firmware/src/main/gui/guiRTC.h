@@ -1,10 +1,8 @@
 /**
  * @file   guiRTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-13 (Last edit)
- * @brief  Header of guiRTC
- *
- * Detailed description of file.
+ * @date   2018-03-11 (Last edit)
+ * @brief  Implementation of GUI for displaying the current time.
  */
 
 /*
@@ -39,6 +37,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize clock views and add them to the user interface.
+ */
 void guiRTC_Init(void);
 
 #endif
