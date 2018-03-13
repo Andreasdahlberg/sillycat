@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-06 (Last edit)
+ * @date   2018-03-13 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.
@@ -107,4 +107,4 @@ void RTC_AddMonths(rtc_time_type *time, uint8_t months);
 void RTC_AddYears(rtc_time_type *time, uint8_t year);
 uint32_t RTC_ConvertToTimestamp(const rtc_time_type *timeptr);
 
-#endif /* RTC_H_ */
+#endif

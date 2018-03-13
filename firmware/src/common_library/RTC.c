@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-17 (Last edit)
+ * @date   2018-03-13 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -465,7 +465,7 @@ uint32_t RTC_ConvertToTimestamp(const rtc_time_type *time)
     tmp += time->minute * 60UL;
     tmp += time->second;
 
-    return return_value += tmp;
+    return return_value + tmp;
 }
 
 //////////////////////////////////////////////////////////////////////////
