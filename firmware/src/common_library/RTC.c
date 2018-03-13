@@ -139,6 +139,28 @@ bool RTC_GetCurrentTime(rtc_time_type *time)
 }
 
 ///
+/// @brief Get the number of days in the supplied month.
+///
+/// @param  *time Pointer to time struct.
+/// @return uint8_t Number of days.
+///
+uint8_t RTC_GetDaysInMonth(const rtc_time_type *time)
+{
+    sc_assert(time != NULL);
+    sc_assert(time->month <= ElementsIn(days_in_months));
+
+    if (time->month == FEBRUARY && RTC_IsLeapYear(2000 + (uint16_t)time->year))
+    {
+        return days_in_months[time->month - 1] + 1;
+    }
+    else
+    {
+        return days_in_months[time->month - 1];
+    }
+
+}
+
+///
 /// @brief Set the current time.
 ///
 /// @param  *time Pointer to struct with time to set.
@@ -323,11 +345,7 @@ void RTC_AddDays(rtc_time_type *time, uint8_t days)
     uint16_t carry;
     uint8_t days_in_month;
 
-    days_in_month = days_in_months[time->month - 1];
-    if (time->month == FEBRUARY && RTC_IsLeapYear(2000 + (uint16_t)time->year))
-    {
-        ++days_in_month;
-    }
+    days_in_month = RTC_GetDaysInMonth(time);
 
     carry = (time->date + days) / days_in_month;
     time->date = (time->date + days) % days_in_month;

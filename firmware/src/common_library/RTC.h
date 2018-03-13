@@ -91,6 +91,7 @@ typedef enum
 #ifdef RTC_HAL
 bool RTC_GetTimeStamp(uint32_t *timestamp);
 bool RTC_GetCurrentTime(rtc_time_type *time);
+uint8_t RTC_GetDaysInMonth(const rtc_time_type *time);
 bool RTC_SetCurrentTime(const rtc_time_type *time);
 bool RTC_SetAlarmTime(const rtc_time_type *time);
 #endif
