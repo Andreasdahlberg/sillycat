@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-13 (Last edit)
+ * @date   2018-03-15 (Last edit)
  * @brief  Header of RTC interface
  *
  * Detailed description of file.
@@ -100,6 +100,7 @@ void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp,
                          size_t size);
 bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day);
 bool RTC_IsLeapYear(uint16_t year);
+uint8_t RTC_CalculateDayOfWeek(rtc_time_type *time);
 void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds);
 void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
 void RTC_AddHours(rtc_time_type *time, uint8_t hours);

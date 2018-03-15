@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-13 (Last edit)
+ * @date   2018-03-15 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -264,6 +264,23 @@ bool RTC_IsLeapYear(uint16_t year)
     }
 
     return is_leap_year;
+}
+
+///
+/// @brief Calculate the week day for the supplied time and date.
+///
+/// @param  *time Pointer to struct with time.
+/// @return uint8_t Week day index.
+///
+uint8_t RTC_CalculateDayOfWeek(rtc_time_type *time)
+{
+    const uint8_t t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+    time->year -= time->month < 3;
+
+    uint16_t leap_year_adjustment;
+    leap_year_adjustment = time->year / 4 - time->year / 100 + time->year / 400;
+
+    return (time->year + leap_year_adjustment + t[time->month - 1] + time->date) % 7;
 }
 
 ///
