@@ -275,12 +275,14 @@ bool RTC_IsLeapYear(uint16_t year)
 uint8_t RTC_CalculateDayOfWeek(rtc_time_type *time)
 {
     const uint8_t t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-    time->year -= time->month < 3;
+    uint16_t year = time->year + 2000;
+
+    year -= time->month < 3;
 
     uint16_t leap_year_adjustment;
-    leap_year_adjustment = time->year / 4 - time->year / 100 + time->year / 400;
+    leap_year_adjustment = year / 4 - year / 100 + year / 400;
 
-    return (time->year + leap_year_adjustment + t[time->month - 1] + time->date) % 7;
+    return (year + leap_year_adjustment + t[time->month - 1] + time->date) % 7;
 }
 
 ///
