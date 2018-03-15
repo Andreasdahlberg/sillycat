@@ -274,6 +274,8 @@ bool RTC_IsLeapYear(uint16_t year)
 ///
 uint8_t RTC_CalculateDayOfWeek(rtc_time_type *time)
 {
+    sc_assert(time != NULL);
+
     const uint8_t t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
     uint16_t year = time->year + 2000;
 
