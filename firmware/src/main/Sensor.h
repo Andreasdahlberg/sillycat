@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2018-02-21 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -39,10 +39,13 @@ struct sensor_t
 {
     void (*Update)(struct sensor_t *);
     uint16_t id;
-    int16_t max;
-    int16_t min;
     int16_t value;
     bool valid;
+    struct {
+        int16_t max;
+        int16_t min;
+        bool valid;
+    } statistics;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -105,6 +108,15 @@ bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value);
  * @return True if the sensor has a valid value, otherwise false.
  */
 bool Sensor_IsValid(struct sensor_t *self);
+
+/**
+ * Check if the supplied sensor has any valid statistics.
+ *
+ * @param self Pointer to sensor struct.
+ *
+ * @return True if the sensor has valid statistics.
+ */
+bool Sensor_IsStatisticsValid(struct sensor_t *self);
 
 /**
  * Reset the recorded values for the supplied sensor.

@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-03-21 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -57,6 +57,7 @@ struct __attribute__((packed)) sensor_statistics_t
 {
     int16_t max;
     int16_t min;
+    bool valid;
     uint16_t crc;
 };
 
@@ -136,8 +137,8 @@ bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value)
     sc_assert(self != NULL);
     sc_assert(value != NULL);
 
-    *value = self->max;
-    return self->valid;
+    *value = self->statistics.max;
+    return self->statistics.valid;
 }
 
 bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value)
@@ -145,8 +146,8 @@ bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value)
     sc_assert(self != NULL);
     sc_assert(value != NULL);
 
-    *value = self->min;
-    return self->valid;
+    *value = self->statistics.min;
+    return self->statistics.valid;
 }
 
 bool Sensor_IsValid(struct sensor_t *self)
@@ -154,6 +155,13 @@ bool Sensor_IsValid(struct sensor_t *self)
     sc_assert(self != NULL);
 
     return self->valid;
+}
+
+bool Sensor_IsStatisticsValid(struct sensor_t *self)
+{
+    sc_assert(self != NULL);
+
+    return self->statistics.valid;
 }
 
 void Sensor_Reset(struct sensor_t *self)
@@ -174,15 +182,17 @@ static void SetSensorValues(struct sensor_t *self, int16_t value)
 
     self->value = value;
 
-    if (value > self->max)
+    if (value > self->statistics.max)
     {
-        self->max = value;
+        self->statistics.max = value;
     }
 
-    if (value < self->min)
+    if (value < self->statistics.min)
     {
-        self->min = value;
+        self->statistics.min = value;
     }
+
+    self->statistics.valid = true;
 }
 
 static void WriteValuesToSRAM(const struct sensor_t *self)
@@ -190,8 +200,9 @@ static void WriteValuesToSRAM(const struct sensor_t *self)
     uint8_t address = sizeof(struct sensor_statistics_t) * self->id;
 
     struct sensor_statistics_t stats;
-    stats.max = self->max;
-    stats.min = self->min;
+    stats.max = self->statistics.max;
+    stats.min = self->statistics.min;
+    stats.valid = self->statistics.valid;
 
     UpdateCRC(&stats);
     libDS3234_WriteToSRAM(address, (uint8_t *)&stats, sizeof(stats));
@@ -206,15 +217,21 @@ static void ReadValuesFromSRAM(struct sensor_t *self)
 
     if (IsCRCValid(&stats))
     {
-        self->max = stats.max;
-        self->min = stats.min;
+        self->statistics.max = stats.max;
+        self->statistics.min = stats.min;
+        self->statistics.valid = stats.valid;
+    }
+    else
+    {
+        self->statistics.valid = false;
     }
 }
 
 static void ResetValues(struct sensor_t *self)
 {
-    self->max = INT16_MIN;
-    self->min = INT16_MAX;
+    self->statistics.max = INT16_MIN;
+    self->statistics.min = INT16_MAX;
+    self->statistics.valid = false;
     self->value = 0;
     self->valid = false;
 }
