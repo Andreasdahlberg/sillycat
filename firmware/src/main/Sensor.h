@@ -78,7 +78,7 @@ void Sensor_Register(struct sensor_t *self);
  *
  * @return True if the sensor has a valid value, otherwise false.
  */
-bool Sensor_GetValue(struct sensor_t *self, int16_t *value);
+bool Sensor_GetValue(const struct sensor_t *self, int16_t *value);
 
 /**
  * Get the maximum value recorded for the supplied sensor.
@@ -88,7 +88,7 @@ bool Sensor_GetValue(struct sensor_t *self, int16_t *value);
  *
  * @return True if the sensor has a valid maximum value, otherwise false.
  */
-bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value);
+bool Sensor_GetMaxValue(const struct sensor_t *self, int16_t *value);
 
 /**
  * Get the minimum value recorded for the supplied sensor.
@@ -98,7 +98,7 @@ bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value);
  *
  * @return True if the sensor has a valid minimum value, otherwise false.
  */
-bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value);
+bool Sensor_GetMinValue(const struct sensor_t *self, int16_t *value);
 
 /**
  * Check if the supplied sensor has a valid value.
@@ -107,7 +107,7 @@ bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value);
  *
  * @return True if the sensor has a valid value, otherwise false.
  */
-bool Sensor_IsValid(struct sensor_t *self);
+bool Sensor_IsValid(const struct sensor_t *self);
 
 /**
  * Check if the supplied sensor has any valid statistics.
@@ -116,7 +116,7 @@ bool Sensor_IsValid(struct sensor_t *self);
  *
  * @return True if the sensor has valid statistics.
  */
-bool Sensor_IsStatisticsValid(struct sensor_t *self);
+bool Sensor_IsStatisticsValid(const struct sensor_t *self);
 
 /**
  * Reset the recorded values for the supplied sensor.

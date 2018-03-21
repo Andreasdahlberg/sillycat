@@ -123,7 +123,7 @@ void Sensor_Register(struct sensor_t *self)
     ++module.number_of_sensors;
 }
 
-bool Sensor_GetValue(struct sensor_t *self, int16_t *value)
+bool Sensor_GetValue(const struct sensor_t *self, int16_t *value)
 {
     sc_assert(self != NULL);
     sc_assert(value != NULL);
@@ -132,7 +132,7 @@ bool Sensor_GetValue(struct sensor_t *self, int16_t *value)
     return self->valid;
 }
 
-bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value)
+bool Sensor_GetMaxValue(const struct sensor_t *self, int16_t *value)
 {
     sc_assert(self != NULL);
     sc_assert(value != NULL);
@@ -141,7 +141,7 @@ bool Sensor_GetMaxValue(struct sensor_t *self, int16_t *value)
     return self->statistics.valid;
 }
 
-bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value)
+bool Sensor_GetMinValue(const struct sensor_t *self, int16_t *value)
 {
     sc_assert(self != NULL);
     sc_assert(value != NULL);
@@ -150,14 +150,14 @@ bool Sensor_GetMinValue(struct sensor_t *self, int16_t *value)
     return self->statistics.valid;
 }
 
-bool Sensor_IsValid(struct sensor_t *self)
+bool Sensor_IsValid(const struct sensor_t *self)
 {
     sc_assert(self != NULL);
 
     return self->valid;
 }
 
-bool Sensor_IsStatisticsValid(struct sensor_t *self)
+bool Sensor_IsStatisticsValid(const struct sensor_t *self)
 {
     sc_assert(self != NULL);
 
