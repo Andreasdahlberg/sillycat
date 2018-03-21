@@ -73,9 +73,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct module_t
+{
+    struct node_t nodes[3];
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -86,8 +93,6 @@ void CheckHealth(void);
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-static struct node_t node;
 
 int main(void)
 {
@@ -133,8 +138,11 @@ int main(void)
     Sensor_Register(driverNTC_GetSensor(0));
     Sensor_Register(driverMCUTemperature_GetSensor());
 
-    Node_Init(&node, 128);
-    Nodes_Add(&node);
+    for (size_t i = 0; i < ElementsIn(module.nodes); ++i)
+    {
+        Node_Init(&module.nodes[i], i + 128);
+        Nodes_Add(&module.nodes[i]);
+    }
 
     Com_SetPacketHandler(PacketHandler_HandleReadingPacket, COM_PACKET_TYPE_READING);
 
