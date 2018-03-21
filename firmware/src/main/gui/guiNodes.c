@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-09 (Last edit)
+ * @date   2018-03-21 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -83,6 +83,7 @@ static void DrawTemperatureMaxMinView(uint16_t context);
 static void DrawHumidityMaxMinView(uint16_t context);
 static void DrawBatteryIndicator(void);
 static void ClearAction(uint16_t context __attribute__ ((unused)));
+static uint8_t ContextToNodeID(uint16_t context);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -122,43 +123,48 @@ static void DrawNodeView(uint16_t context)
     //with indexing starting at 1.
     libUI_Print("%u", 1, 12, context + 1);
 
-    struct node_t *node_p = Nodes_GetNodeFromID((uint8_t)context+128);
+    struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
+    sc_assert(node_p != NULL);
 
-    if (node_p != NULL && Node_IsActive(node_p))
+    if (Node_IsActive(node_p))
     {
         struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
         struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
 
-        int16_t temperature_scaled;
-        int16_t humidity_scaled;
-
-        Sensor_GetValue(temperature_sensor_p, &temperature_scaled);
-        Sensor_GetValue(humidity_sensor_p, &humidity_scaled);
-
-        struct div_t temperature;
-        struct div_t humidity;
-
-        temperature = Divide((int32_t)temperature_scaled, 10);
-        humidity = Divide((int32_t)humidity_scaled, 10);
-
-        libUI_Print(
-            "%ld.+%d C",
-            45,
-            UI_DOUBLE_ROW_FIRST,
-            temperature.quotient,
-            abs(temperature.remainder)
-        );
-        libUI_Print(
-            "%ld.+%d %%",
-            45,
-            UI_DOUBLE_ROW_SECOND,
-            humidity.quotient,
-            abs(humidity.remainder)
-        );
-
-        if (!Node_IsBatteryOk(node_p))
+        if (Sensor_IsValid(temperature_sensor_p) &&
+                Sensor_IsValid(humidity_sensor_p))
         {
-            DrawBatteryIndicator();
+            int16_t temperature_scaled;
+            int16_t humidity_scaled;
+
+            Sensor_GetValue(temperature_sensor_p, &temperature_scaled);
+            Sensor_GetValue(humidity_sensor_p, &humidity_scaled);
+
+            struct div_t temperature;
+            struct div_t humidity;
+
+            temperature = Divide((int32_t)temperature_scaled, 10);
+            humidity = Divide((int32_t)humidity_scaled, 10);
+
+            libUI_Print(
+                "%ld.+%d C",
+                45,
+                UI_DOUBLE_ROW_FIRST,
+                temperature.quotient,
+                abs(temperature.remainder)
+            );
+            libUI_Print(
+                "%ld.+%d %%",
+                45,
+                UI_DOUBLE_ROW_SECOND,
+                humidity.quotient,
+                abs(humidity.remainder)
+            );
+        }
+        else
+        {
+            libUI_Print("--.-- C", 40, UI_DOUBLE_ROW_FIRST);
+            libUI_Print("--.-- %%", 40, UI_DOUBLE_ROW_SECOND);
         }
     }
     else
@@ -170,7 +176,7 @@ static void DrawNodeView(uint16_t context)
 
 static void DrawDetailedNodeView(uint16_t context)
 {
-    struct node_t *node_p = Nodes_GetNodeFromID((uint8_t)context+128);
+    struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
 
     if (node_p != NULL && Node_IsActive(node_p))
     {
@@ -189,11 +195,13 @@ static void DrawDetailedNodeView(uint16_t context)
 
 static void DrawTemperatureMaxMinView(uint16_t context)
 {
-    struct node_t *node_p = Nodes_GetNodeFromID((uint8_t)context+128);
+    struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
+    sc_assert(node_p != NULL);
 
-    if (node_p != NULL && Node_IsActive(node_p))
+    struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
+
+    if (Sensor_IsStatisticsValid(temperature_sensor_p))
     {
-        struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
         int16_t temperature_scaled;
         struct div_t temperature;
 
@@ -224,11 +232,13 @@ static void DrawTemperatureMaxMinView(uint16_t context)
 
 static void DrawHumidityMaxMinView(uint16_t context)
 {
-    struct node_t *node_p = Nodes_GetNodeFromID((uint8_t)context+128);
+    struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
+    sc_assert(node_p != NULL);
 
-    if (node_p != NULL && Node_IsActive(node_p))
+    struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
+
+    if (Sensor_IsStatisticsValid(humidity_sensor_p))
     {
-        struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
         int16_t humidity_scaled;
         struct div_t humidity;
 
@@ -269,7 +279,7 @@ static void DrawBatteryIndicator(void)
 
 static void ClearAction(uint16_t context __attribute__ ((unused)))
 {
-    struct node_t *node_p = Nodes_GetNodeFromID((uint8_t)context+128);
+    struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
 
     Sensor_Reset(Node_GetTemperatureSensor(node_p));
     Sensor_Reset(Node_GetHumiditySensor(node_p));
@@ -277,4 +287,9 @@ static void ClearAction(uint16_t context __attribute__ ((unused)))
     Interface_Refresh();
 
     return;
+}
+
+static uint8_t ContextToNodeID(uint16_t context)
+{
+    return (uint8_t)context + 128;
 }
