@@ -99,11 +99,11 @@ void guiNodes_Init(void)
         Interface_AddView(&view_p->overview);
 
         Interface_InitView(&view_p->temperature, DrawTemperatureMaxMinView, i);
-        view_p->temperature.action_function = ClearAction;
+        Interface_AddAction(&view_p->temperature, ClearAction);
         Interface_AddChild(&view_p->overview, &view_p->temperature);
 
         Interface_InitView(&view_p->humidity, DrawHumidityMaxMinView, i);
-        view_p->humidity.action_function = ClearAction;
+        Interface_AddAction(&view_p->humidity, ClearAction);
         Interface_AddChild(&view_p->overview, &view_p->humidity);
 
         Interface_InitView(&view_p->details, DrawDetailedNodeView, i);
