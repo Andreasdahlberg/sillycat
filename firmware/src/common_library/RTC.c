@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-15 (Last edit)
+ * @date   2018-03-23 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -170,13 +170,12 @@ bool RTC_SetCurrentTime(const rtc_time_type *time)
 {
     sc_assert(time != NULL);
 
-    RTC_SetYear(time->year);
-    RTC_SetMonth(time->month);
-    RTC_SetDate(time->date);
-    RTC_SetHour(time->hour);
-    RTC_SetMinutes(time->minute);
-    RTC_SetSeconds(time->second);
-    return true;
+    return RTC_SetYear(time->year) &&
+           RTC_SetMonth(time->month) &&
+           RTC_SetDate(time->date) &&
+           RTC_SetHour(time->hour) &&
+           RTC_SetMinutes(time->minute) &&
+           RTC_SetSeconds(time->second);
 }
 
 ///
@@ -189,10 +188,9 @@ bool RTC_SetAlarmTime(const rtc_time_type *time)
 {
     sc_assert(time != NULL);
 
-    RTC_SetAlarmHour(time->hour);
-    RTC_SetAlarmMinutes(time->minute);
-    RTC_SetAlarmSeconds(time->second);
-    return true;
+    return RTC_SetAlarmHour(time->hour) &&
+           RTC_SetAlarmMinutes(time->minute) &&
+           RTC_SetAlarmSeconds(time->second);
 }
 #endif
 

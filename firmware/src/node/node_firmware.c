@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-08 (Last edit)
+ * @date   2018-03-23 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -189,6 +189,8 @@ static bool TimePacketHandler(packet_frame_type *packet)
 {
     sc_assert(packet != NULL);
 
+    bool status = true;
+
     rtc_time_type current_time;
     RTC_GetCurrentTime(&current_time);
 
@@ -200,13 +202,13 @@ static bool TimePacketHandler(packet_frame_type *packet)
 
     if (current_timestamp != received_timestamp)
     {
-        RTC_SetCurrentTime(&packet->content.timestamp);
-        INFO("New time set: %lu", received_timestamp);
+        status = RTC_SetCurrentTime(&packet->content.timestamp);
+        INFO("New time[%u]: %lu", (uint8_t)status, received_timestamp);
     }
 
     sleep_status.sleep_now = true;
 
-    return true;
+    return status;
 }
 
 static void RHTAvailable(const event_type *event __attribute__ ((unused)))
