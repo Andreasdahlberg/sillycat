@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-09 (Last edit)
+ * @date   2018-03-23 (Last edit)
  * @brief  Implementation of MCP79510-driver.
  *
  * Detailed description of file.
@@ -133,12 +133,17 @@ void libMCP79510_GetHundredthSecond(uint8_t *hsec)
 /// @param  hsec Hundredth of second to set.
 /// @return None
 ///
-void libMCP79510_SetHundredthSecond(uint8_t hsec)
+bool libMCP79510_SetHundredthSecond(uint8_t hsec)
 {
-    sc_assert(hsec < 100);
+    bool status = false;
 
-    SetDecimalRegisterValue(REG_TC_SEC_CENT, hsec);
-    return;
+    if (hsec < 100)
+    {
+        SetDecimalRegisterValue(REG_TC_SEC_CENT, hsec);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -149,12 +154,17 @@ void libMCP79510_SetHundredthSecond(uint8_t hsec)
 /// @param  hsec Hundredth of second to set alarm to.
 /// @return None
 ///
-void libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
+bool libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
 {
-    sc_assert(hsec < 100);
+    bool status = false;
 
-    SetDecimalRegisterValue(REG_ALARM1_SEC_CENT, hsec);
-    return;
+    if (hsec < 100)
+    {
+        SetDecimalRegisterValue(REG_ALARM1_SEC_CENT, hsec);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -179,15 +189,21 @@ void libMCP79510_GetSecond(uint8_t *sec)
 /// @param  sec Second to set.
 /// @return None
 ///
-void libMCP79510_SetSecond(uint8_t sec)
+bool libMCP79510_SetSecond(uint8_t sec)
 {
-    sc_assert(sec < 60);
+    bool status = false;
 
-    uint8_t register_content;
-    register_content = ReadRegister(REG_TC_SEC);
+    if (sec < 60)
+    {
+        uint8_t register_content;
+        register_content = ReadRegister(REG_TC_SEC);
 
-    WriteRegister(REG_TC_SEC, DecimalToBCD(sec) | (register_content & 0x80));
-    return;
+        WriteRegister(REG_TC_SEC, DecimalToBCD(sec) | (register_content & 0x80));
+
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -197,17 +213,24 @@ void libMCP79510_SetSecond(uint8_t sec)
 /// @param  alarm_index Alarm index, 0 or 1.
 /// @return None
 ///
-void libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
+bool libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
 {
-    sc_assert(sec < 60);
     sc_assert(alarm_index < 2);
 
-    uint8_t register_address;
+    bool status = false;
 
-    register_address = (alarm_index == 0) ? REG_ALARM0_SEC :
-                       REG_ALARM1_SEC;
-    SetDecimalRegisterValue(register_address, sec);
-    return;
+    if (sec < 60)
+    {
+        uint8_t register_address;
+
+        register_address = (alarm_index == 0) ? REG_ALARM0_SEC :
+                           REG_ALARM1_SEC;
+        SetDecimalRegisterValue(register_address, sec);
+
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -228,12 +251,17 @@ void libMCP79510_GetMinute(uint8_t *minute)
 /// @param  minute Minute to set.
 /// @return None
 ///
-void libMCP79510_SetMinute(uint8_t minute)
+bool libMCP79510_SetMinute(uint8_t minute)
 {
-    sc_assert(minute < 60);
+    bool status = false;
 
-    SetDecimalRegisterValue(REG_TC_MIN, minute);
-    return;
+    if (minute < 60)
+    {
+        SetDecimalRegisterValue(REG_TC_MIN, minute);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -243,17 +271,23 @@ void libMCP79510_SetMinute(uint8_t minute)
 /// @param  alarm_index Alarm index, 0 or 1.
 /// @return None
 ///
-void libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
+bool libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
 {
-    sc_assert(minute < 60);
     sc_assert(alarm_index < 2);
 
-    uint8_t register_address;
+    bool status = false;
 
-    register_address = (alarm_index == 0) ? REG_ALARM0_MIN :
-                       REG_ALARM1_MIN;
-    SetDecimalRegisterValue(register_address, minute);
-    return;
+    if (minute < 60)
+    {
+        uint8_t register_address;
+        register_address = (alarm_index == 0) ? REG_ALARM0_MIN :
+                           REG_ALARM1_MIN;
+
+        SetDecimalRegisterValue(register_address, minute);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -287,26 +321,31 @@ void libMCP79510_GetHour(uint8_t *hour)
 /// @param  hour Hour to set.
 /// @return None
 ///
-void libMCP79510_SetHour(uint8_t hour)
+bool libMCP79510_SetHour(uint8_t hour)
 {
+    bool status = false;
+
     //TODO: check after hour mode is known?
-    sc_assert(hour < 24);
-
-    uint8_t register_content = ReadRegister(REG_TC_HOUR);
-    uint8_t new_content;
-
-    //Check if 24-hour mode is used.
-    if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+    if (hour < 24)
     {
-        new_content = (register_content & 0xC0) | DecimalToBCD(hour);
-    }
-    else
-    {
-        new_content = (register_content & 0xE0) | DecimalToBCD(hour);
+        uint8_t register_content = ReadRegister(REG_TC_HOUR);
+        uint8_t new_content;
+
+        //Check if 24-hour mode is used.
+        if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+        {
+            new_content = (register_content & 0xC0) | DecimalToBCD(hour);
+        }
+        else
+        {
+            new_content = (register_content & 0xE0) | DecimalToBCD(hour);
+        }
+
+        WriteRegister(REG_TC_HOUR, new_content);
+        status = true;
     }
 
-    WriteRegister(REG_TC_HOUR, new_content);
-    return;
+    return status;
 }
 
 ///
@@ -316,29 +355,34 @@ void libMCP79510_SetHour(uint8_t hour)
 /// @param  alarm_index Alarm index, 0 or 1.
 /// @return None
 ///
-void libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
+bool libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 {
-    //TODO: check after hour mode is known?
-    sc_assert(hour < 24);
     sc_assert(alarm_index < 2);
 
-    uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_HOUR :
-                               REG_ALARM1_HOUR;
-    uint8_t register_content = ReadRegister(register_address);
-    uint8_t new_content;
+    bool status = false;
 
-    //Check if 24-hour mode is used.
-    if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+    //TODO: check after hour mode is known?
+    if (hour < 24)
     {
-        new_content = (register_content & 0xC0) | DecimalToBCD(hour);
-    }
-    else
-    {
-        new_content = (register_content & 0xE0) | DecimalToBCD(hour);
-    }
+        uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_HOUR :
+                                   REG_ALARM1_HOUR;
+        uint8_t register_content = ReadRegister(register_address);
+        uint8_t new_content;
 
-    WriteRegister(register_address, new_content);
-    return;
+        //Check if 24-hour mode is used.
+        if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+        {
+            new_content = (register_content & 0xC0) | DecimalToBCD(hour);
+        }
+        else
+        {
+            new_content = (register_content & 0xE0) | DecimalToBCD(hour);
+        }
+
+        WriteRegister(register_address, new_content);
+        status = true;
+    }
+    return status;
 }
 
 ///
@@ -363,15 +407,20 @@ void libMCP79510_GetDay(uint8_t *day)
 /// @param  day Day to set.
 /// @return None
 ///
-void libMCP79510_SetDay(uint8_t day)
+bool libMCP79510_SetDay(uint8_t day)
 {
-    sc_assert(day < 8);
+    bool status = false;
 
-    uint8_t register_content;
-    register_content = ReadRegister(REG_TC_DAY);
+    if (day > 0 && day < 8)
+    {
+        uint8_t register_content;
+        register_content = ReadRegister(REG_TC_DAY);
 
-    WriteRegister(REG_TC_DAY, DecimalToBCD(day) | (register_content & 0xF8));
-    return;
+        WriteRegister(REG_TC_DAY, DecimalToBCD(day) | (register_content & 0xF8));
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -392,12 +441,17 @@ void libMCP79510_GetDate(uint8_t *date)
 /// @param  date Date to set.
 /// @return None
 ///
-void libMCP79510_SetDate(uint8_t date)
+bool libMCP79510_SetDate(uint8_t date)
 {
-    sc_assert(date < 32);
+    bool status = false;
 
-    SetDecimalRegisterValue(REG_TC_DATE, date);
-    return;
+    if (date > 0 && date < 32)
+    {
+        SetDecimalRegisterValue(REG_TC_DATE, date);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -407,17 +461,23 @@ void libMCP79510_SetDate(uint8_t date)
 /// @param  alarm_index Alarm index, 0 or 1.
 /// @return None
 ///
-void libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
+bool libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 {
-    sc_assert(date < 32);
     sc_assert(alarm_index < 2);
 
-    uint8_t register_address;
-    register_address = (alarm_index == 0) ? REG_ALARM0_DATE :
-                       REG_ALARM1_DATE;
+    bool status = false;
 
-    SetDecimalRegisterValue(register_address, date);
-    return;
+    if (date > 0 && date < 32)
+    {
+        uint8_t register_address;
+        register_address = (alarm_index == 0) ? REG_ALARM0_DATE :
+                           REG_ALARM1_DATE;
+
+        SetDecimalRegisterValue(register_address, date);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -442,15 +502,20 @@ void libMCP79510_GetMonth(uint8_t *month)
 /// @param  month Month to set.
 /// @return None
 ///
-void libMCP79510_SetMonth(uint8_t month)
+bool libMCP79510_SetMonth(uint8_t month)
 {
-    sc_assert(month < 13);
+    bool status = false;
 
-    uint8_t register_content;
-    register_content = ReadRegister(REG_TC_MONTH);
+    if (month > 0 && month < 13)
+    {
+        uint8_t register_content;
+        register_content = ReadRegister(REG_TC_MONTH);
 
-    WriteRegister(REG_TC_MONTH, DecimalToBCD(month) | (register_content & 0xE0));
-    return;
+        WriteRegister(REG_TC_MONTH, DecimalToBCD(month) | (register_content & 0xE0));
+        status = true;
+    }
+
+    return status;
 }
 
 ///
@@ -471,12 +536,17 @@ void libMCP79510_GetYear(uint8_t *year)
 /// @param  year Year to set, number of years since 2000.
 /// @return None
 ///
-void libMCP79510_SetYear(uint8_t year)
+bool libMCP79510_SetYear(uint8_t year)
 {
-    sc_assert(year < 100);
+    bool status = false;
 
-    SetDecimalRegisterValue(REG_TC_YEAR, year);
-    return;
+    if (year < 100)
+    {
+        SetDecimalRegisterValue(REG_TC_YEAR, year);
+        status = true;
+    }
+
+    return status;
 }
 
 ///
