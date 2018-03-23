@@ -1,7 +1,7 @@
 /**
  * @file   libMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-07 (Last edit)
+ * @date   2018-03-23 (Last edit)
  * @brief  Header of libMCP79510
  *
  * Detailed description of file.
@@ -81,4 +81,4 @@ bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
 void libMCP79510_ClearSRAM(void);
 void libMCP79510_GetEUI(uint8_t *eui, size_t length);
 
-#endif /* LIBMCP79510_H_ */
+#endif
