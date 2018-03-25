@@ -1,10 +1,8 @@
 /**
  * @file   libMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-23 (Last edit)
- * @brief  Implementation of MCP79510-driver.
- *
- * Detailed description of file.
+ * @date   2018-03-25 (Last edit)
+ * @brief  Implementation of a driver for the MCP79510 RTC.
  */
 
 /*
@@ -77,12 +75,6 @@ static void DumpRegisterValues(void) __attribute__((unused));
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Init the MCP79510 RTC
-///
-/// @param  None
-/// @return None
-///
 void libMCP79510_Init(void)
 {
     libMCP79510_EnableSquareWave(false);
@@ -96,13 +88,6 @@ void libMCP79510_Init(void)
     return;
 }
 
-///
-/// @brief Set the SS pin as output and pull high. This function should
-///        be called as early as possible in a system with several SPI-devices.
-///
-/// @param  None
-/// @return None
-///
 void libMCP79510_HWInit(void)
 {
     //Set SS as output and pull high to release device.
@@ -115,24 +100,12 @@ void libMCP79510_HWInit(void)
     return;
 }
 
-///
-/// @brief Get hundredth of second.
-///
-/// @param  *hsec Pointer to variable where the hundredth of second will be stored.
-/// @return None
-///
-void libMCP79510_GetHundredthSecond(uint8_t *hsec)
+void libMCP79510_GetHundredthSecond(uint8_t *hsec_p)
 {
-    *hsec = GetDecimalRegisterValue(REG_TC_SEC_CENT);
+    *hsec_p = GetDecimalRegisterValue(REG_TC_SEC_CENT);
     return;
 }
 
-///
-/// @brief Set hundredth of second.
-///
-/// @param  hsec Hundredth of second to set.
-/// @return None
-///
 bool libMCP79510_SetHundredthSecond(uint8_t hsec)
 {
     bool status = false;
@@ -146,14 +119,6 @@ bool libMCP79510_SetHundredthSecond(uint8_t hsec)
     return status;
 }
 
-///
-/// @brief Set alarm hundredth of second.
-///
-/// Hundredth of second precision is only available for alarm 1.
-///
-/// @param  hsec Hundredth of second to set alarm to.
-/// @return None
-///
 bool libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
 {
     bool status = false;
@@ -167,28 +132,16 @@ bool libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
     return status;
 }
 
-///
-/// @brief Get second.
-///
-/// @param  *sec Pointer to variable where the second will be stored.
-/// @return None
-///
-void libMCP79510_GetSecond(uint8_t *sec)
+void libMCP79510_GetSecond(uint8_t *sec_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_SEC);
     register_content &= ~(1 << REG_TC_SEC_OSC_BIT);
 
-    *sec = BCDToDecimal(register_content);
+    *sec_p = BCDToDecimal(register_content);
     return;
 }
 
-///
-/// @brief Set second.
-///
-/// @param  sec Second to set.
-/// @return None
-///
 bool libMCP79510_SetSecond(uint8_t sec)
 {
     bool status = false;
@@ -206,13 +159,6 @@ bool libMCP79510_SetSecond(uint8_t sec)
     return status;
 }
 
-///
-/// @brief Set alarm second.
-///
-/// @param  sec Alarm second to set.
-/// @param  alarm_index Alarm index, 0 or 1.
-/// @return None
-///
 bool libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
@@ -233,24 +179,12 @@ bool libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
     return status;
 }
 
-///
-/// @brief Get minute.
-///
-/// @param  *minute Pointer to variable where the minute will be stored.
-/// @return None
-///
-void libMCP79510_GetMinute(uint8_t *minute)
+void libMCP79510_GetMinute(uint8_t *minute_p)
 {
-    *minute = GetDecimalRegisterValue(REG_TC_MIN);
+    *minute_p = GetDecimalRegisterValue(REG_TC_MIN);
     return;
 }
 
-///
-/// @brief Set minute.
-///
-/// @param  minute Minute to set.
-/// @return None
-///
 bool libMCP79510_SetMinute(uint8_t minute)
 {
     bool status = false;
@@ -264,13 +198,6 @@ bool libMCP79510_SetMinute(uint8_t minute)
     return status;
 }
 
-///
-/// @brief Set alarm minute.
-///
-/// @param  minute Alarm minute to set.
-/// @param  alarm_index Alarm index, 0 or 1.
-/// @return None
-///
 bool libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
@@ -290,13 +217,7 @@ bool libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
     return status;
 }
 
-///
-/// @brief Get hour.
-///
-/// @param  *hour Pointer to variable where the hour will be stored.
-/// @return None
-///
-void libMCP79510_GetHour(uint8_t *hour)
+void libMCP79510_GetHour(uint8_t *hour_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_HOUR);
@@ -311,16 +232,10 @@ void libMCP79510_GetHour(uint8_t *hour)
         register_content &= 0x1F;
     }
 
-    *hour = BCDToDecimal(register_content);
+    *hour_p = BCDToDecimal(register_content);
     return;
 }
 
-///
-/// @brief Set hour.
-///
-/// @param  hour Hour to set.
-/// @return None
-///
 bool libMCP79510_SetHour(uint8_t hour)
 {
     bool status = false;
@@ -348,13 +263,6 @@ bool libMCP79510_SetHour(uint8_t hour)
     return status;
 }
 
-///
-/// @brief Set alarm hour.
-///
-/// @param  hour Alarm hour to set.
-/// @param  alarm_index Alarm index, 0 or 1.
-/// @return None
-///
 bool libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
@@ -385,28 +293,16 @@ bool libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
     return status;
 }
 
-///
-/// @brief Get day.
-///
-/// @param  *day Pointer to variable where the day will be stored.
-/// @return None
-///
-void libMCP79510_GetDay(uint8_t *day)
+void libMCP79510_GetDay(uint8_t *day_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_DAY);
     register_content &= 0x07;
 
-    *day = BCDToDecimal(register_content);
+    *day_p = BCDToDecimal(register_content);
     return;
 }
 
-///
-/// @brief Set day.
-///
-/// @param  day Day to set.
-/// @return None
-///
 bool libMCP79510_SetDay(uint8_t day)
 {
     bool status = false;
@@ -423,24 +319,12 @@ bool libMCP79510_SetDay(uint8_t day)
     return status;
 }
 
-///
-/// @brief Get date.
-///
-/// @param  *date Pointer to variable where the date will be stored.
-/// @return None
-///
-void libMCP79510_GetDate(uint8_t *date)
+void libMCP79510_GetDate(uint8_t *date_p)
 {
-    *date = GetDecimalRegisterValue(REG_TC_DATE);
+    *date_p = GetDecimalRegisterValue(REG_TC_DATE);
     return;
 }
 
-///
-/// @brief Set date.
-///
-/// @param  date Date to set.
-/// @return None
-///
 bool libMCP79510_SetDate(uint8_t date)
 {
     bool status = false;
@@ -454,13 +338,6 @@ bool libMCP79510_SetDate(uint8_t date)
     return status;
 }
 
-///
-/// @brief Set alarm date.
-///
-/// @param  date Alarm date to set.
-/// @param  alarm_index Alarm index, 0 or 1.
-/// @return None
-///
 bool libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
@@ -480,28 +357,16 @@ bool libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
     return status;
 }
 
-///
-/// @brief Get month.
-///
-/// @param  *month Pointer to variable where the month will be stored.
-/// @return None
-///
-void libMCP79510_GetMonth(uint8_t *month)
+void libMCP79510_GetMonth(uint8_t *month_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_MONTH);
     register_content &= 0x1F;
 
-    *month = BCDToDecimal(register_content);
+    *month_p = BCDToDecimal(register_content);
     return;
 }
 
-///
-/// @brief Set month.
-///
-/// @param  month Month to set.
-/// @return None
-///
 bool libMCP79510_SetMonth(uint8_t month)
 {
     bool status = false;
@@ -518,24 +383,12 @@ bool libMCP79510_SetMonth(uint8_t month)
     return status;
 }
 
-///
-/// @brief Get year(number of years since 2000).
-///
-/// @param  *year Pointer to variable where the year will be stored.
-/// @return None
-///
-void libMCP79510_GetYear(uint8_t *year)
+void libMCP79510_GetYear(uint8_t *year_p)
 {
-    *year = GetDecimalRegisterValue(REG_TC_YEAR);
+    *year_p = GetDecimalRegisterValue(REG_TC_YEAR);
     return;
 }
 
-///
-/// @brief Set year.
-///
-/// @param  year Year to set, number of years since 2000.
-/// @return None
-///
 bool libMCP79510_SetYear(uint8_t year)
 {
     bool status = false;
@@ -549,12 +402,6 @@ bool libMCP79510_SetYear(uint8_t year)
     return status;
 }
 
-///
-/// @brief Enabled 24-hour mode.
-///
-/// @param  enabled Set to true for enabling 24-hour mode.
-/// @return None
-///
 void libMCP79510_Enable24HourMode(bool enabled)
 {
     uint8_t register_content;
@@ -573,13 +420,6 @@ void libMCP79510_Enable24HourMode(bool enabled)
     return;
 }
 
-///
-/// @brief Check if 24-hour mode is active.
-///
-/// @param  None
-/// @return false  If 24-mode is inactive and 12-hour mode is used.
-/// @return true If 24-mode is active.
-///
 bool libMCP79510_Is24HourMode(void)
 {
     uint8_t register_content;
@@ -588,12 +428,6 @@ bool libMCP79510_Is24HourMode(void)
     return !IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content);
 }
 
-///
-/// @brief Enable/disable the MCP79510 on-board oscillator.
-///
-/// @param  enabled Set to true for enabling the oscillator.
-/// @return None
-///
 void libMCP79510_EnableOscillator(bool enabled)
 {
     uint8_t register_content;
@@ -612,12 +446,6 @@ void libMCP79510_EnableOscillator(bool enabled)
     return;
 }
 
-///
-/// @brief Check if the active year is a leap year.
-///
-/// @param  None
-/// @return bool True if leap year, otherwise false.
-///
 bool libMCP79510_IsLeapYear(void)
 {
     uint8_t register_content;
@@ -626,12 +454,6 @@ bool libMCP79510_IsLeapYear(void)
     return IsBitSet(REG_TC_MONTH_LP_BIT, &register_content);
 }
 
-///
-/// @brief Enable an alarm.
-///
-/// @param  Index of alarm to enable, 0 or 1.
-/// @return None
-///
 void libMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
@@ -651,14 +473,6 @@ void libMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
     return;
 }
 
-///
-/// @brief Enable the square wave output.
-///
-/// Enables the divided output from the crystal oscillator.
-///
-/// @param  enabled Set to true for enabling the output.
-/// @return None
-///
 void libMCP79510_EnableSquareWave(bool enable)
 {
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
@@ -669,17 +483,6 @@ void libMCP79510_EnableSquareWave(bool enable)
     return;
 }
 
-///
-/// @brief Check if oscillator is running.
-///
-/// This flag is set and cleared by hardware. If this flag is set, the oscillator is
-/// running; if clear, the oscillator is not running. This flag does not indicate that
-/// the oscillator is running at the correct frequency. The flag will wait 32 oscillator
-/// cycles before the bit is set.
-///
-/// @param  None
-/// @return bool True if oscillator is running, otherwise false.
-///
 bool libMCP79510_IsOscillatorRunning(void)
 {
     uint8_t register_content;
@@ -688,15 +491,6 @@ bool libMCP79510_IsOscillatorRunning(void)
     return IsBitSet(REG_TC_DAY_OSCON_BIT, &register_content);
 }
 
-///
-/// @brief Clear the external battery switched flag.
-///
-/// This flag is set by hardware when the VCC fails and the VBAT is used to power
-/// the oscillator and the RTCC registers. This flag is cleared by software.
-///
-/// @param  None
-/// @return None
-///
 void libMCP79510_ClearBatterySwitchFlag(void)
 {
     uint8_t register_content;
@@ -708,14 +502,6 @@ void libMCP79510_ClearBatterySwitchFlag(void)
     return;
 }
 
-///
-/// @brief Clear the alarm flag.
-///
-/// Must be cleared after an alarm has triggered.
-///
-/// @param  Index of alarm flag to clear, 0 or 1.
-/// @return None
-///
 void libMCP79510_ClearAlarmFlag(uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
@@ -732,17 +518,6 @@ void libMCP79510_ClearAlarmFlag(uint8_t alarm_index)
     return;
 }
 
-///
-/// @brief  Write data to SRAM.
-///
-/// Write data to SRAM. The SRAM is powered by the RTC battery so data is
-/// persistent between power cycles.
-///
-/// @param  address Address in flash to write. Virtual address starting at zero.
-/// @param  *data Pointer to data to write.
-/// @param  length Number of bytes to write.
-/// @return bool True if address and length is valid, otherwise false.
-///
 bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
                              uint8_t length)
 {
@@ -765,17 +540,6 @@ bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
     return status;
 }
 
-///
-/// @brief  Read data from SRAM.
-///
-/// Read data from SRAM. The SRAM is powered by the RTC battery so data is
-/// persistent between power cycles.
-///
-/// @param  address Address in flash to read. Virtual address starting at zero.
-/// @param  *data Pointer to buffer where data will be stored.
-/// @param  length Number of bytes to read.
-/// @return bool True if address and length is valid, otherwise false.
-///
 bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
     bool status = false;
@@ -797,14 +561,6 @@ bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
     return status;
 }
 
-///
-/// @brief Clear SRAM.
-///
-/// Clear SRAM by reseting all locations to 0x00.
-///
-/// @param  None
-/// @return None
-///
 void libMCP79510_ClearSRAM(void)
 {
     libSPI_WriteByte(INST_CLRRAM, &PreCallback, NULL);
@@ -812,16 +568,6 @@ void libMCP79510_ClearSRAM(void)
     return;
 }
 
-///
-/// @brief Get unique ID.
-///
-/// Get the unique EUI-48/68 id. ID could be preprogrammed from the factory
-/// or defined by the user application.
-///
-/// @param  *eui Pointer to buffer where the ID will be stored.
-/// @param  length Length of ID.
-/// @return None
-///
 void libMCP79510_GetEUI(uint8_t *eui, size_t length)
 {
     sc_assert(length <= EUI_MAX_SIZE);
@@ -844,12 +590,6 @@ void libMCP79510_GetEUI(uint8_t *eui, size_t length)
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef DEBUG_ENABLE
-///
-/// @brief Dump all register values.
-///
-/// @param  None
-/// @return None
-///
 static void DumpRegisterValues(void)
 {
     uint8_t address;
@@ -871,13 +611,6 @@ static void DumpRegisterValues(void)
 }
 #endif
 
-///
-/// @brief Write value to register.
-///
-/// @param  address Address of register.
-/// @param  register_data Value to write.
-/// @return None
-///
 static void WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address < 0x20);
@@ -888,12 +621,6 @@ static void WriteRegister(uint8_t address, uint8_t register_data)
     return;
 }
 
-///
-/// @brief Read value from register.
-///
-/// @param  address Address of register.
-/// @return uint8_t Register value
-///
 static uint8_t ReadRegister(uint8_t address)
 {
     sc_assert(address < 0x20);
@@ -906,12 +633,6 @@ static uint8_t ReadRegister(uint8_t address)
     return register_data;
 }
 
-///
-/// @brief Set correct SPI-mode and select device.
-///
-/// @param  None
-/// @return None
-///
 static void PreCallback(void)
 {
     libSPI_SetMode(SPIMODE);
@@ -919,14 +640,6 @@ static void PreCallback(void)
     return;
 }
 
-///
-/// @brief Deselect device.
-///
-/// Pulls SS high so the device is deselected. The SPI-mode is left as it is.
-///
-/// @param  None
-/// @return None
-///
 static void PostCallback(void)
 {
     PORTD |= (1 << SS); //Pull SS high to release device
