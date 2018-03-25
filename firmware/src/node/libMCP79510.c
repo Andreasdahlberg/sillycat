@@ -518,7 +518,7 @@ void libMCP79510_ClearAlarmFlag(uint8_t alarm_index)
     return;
 }
 
-bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
+bool libMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
                              uint8_t length)
 {
     bool status = false;
@@ -531,8 +531,10 @@ bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
         uint8_t index;
         for (index = 0; index < length; ++index)
         {
+            const uint8_t *tmp_p = (uint8_t *)data_p;
+
             //TODO: Verify that address is auto incremented for write.
-            libSPI_WriteByte(data[index], NULL, NULL);
+            libSPI_WriteByte(tmp_p[index], NULL, NULL);
         }
         PostCallback();
         status = true;
@@ -540,7 +542,7 @@ bool libMCP79510_WriteToSRAM(uint8_t address, const uint8_t *data,
     return status;
 }
 
-bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
+bool libMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
 {
     bool status = false;
 
@@ -552,8 +554,10 @@ bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
         uint8_t index;
         for (index = 0; index < length; ++index)
         {
+            uint8_t *tmp_p = (uint8_t *)data_p;
+
             //SRAM address is auto incremented after each read
-            libSPI_ReadByte(&data[index], NULL, NULL);
+            libSPI_ReadByte(&tmp_p[index], NULL, NULL);
         }
         PostCallback();
         status = true;
