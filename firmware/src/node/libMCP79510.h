@@ -313,7 +313,7 @@ void libMCP79510_ClearAlarmFlag(uint8_t alarm_index);
  * @return True if address and length is valid, otherwise false.
  */
 bool libMCP79510_WriteToSRAM(uint8_t address,
-                             const uint8_t *data,
+                             const void *data_p,
                              uint8_t length);
 
 /**
@@ -328,7 +328,7 @@ bool libMCP79510_WriteToSRAM(uint8_t address,
  *
  * @return True if address and length is valid, otherwise false.
  */
-bool libMCP79510_ReadFromSRAM(uint8_t address, uint8_t *data_p, uint8_t length);
+bool libMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length);
 
 /**
  * Clear SRAM.
