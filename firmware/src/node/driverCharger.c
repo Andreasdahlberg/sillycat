@@ -1,7 +1,7 @@
 /**
  * @file   driverCharger.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-17 (Last edit)
+ * @date   2018-03-26 (Last edit)
  * @brief  LTC4060 charger driver
  *
  * Driver for the LTC4060 NiMH/NICd fast battery charger.
@@ -42,8 +42,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define VREF 3300 // mV
-#define R1_RESISTANCE 5600.0
-#define R2_RESISTANCE 100000.0
+#define R1_RESISTANCE 5600
+#define R2_RESISTANCE 100000
 
 #define CONNECTED_PIN PINC1
 #define CHARGING_PIN PINC4
@@ -106,9 +106,6 @@ uint16_t driverCharger_GetBatteryVoltage(void)
     uint16_t adc_value;
     ADC_Convert(&module.adc.voltage, &adc_value, 1);
 
-    uint32_t voltage;
-    voltage = ((uint32_t)adc_value * VREF) / 1024;
-
     /**
      *
      *  | VBAT
@@ -128,9 +125,8 @@ uint16_t driverCharger_GetBatteryVoltage(void)
      *  | GND
      */
 
-    /* Adjust voltage from voltage divider. */
-    return (uint32_t)((float)voltage / (R2_RESISTANCE / (R1_RESISTANCE +
-                                        R2_RESISTANCE)));
+    return (adc_value * VREF) /
+           ((R2_RESISTANCE * 1024) / (R1_RESISTANCE + R2_RESISTANCE));
 }
 
 int16_t driverCharger_GetBatteryTemperature(void)
