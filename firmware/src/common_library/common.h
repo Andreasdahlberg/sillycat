@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2018-03-26 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -73,12 +73,6 @@ typedef enum function_status
     TIMEOUT
 } function_status;
 
-typedef struct
-{
-    int32_t integer;
-    uint8_t fractional;
-} float_parts_type;
-
 struct div_t
 {
     int32_t quotient;
@@ -89,7 +83,6 @@ struct div_t
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-float_parts_type FloatToParts(float f_value);
 struct div_t Divide(int32_t numerator, int32_t denominator);
 void SetBit(uint8_t bit_index, bool state, uint8_t *data);
 bool IsBitSet(uint8_t bit_index, const uint8_t *data);

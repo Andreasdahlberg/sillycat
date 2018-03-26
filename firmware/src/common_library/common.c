@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2018-03-26 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -60,19 +60,6 @@ void StackPaint(void) __attribute__ ((naked)) __attribute__ ((
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-float_parts_type FloatToParts(float f_value)
-{
-    float_parts_type parts;
-
-    parts.integer = (int32_t)f_value;
-
-    int8_t tmp;
-    tmp = (int8_t)((f_value - parts.integer) * 10);
-    parts.fractional = tmp < 0 ? -tmp : tmp;
-
-    return parts;
-}
 
 ///
 /// @brief Computes the numerator/denominator and returns the quotient and remainder.
