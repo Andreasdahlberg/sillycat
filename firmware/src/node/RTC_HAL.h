@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-07 (Last edit)
+ * @date   2018-03-26 (Last edit)
  * @brief  Header of RTC HAL
  *
  * Detailed description of file.
@@ -76,4 +76,4 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-#endif /* RTCHAL_H_ */
+#endif
