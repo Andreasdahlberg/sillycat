@@ -1,7 +1,7 @@
 /**
  * @file   driverCharger.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-26 (Last edit)
+ * @date   2018-03-28 (Last edit)
  * @brief  LTC4060 charger driver
  *
  * Driver for the LTC4060 NiMH/NICd fast battery charger.
@@ -125,7 +125,7 @@ uint16_t driverCharger_GetBatteryVoltage(void)
      *  | GND
      */
 
-    return (adc_value * VREF) /
+    return ((uint32_t)adc_value * VREF) /
            ((R2_RESISTANCE * 1024) / (R1_RESISTANCE + R2_RESISTANCE));
 }
 
