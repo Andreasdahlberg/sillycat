@@ -1,7 +1,7 @@
 /**
  * @file   Node.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-04-06 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -38,7 +38,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 struct node_t
 {
     uint32_t last_active;
-    uint16_t battery_voltage;
+    struct
+    {
+        uint16_t voltage;
+        int16_t temperature;
+        bool charging;
+        bool connected;
+    } battery;
     bool connected;
     int8_t rssi;
     uint8_t id;
@@ -119,12 +125,31 @@ bool Node_IsBatteryOk(struct node_t *self_p);
 uint16_t Node_GetBatteryVoltage(struct node_t *self_p);
 
 /**
- * Set the battery voltage.
+ * Get the battery temperature.
  *
- * @param self_p  Pointer to node struct.
- * @param voltage Battery voltage in mV.
+ * @param self_p Pointer to node struct.
+ *
+ * @return Battery temperature in Celsius.
  */
-void Node_SetBatteryVoltage(struct node_t *self_p, uint16_t voltage);
+int16_t Node_GetBatteryTemperature(struct node_t *self_p);
+
+/**
+ * Check if the battery is charging.
+ *
+ * @param self_p Pointer to node struct.
+ *
+ * @return True if charging, otherwise false.
+ */
+bool Node_IsBatteryCharging(struct node_t *self_p);
+
+/**
+ * Check if the battery charger is connected.
+ *
+ * @param self_p Pointer to node struct.
+ *
+ * @return True if charger is connected, otherwise false.
+ */
+bool Node_IsBatteryChargerConnected(struct node_t *self_p);
 
 /**
  * Get the signal strength.

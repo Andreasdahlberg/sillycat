@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-09 (Last edit)
+ * @date   2018-04-06 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -112,21 +112,35 @@ bool Node_IsBatteryOk(struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
-    return self_p->battery_voltage > LOW_BATTERY_LIMIT;
+    return self_p->battery.voltage > LOW_BATTERY_LIMIT;
 }
 
 uint16_t Node_GetBatteryVoltage(struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
-    return self_p->battery_voltage;
+    return self_p->battery.voltage;
 }
 
-void Node_SetBatteryVoltage(struct node_t *self_p, uint16_t voltage)
+int16_t Node_GetBatteryTemperature(struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
-    self_p->battery_voltage = voltage;
+    return self_p->battery.temperature;
+}
+
+bool Node_IsBatteryCharging(struct node_t *self_p)
+{
+    sc_assert(self_p != NULL);
+
+    return self_p->battery.charging;
+}
+
+bool Node_IsBatteryChargerConnected(struct node_t *self_p)
+{
+    sc_assert(self_p != NULL);
+
+    return self_p->battery.connected;
 }
 
 int8_t Node_GetRSSI(struct node_t *self_p)
