@@ -280,9 +280,9 @@ static void DrawBattery(uint8_t nr_bars)
 
     for (size_t i = 0; i < nr_bars; ++i)
     {
-        libUI_DrawLine(BATT_INDICATOR_X + 2 + (i * 2),
+        libUI_DrawLine(BATT_INDICATOR_X + 2 + i,
                        BATT_INDICATOR_Y + 2,
-                       BATT_INDICATOR_X + 2 + (i * 2),
+                       BATT_INDICATOR_X + 2 + i,
                        BATT_INDICATOR_Y + 3);
     }
 }
@@ -291,7 +291,7 @@ static void DrawBatteryIndicator(struct node_t *node_p)
 {
     if (Node_IsBatteryCharging(node_p))
     {
-        DrawBattery(module.tick % 4);
+        DrawBattery(module.tick % 6);
     }
     else if (Node_IsBatteryChargerConnected(node_p))
     {
