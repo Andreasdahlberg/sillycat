@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2018-04-06 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -71,37 +71,6 @@ bool PacketHandler_HandleReadingPacket(packet_frame_type *packet_p)
         Node_SetRSSI(node_p, packet_p->header.rssi);
         Node_Update(node_p, packet_p->content.data, (size_t)packet_p->content.size);
         SendAck(Node_GetID(node_p));
-
-        return true;
-    }
-    else
-    {
-        /**
-         * TODO: The current implementation only accept predefined node IDs.
-         *       Register new nodes here.
-         */
-        WARNING("Received packet from unknown node: %x", packet_p->header.source);
-        return false;
-    }
-}
-
-bool PacketHandler_HandleBatteryPacket(packet_frame_type *packet_p)
-{
-    sc_assert(packet_p != NULL);
-
-    struct node_t *node_p = Nodes_GetNodeFromID(packet_p->header.source);
-
-    if (node_p != NULL)
-    {
-        DEBUG("Battery packet from 0x%02x\r\n", Node_GetID(node_p));
-
-        uint16_t battery_voltage;
-
-        memcpy(&battery_voltage, packet_p->content.data, sizeof(battery_voltage));
-        Node_SetBatteryVoltage(node_p, battery_voltage);
-
-        Node_ReportActivity(node_p);
-        Node_SetRSSI(node_p, packet_p->header.rssi);
 
         return true;
     }

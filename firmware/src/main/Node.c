@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Node.h"
 #include "Timer.h"
 #include "libDebug.h"
+#include "Packet.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -169,17 +170,30 @@ void Node_Update(struct node_t *self_p, void *data_p, size_t length)
     sc_assert(self_p != NULL);
     sc_assert(data_p != NULL);
 
-    if (length >= 2 * sizeof(uint16_t))
+    if (length == sizeof(struct packet_t))
     {
-        uint8_t *content_p = (uint8_t *)data_p;
+        struct packet_t packet;
+        memcpy(&packet, data_p, sizeof(packet));
 
-        memcpy(&self_p->sensor.humidity.value, content_p, sizeof(uint16_t));
-        self_p->sensor.humidity.valid = true;
+        self_p->battery.voltage = packet.battery.voltage;
+        self_p->battery.temperature = packet.battery.temperature;
+        self_p->battery.charging = packet.battery.charging;
+        self_p->battery.connected = packet.battery.connected;
 
-        content_p += sizeof(uint16_t);
+        if (packet.sensor.valid)
+        {
+            self_p->sensor.humidity.value = packet.sensor.humidity;
+            self_p->sensor.humidity.valid = true;
+            self_p->sensor.temperature.value = packet.sensor.temperature;
+            self_p->sensor.temperature.valid = true;
+        }
+        else
+        {
+            self_p->sensor.humidity.valid = false;
+            self_p->sensor.temperature.valid = false;
 
-        memcpy(&self_p->sensor.temperature.value, content_p, sizeof(uint16_t));
-        self_p->sensor.temperature.valid = true;
+            WARNING("Invalid sensor data from 0x%x", Node_GetID(self_p));
+        }
     }
     else
     {

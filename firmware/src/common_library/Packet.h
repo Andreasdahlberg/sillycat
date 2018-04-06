@@ -1,8 +1,8 @@
 /**
- * @file   PacketHandler.c
+ * @file   packet.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-04-06 (Last edit)
- * @brief  Implementation of a node packet handler.
+ * @brief  Definition of packet format used for battery and sensor data.
  */
 
 /*
@@ -22,30 +22,41 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PACKETHANDLER_H_
-#define PACKETHANDLER_H_
+#ifndef PACKET_H_
+#define PACKET_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "Transceiver.h"
+#include "RTC.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct __attribute__((packed)) packet_t
+{
+    struct {
+        uint16_t voltage;
+        int16_t temperature;
+        bool charging;
+        bool connected;
+    } battery;
+    struct {
+        int16_t humidity;
+        int16_t temperature;
+        bool valid;
+    } sensor;
+    rtc_time_type timestamp;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
-
-/**
- * Handle packets containing node sensors values.
- *
- * @param packet_p Pointer to packet struct.
- *
- * @return True if packet was handled correctly, otherwise false.
- */
-bool PacketHandler_HandleReadingPacket(packet_frame_type *packet_p);
 
 #endif
