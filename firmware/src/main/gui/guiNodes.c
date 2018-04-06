@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-21 (Last edit)
+ * @date   2018-04-06 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -47,8 +47,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAX_NR_NODE_VIEWS 3
 
-#define BATT_INDICATOR_X 1
-#define BATT_INDICATOR_Y 26
+#define BATT_INDICATOR_X 2
+#define BATT_INDICATOR_Y 23
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -65,6 +65,7 @@ struct node_view_t
 struct module_t
 {
     struct node_view_t views[MAX_NR_NODE_VIEWS];
+    uint8_t tick;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,7 +82,8 @@ static void DrawNodeView(uint16_t context);
 static void DrawDetailedNodeView(uint16_t context);
 static void DrawTemperatureMaxMinView(uint16_t context);
 static void DrawHumidityMaxMinView(uint16_t context);
-static void DrawBatteryIndicator(void);
+static void DrawBattery(uint8_t nr_bars);
+static void DrawBatteryIndicator(struct node_t *node_p);
 static void ClearAction(uint16_t context __attribute__ ((unused)));
 static uint8_t ContextToNodeID(uint16_t context);
 
@@ -110,7 +112,7 @@ void guiNodes_Init(void)
         Interface_AddChild(&view_p->overview, &view_p->details);
     }
 
-    return;
+    module.tick = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -166,6 +168,8 @@ static void DrawNodeView(uint16_t context)
             libUI_Print("--.-- C", 40, UI_DOUBLE_ROW_FIRST);
             libUI_Print("--.-- %%", 40, UI_DOUBLE_ROW_SECOND);
         }
+
+        DrawBatteryIndicator(node_p);
     }
     else
     {
@@ -183,13 +187,13 @@ static void DrawDetailedNodeView(uint16_t context)
         uint16_t voltage = Node_GetBatteryVoltage(node_p);
         int16_t rssi = Node_GetRSSI(node_p);
 
-        libUI_Print("%hu mV", 40, UI_DOUBLE_ROW_FIRST, voltage);
-        libUI_Print("%i dBm", 40, UI_DOUBLE_ROW_SECOND, rssi);
+        libUI_Print("Batt: %hu mV", 2, UI_DOUBLE_ROW_FIRST, voltage);
+        libUI_Print("RSSI: %i dBm", 2, UI_DOUBLE_ROW_SECOND, rssi);
     }
     else
     {
-        libUI_Print("-- mV", 40, UI_DOUBLE_ROW_FIRST);
-        libUI_Print("-- dBm", 40, UI_DOUBLE_ROW_SECOND);
+        libUI_Print("Batt: -- mV", 2, UI_DOUBLE_ROW_FIRST);
+        libUI_Print("RSSI: -- dBm", 2, UI_DOUBLE_ROW_SECOND);
     }
 }
 
@@ -266,15 +270,39 @@ static void DrawHumidityMaxMinView(uint16_t context)
     }
 }
 
-static void DrawBatteryIndicator(void)
+static void DrawBattery(uint8_t nr_bars)
 {
+    libUI_DrawRectangle(BATT_INDICATOR_X, BATT_INDICATOR_Y, 8, 5);
+    libUI_DrawLine(BATT_INDICATOR_X + 9,
+                   BATT_INDICATOR_Y + 1,
+                   BATT_INDICATOR_X + 9,
+                   BATT_INDICATOR_Y + 4);
 
-    libUI_DrawRectangle(BATT_INDICATOR_X, BATT_INDICATOR_Y, 6, 3);
+    for (size_t i = 0; i < nr_bars; ++i)
+    {
+        libUI_DrawLine(BATT_INDICATOR_X + 2 + (i * 2),
+                       BATT_INDICATOR_Y + 2,
+                       BATT_INDICATOR_X + 2 + (i * 2),
+                       BATT_INDICATOR_Y + 3);
+    }
+}
 
-    libUI_DrawLine(BATT_INDICATOR_X + 7, BATT_INDICATOR_Y + 1, BATT_INDICATOR_X + 7,
-                   BATT_INDICATOR_Y + 2);
+static void DrawBatteryIndicator(struct node_t *node_p)
+{
+    if (Node_IsBatteryCharging(node_p))
+    {
+        DrawBattery(module.tick % 4);
+    }
+    else if (Node_IsBatteryChargerConnected(node_p))
+    {
+        DrawBattery(3);
+    }
+    else if (!Node_IsBatteryOk(node_p))
+    {
+        DrawBattery(0);
+    }
 
-    return;
+    ++module.tick;
 }
 
 static void ClearAction(uint16_t context __attribute__ ((unused)))
