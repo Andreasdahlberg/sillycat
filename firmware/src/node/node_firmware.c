@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-23 (Last edit)
+ * @date   2018-04-06 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -54,6 +54,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Power.h"
 #include "Event.h"
 #include "Com.h"
+#include "Packet.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -86,6 +87,7 @@ static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
 static void RHTAvailable(const event_type *event __attribute__ ((unused)));
 static bool TimePacketHandler(packet_frame_type *packet);
+static void FillPacket(struct packet_t *packet_p);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -211,22 +213,42 @@ static bool TimePacketHandler(packet_frame_type *packet)
     return status;
 }
 
-static void RHTAvailable(const event_type *event __attribute__ ((unused)))
+static void FillPacket(struct packet_t *packet_p)
 {
+    packet_p->battery.voltage = driverCharger_GetBatteryVoltage();
+    packet_p->battery.temperature = driverCharger_GetBatteryTemperature();
+    packet_p->battery.charging = driverCharger_IsCharging();
+    packet_p->battery.connected = driverCharger_IsConnected();
+
     sensor_data_type reading;
     if (Sensor_GetReading(&reading))
     {
-        Com_Send(MASTER_ADDRESS, COM_PACKET_TYPE_READING, &reading,
-                 sizeof(reading));
+        packet_p->sensor.temperature = reading.temperature;
+        packet_p->sensor.humidity = reading.humidity;
+        packet_p->sensor.valid = true;
     }
     else
     {
-        WARNING("RHT event triggered with no valid reading available.");
+        packet_p->sensor.valid = false;
 
-        //Go to sleep directly instead of waiting for the sleep timeout.
-        sleep_status.sleep_now = true;
+        WARNING("Sending packet with no valid sensor data");
     }
-    return;
+
+    /**
+     * Use a temporary variable since the packet struct is packed and thus
+     * are pointers to the members not allowed.
+     */
+    rtc_time_type timestamp;
+    RTC_GetCurrentTime(&timestamp);
+    packet_p->timestamp = timestamp;
+}
+
+static void RHTAvailable(const event_type *event __attribute__ ((unused)))
+{
+    struct packet_t packet;
+
+    FillPacket(&packet);
+    Com_Send(MASTER_ADDRESS, COM_PACKET_TYPE_READING, &packet, sizeof(packet));
 }
 
 static bool IsTimeForSleep(void)
