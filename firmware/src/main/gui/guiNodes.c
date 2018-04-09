@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2018-04-09 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -295,7 +295,7 @@ static void DrawBatteryIndicator(struct node_t *node_p)
     }
     else if (Node_IsBatteryChargerConnected(node_p))
     {
-        DrawBattery(3);
+        DrawBattery(5);
     }
     else if (!Node_IsBatteryOk(node_p))
     {
