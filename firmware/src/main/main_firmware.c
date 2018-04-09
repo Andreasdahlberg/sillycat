@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-08 (Last edit)
+ * @date   2018-04-09 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -153,8 +153,6 @@ int main(void)
 
     INFO("Start up done");
     DEBUG("Node ID: 0x%02X\r\n", Config_GetNodeId());
-
-    ErrorHandler_PrintLog();
 
     uint32_t check_timer = Timer_GetMilliseconds();
 
