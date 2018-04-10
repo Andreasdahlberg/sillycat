@@ -1,7 +1,7 @@
 /**
  * @file   driverCharger.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-28 (Last edit)
+ * @date   2018-04-10 (Last edit)
  * @brief  LTC4060 charger driver
  *
  * Driver for the LTC4060 NiMH/NICd fast battery charger.
@@ -32,6 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 #include "driverCharger.h"
 #include "libDebug.h"
@@ -45,8 +46,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define R1_RESISTANCE 5600
 #define R2_RESISTANCE 100000
 
-#define CONNECTED_PIN PINC1
-#define CHARGING_PIN PINC4
+#define CONNECTED_PIN       PINC1
+#define CONNECTED_PIN_INT   PCINT9
+#define CHARGING_PIN        PINC4
+#define CHARGING_PIN_INT    PCINT12
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -76,6 +79,14 @@ void InitChargerPins(void);
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
 //////////////////////////////////////////////////////////////////////////
+
+ISR(PCINT1_vect)
+{
+    /**
+     * Nothing is done in the ISR for the moment. The interrupt is only used
+     * to wake the device from sleep.
+     */
+}
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -144,6 +155,9 @@ void InitChargerPins(void)
     DDRC &= ~(1 << CONNECTED_PIN | 1 << CHARGING_PIN);
 
     /* Enable pull-ups. */
-    PORTC  |= (1 << CONNECTED_PIN);
-    PORTC  |= (1 << CHARGING_PIN);
+    PORTC |= 1 << CONNECTED_PIN | 1 << CHARGING_PIN;
+
+    /* Enable pin change interrupts. */
+    PCMSK1 |= 1 << CONNECTED_PIN_INT | 1 << CHARGING_PIN_INT;
+    PCICR |= (1 << PCIE1);
 }
