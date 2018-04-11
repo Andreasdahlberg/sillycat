@@ -22,7 +22,7 @@ Import(['*'])
 include_path = '#{}'.format(Dir('.').srcnode().path)
 env.Append(CPPPATH=[
     include_path,
-    '#src/common_library'
+    '#src/common'
     ])
 
 source = Glob('*.c')

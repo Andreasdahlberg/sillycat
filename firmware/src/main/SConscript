@@ -20,13 +20,13 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['gui', 'fonts', '../utility', '../common_library']
+DIRECTORIES = ['gui', 'fonts', '../utility', '../common']
 
 #Import all exported variables
 Import(['*'])
 
 
-env.Append(CPPPATH=['#src/utility', '#src/main' ,'#src/common_library', '#src/common_library/ADC', 'gui', 'fonts'])
+env.Append(CPPPATH=['#src/utility', '#src/main' ,'#src/common', '#src/common/ADC', 'gui', 'fonts'])
 
 source = Glob('*.c')
 objects = env.Object(source=source)

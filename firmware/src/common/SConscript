@@ -7,7 +7,7 @@ modules = ['ADC']
 module_objects = []
 
 source = Glob('*.c')
-env.Append(CPPPATH=['#src/utility/FIFO', '#src/common_library', '#src/{}'.format(target)])
+env.Append(CPPPATH=['#src/utility/FIFO', '#src/common', '#src/{}'.format(target)])
 module_objects.append(env.Object(source))
 
 for module in modules:

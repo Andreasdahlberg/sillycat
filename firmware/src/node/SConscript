@@ -20,13 +20,13 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['../utility', '../common_library']
+DIRECTORIES = ['../utility', '../common']
 
 #Import all exported variables
 Import(['*'])
 
 
-env.Append(CPPPATH=['#src/utility', '#src/node' ,'#src/common_library', '#src/common_library/ADC'])
+env.Append(CPPPATH=['#src/utility', '#src/node' ,'#src/common', '#src/common/ADC'])
 
 source = Glob('*.c')
 objects = env.Object(source=source)
