@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2018-04-11 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -32,12 +32,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Timer.h"
 #include "libDebug.h"
 #include "Packet.h"
+#include "Battery.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define LOW_BATTERY_LIMIT           2200
 #define NODE_INACTIVE_TIME_LIMIT    20000
 
 //////////////////////////////////////////////////////////////////////////
@@ -113,7 +113,7 @@ bool Node_IsBatteryOk(struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
-    return self_p->battery.voltage > LOW_BATTERY_LIMIT;
+    return self_p->battery.voltage > BATTERY_LOW_VOLTAGE_MV;
 }
 
 uint16_t Node_GetBatteryVoltage(struct node_t *self_p)

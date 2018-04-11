@@ -38,6 +38,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RTC.h"
 #include "Config.h"
 #include "Event.h"
+#include "Battery.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -46,9 +47,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
-
-#define LOW_VOLTAGE_MV 2200
-#define CRITICAL_VOLTAGE_MV 1900
 
 typedef enum
 {
@@ -114,7 +112,7 @@ static void BatteryMonitoringSM(void)
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
-            else if (driverCharger_GetBatteryVoltage() < LOW_VOLTAGE_MV)
+            else if (driverCharger_GetBatteryVoltage() < BATTERY_LOW_VOLTAGE_MV)
             {
                 INFO("Low battery voltage[%u mV]", driverCharger_GetBatteryVoltage());
                 event_type event = Event_New(EVENT_BATTERY_LOW);
@@ -131,7 +129,7 @@ static void BatteryMonitoringSM(void)
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
-            else if (driverCharger_GetBatteryVoltage() < CRITICAL_VOLTAGE_MV)
+            else if (driverCharger_GetBatteryVoltage() < BATTERY_CRITICAL_VOLTAGE_MV)
             {
                 WARNING("Critical battery voltage");
                 event_type event = Event_New(EVENT_BATTERY_CRITICAL);
