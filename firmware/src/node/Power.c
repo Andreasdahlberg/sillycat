@@ -1,10 +1,8 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
- * @brief  Implementation of Power manager
- *
- * Detailed description of file.
+ * @date   2018-04-11 (Last edit)
+ * @brief  Implementation of the power management module.
  */
 
 /*
@@ -78,12 +76,6 @@ static void BatteryMonitoringSM(void);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Init Power module
-///
-/// @param  None
-/// @return None
-///
 void Power_Init(void)
 {
     battery_state = POWER_NORMAL;
@@ -91,27 +83,15 @@ void Power_Init(void)
     return;
 }
 
-///
-/// @brief Update the internal state of the Power module
-///
-/// @param  None
-/// @return None
-///
 void Power_Update(void)
 {
     BatteryMonitoringSM();
     return;
 }
 
-///
-/// @brief Handle wake up event.
-///
-/// @param  *event Pointer to triggered event
-/// @return None
-///
-void Power_WakeUp(const event_type *event __attribute__ ((unused)))
+void Power_WakeUp(const event_type *event_p __attribute__ ((unused)))
 {
-    sc_assert(event != NULL);
+    sc_assert(event_p != NULL);
 
     DEBUG("Battery voltage: %u\r\n", driverCharger_GetBatteryVoltage());
     DEBUG("Charger connected: %u\r\n", (uint8_t)driverCharger_IsConnected());

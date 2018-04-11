@@ -1,10 +1,8 @@
 /**
  * @file   Power.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-07-03 (Last edit)
- * @brief  Header of Power
- *
- * Detailed description of file.
+ * @date   2018-04-11 (Last edit)
+ * @brief  Implementation of the power management module.
  */
 
 /*
@@ -43,8 +41,21 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the power management module.
+ */
 void Power_Init(void);
-void Power_Update(void);
-void Power_WakeUp(const event_type *event __attribute__ ((unused)));
 
-#endif /* POWER_H_ */
+/**
+ * Update the power management state machine.
+ */
+void Power_Update(void);
+
+/**
+ * Handler for wake up events.
+ *
+ * @param event_p Pointer to triggered event.
+ */
+void Power_WakeUp(const event_type *event_p __attribute__ ((unused)));
+
+#endif
