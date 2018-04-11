@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-09 (Last edit)
+ * @date   2018-04-11 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -57,5 +57,6 @@ void Sensor_Init(void);
 void Sensor_Update(void);
 bool Sensor_GetReading(sensor_data_type *reading);
 void Sensor_WakeUp(const event_type *event __attribute__ ((unused)));
+void Sensor_Sleep(const event_type *event __attribute__ ((unused)));
 
 #endif

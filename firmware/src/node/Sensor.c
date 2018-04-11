@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-09 (Last edit)
+ * @date   2018-04-11 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -139,9 +139,9 @@ bool Sensor_GetReading(sensor_data_type *reading)
 }
 
 ///
-/// @brief Handle events
+/// @brief Handle wake up events.
 ///
-/// @param  *event Pointer to triggered event
+/// @param  *event Pointer to triggered event.
 /// @return None
 ///
 void Sensor_WakeUp(const event_type *event __attribute__ ((unused)))
@@ -150,6 +150,22 @@ void Sensor_WakeUp(const event_type *event __attribute__ ((unused)))
 
     libDHT22_StartReading();
     return;
+}
+
+///
+/// @brief Handle sleep events.
+///
+/// @param  *event Pointer to triggered event.
+/// @return None
+///
+void Sensor_Sleep(const event_type *event __attribute__ ((unused)))
+{
+    sc_assert(event != NULL);
+
+    while (!libDHT22_IsIdle())
+    {
+        libDHT22_Update();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
