@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2018-04-11 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -86,6 +86,7 @@ static sleep_status_type sleep_status = {0};
 static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
 static void RHTAvailable(const event_type *event __attribute__ ((unused)));
+static void CriticalBatteryVoltageHandler(const event_type *event __attribute__ ((unused)));
 static bool TimePacketHandler(packet_frame_type *packet);
 static void FillPacket(struct packet_t *packet_p);
 
@@ -149,10 +150,12 @@ int main(void)
     Event_AddListener(libDebug_WakeUp, EVENT_WAKEUP);
 #endif
     Event_AddListener(Sensor_WakeUp, EVENT_WAKEUP);
+    Event_AddListener(Sensor_Sleep, EVENT_SLEEP);
     Event_AddListener(Power_WakeUp, EVENT_WAKEUP);
     Event_AddListener(LED_EventHandler, EVENT_ALL);
     Event_AddListener(Transceiver_EventHandler, EVENT_ALL);
     Event_AddListener(RHTAvailable, EVENT_RHT_AVAILABLE);
+    Event_AddListener(CriticalBatteryVoltageHandler, EVENT_BATTERY_CRITICAL);
 
     //Since RTC-alarms are persistent between restarts we need to make
     //sure that they are disabled.
@@ -249,6 +252,21 @@ static void RHTAvailable(const event_type *event __attribute__ ((unused)))
 
     FillPacket(&packet);
     Com_Send(MASTER_ADDRESS, COM_PACKET_TYPE_READING, &packet, sizeof(packet));
+}
+
+static void CriticalBatteryVoltageHandler(const event_type *event __attribute__ ((unused)))
+{
+    event_type sleep_event = Event_New(EVENT_SLEEP);
+    Event_Trigger(&sleep_event);
+
+    /**
+     * Enter sleep mode, execution will continue from this point
+     * after sleep is done.
+     */
+    libPower_Sleep();
+
+    sleep_event = Event_New(EVENT_WAKEUP);
+    Event_Trigger(&sleep_event);
 }
 
 static bool IsTimeForSleep(void)
