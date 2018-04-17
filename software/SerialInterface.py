@@ -20,7 +20,7 @@
 import glob
 
 import serial
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 from DevToolUtil import platform_is_windows
 
 __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
@@ -29,6 +29,10 @@ __version__ = '0.1.0'
 
 class SerialInterface(QtCore.QThread):
     """Class to listen for serial data"""
+
+    new_vram = QtCore.pyqtSignal(QtCore.QByteArray)
+    new_pck = QtCore.pyqtSignal(str)
+    new_stream = QtCore.pyqtSignal(str)
 
     def __init__(self):
         """Init interface"""
@@ -71,15 +75,12 @@ class SerialInterface(QtCore.QThread):
             if rx_data:
                 if rx_data[:6] == b'<VRAM>':
                     rx_data += (self._ser.read(520 - len(rx_data)))
-                    self.emit(QtCore.SIGNAL('new_vram(QByteArray)'),
-                              rx_data[6:-2])
+                    self.new_vram.emit(rx_data[6:-2])
                 elif rx_data[:5] == b'<PCK>':
-                    self.emit(QtCore.SIGNAL('new_pck(QString)'),
-                              rx_data[5:].decode('utf-8').rstrip('\r\n'))
+                    self.new_pck.emit(rx_data[5:].decode('utf-8').rstrip('\r\n'))
                 else:
                     try:
-                        self.emit(QtCore.SIGNAL('new_stream(QString)'),
-                                  rx_data.decode('utf-8').rstrip('\r\n'))
+                        self.new_stream.emit(rx_data.decode('utf-8').rstrip('\r\n'))
                     except UnicodeDecodeError:
                         pass
         self.exit_cleanup()

@@ -19,13 +19,13 @@
 
 import os
 import time
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 
 __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
 
-class PacketView(QtGui.QTableWidget):
+class PacketView(QtWidgets.QTableWidget):
 
     def __init__(self, path):
         super().__init__()
@@ -43,7 +43,7 @@ class PacketView(QtGui.QTableWidget):
                 'Type',
                 'Data size'
             ])
-        self.horizontalHeader().setResizeMode(QtGui.QHeaderView.Stretch)
+        self.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
 
         self._path = path
 
@@ -55,7 +55,7 @@ class PacketView(QtGui.QTableWidget):
 
         col_index = 0
         for value in text.split(','):
-            self.setItem(row_index, col_index, QtGui.QTableWidgetItem(value))
+            self.setItem(row_index, col_index, QtWidgets.QTableWidgetItem(value))
             col_index = col_index + 1
 
     def export_to_csv(self, name, separator=',', end_of_line='\n'):
