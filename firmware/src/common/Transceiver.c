@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
+ * @date   2018-04-17 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -152,7 +152,8 @@ void Transceiver_Init(void)
     libRFM69_SetClockOutFrequency(RFM_CLKOUT_OFF);
     libRFM69_EnableOCP(false);
     libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
-    libRFM69_SetPowerLevel(31);
+    libRFM69_EnableHighPowerSetting(false);
+    libRFM69_SetPowerLevel(28);
     libRFM69_SetAESKey((uint8_t *)Config_GetAESKey());
 
     tx_packet_fifo = FIFO_New(tx_packet_buffer);
@@ -398,7 +399,6 @@ static transceiver_state_type SendingStateMachine(void)
                                          packet.content.size + 8);
 
                     libRFM69_SetMode(RFM_TRANSMITTER);
-                    libRFM69_EnableHighPowerSetting(true);
                     state = TR_STATE_SENDING_TRANSMITTING;
                 }
                 else
@@ -413,8 +413,6 @@ static transceiver_state_type SendingStateMachine(void)
         case TR_STATE_SENDING_TRANSMITTING:
             if (libRFM69_IsPacketSent())
             {
-                libRFM69_EnableHighPowerSetting(false);
-
                 state = TR_STATE_SENDING_INIT;
                 next_state = TR_STATE_LISTENING;
             }
