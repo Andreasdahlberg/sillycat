@@ -6,7 +6,7 @@ import os
 from collections import deque
 import ctypes
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from SerialInterface import SerialInterface
 from DataLog import DataLog
 from DisplayView import DisplayView
@@ -20,8 +20,7 @@ SCREENSHOT_PATH = os.path.join(sys.path[0], 'screenshots')
 EXPORT_PATH = os.path.join(sys.path[0], 'exports')
 DEV_ICON = os.path.join(sys.path[0], 'icons', 'dev_tool_icon.png')
 
-
-class ConsoleView(QtGui.QPlainTextEdit):
+class ConsoleView(QtWidgets.QPlainTextEdit):
 
     def __init__(self):
         super(ConsoleView, self).__init__()
@@ -47,7 +46,7 @@ class ConsoleView(QtGui.QPlainTextEdit):
             self.appendPlainText(self._stream_buffer.popleft())
 
 
-class DevTool(QtGui.QWidget):
+class DevTool(QtWidgets.QWidget):
 
     def __init__(self):
         super(DevTool, self).__init__()
@@ -62,57 +61,57 @@ class DevTool(QtGui.QWidget):
         self.dv.hide()
         self.pv = PacketView(EXPORT_PATH)
 
-        self.checkbox = QtGui.QCheckBox('Pause')
+        self.checkbox = QtWidgets.QCheckBox('Pause')
         self.checkbox.stateChanged.connect(self.console_view.toogle_pause)
 
-        self.port_select = QtGui.QComboBox()
+        self.port_select = QtWidgets.QComboBox()
 
         for port in self.ser.get_ports():
             self.port_select.addItem(port)
 
-        self.connect_button = QtGui.QPushButton('Connect')
+        self.connect_button = QtWidgets.QPushButton('Connect')
         self.connect_button.setCheckable(True)
         self.connect_button.clicked[bool].connect(self.connect_clicked)
 
-        self.pixel_label = QtGui.QLabel()
+        self.pixel_label = QtWidgets.QLabel()
         self.pixel_label.setText('X: 0, Y: 0')
         self.pixel_label.hide()
 
-        self.save_display_button = QtGui.QPushButton('Save image')
+        self.save_display_button = QtWidgets.QPushButton('Save image')
         self.save_display_button.clicked.connect(self.dv.save_view_to_file)
         self.save_display_button.hide()
 
-        self.display_hbox = QtGui.QHBoxLayout()
+        self.display_hbox = QtWidgets.QHBoxLayout()
         self.display_hbox.addWidget(self.pixel_label)
         self.display_hbox.addWidget(self.save_display_button)
 
-        display_vbox = QtGui.QVBoxLayout()
+        display_vbox = QtWidgets.QVBoxLayout()
         display_vbox.addWidget(self.dv)
         display_vbox.addLayout(self.display_hbox)
         display_vbox.addStretch(1)
 
-        hbox = QtGui.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         hbox.addLayout(display_vbox)
         hbox.addWidget(self.console_view)
 
-        connect_box = QtGui.QHBoxLayout()
+        connect_box = QtWidgets.QHBoxLayout()
         connect_box.addWidget(self.port_select)
         connect_box.addWidget(self.connect_button)
         connect_box.addStretch(1)
         connect_box.addWidget(self.checkbox)
 
-        clear_packets_button = QtGui.QPushButton('Clear')
+        clear_packets_button = QtWidgets.QPushButton('Clear')
         clear_packets_button.clicked.connect(self.pv.setRowCount)
-        export_packets_button = QtGui.QPushButton('Export')
+        export_packets_button = QtWidgets.QPushButton('Export')
         export_packets_button.clicked.connect(
             lambda: self.pv.export_to_csv('packets'))
 
-        packet_btn_box = QtGui.QHBoxLayout()
+        packet_btn_box = QtWidgets.QHBoxLayout()
         packet_btn_box.addWidget(clear_packets_button)
         packet_btn_box.addWidget(export_packets_button)
         packet_btn_box.addStretch(1)
 
-        vbox = QtGui.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addLayout(connect_box)
 
         vbox.addLayout(hbox)
@@ -128,21 +127,13 @@ class DevTool(QtGui.QWidget):
         self.setWindowIcon(QtGui.QIcon(DEV_ICON))
         self.show()
 
-        self.connect(self.ser, QtCore.SIGNAL('new_stream(QString)'),
-                     self.console_view.update_console_view)
-        self.connect(self.ser, QtCore.SIGNAL(
-            'new_stream(QString)'), self.print_text)
-        self.connect(self.ser, QtCore.SIGNAL(
-            'new_stream(QString)'), self.log.handle_signal)
-
-        self.connect(self.ser, QtCore.SIGNAL(
-            'new_vram(QByteArray)'), self.show_display_widgets)
-        self.connect(self.ser, QtCore.SIGNAL(
-            'new_vram(QByteArray)'), self.dv.update_display_view)
-        self.connect(self.ser, QtCore.SIGNAL(
-            'new_pck(QString)'), self.pv.update_packet_view)
-        self.connect(self.dv, QtCore.SIGNAL(
-            'new_pixel(QPoint)'), self.update_pixel_text)
+        self.ser.new_vram.connect(self.dv.update_display_view)
+        self.ser.new_vram.connect(self.show_display_widgets)
+        self.ser.new_pck.connect(self.pv.update_packet_view)
+        self.ser.new_stream.connect(self.console_view.update_console_view)
+        self.ser.new_stream.connect(self.print_text)
+        self.ser.new_stream.connect(self.log.handle_signal)
+        self.dv.new_pixel.connect(self.update_pixel_text)
 
     def connect_clicked(self, pressed):
         if pressed:
@@ -186,7 +177,7 @@ class DevTool(QtGui.QWidget):
 
     def center(self):
         qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
@@ -199,7 +190,7 @@ def main():
         myappid = 'sillycat.software.devtool.10'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     ex = DevTool()
     sys.exit(app.exec_())
 

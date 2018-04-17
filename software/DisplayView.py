@@ -22,7 +22,7 @@ import time
 import math
 import struct
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
@@ -46,13 +46,14 @@ def create_bitmap_image(rows, w):
             b"".join([bytes(row + pad) for row in reversed(rows)]))
 
 
-class DisplayPixmap(QtGui.QLabel):
+class DisplayPixmap(QtWidgets.QLabel):
 
     def __init__(self):
         super(DisplayPixmap, self).__init__()
 
 
-class DisplayView(QtGui.QLabel):
+class DisplayView(QtWidgets.QLabel):
+    new_pixel = QtCore.pyqtSignal(QtCore.QPoint)
 
     def __init__(self, path):
         super(DisplayView, self).__init__()
@@ -78,7 +79,7 @@ class DisplayView(QtGui.QLabel):
             y_pos = 30
 
         scaled_point = QtCore.QPoint(x_pos, y_pos)
-        self.emit(QtCore.SIGNAL('new_pixel(QPoint)'), scaled_point)
+        self.new_pixel.emit(scaled_point)
 
     def set_pixel(self, x, y):
         self.pos_x = x
