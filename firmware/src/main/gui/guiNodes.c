@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-09 (Last edit)
+ * @date   2018-04-20 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -47,8 +47,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MAX_NR_NODE_VIEWS 3
 
-#define BATT_INDICATOR_X 2
-#define BATT_INDICATOR_Y 23
+#define BATT_INDICATOR_X                2
+#define BATT_INDICATOR_Y                23
+#define BATT_INDICATOR_ANIMATION_DELAY  400
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -65,7 +66,11 @@ struct node_view_t
 struct module_t
 {
     struct node_view_t views[MAX_NR_NODE_VIEWS];
-    uint8_t tick;
+    struct
+    {
+        uint8_t nr_bars;
+        uint32_t timer;
+    } battery_indicator;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -112,7 +117,8 @@ void guiNodes_Init(void)
         Interface_AddChild(&view_p->overview, &view_p->details);
     }
 
-    module.tick = 0;
+    module.battery_indicator.nr_bars = 0;
+    module.battery_indicator.timer = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -291,7 +297,13 @@ static void DrawBatteryIndicator(struct node_t *node_p)
 {
     if (Node_IsBatteryCharging(node_p))
     {
-        DrawBattery(module.tick % 6);
+        if (Timer_TimeDifference(module.battery_indicator.timer) >
+                BATT_INDICATOR_ANIMATION_DELAY)
+        {
+            ++module.battery_indicator.nr_bars;
+            module.battery_indicator.timer = Timer_GetMilliseconds();
+        }
+        DrawBattery(module.battery_indicator.nr_bars % 6);
     }
     else if (Node_IsBatteryChargerConnected(node_p))
     {
@@ -301,8 +313,6 @@ static void DrawBatteryIndicator(struct node_t *node_p)
     {
         DrawBattery(0);
     }
-
-    ++module.tick;
 }
 
 static void ClearAction(uint16_t context __attribute__ ((unused)))
