@@ -1,7 +1,7 @@
 /**
  * @file   driverCharger.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-15 (Last edit)
+ * @date   2018-04-20 (Last edit)
  * @brief  LTC4060 charger driver
  *
  * Driver for the LTC4060 NiMH/NICd fast battery charger.
@@ -43,6 +43,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * Initialize the charger driver.
  */
 void driverCharger_Init(void);
+
+/**
+ * Update the internal state of the driver.
+ */
+void driverCharger_Update(void);
 
 /**
  * Check if the charger is connected.

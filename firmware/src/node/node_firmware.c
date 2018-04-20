@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-11 (Last edit)
+ * @date   2018-04-20 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -172,6 +172,7 @@ int main(void)
 
     while (1)
     {
+        driverCharger_Update();
         Power_Update();
         libDHT22_Update();
         Sensor_Update();

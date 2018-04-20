@@ -1,7 +1,7 @@
 /**
  * @file   driverCharger.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-10 (Last edit)
+ * @date   2018-04-20 (Last edit)
  * @brief  LTC4060 charger driver
  *
  * Driver for the LTC4060 NiMH/NICd fast battery charger.
@@ -37,14 +37,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "driverCharger.h"
 #include "libDebug.h"
 #include "ADC.h"
+#include "Filter.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define VREF 3300 // mV
-#define R1_RESISTANCE 5600
-#define R2_RESISTANCE 100000
+#define VREF            3300    // mV
+#define R1_RESISTANCE   5600    // Ohm
+#define R2_RESISTANCE   100000  // Ohm
+#define SAMPLE_PERIOD   20      // ms
 
 #define CONNECTED_PIN       PINC1
 #define CONNECTED_PIN_INT   PCINT9
@@ -62,6 +64,11 @@ struct module_t
         struct adc_channel_t voltage;
         struct adc_channel_t temperature;
     } adc;
+    struct
+    {
+        struct filter_t voltage;
+    } filter;
+    uint32_t sample_timer;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -75,6 +82,7 @@ static struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 void InitChargerPins(void);
+uint16_t GetBatteryVoltage(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -99,7 +107,22 @@ void driverCharger_Init(void)
 
     InitChargerPins();
 
+    Filter_Init(&module.filter.voltage, GetBatteryVoltage(), FILTER_ALPHA(0.1));
+    module.sample_timer = 0;
+
     INFO("LTC4060 driver initialized");
+}
+
+void driverCharger_Update(void)
+{
+    if (Timer_TimeDifference(module.sample_timer) > SAMPLE_PERIOD)
+    {
+        uint16_t voltage = GetBatteryVoltage();
+
+        Filter_Process(&module.filter.voltage, (int16_t)voltage);
+
+        module.sample_timer = Timer_GetMilliseconds();
+    }
 }
 
 bool driverCharger_IsConnected(void)
@@ -113,6 +136,33 @@ bool driverCharger_IsCharging(void)
 }
 
 uint16_t driverCharger_GetBatteryVoltage(void)
+{
+    return (uint16_t)Filter_Output(&module.filter.voltage);
+}
+
+int16_t driverCharger_GetBatteryTemperature(void)
+{
+    return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+void InitChargerPins(void)
+{
+    /* Set pins as inputs. */
+    DDRC &= ~(1 << CONNECTED_PIN | 1 << CHARGING_PIN);
+
+    /* Enable pull-ups. */
+    PORTC |= 1 << CONNECTED_PIN | 1 << CHARGING_PIN;
+
+    /* Enable pin change interrupts. */
+    PCMSK1 |= 1 << CONNECTED_PIN_INT | 1 << CHARGING_PIN_INT;
+    PCICR |= (1 << PCIE1);
+}
+
+uint16_t GetBatteryVoltage(void)
 {
     uint16_t adc_value;
     ADC_Convert(&module.adc.voltage, &adc_value, 1);
@@ -138,26 +188,4 @@ uint16_t driverCharger_GetBatteryVoltage(void)
 
     return ((uint32_t)adc_value * VREF) /
            ((R2_RESISTANCE * 1024) / (R1_RESISTANCE + R2_RESISTANCE));
-}
-
-int16_t driverCharger_GetBatteryTemperature(void)
-{
-    return 0;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//FUNCTIONS
-//////////////////////////////////////////////////////////////////////////
-
-void InitChargerPins(void)
-{
-    /* Set pins as inputs. */
-    DDRC &= ~(1 << CONNECTED_PIN | 1 << CHARGING_PIN);
-
-    /* Enable pull-ups. */
-    PORTC |= 1 << CONNECTED_PIN | 1 << CHARGING_PIN;
-
-    /* Enable pin change interrupts. */
-    PCMSK1 |= 1 << CONNECTED_PIN_INT | 1 << CHARGING_PIN_INT;
-    PCICR |= (1 << PCIE1);
 }
