@@ -6,7 +6,7 @@ before_install:
   - docker run -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
   - docker exec build scons -C firmware coverage
-  - docker exec build scons -C firmware build-node-release build-main-release
+  - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release
 notifications:
   email:
     - andreas.dahlberg90@gmail.com
@@ -17,7 +17,9 @@ deploy:
     secure: rJgXccqjoUZejjAjYIxT3Ipju0PZ82xdo9AXCJssXpyQ69cGJSBRtoor4yWOvOhMlahz6Y4gKBh0rTX0C/MsTAIMgmxRMvIp+xLyzH6u+Mla4iKFbGIHj93XRjAMWYkNdxACW9M6I7ZpbJLcRBlNmrPvBXoUUvg2bTsU/ugBDU/HUgP1abejK5Ammkia536R+UGiuKQHyR0zVUIdN1ZCVWokKyIx/zBilhy8rrV1OFgD0Pd0rNHm7Lmqg2UFNGXFiBBW7ic6EhPgTB/JTFXg6/YsRQYqu1SDILMX4VsE6hX9HWL0wgJLVz43iZ9QsLuHhbrvw9iRBb0pO9tb9nK8UYa0yLr78BYHviZ7BczMY9NejIdaLQAd1Zw2O7DUr3PD2nWjg8T6h0hAzM8IQj6lI9I8g0DePtA1vdPb1JAFlwxhJYf4oSfbsi4ZST6OJUv2fQMdaAiNjbBmmj2Roc5AjsU1Gn2ZK28388aUj3B/bSn85alF8nPPLwTQdkDDH7YrgNwcl1DkbcFTl7dNz1LJ+4kRBYjl0b3zaZ5bImb+hb+qFA9TpAj1nrUm6R2JEMinjlHB3FIbW/PgJPCGkNO+NE1Jw3xrI7MHzTnfMhil2G7jRXu5kE52+7lby78Bx02BbKgAguCSFRen3QzZctoww41qNFqTqy5SzcXhKOQB1cY=
   file:
     - firmware/build/release/main/main/main_release.hex
+    - firmware/build/release/main/main/main_release.eep
     - firmware/build/release/node/node/node_release.hex
+    - firmware/build/release/node/node/node_release.eep
   on:
     tags: true
 after_success:
