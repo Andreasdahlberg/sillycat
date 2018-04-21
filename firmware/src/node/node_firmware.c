@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-20 (Last edit)
+ * @date   2018-04-21 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -272,11 +272,6 @@ static void CriticalBatteryVoltageHandler(const event_type *event __attribute__ 
 
 static bool IsTimeForSleep(void)
 {
-    if (driverCharger_IsConnected())
-    {
-        return false;
-    }
-
     return (sleep_status.sleep_now == true ||
             Timer_TimeDifference(sleep_status.last_sleep_time) > MAX_AWAKE_TIME_MS);
 }
