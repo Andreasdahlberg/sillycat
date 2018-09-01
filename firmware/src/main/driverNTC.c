@@ -1,7 +1,7 @@
 /**
  * @file   driverNTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2018-09-01 (Last edit)
  * @brief  NTC sensor driver
  *
  * Driver for NTC sensors.
@@ -139,6 +139,15 @@ static const struct lookup_table_t ntc_lut PROGMEM =
 
 static struct ntc_sensor_t ntc_sensors[] =
 {
+    {
+        .base =
+        {
+            .Update = Update
+        },
+        .adc = {
+            .index = 0x06
+        }
+    },
     {
         .base =
         {
