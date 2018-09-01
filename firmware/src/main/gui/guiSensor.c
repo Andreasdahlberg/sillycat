@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-09-01 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -68,22 +68,12 @@ void ClearAction(uint16_t context __attribute__ ((unused)));
 
 void guiSensor_Init(void)
 {
-    temperature_view.draw_function = guiSensor_DrawTemperatureView;
-    temperature_view.action_function = NULL;
-    temperature_view.child = NULL;
-    temperature_view.prev = NULL;
-    temperature_view.next = NULL;
-    temperature_view.parent = NULL;
-
-    detailed_temperature_view.draw_function = guiSensor_DrawDetailedTemperatureView;
-    detailed_temperature_view.action_function = ClearAction;
-    detailed_temperature_view.child = NULL;
-    detailed_temperature_view.prev = NULL;
-    detailed_temperature_view.next = NULL;
-    detailed_temperature_view.parent = NULL;
-
-    Interface_AddChild(&temperature_view, &detailed_temperature_view);
+    Interface_InitView(&temperature_view, guiSensor_DrawTemperatureView, 0);
     Interface_AddView(&temperature_view);
+
+    Interface_InitView(&detailed_temperature_view, guiSensor_DrawDetailedTemperatureView, 0);
+    Interface_AddAction(&detailed_temperature_view, ClearAction);
+    Interface_AddChild(&temperature_view, &detailed_temperature_view);
 
     temperature_sensor = driverNTC_GetSensor(0);
     return;
