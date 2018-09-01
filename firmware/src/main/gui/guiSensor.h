@@ -39,8 +39,23 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the sensor views.
+ */
 void guiSensor_Init(void);
+
+/**
+ * Draw view with detailed information such as min and max values.
+ *
+ * @param context Not used.
+ */
 void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((unused)));
+
+/**
+ * Draw view with the current sensor value.
+ *
+ * @param context Not used.
+ */
 void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)));
 
 #endif
