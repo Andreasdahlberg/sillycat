@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-01 (Last edit)
+ * @date   2018-09-02 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -44,23 +44,38 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define NR_SENSOR_VIEWS 2
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
+
+struct sensor_view_t
+{
+    struct view overview;
+    struct view details;
+    struct sensor_t *sensor_p;
+};
+
+struct module_t
+{
+    struct sensor_view_t views[NR_SENSOR_VIEWS];
+};
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static struct view detailed_temperature_view;
-static struct view temperature_view;
-static struct sensor_t *temperature_sensor;
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void ClearAction(uint16_t context __attribute__ ((unused)));
+void DrawDetailsView(uint16_t context);
+void DrawOverviewView(uint16_t context);
+void ClearAction(uint16_t context);
+struct sensor_view_t *GetViewPointerFromContext(uint16_t context);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -68,25 +83,34 @@ void ClearAction(uint16_t context __attribute__ ((unused)));
 
 void guiSensor_Init(void)
 {
-    Interface_InitView(&temperature_view, guiSensor_DrawTemperatureView, 0);
-    Interface_AddView(&temperature_view);
+    for  (size_t i = 0; i < ElementsIn(module.views); ++i)
+    {
+        struct sensor_view_t *view_p = GetViewPointerFromContext(i);
 
-    Interface_InitView(&detailed_temperature_view, guiSensor_DrawDetailedTemperatureView, 0);
-    Interface_AddAction(&detailed_temperature_view, ClearAction);
-    Interface_AddChild(&temperature_view, &detailed_temperature_view);
+        Interface_InitView(&view_p->overview, DrawOverviewView, i);
+        Interface_AddView(&view_p->overview);
 
-    temperature_sensor = driverNTC_GetSensor(0);
-    return;
+        Interface_InitView(&view_p->details, DrawDetailsView, i);
+        Interface_AddAction(&view_p->details, ClearAction);
+        Interface_AddChild(&view_p->overview, &view_p->details);
+
+        view_p->sensor_p = driverNTC_GetSensor(i);
+    }
 }
 
-void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
-            unused)))
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+void DrawDetailsView(uint16_t context)
 {
+    struct sensor_view_t *view_p = GetViewPointerFromContext(context);
+
     int16_t max_scaled;
     int16_t min_scaled;
 
-    if (Sensor_GetMaxValue(temperature_sensor, &max_scaled) &&
-            Sensor_GetMinValue(temperature_sensor, &min_scaled))
+    if (Sensor_GetMaxValue(view_p->sensor_p, &max_scaled) &&
+            Sensor_GetMinValue(view_p->sensor_p, &min_scaled))
     {
         struct div_t max;
         struct div_t min;
@@ -104,14 +128,20 @@ void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((
         libUI_Print("Max: -.- C", 2, UI_DOUBLE_ROW_FIRST);
         libUI_Print("Min: -.- C", 2, UI_DOUBLE_ROW_SECOND);
     }
-    return;
 }
 
-void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
+void DrawOverviewView(uint16_t context)
 {
+    /**
+     * Add one to index(context) since end users are more familiar with
+     * indexing starting at 1.
+     */
+    libUI_Print("%u", 1, 12, context + 1);
+
+    struct sensor_view_t *view_p = GetViewPointerFromContext(context);
     int16_t temperature_scaled;
 
-    if (Sensor_GetValue(temperature_sensor, &temperature_scaled))
+    if (Sensor_GetValue(view_p->sensor_p, &temperature_scaled))
     {
         struct div_t temperature;
         temperature = Divide((int32_t)temperature_scaled, 10);
@@ -123,18 +153,19 @@ void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)))
     {
         libUI_Print("-.- C", 45, UI_SINGLE_ROW);
     }
-
-    return;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//LOCAL FUNCTIONS
-//////////////////////////////////////////////////////////////////////////
-
-void ClearAction(uint16_t context __attribute__ ((unused)))
+void ClearAction(uint16_t context)
 {
-    Sensor_Reset(temperature_sensor);
-    Interface_Refresh();
+    struct sensor_view_t *view_p = GetViewPointerFromContext(context);
 
-    return;
+    Sensor_Reset(view_p->sensor_p);
+    Interface_Refresh();
+}
+
+struct sensor_view_t *GetViewPointerFromContext(uint16_t context)
+{
+    sc_assert(context < ElementsIn(module.views));
+
+    return &module.views[context];
 }

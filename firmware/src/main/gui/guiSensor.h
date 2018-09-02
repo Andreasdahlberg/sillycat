@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-01 (Last edit)
+ * @date   2018-09-02 (Last edit)
  * @brief  Header of guiSensor
  *
  * Detailed description of file.
@@ -43,19 +43,5 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * Initialize the sensor views.
  */
 void guiSensor_Init(void);
-
-/**
- * Draw view with detailed information such as min and max values.
- *
- * @param context Not used.
- */
-void guiSensor_DrawDetailedTemperatureView(uint16_t context __attribute__ ((unused)));
-
-/**
- * Draw view with the current sensor value.
- *
- * @param context Not used.
- */
-void guiSensor_DrawTemperatureView(uint16_t context __attribute__ ((unused)));
 
 #endif

@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-09 (Last edit)
+ * @date   2018-09-02 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -136,6 +136,7 @@ int main(void)
     Nodes_Init();
 
     Sensor_Register(driverNTC_GetSensor(0));
+    Sensor_Register(driverNTC_GetSensor(1));
     Sensor_Register(driverMCUTemperature_GetSensor());
 
     for (size_t i = 0; i < ElementsIn(module.nodes); ++i)

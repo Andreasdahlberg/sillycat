@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-21 (Last edit)
+ * @date   2018-09-02 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -41,7 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define MAX_NUMBER_OF_SENSORS 8
+#define MAX_NUMBER_OF_SENSORS 9
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
