@@ -1,10 +1,8 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
- * @brief  Implementation of input module.
- *
- * Detailed description of file.
+ * @date   2018-09-02 (Last edit)
+ * @brief  Module responsible for handling user input.
  */
 
 /*
@@ -60,41 +58,41 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    uint8_t right;
-    uint8_t left;
-} encoder_rotations_type;
-
-struct encoder_push_t
-{
-    uint32_t down;
-    bool pressed;
-};
-
 struct module_t
 {
     struct adc_channel_t push_channel;
+    struct
+    {
+        libinput_callback_t left;
+        libinput_callback_t right;
+        libinput_callback_t push;
+        libinput_callback_t press;
+    } callbacks;
+    struct
+    {
+        uint32_t down_timer;
+        bool pressed;
+        struct
+        {
+            uint8_t right;
+            uint8_t left;
+        } rotations;
+    } encoder;
 };
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static libinput_callback_type left_event_callback;
-static libinput_callback_type right_event_callback;
-static libinput_callback_type push_event_callback;
-static libinput_callback_type press_event_callback;
-static encoder_rotations_type encoder_rotations;
 static struct module_t module;
-
-static struct encoder_push_t push;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+void InitializePins(void);
 void PushCheckAndTrigger(void);
+bool IsPushed(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -104,12 +102,11 @@ ISR(PCINT0_vect)
 {
     if (GetLatchSignal() != GetDirectionSignal())
     {
-
-        encoder_rotations.right = 1;
+        module.encoder.rotations.right = 1;
     }
     else
     {
-        encoder_rotations.left = 1;
+        module.encoder.rotations.left = 1;
     }
 }
 
@@ -125,29 +122,14 @@ ISR(PCINT0_vect)
 ///
 void libInput_Init(void)
 {
-    //Set pins as inputs
-    INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN);
+    module = (struct module_t) { {0}, {0}, {0}};
+
+    InitializePins();
 
     //NOTE: Using a ADC-channel for the push-button since no other pin is free.
     ADC_InitChannel(&module.push_channel, PUSH_ADC_CHANNEL);
 
-    //Reset all callbacks
-    right_event_callback = NULL;
-    left_event_callback = NULL;
-    push_event_callback = NULL;
-    press_event_callback = NULL;
-
-    //Reset pending rotations
-    encoder_rotations = (encoder_rotations_type) {0};
-
-    push = (struct encoder_push_t) {0};
-
-    //Enable pin change interrupt on the latch pin
-    PCMSK0 |= (1 << PCINT0);
-    PCICR |= (1 << PCIE0);
-
-    INFO("Init done");
-    return;
+    INFO("Input module initialized");
 }
 
 ///
@@ -160,18 +142,16 @@ void libInput_Update(void)
 {
     PushCheckAndTrigger();
 
-    if (encoder_rotations.right > 0 && right_event_callback != NULL)
+    if (module.encoder.rotations.right > 0 && module.callbacks.right != NULL)
     {
-        right_event_callback();
-        --encoder_rotations.right;
+        module.callbacks.right();
+        --module.encoder.rotations.right;
     }
-    else if (encoder_rotations.left > 0 && left_event_callback != NULL)
+    else if (module.encoder.rotations.left > 0 && module.callbacks.left != NULL)
     {
-        left_event_callback();
-        --encoder_rotations.left;
+        module.callbacks.left();
+        --module.encoder.rotations.left;
     }
-
-    return;
 }
 
 ///
@@ -187,57 +167,74 @@ void libInput_Update(void)
 ///                     action is wanted.
 /// @return None
 ///
-void libInput_SetCallbacks(libinput_callback_type right_event,
-                           libinput_callback_type left_event,
-                           libinput_callback_type push_event,
-                           libinput_callback_type press_event)
+void libInput_SetCallbacks(libinput_callback_t right_event,
+                           libinput_callback_t left_event,
+                           libinput_callback_t push_event,
+                           libinput_callback_t press_event)
 {
-    right_event_callback = right_event;
-    left_event_callback = left_event;
-    push_event_callback = push_event;
-    press_event_callback = press_event;
-
-    return;
+    module.callbacks.right = right_event;
+    module.callbacks.left = left_event;
+    module.callbacks.push = push_event;
+    module.callbacks.press = press_event;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+void InitializePins(void)
+{
+    /**
+     * Set latch and data pins as inputs.
+     */
+    INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN);
+
+    /**
+     * Enable pin change interrupts on the latch pin so that the
+     * data pin can be decoded when the latch pin changes.
+     */
+    PCMSK0 |= (1 << PCINT0);
+    PCICR |= (1 << PCIE0);
+}
+
 void PushCheckAndTrigger(void)
 {
     static bool prev_push = false;
 
-    uint16_t adc_sample;
-    ADC_Convert(&module.push_channel, &adc_sample, 1);
-
-    bool curr_push;
-    curr_push = (bool)(adc_sample > 512);
+    bool curr_push = IsPushed();
 
     if (!prev_push && curr_push)
     {
-        push.down = Timer_GetMilliseconds();
+        module.encoder.down_timer = Timer_GetMilliseconds();
     }
     else if (prev_push  && curr_push)
     {
-        if (!push.pressed && Timer_TimeDifference(push.down) > PUSH_TIME_MS)
+        if (!module.encoder.pressed &&
+                Timer_TimeDifference(module.encoder.down_timer) > PUSH_TIME_MS)
         {
-            if (press_event_callback != NULL)
+            if (module.callbacks.press != NULL)
             {
-                press_event_callback();
+                module.callbacks.press();
             }
-            push.pressed = true;
+            module.encoder.pressed = true;
         }
     }
     else if (prev_push && !curr_push)
     {
-        if (!push.pressed && push_event_callback != NULL)
+        if (!module.encoder.pressed && module.callbacks.push != NULL)
         {
-            push_event_callback();
+            module.callbacks.push();
         }
-        push.pressed = false;
+        module.encoder.pressed = false;
     }
 
     prev_push = curr_push;
-    return;
+}
+
+bool IsPushed(void)
+{
+    uint16_t adc_sample;
+    ADC_Convert(&module.push_channel, &adc_sample, 1);
+
+    return (bool)(adc_sample > 512);
 }

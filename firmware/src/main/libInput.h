@@ -1,10 +1,8 @@
 /**
  * @file   libInput.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-26 (Last edit)
- * @brief  Header of Input module.
- *
- * Detailed description of file.
+ * @date   2018-09-02 (Last edit)
+ * @brief  Module responsible for handling user input.
  */
 
 /*
@@ -37,7 +35,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef void (*libinput_callback_type)(void);
+typedef void (*libinput_callback_t)(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -48,9 +46,9 @@ void libInput_Update(void);
 bool libInput_RightRotation(void);
 bool libInput_LeftRotation(void);
 bool libInput_Push(void);
-void libInput_SetCallbacks(libinput_callback_type right_event,
-                           libinput_callback_type left_event,
-                           libinput_callback_type push_event,
-                           libinput_callback_type press_event);
+void libInput_SetCallbacks(libinput_callback_t right_event,
+                           libinput_callback_t left_event,
+                           libinput_callback_t push_event,
+                           libinput_callback_t press_event);
 
 #endif
