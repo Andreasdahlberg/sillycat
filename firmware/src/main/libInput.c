@@ -114,12 +114,6 @@ ISR(PCINT0_vect)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Init pins and reset all event callbacks.
-///
-/// @param  None
-/// @return None
-///
 void libInput_Init(void)
 {
     module = (struct module_t) { {0}, {0}, {0}};
@@ -132,12 +126,6 @@ void libInput_Init(void)
     INFO("Input module initialized");
 }
 
-///
-/// @brief Check for new inputs and trigger events.
-///
-/// @param  None
-/// @return None
-///
 void libInput_Update(void)
 {
     PushCheckAndTrigger();
@@ -154,19 +142,6 @@ void libInput_Update(void)
     }
 }
 
-///
-/// @brief Set callbacks for input events.
-///
-/// @param  right_event Function to call when rotation to the right is detected,
-///                     NULL if no action is wanted.
-/// @param  left_event Function to call when rotation to the left is detected,
-///                    NULL if no action is wanted.
-/// @param  push_event Function to call when push is detected, NULL if no action
-///                    is wanted.
-/// @param  press_event Function to call when pressing is detected, NULL if no
-///                     action is wanted.
-/// @return None
-///
 void libInput_SetCallbacks(libinput_callback_t right_event,
                            libinput_callback_t left_event,
                            libinput_callback_t push_event,

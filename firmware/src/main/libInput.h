@@ -41,14 +41,31 @@ typedef void (*libinput_callback_t)(void);
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the input module.
+ *
+ * Initialize the hardware pins used for user input and reset the internal
+ * module state.
+ */
 void libInput_Init(void);
+
+/**
+ * Check for new inputs and trigger events.
+ */
 void libInput_Update(void);
-bool libInput_RightRotation(void);
-bool libInput_LeftRotation(void);
-bool libInput_Push(void);
+
+/**
+ * Set callbacks for input events.
+ *
+ * NULL can be used if no action is needed.
+ *
+ * @param right_event Function to call when right rotation is detected.
+ * @param left_event Function to call when left rotation is detected.
+ * @param push_event Function to call when the button is pushed briefly.
+ * @param press_event Function to call when the button is pressed.
+ */
 void libInput_SetCallbacks(libinput_callback_t right_event,
                            libinput_callback_t left_event,
                            libinput_callback_t push_event,
                            libinput_callback_t press_event);
-
 #endif
