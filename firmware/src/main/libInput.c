@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-02 (Last edit)
+ * @date   2018-09-07 (Last edit)
  * @brief  Module responsible for handling user input.
  */
 
@@ -90,9 +90,9 @@ static struct module_t module;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void InitializePins(void);
-void PushCheckAndTrigger(void);
-bool IsPushed(void);
+static void InitializePins(void);
+static void PushCheckAndTrigger(void);
+static bool IsPushed(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -157,7 +157,7 @@ void libInput_SetCallbacks(libinput_callback_t right_event,
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void InitializePins(void)
+static void InitializePins(void)
 {
     /**
      * Set latch and data pins as inputs.
@@ -172,7 +172,7 @@ void InitializePins(void)
     PCICR |= (1 << PCIE0);
 }
 
-void PushCheckAndTrigger(void)
+static void PushCheckAndTrigger(void)
 {
     static bool prev_push = false;
 
@@ -206,7 +206,7 @@ void PushCheckAndTrigger(void)
     prev_push = curr_push;
 }
 
-bool IsPushed(void)
+static bool IsPushed(void)
 {
     uint16_t adc_sample;
     ADC_Convert(&module.push_channel, &adc_sample, 1);
