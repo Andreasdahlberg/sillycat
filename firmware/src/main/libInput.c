@@ -48,10 +48,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define DATA_PIN DDB1
 
 #define PUSH_ADC_CHANNEL 0x06
-
-#define GetLatchSignal() ((INPUT_PINR & (1 << LATCH_PIN)) != 0)
-#define GetDirectionSignal() ((INPUT_PINR & (1 << DATA_PIN)) != 0)
-
 #define PUSH_TIME_MS 1000
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,7 +88,9 @@ static struct module_t module;
 
 static void InitializePins(void);
 static void PushCheckAndTrigger(void);
-static bool IsPushed(void);
+static inline bool GetLatchSignal(void);
+static inline bool GetDirectionSignal(void);
+static inline bool GetButtonSignal(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -176,7 +174,7 @@ static void PushCheckAndTrigger(void)
 {
     static bool prev_push = false;
 
-    bool curr_push = IsPushed();
+    bool curr_push = GetButtonSignal();
 
     if (!prev_push && curr_push)
     {
@@ -206,10 +204,20 @@ static void PushCheckAndTrigger(void)
     prev_push = curr_push;
 }
 
-static bool IsPushed(void)
+static inline bool GetButtonSignal(void)
 {
     uint16_t adc_sample;
     ADC_Convert(&module.push_channel, &adc_sample, 1);
 
     return (bool)(adc_sample > 512);
+}
+
+static inline bool GetLatchSignal(void)
+{
+    return (INPUT_PINR & (1 << LATCH_PIN)) != 0;
+}
+
+static inline bool GetDirectionSignal(void)
+{
+    return (INPUT_PINR & (1 << DATA_PIN)) != 0;
 }
