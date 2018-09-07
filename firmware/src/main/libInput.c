@@ -34,20 +34,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libInput.h"
-
-#include "ADC.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define INPUT_DDR DDRB
-#define INPUT_PINR PINB
-#define LATCH_PIN DDB0
-#define DATA_PIN DDB1
+#define INPUT_DDR   DDRB
+#define INPUT_PINR  PINB
+#define LATCH_PIN   DDB0
+#define DATA_PIN    DDB1
+#define BUTTON_PIN  DDB6
 
-#define PUSH_ADC_CHANNEL 0x06
 #define PUSH_TIME_MS 1000
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,7 +54,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 struct module_t
 {
-    struct adc_channel_t push_channel;
     struct
     {
         libinput_callback_t left;
@@ -114,12 +111,9 @@ ISR(PCINT0_vect)
 
 void libInput_Init(void)
 {
-    module = (struct module_t) { {0}, {0}, {0}};
+    module = (struct module_t) { {0}, {0}};
 
     InitializePins();
-
-    //NOTE: Using a ADC-channel for the push-button since no other pin is free.
-    ADC_InitChannel(&module.push_channel, PUSH_ADC_CHANNEL);
 
     INFO("Input module initialized");
 }
@@ -158,9 +152,9 @@ void libInput_SetCallbacks(libinput_callback_t right_event,
 static void InitializePins(void)
 {
     /**
-     * Set latch and data pins as inputs.
+     * Set latch, data and button pins as inputs.
      */
-    INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN);
+    INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN | 1 << BUTTON_PIN);
 
     /**
      * Enable pin change interrupts on the latch pin so that the
@@ -206,10 +200,7 @@ static void PushCheckAndTrigger(void)
 
 static inline bool GetButtonSignal(void)
 {
-    uint16_t adc_sample;
-    ADC_Convert(&module.push_channel, &adc_sample, 1);
-
-    return (bool)(adc_sample > 512);
+    return (INPUT_PINR & (1 << BUTTON_PIN)) != 0;
 }
 
 static inline bool GetLatchSignal(void)
