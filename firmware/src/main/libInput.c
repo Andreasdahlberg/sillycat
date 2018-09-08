@@ -152,9 +152,11 @@ void libInput_SetCallbacks(libinput_callback_t right_event,
 static void InitializePins(void)
 {
     /**
-     * Set latch, data and button pins as inputs.
+     * Set latch, data and button pins as inputs and enable internal
+     * pull-up for the button pin.
      */
     INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN | 1 << BUTTON_PIN);
+    PORTB |= (1 << BUTTON_PIN);
 
     /**
      * Enable pin change interrupts on the latch pin so that the
