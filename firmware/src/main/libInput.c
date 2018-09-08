@@ -1,7 +1,7 @@
 /**
  * @file   libInput.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-07 (Last edit)
+ * @date   2018-09-08 (Last edit)
  * @brief  Module responsible for handling user input.
  */
 
@@ -200,7 +200,7 @@ static void PushCheckAndTrigger(void)
 
 static inline bool GetButtonSignal(void)
 {
-    return (INPUT_PINR & (1 << BUTTON_PIN)) != 0;
+    return (INPUT_PINR & (1 << BUTTON_PIN)) == 0;
 }
 
 static inline bool GetLatchSignal(void)
