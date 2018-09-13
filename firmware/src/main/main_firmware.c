@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-02 (Last edit)
+ * @date   2018-09-13 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -42,7 +42,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 #include "libDS3234.h"
 #include "libRFM69.h"
-#include "libInput.h"
 
 #include "ADC.h"
 #include "Sensor.h"
@@ -54,9 +53,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Config.h"
 #include "ErrorHandler.h"
 #include "PacketHandler.h"
+#include "Encoder.h"
 
 #include "driverNTC.h"
 #include "driverMCUTemperature.h"
+#include "driverPEC11.h"
 
 #include "guiRTC.h"
 #include "guiSensor.h"
@@ -117,7 +118,7 @@ int main(void)
     Sensor_Init();
     driverNTC_Init();
     driverMCUTemperature_Init();
-    libInput_Init();
+    driverPEC11_Init();
 
     if (!Config_Load())
     {
@@ -128,6 +129,7 @@ int main(void)
 
     Transceiver_Init();
     Com_Init();
+    Encoder_Init();
     Interface_Init();
     //NOTE: The first gui init called will be the root view.
     guiRTC_Init();
@@ -147,10 +149,10 @@ int main(void)
 
     Com_SetPacketHandler(PacketHandler_HandleReadingPacket, COM_PACKET_TYPE_READING);
 
-    libInput_SetCallbacks(Interface_NextView,
-                          Interface_PreviousView,
-                          Interface_ActivateView,
-                          Interface_Action);
+    Encoder_SetCallbacks(Interface_NextView,
+                         Interface_PreviousView,
+                         Interface_ActivateView,
+                         Interface_Action);
 
     INFO("Start up done");
     DEBUG("Node ID: 0x%02X\r\n", Config_GetNodeId());
@@ -159,7 +161,7 @@ int main(void)
 
     while (1)
     {
-        libInput_Update();
+        Encoder_Update();
         Sensor_Update();
         Transceiver_Update();
         Com_Update();

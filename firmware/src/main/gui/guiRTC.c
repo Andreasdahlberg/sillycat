@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-15 (Last edit)
+ * @date   2018-09-13 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -29,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include "libDebug.h"
 #include "libUI.h"
-#include "libInput.h"
+#include "Encoder.h"
 #include "Interface.h"
 #include "RTC.h"
 #include "guiRTC.h"
@@ -340,10 +340,10 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
          * The callbacks need to be restored to the default functions
          * so that the user can leave the 'set time' view.
          */
-        libInput_SetCallbacks(Interface_NextView,
-                              Interface_PreviousView,
-                              Interface_ActivateView,
-                              Interface_Action);
+        Encoder_SetCallbacks(Interface_NextView,
+                             Interface_PreviousView,
+                             Interface_ActivateView,
+                             Interface_Action);
 
         RTC_SetCurrentTime(&module.set_time.time);
 
@@ -358,10 +358,10 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
          * Hijack the input callbacks so that they are used to change the
          * time instead of navigation.
          */
-        libInput_SetCallbacks(IncreaseField,
-                              DecreaseField,
-                              NextField,
-                              Interface_Action);
+        Encoder_SetCallbacks(IncreaseField,
+                             DecreaseField,
+                             NextField,
+                             Interface_Action);
 
         RTC_GetCurrentTime(&module.set_time.time);
 

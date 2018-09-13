@@ -1,8 +1,8 @@
 /**
- * @file   libInput.h
+ * @file   Encoder.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-02 (Last edit)
- * @brief  Module responsible for handling user input.
+ * @date   2018-09-13 (Last edit)
+ * @brief  Module for handling rotary encoders.
  */
 
 /*
@@ -22,50 +22,49 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBINPUT_H_
-#define LIBINPUT_H_
+#ifndef ENCODER_H_
+#define ENCODER_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <stdbool.h>
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef void (*libinput_callback_t)(void);
+typedef void (*encoder_callback_t)(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * Initialize the input module.
- *
- * Initialize the hardware pins used for user input and reset the internal
- * module state.
+ * Initialize the encoder module.
  */
-void libInput_Init(void);
+void Encoder_Init(void);
 
 /**
- * Check for new inputs and trigger events.
+ * Update the internal state of the encoder module.
+ *
+ * Calls any set callbacks if the rotary encoder has been active.
  */
-void libInput_Update(void);
+void Encoder_Update(void);
 
 /**
- * Set callbacks for input events.
+ * Set callbacks for the encoder signals.
  *
- * NULL can be used if no action is needed.
- *
- * @param right_event Function to call when right rotation is detected.
- * @param left_event Function to call when left rotation is detected.
- * @param push_event Function to call when the button is pushed briefly.
- * @param press_event Function to call when the button is pressed.
+ * @param right Callback for right rotations.
+ * @param left Callback for left rotations.
+ * @param brief_push Callback for brief pushes.
+ * @param extended_push Callback for extended pushes.
  */
-void libInput_SetCallbacks(libinput_callback_t right_event,
-                           libinput_callback_t left_event,
-                           libinput_callback_t push_event,
-                           libinput_callback_t press_event);
+void Encoder_SetCallbacks(encoder_callback_t right,
+                          encoder_callback_t left,
+                          encoder_callback_t brief_push,
+                          encoder_callback_t extended_push);
 #endif

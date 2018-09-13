@@ -5,7 +5,7 @@ Import(['*'])
 
 source = Glob('*.c')
 
-env.Append(CPPPATH=['#src/main/fonts'])
+env.Append(CPPPATH=['#src/main/fonts', '#src/main/encoder'])
 
 objects = env.Object(source=source)
 
