@@ -15,32 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-__author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
-
 import os
 
-#Directories to compile
-DIRECTORIES = ['encoder', 'gui', 'fonts', '../utility', '../common']
-
-#Import all exported variables
 Import(['*'])
 
-
-env.Append(CPPPATH=['#src/utility', '#src/main' ,'#src/common', '#src/common/ADC', 'encoder', 'gui', 'fonts'])
-
 source = Glob('*.c')
-objects = env.Object(source=source)
+objects = env.Object(source)
 
-for subdir in DIRECTORIES:
-    objects = objects + env.SConscript('{}/SConscript'.format(subdir), {'env': env, 'mode': mode, 'target': target})
-
-
-elf_name = '{}_{}.elf'.format(target, mode)
-hex_name = '{}_{}.hex'.format(target, mode)
-eep_name = '{}_{}.eep'.format(target, mode)
-
-elf = env.Elf(elf_name, objects)
-hex = env.Hex(hex_name, elf)
-eep = env.EEPROM(eep_name, elf)
-
-Return(['hex', 'elf', 'eep'])
+Return('objects')
