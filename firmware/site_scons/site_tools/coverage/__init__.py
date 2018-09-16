@@ -24,14 +24,13 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
 colors = {}
-colors['cyan']   = '\033[96m'
-colors['purple'] = '\033[95m'
-colors['blue']   = '\033[94m'
-colors['green']  = '\033[92m'
-colors['yellow'] = '\033[93m'
-colors['red']    = '\033[91m'
-colors['end']    = '\033[0m'
-
+colors['cyan'] = '\033[36m'
+colors['purple'] = '\033[35m'
+colors['blue'] = '\033[34m'
+colors['yellow'] = '\033[33m'
+colors['green'] = '\033[32m'
+colors['red'] = '\033[31m'
+colors['end'] = '\033[0m'
 
 def get_status_message(code):
     """Get a status message for 'code'."""
