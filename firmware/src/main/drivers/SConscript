@@ -21,7 +21,7 @@ Import(['*'])
 
 source = Glob('*.c')
 
-env.Append(CPPPATH=['#src/common', '#src/main/drivers'])
+env.Append(CPPPATH=['#src/common'])
 
 objects = env.Object(source=source)
 
