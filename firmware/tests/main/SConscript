@@ -19,10 +19,13 @@ import os
 
 Import(['*'])
 
-sconscripts = ['mocks/SConscript', 'utility/SConscript', 'main/SConscript']
-
+modules = ['encoder']
 objects = []
-for test in sconscripts:
-    objects.append(SConscript(test, exports={'env': env}))
+
+for module in modules:
+    sconscript_file = os.path.join(module, 'SConscript')
+
+    object = SConscript(sconscript_file, exports={'env': env})
+    objects.append(object)
 
 Return('objects')
