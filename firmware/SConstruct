@@ -160,7 +160,7 @@ for target in TARGETS:
 
         Help('\n')
 
-def add_test(module_under_test):
+def add_test(module_under_test, mocks):
     module_under_test_name = module_under_test.split(os.path.sep)[-1]
 
     unit_test_dir = os.path.join('build', 'unit_tests', module_under_test_name, 'unit')
@@ -171,33 +171,39 @@ def add_test(module_under_test):
         exports={'env': test_env, 'project_name': PROJECT_NAME}
     )
 
-    mod_env = test_env.Clone()
-    mod_env.Append(CCFLAGS='--coverage')
+    test_env.Append(CCFLAGS='--coverage')
 
     module_under_test_dir = os.path.join('build', 'unit_tests', module_under_test_name, 'module')
     module_under_test_sconscript = os.path.join('src', module_under_test, 'SConscript')
-    module_object = mod_env.SConscript(module_under_test_sconscript,
+    module_object = test_env.SConscript(module_under_test_sconscript,
         variant_dir=module_under_test_dir,
         duplicate=0,
-        exports={'env': mod_env, 'project_name': PROJECT_NAME}
+        exports={'env': test_env, 'project_name': PROJECT_NAME}
     )
 
     coverage_file = os.path.join(module_under_test_dir, '{}.gcno'.format(module_under_test_name))
     Clean(module_object, coverage_file)
 
     runner_name = os.path.join('build', 'unit_tests', module_under_test_name, 'TestRunner')
-    runner = test_env.Program(target=runner_name, source=[test_object, module_object])
+    runner = test_env.Program(target=runner_name, source=[test_object, module_object]+mock_object)
 
     return runner
 
+mock_object = test_env.SConscript('tests/mocks/SConscript',
+    variant_dir='build/unit_tests/mocks',
+    duplicate=0,
+    exports={'env': test_env, 'project_name': PROJECT_NAME}
+)
+
 modules = [
     os.path.join('utility', 'CRC'),
-    os.path.join('utility', 'List')
+    os.path.join('utility', 'List'),
+    os.path.join('main', 'encoder')
 ]
 
 tests = []
 for module in modules:
-    tests.append(add_test(module))
+    tests.append(add_test(module, mock_object))
 
 test_env.Alias('build-tests', tests)
 test_env.Coverage(source=tests, target='coverage')

@@ -23,7 +23,7 @@ mock_env = env.Clone()
 mock_env.Append(CPPPATH=[
     '#src/main',
     '#src/main/gui',
-    '#src/common_library'
+    '#src/common'
     ])
 
 source = Glob('*.c')
