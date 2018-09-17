@@ -66,6 +66,7 @@ static struct module_t module;
 void Encoder_Init(void)
 {
     module = (struct module_t) { {0}};
+    driverPEC11_Init();
 
     INFO("Encoder module initialized");
 }
