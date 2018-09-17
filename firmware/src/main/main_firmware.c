@@ -118,7 +118,6 @@ int main(void)
     Sensor_Init();
     driverNTC_Init();
     driverMCUTemperature_Init();
-    driverPEC11_Init();
 
     if (!Config_Load())
     {
