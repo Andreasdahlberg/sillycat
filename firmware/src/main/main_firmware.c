@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-13 (Last edit)
+ * @date   2018-09-17 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -149,10 +149,14 @@ int main(void)
 
     Com_SetPacketHandler(PacketHandler_HandleReadingPacket, COM_PACKET_TYPE_READING);
 
-    Encoder_SetCallbacks(Interface_NextView,
-                         Interface_PreviousView,
-                         Interface_ActivateView,
-                         Interface_Action);
+    const struct encoder_callbacks_t encoder_callbacks =
+    {
+        .right = Interface_NextView,
+        .left = Interface_PreviousView,
+        .brief_push = Interface_ActivateView,
+        .extended_push = Interface_Action
+    };
+    Encoder_SetCallbacks(&encoder_callbacks);
 
     INFO("Start up done");
     DEBUG("Node ID: 0x%02X\r\n", Config_GetNodeId());

@@ -1,7 +1,7 @@
 /**
  * @file   Encoder.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-13 (Last edit)
+ * @date   2018-09-17 (Last edit)
  * @brief  Module for handling rotary encoders.
  */
 
@@ -38,6 +38,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 typedef void (*encoder_callback_t)(void);
+struct encoder_callbacks_t
+{
+    encoder_callback_t right;
+    encoder_callback_t left;
+    encoder_callback_t brief_push;
+    encoder_callback_t extended_push;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -58,13 +65,15 @@ void Encoder_Update(void);
 /**
  * Set callbacks for the encoder signals.
  *
- * @param right Callback for right rotations.
- * @param left Callback for left rotations.
- * @param brief_push Callback for brief pushes.
- * @param extended_push Callback for extended pushes.
+ * @param callbacks_p Pointer to struct with callbacks for all signals.
  */
-void Encoder_SetCallbacks(encoder_callback_t right,
-                          encoder_callback_t left,
-                          encoder_callback_t brief_push,
-                          encoder_callback_t extended_push);
+void Encoder_SetCallbacks(const struct encoder_callbacks_t *callbacks_p);
+
+/**
+ * Get callbacks for the encoder signals.
+ *
+ * @return Struct with callbacks for all signals.
+ */
+struct encoder_callbacks_t Encoder_GetCallbacks(void);
+
 #endif

@@ -1,7 +1,7 @@
 /**
  * @file   Encoder.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-13 (Last edit)
+ * @date   2018-09-17 (Last edit)
  * @brief  Module for handling rotary encoders.
  */
 
@@ -42,13 +42,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 struct module_t
 {
-    struct
-    {
-        encoder_callback_t right;
-        encoder_callback_t left;
-        encoder_callback_t brief_push;
-        encoder_callback_t extended_push;
-    } callbacks;
+    struct encoder_callbacks_t callbacks;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,15 +90,14 @@ void Encoder_Update(void)
     }
 }
 
-void Encoder_SetCallbacks(encoder_callback_t right,
-                          encoder_callback_t left,
-                          encoder_callback_t brief_push,
-                          encoder_callback_t extended_push)
+void Encoder_SetCallbacks(const struct encoder_callbacks_t *callbacks_p)
 {
-    module.callbacks.right = right;
-    module.callbacks.left = left;
-    module.callbacks.brief_push = brief_push;
-    module.callbacks.extended_push = extended_push;
+    module.callbacks = *callbacks_p;
+}
+
+struct encoder_callbacks_t Encoder_GetCallbacks(void)
+{
+    return module.callbacks;
 }
 
 //////////////////////////////////////////////////////////////////////////

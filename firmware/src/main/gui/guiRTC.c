@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-13 (Last edit)
+ * @date   2018-09-17 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -57,6 +57,7 @@ struct module_t
         bool active;
         size_t index;
         rtc_time_type time;
+        struct encoder_callbacks_t callbacks;
     } set_time;
 };
 
@@ -340,10 +341,7 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
          * The callbacks need to be restored to the default functions
          * so that the user can leave the 'set time' view.
          */
-        Encoder_SetCallbacks(Interface_NextView,
-                             Interface_PreviousView,
-                             Interface_ActivateView,
-                             Interface_Action);
+        Encoder_SetCallbacks(&module.set_time.callbacks);
 
         RTC_SetCurrentTime(&module.set_time.time);
 
@@ -356,12 +354,18 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
     {
         /**
          * Hijack the input callbacks so that they are used to change the
-         * time instead of navigation.
+         * time instead of navigation. Store the old callbacks so that
+         * they can be restored when the time is set.
          */
-        Encoder_SetCallbacks(IncreaseField,
-                             DecreaseField,
-                             NextField,
-                             Interface_Action);
+        module.set_time.callbacks = Encoder_GetCallbacks();
+        const struct encoder_callbacks_t encoder_callbacks =
+        {
+            .right = IncreaseField,
+            .left = DecreaseField,
+            .brief_push = NextField,
+            .extended_push = Interface_Action
+        };
+        Encoder_SetCallbacks(&encoder_callbacks);
 
         RTC_GetCurrentTime(&module.set_time.time);
 
