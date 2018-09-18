@@ -1,24 +1,67 @@
+/**
+ * @file   test_Interface.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2018-09-18 (Last edit)
+ * @brief  Test suite for the Interface module.
+ */
+
+/*
+This file is part of SillyCat firmware.
+
+SillyCat firmware is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+SillyCat firmware is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
-
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "test_Interface.h"
 #include "Interface.h"
 
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
 #define NUM_TEST_VIEWS 8
 #define view_ptr(idx) (&test_views[idx])
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
 
 static struct view test_views[8];
 static uint16_t DummyDrawView_context;
 
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
 static void DummyDrawView(uint16_t context)
 {
     DummyDrawView_context = context;
-    return;
 }
 
 static void ResetViews(void)
@@ -44,10 +87,13 @@ static int setup(void **state)
     return 0;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//TESTS
+//////////////////////////////////////////////////////////////////////////
+
 void test_GetRootView_None(void **state)
 {
     assert_null(Interface_GetRootView());
-    return;
 }
 
 void test_GetRootView_OneView(void **state)
@@ -57,7 +103,6 @@ void test_GetRootView_OneView(void **state)
 
     Interface_AddView(test_view);
     assert_ptr_equal(Interface_GetRootView(), test_view);
-    return;
 }
 
 void test_GetRootView_TwoViews(void **state)
@@ -65,7 +110,6 @@ void test_GetRootView_TwoViews(void **state)
     Interface_AddView(&test_views[0]);
     Interface_AddView(&test_views[1]);
     assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
-    return;
 }
 
 void test_GetRootView_OneViewWithOneChild(void **state)
@@ -73,13 +117,11 @@ void test_GetRootView_OneViewWithOneChild(void **state)
     Interface_AddChild(&test_views[0], &test_views[1]);
     Interface_AddView(&test_views[0]);
     assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
-    return;
 }
 
 void test_AddView_NullWithRootView(void **state)
 {
     struct view *root_view;
-
 
     Interface_AddView(&test_views[0]);
     Interface_AddView(NULL);
@@ -87,26 +129,22 @@ void test_AddView_NullWithRootView(void **state)
     root_view = Interface_GetRootView();
 
     assert_null(root_view->next);
-    return;
 }
 
 void test_AddView_NullWithoutRootView(void **state)
 {
     Interface_AddView(NULL);
     assert_null(Interface_GetRootView());
-    return;
 }
 
 void test_AddView_OneView(void **state)
 {
     Interface_AddView(view_ptr(0));
     assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
-    return;
 }
 
 void test_AddView_SeveralViews(void **state)
 {
-
     Interface_AddView(&test_views[0]);
     Interface_AddView(&test_views[1]);
     Interface_AddView(&test_views[2]);
@@ -115,7 +153,6 @@ void test_AddView_SeveralViews(void **state)
     assert_ptr_equal(test_views[1].prev, &test_views[0]);
     assert_ptr_equal(test_views[1].next, &test_views[2]);
     assert_ptr_equal(test_views[2].prev, &test_views[1]);
-    return;
 }
 
 void test_RemoveView_Null(void **state)
@@ -151,8 +188,6 @@ void test_RemoveView_RootViewWithOneSibling(void **state)
     Interface_AddView(&test_views[1]);
     Interface_RemoveView(&test_views[0]);
 
-    printf("%p:%p\n", &test_views[0], &test_views[1]);
-
     assert_ptr_equal(Interface_GetRootView(), &test_views[1]);
 }
 
@@ -179,8 +214,6 @@ void test_RemoveView_ViewWithPrevSibling(void **state)
 
 void test_RemoveView_ViewWithPrevAndNextSibling(void **state)
 {
-    struct view *test_view;
-
     Interface_AddView(&test_views[0]);
     Interface_AddView(&test_views[1]);
     Interface_AddView(&test_views[2]);
@@ -192,7 +225,6 @@ void test_RemoveView_ViewWithPrevAndNextSibling(void **state)
 
 void test_RemoveView_ChildViewWithSibling(void **state)
 {
-
     Interface_AddSibling(view_ptr(1), view_ptr(2));
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddView(view_ptr(0));
@@ -366,26 +398,26 @@ void test_Update_ViewWithDrawFunction(void **state)
 
 void test_Update_AutoRefresh(void **state)
 {
-    //First update
+    /* First update */
     will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
 
-    //Second update
+    /* Second update */
     will_return(__wrap_Timer_TimeDifference, 101);
 
-    //Third update
+    /* Third update */
     will_return(__wrap_Timer_TimeDifference, 110);
     will_return(__wrap_libTimer_GetMilliseconds, 110);
     will_return(__wrap_Timer_TimeDifference, 0);
 
-    //Fourth update
+    /* Fourth update */
     will_return(__wrap_Timer_TimeDifference, 211);
 
     view_ptr(0)->draw_function = DummyDrawView;
     view_ptr(0)->context = 1;
 
-    //Expect a automatic refresh in the first and third update
+    /* Expect a automatic refresh in the first and third update */
     Interface_AddView(view_ptr(0));
     expect_function_call(__wrap_libUI_Update);
     Interface_Update();
@@ -397,19 +429,19 @@ void test_Update_AutoRefresh(void **state)
 
 void test_Update_ForcedRefresh(void **state)
 {
-    //First update
+    /* First update */
     will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
 
-    //Second update
+    /* Second update */
     will_return(__wrap_Timer_TimeDifference, 101);
 
-    //Third update
+    /* Third update */
     will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
-    //Fourth update
+    /* Fourth update */
     will_return(__wrap_Timer_TimeDifference, 0);
 
 
@@ -429,6 +461,10 @@ void test_Update_ForcedRefresh(void **state)
     Interface_Update();
     Interface_Update();
 }
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
 int main(void)
 {
@@ -470,5 +506,5 @@ int main(void)
         cmocka_unit_test_setup(test_Update_AutoRefresh, setup),
         cmocka_unit_test_setup(test_Update_ForcedRefresh, setup),
     };
-    return cmocka_run_group_tests(tests, setup, NULL);
+    return cmocka_run_group_tests(tests, NULL, NULL);
 }
