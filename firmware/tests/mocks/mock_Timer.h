@@ -1,8 +1,8 @@
 /**
- * @file   mock_libUI.h
+ * @file   mock_Timer.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-09-18 (Last edit)
- * @brief  Mock functions for libUI.
+ * @brief  Mock functions for Timer module.
  */
 
 /*
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WRAP_LIBUI_H_
-#define WRAP_LIBUI_H_
+#ifndef WRAP_TIMER_H_
+#define WRAP_TIMER_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -41,11 +41,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_libUI_Update(void);
-void __wrap_libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos);
-void __wrap_libUI_Print_P(const char *text, uint8_t x_pos, uint8_t y_pos, ...);
-void __wrap_libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end, uint8_t y_end);
-void __wrap_libUI_DrawRectangle(uint8_t x_start, uint8_t y_start, uint8_t width, uint8_t height);
-void __wrap_libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius);
+uint32_t __wrap_Timer_GetSeconds(void);
+uint32_t __wrap_Timer_TimeDifference(uint32_t time_ms);
 
 #endif
