@@ -1,7 +1,7 @@
 /**
  * @file   libUI.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-03-30 (Last edit)
+ * @date   2018-09-18 (Last edit)
  * @brief  Header of UI-library.
  *
  * Detailed description of file.
@@ -31,7 +31,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * TODO: Find a better solution for this, header not found when building
+ *       unit tests.
+ */
+#ifndef UNIT_TESTING
 #include <avr/pgmspace.h>
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

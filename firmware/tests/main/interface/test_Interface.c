@@ -13,14 +13,7 @@
 #define view_ptr(idx) (&test_views[idx])
 
 static struct view test_views[8];
-static uint8_t libUI_Updated_called;
 static uint16_t DummyDrawView_context;
-
-void __wrap_libUI_Update(void)
-{
-    ++libUI_Updated_called;
-    return;
-}
 
 static void DummyDrawView(uint16_t context)
 {
@@ -44,7 +37,6 @@ static void ResetViews(void)
 
 static int setup(void **state)
 {
-    libUI_Updated_called = 0;
     DummyDrawView_context = 0;
 
     ResetViews();
@@ -140,11 +132,26 @@ void test_RemoveView_RootViewAlone(void **state)
     assert_null(Interface_GetRootView());
 }
 
+void test_RemoveView_ActiveView(void **state)
+{
+    Interface_AddView(&test_views[0]);
+    Interface_AddView(&test_views[1]);
+
+    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    Interface_NextView();
+
+    Interface_RemoveView(&test_views[1]);
+
+    assert_ptr_not_equal(Interface_GetActiveView(), &test_views[1]);
+}
+
 void test_RemoveView_RootViewWithOneSibling(void **state)
 {
     Interface_AddView(&test_views[0]);
     Interface_AddView(&test_views[1]);
     Interface_RemoveView(&test_views[0]);
+
+    printf("%p:%p\n", &test_views[0], &test_views[1]);
 
     assert_ptr_equal(Interface_GetRootView(), &test_views[1]);
 }
@@ -326,35 +333,32 @@ void test_ActivateView_ActivateTwiceWithChild(void **state)
 
 void test_Update_NoRootView(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
 
     Interface_Update();
-
-    assert_int_equal(libUI_Updated_called, 0);
 }
 
 void test_Update_ViewWithNoDrawFunction(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_Update();
-
-    assert_int_equal(libUI_Updated_called, 0);
 }
 
 void test_Update_ViewWithDrawFunction(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
 
     view_ptr(0)->draw_function = DummyDrawView;
     view_ptr(0)->context = 1;
 
     Interface_AddView(view_ptr(0));
+    expect_function_call(__wrap_libUI_Update);
     Interface_Update();
 
     assert_int_equal(DummyDrawView_context, 1);
@@ -363,71 +367,73 @@ void test_Update_ViewWithDrawFunction(void **state)
 void test_Update_AutoRefresh(void **state)
 {
     //First update
+    will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
 
     //Second update
-    will_return(__wrap_libTimer_GetMilliseconds, 1001);
+    will_return(__wrap_Timer_TimeDifference, 101);
 
     //Third update
-    will_return(__wrap_libTimer_GetMilliseconds, 1100);
-    will_return(__wrap_libTimer_GetMilliseconds, 1100);
-    will_return(__wrap_libTimer_GetMilliseconds, 1100);
+    will_return(__wrap_Timer_TimeDifference, 110);
+    will_return(__wrap_libTimer_GetMilliseconds, 110);
+    will_return(__wrap_Timer_TimeDifference, 0);
 
     //Fourth update
-    will_return(__wrap_libTimer_GetMilliseconds, 2101);
-
+    will_return(__wrap_Timer_TimeDifference, 211);
 
     view_ptr(0)->draw_function = DummyDrawView;
     view_ptr(0)->context = 1;
 
-    Interface_AddView(view_ptr(0));
-    Interface_Update();
-    Interface_Update();
-    Interface_Update();
-    Interface_Update();
-
     //Expect a automatic refresh in the first and third update
-    assert_int_equal(libUI_Updated_called, 2);
+    Interface_AddView(view_ptr(0));
+    expect_function_call(__wrap_libUI_Update);
+    Interface_Update();
+    Interface_Update();
+    expect_function_call(__wrap_libUI_Update);
+    Interface_Update();
+    Interface_Update();
 }
 
 void test_Update_ForcedRefresh(void **state)
 {
     //First update
+    will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
 
     //Second update
-    will_return(__wrap_libTimer_GetMilliseconds, 100);
+    will_return(__wrap_Timer_TimeDifference, 101);
 
     //Third update
-    will_return(__wrap_libTimer_GetMilliseconds, 101);
-    will_return(__wrap_libTimer_GetMilliseconds, 101);
-    will_return(__wrap_libTimer_GetMilliseconds, 101);
-
+    will_return(__wrap_Timer_TimeDifference, 0);
+    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
     //Fourth update
-    will_return(__wrap_libTimer_GetMilliseconds, 1102);
+    will_return(__wrap_Timer_TimeDifference, 0);
 
 
     view_ptr(0)->draw_function = DummyDrawView;
     view_ptr(0)->context = 1;
 
+    /**
+     * Expect an automatic refresh in the first update and a forced refresh in
+     *  the third update
+     */
     Interface_AddView(view_ptr(0));
+    expect_function_call(__wrap_libUI_Update);
     Interface_Update();
     Interface_Update();
     Interface_Refresh();
+    expect_function_call(__wrap_libUI_Update);
     Interface_Update();
     Interface_Update();
-
-    //Expect an automatic refresh in the first update and a forced refresh in the third update
-    assert_int_equal(libUI_Updated_called, 2);
 }
 
-#if 1
-int main(void) {
-    const struct CMUnitTest tests[] = {
+int main(void)
+{
+    const struct CMUnitTest tests[] =
+    {
         cmocka_unit_test_setup(test_GetRootView_None, setup),
         cmocka_unit_test_setup(test_GetRootView_OneView, setup),
         cmocka_unit_test_setup(test_GetRootView_TwoViews, setup),
@@ -437,6 +443,7 @@ int main(void) {
         cmocka_unit_test_setup(test_AddView_SeveralViews, setup),
         cmocka_unit_test_setup(test_RemoveView_Null, setup),
         cmocka_unit_test_setup(test_RemoveView_RootViewAlone, setup),
+        cmocka_unit_test_setup(test_RemoveView_ActiveView, setup),
         cmocka_unit_test_setup(test_RemoveView_RootViewWithChild, setup),
         cmocka_unit_test_setup(test_RemoveView_RootViewWithOneSibling, setup),
         cmocka_unit_test_setup(test_RemoveView_ViewWithPrevSibling, setup),
@@ -465,4 +472,3 @@ int main(void) {
     };
     return cmocka_run_group_tests(tests, setup, NULL);
 }
-#endif

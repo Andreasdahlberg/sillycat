@@ -19,31 +19,24 @@ import os
 
 Import(['*'])
 
-unit_env.Append(CPPPATH=[
+env.Append(CPPPATH=[
     '#src/main',
     '#src/main/gui',
-    '#src/common_library',
-    '#tests/mocks'
+    '#src/main/interface',
+    '#src/common'
     ])
 
-unit_env.Append(LINKFLAGS=[
+env.Append(LINKFLAGS=[
     '-Wl,--wrap=libDisplay_Init',
     '-Wl,--wrap=libDisplay_On',
     '-Wl,--wrap=libDisplay_ClearVRAM',
+    '-Wl,--wrap=Timer_TimeDifference',
     '-Wl,--wrap=libTimer_GetMilliseconds',
     '-Wl,--wrap=guiInterface_DrawViewIndicator',
     '-Wl,--wrap=libUI_Update',
     ])
 
-source = [
-    'test_Interface.c',
-    '#src/common_library/Timer.c',
-    ]
-objects = unit_env.Object(source=source)
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
 
-unit_env_cov = unit_env.Clone()
-unit_env_cov.Append(CCFLAGS=['--coverage'])
-module_under_test = unit_env_cov.Object(source='#src/main/Interface.c')
-
-objects.append(module_under_test)
-Return('objects')
+Return('OBJECTS')

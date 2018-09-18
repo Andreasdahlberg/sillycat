@@ -189,7 +189,8 @@ def add_test(module_under_test, mocks):
 
     return runner
 
-mock_object = test_env.SConscript('tests/mocks/SConscript',
+mock_object = test_env.SConscript(
+    'tests/mocks/SConscript',
     variant_dir='build/unit_tests/mocks',
     duplicate=0,
     exports={'env': test_env, 'project_name': PROJECT_NAME}
@@ -198,7 +199,8 @@ mock_object = test_env.SConscript('tests/mocks/SConscript',
 modules = [
     os.path.join('utility', 'CRC'),
     os.path.join('utility', 'List'),
-    os.path.join('main', 'encoder')
+    os.path.join('main', 'encoder'),
+    os.path.join('main', 'interface')
 ]
 
 tests = []
