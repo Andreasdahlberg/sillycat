@@ -1,7 +1,7 @@
 /**
  * @file   test_Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-18 (Last edit)
+ * @date   2018-09-20 (Last edit)
  * @brief  Test suite for the Interface module.
  */
 
@@ -182,13 +182,26 @@ void test_RemoveView_ActiveView(void **state)
     assert_ptr_not_equal(Interface_GetActiveView(), &test_views[1]);
 }
 
+void test_RemoveView_ActiveViewWithParent(void **state)
+{
+    Interface_AddChild(view_ptr(0), view_ptr(1));
+    Interface_AddView(view_ptr(0));
+
+    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    Interface_ActivateView();
+
+    Interface_RemoveView(view_ptr(1));
+    assert_ptr_equal(Interface_GetActiveView(), view_ptr(0));
+}
+
 void test_RemoveView_RootViewWithOneSibling(void **state)
 {
-    Interface_AddView(&test_views[0]);
-    Interface_AddView(&test_views[1]);
-    Interface_RemoveView(&test_views[0]);
+    Interface_AddView(view_ptr(0));
+    Interface_AddView(view_ptr(1));
+    Interface_RemoveView(view_ptr(0));
 
-    assert_ptr_equal(Interface_GetRootView(), &test_views[1]);
+    assert_ptr_equal(Interface_GetRootView(), view_ptr(1));
+    assert_ptr_equal(Interface_GetActiveView(), view_ptr(1));
 }
 
 void test_RemoveView_RootViewWithChild(void **state)
@@ -480,6 +493,7 @@ int main(void)
         cmocka_unit_test_setup(test_RemoveView_Null, setup),
         cmocka_unit_test_setup(test_RemoveView_RootViewAlone, setup),
         cmocka_unit_test_setup(test_RemoveView_ActiveView, setup),
+        cmocka_unit_test_setup(test_RemoveView_ActiveViewWithParent, setup),
         cmocka_unit_test_setup(test_RemoveView_RootViewWithChild, setup),
         cmocka_unit_test_setup(test_RemoveView_RootViewWithOneSibling, setup),
         cmocka_unit_test_setup(test_RemoveView_ViewWithPrevSibling, setup),

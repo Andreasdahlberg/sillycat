@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-11 (Last edit)
+ * @date   2018-09-20 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -221,8 +221,23 @@ void Interface_RemoveView(struct view *view)
         }
         else if (view->parent == NULL && view->prev == NULL)
         {
-            root_view = NULL;
-            active_view = NULL;
+            root_view = view->next;
+        }
+
+        if (view == active_view)
+        {
+            if (view->prev != NULL)
+            {
+                active_view = view->prev;
+            }
+            else if (view->next != NULL)
+            {
+                active_view = view->next;
+            }
+            else if (view->parent != NULL)
+            {
+                active_view = view->parent;
+            }
         }
     }
     return;
