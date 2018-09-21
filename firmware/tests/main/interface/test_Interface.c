@@ -64,6 +64,16 @@ static void DummyDrawView(uint16_t context)
     DummyDrawView_context = context;
 }
 
+static void MockDrawView(uint16_t context)
+{
+    check_expected(context);
+}
+
+static void MockAction(uint16_t context)
+{
+    check_expected(context);
+}
+
 static void ResetViews(void)
 {
     uint8_t index;
@@ -90,6 +100,29 @@ static int setup(void **state)
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
+
+static void test_InitView(void **state)
+{
+    const uint16_t context = 2;
+
+    view_ptr(0)->child = view_ptr(1);
+    view_ptr(0)->parent = view_ptr(2);
+    view_ptr(0)->next = view_ptr(3);
+    view_ptr(0)->prev = view_ptr(4);
+
+    Interface_InitView(view_ptr(0), MockDrawView, context);
+
+    assert_ptr_equal(view_ptr(0)->draw_function, MockDrawView);
+    assert_ptr_equal(view_ptr(0)->context, context);
+    assert_null(view_ptr(0)->action_function);
+    assert_null(view_ptr(0)->child);
+    assert_null(view_ptr(0)->prev);
+    assert_null(view_ptr(0)->next);
+    assert_null(view_ptr(0)->parent);
+
+    Interface_InitView(view_ptr(0), NULL, 0);
+    assert_null(view_ptr(0)->draw_function);
+}
 
 void test_GetRootView_None(void **state)
 {
@@ -244,6 +277,32 @@ void test_RemoveView_ChildViewWithSibling(void **state)
     Interface_RemoveView(view_ptr(1));
 
     assert_ptr_equal(view_ptr(0)->child, view_ptr(2));
+}
+
+void test_AddAction(void **state)
+{
+    Interface_AddAction(view_ptr(0), MockAction);
+    assert_ptr_equal(view_ptr(0)->action_function, MockAction);
+
+    Interface_AddAction(view_ptr(0), NULL);
+    assert_null(view_ptr(0)->action_function);
+}
+
+void test_Action(void **state)
+{
+    const uint16_t context = 3;
+    view_ptr(0)->context = context;;
+
+    /* Expect nothing to happen if there is no active view. */
+    Interface_Action();
+
+    /* Expect nothing to happen if there is no action set. */
+    Interface_AddView(view_ptr(0));
+    Interface_Action();
+
+    Interface_AddAction(view_ptr(0), MockAction);
+    expect_value(MockAction, context, context);
+    Interface_Action();
 }
 
 void test_AddChild_NullChildWithNoExistingChild(void **state)
@@ -483,6 +542,7 @@ int main(void)
 {
     const struct CMUnitTest tests[] =
     {
+        cmocka_unit_test_setup(test_InitView, setup),
         cmocka_unit_test_setup(test_GetRootView_None, setup),
         cmocka_unit_test_setup(test_GetRootView_OneView, setup),
         cmocka_unit_test_setup(test_GetRootView_TwoViews, setup),
@@ -499,6 +559,8 @@ int main(void)
         cmocka_unit_test_setup(test_RemoveView_ViewWithPrevSibling, setup),
         cmocka_unit_test_setup(test_RemoveView_ViewWithPrevAndNextSibling, setup),
         cmocka_unit_test_setup(test_RemoveView_ChildViewWithSibling, setup),
+        cmocka_unit_test_setup(test_AddAction, setup),
+        cmocka_unit_test_setup(test_Action, setup),
         cmocka_unit_test_setup(test_AddChild_NullChildWithNoExistingChild, setup),
         cmocka_unit_test_setup(test_AddChild_NullChildWithExistingChild, setup),
         cmocka_unit_test_setup(test_AddChild_NullParentWithNoExistingChild, setup),
