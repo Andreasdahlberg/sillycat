@@ -26,9 +26,9 @@ build/unit_tests/timer/TestRunner
 
 ## Add a new test suite
 1. Add a new directory for the test suite in *tests*. It's important that the
-directory structure is the same as in the *src *directory. Assume we want to
-add a test suite for the *src/main/encoder *module, then we create
-*tests/main/encoder *.
+directory structure is the same as in the *src* directory. Assume we want to
+add a test suite for the *src/main/encoder* module, then we create
+*tests/main/encoder*.
 
 1. Create a SConscript file with the following content
     ```python
@@ -49,7 +49,7 @@ add a test suite for the *src/main/encoder *module, then we create
 
     Return('OBJECTS')
     ```
-1. Implement the test suite in *test_MODULE_NAME.c *. A basic template is
+1. Implement the test suite in *test_MODULE_NAME.c*. A basic template is
 included below but the existing test suites is the best place to learn how to write tests.
     ```c
     #include <stdarg.h>
