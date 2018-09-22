@@ -99,12 +99,6 @@ void test_FIFO_Push_Empty(void **state)
     assert_true(FIFO_Push(&fifo, &item));
 
     // Make sure the FIFO content is correct.
-    //
-    for (uint8_t i = 0; i < 8; ++i)
-    {
-        printf("BUFFER[%u]0x%X\n", i, buffer[i]);
-    }
-
     uint8_t expected_buffer_content[8] = {0x00, 0xAA, 0, 0, 0, 0, 0, 0};
     assert_memory_equal(expected_buffer_content, buffer,
                         sizeof(expected_buffer_content));
