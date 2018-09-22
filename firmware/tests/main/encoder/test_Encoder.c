@@ -1,7 +1,7 @@
 /**
  * @file   test_Encoder.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-17 (Last edit)
+ * @date   2018-09-22 (Last edit)
  * @brief  Test suite for the Encoder module.
  */
 
@@ -166,7 +166,7 @@ static void test_Encoder_Update_NoCallbacks(void **state)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-int main(void)
+int main(int argc, char *argv[])
 {
     const struct CMUnitTest tests[] =
     {
@@ -175,5 +175,11 @@ int main(void)
         cmocka_unit_test_setup(test_Encoder_SetGetCallbacks, Setup),
         cmocka_unit_test_setup(test_Encoder_Update_NoCallbacks, Setup)
     };
+
+    if (argc >= 2)
+    {
+        cmocka_set_test_filter(argv[1]);
+    }
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

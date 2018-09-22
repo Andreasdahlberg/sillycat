@@ -285,7 +285,7 @@ void test_FIFO_Clear_Full(void **state)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-int main(void)
+int main(int argc, char *argv[])
 {
     const struct CMUnitTest test_FIFO[] =
     {
@@ -310,5 +310,11 @@ int main(void)
         cmocka_unit_test(test_FIFO_Clear_NULL),
         cmocka_unit_test(test_FIFO_Clear_Full)
     };
+
+    if (argc >= 2)
+    {
+        cmocka_set_test_filter(argv[1]);
+    }
+
     return cmocka_run_group_tests(test_FIFO, NULL, NULL);
 }

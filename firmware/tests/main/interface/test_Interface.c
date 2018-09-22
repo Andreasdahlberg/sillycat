@@ -541,7 +541,7 @@ void test_Update_ForcedRefresh(void **state)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-int main(void)
+int main(int argc, char *argv[])
 {
     const struct CMUnitTest tests[] =
     {
@@ -586,5 +586,11 @@ int main(void)
         cmocka_unit_test_setup(test_Update_AutoRefresh, Setup),
         cmocka_unit_test_setup(test_Update_ForcedRefresh, Setup),
     };
+
+    if (argc >= 2)
+    {
+        cmocka_set_test_filter(argv[1]);
+    }
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

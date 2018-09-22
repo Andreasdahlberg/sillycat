@@ -55,7 +55,7 @@ void test_CRC_16_SeveralBytes(void **state __attribute__((__unused__)))
     assert_int_equal(crc, 0x17FB);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     const struct CMUnitTest tests[] =
     {
@@ -65,5 +65,11 @@ int main(void)
         cmocka_unit_test(test_CRC_16_SingleBytes),
         cmocka_unit_test(test_CRC_16_SeveralBytes)
     };
+
+    if (argc >= 2)
+    {
+        cmocka_set_test_filter(argv[1]);
+    }
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

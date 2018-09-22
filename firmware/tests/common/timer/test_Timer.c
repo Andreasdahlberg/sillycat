@@ -150,7 +150,7 @@ void test_Timer_GetSeconds_floor(void **state)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-int main(void)
+int main(int argc, char *argv[])
 {
     const struct CMUnitTest tests[] =
     {
@@ -164,5 +164,11 @@ int main(void)
         cmocka_unit_test(test_Timer_GetSeconds_ceil),
         cmocka_unit_test(test_Timer_GetSeconds_floor),
     };
+
+    if (argc >= 2)
+    {
+        cmocka_set_test_filter(argv[1]);
+    }
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
