@@ -201,6 +201,7 @@ mock_object = test_env.SConscript(
 modules = [
     os.path.join('utility', 'CRC'),
     os.path.join('utility', 'List'),
+    os.path.join('utility', 'FIFO'),
     os.path.join('main', 'encoder'),
     os.path.join('main', 'interface'),
     os.path.join('common', 'timer')
