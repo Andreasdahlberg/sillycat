@@ -1,10 +1,8 @@
 /**
  * @file   FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
- * @brief  Implementation of a FIFO
- *
- * Detailed description of file.
+ * @date   2018-09-22 (Last edit)
+ * @brief  FIFO module.
  */
 
 /*
@@ -29,6 +27,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include <string.h>
+#include "sc_assert.h"
 #include "FIFO.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -62,6 +61,9 @@ uint8_t NextPosition(fifo_type *fifo, uint8_t current_position);
 ///
 bool FIFO_Push(fifo_type *fifo, void *item)
 {
+    sc_assert(fifo != NULL);
+    sc_assert(item != NULL);
+
     uint8_t *ptr;
 
     if (FIFO_IsFull(fifo) == true)
@@ -86,6 +88,9 @@ bool FIFO_Push(fifo_type *fifo, void *item)
 ///
 bool FIFO_Pop(fifo_type *fifo, void *item)
 {
+    sc_assert(fifo != NULL);
+    sc_assert(item != NULL);
+
     uint8_t *ptr;
 
     if (FIFO_IsEmpty(fifo) == true)
@@ -110,6 +115,9 @@ bool FIFO_Pop(fifo_type *fifo, void *item)
 ///
 bool FIFO_Peek(fifo_type *fifo, void *item)
 {
+    sc_assert(fifo != NULL);
+    sc_assert(item != NULL);
+
     uint8_t *ptr;
 
     if (FIFO_IsEmpty(fifo) == true)
@@ -130,6 +138,8 @@ bool FIFO_Peek(fifo_type *fifo, void *item)
 ///
 bool FIFO_IsFull(fifo_type *fifo)
 {
+    sc_assert(fifo != NULL);
+
     return NextPosition(fifo, fifo->head) == fifo->tail;
 }
 
@@ -141,6 +151,8 @@ bool FIFO_IsFull(fifo_type *fifo)
 ///
 bool FIFO_IsEmpty(fifo_type *fifo)
 {
+    sc_assert(fifo != NULL);
+
     return fifo->head == fifo->tail;
 }
 
@@ -152,6 +164,8 @@ bool FIFO_IsEmpty(fifo_type *fifo)
 ///
 void FIFO_Clear(fifo_type *fifo)
 {
+    sc_assert(fifo != NULL);
+
     fifo->head = 0;
     fifo->tail = 0;
     return;
