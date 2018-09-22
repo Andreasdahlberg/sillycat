@@ -83,6 +83,10 @@ static void ResetViews(void)
 static int Setup(void **state)
 {
     ResetViews();
+
+    expect_function_call(__wrap_libDisplay_Init);
+    expect_function_call(__wrap_libDisplay_On);
+
     Interface_Init();
 
     return 0;
@@ -91,6 +95,14 @@ static int Setup(void **state)
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
+
+void test_Init(void **state)
+{
+    expect_function_call(__wrap_libDisplay_Init);
+    expect_function_call(__wrap_libDisplay_On);
+
+    Interface_Init();
+}
 
 void test_InitView(void **state)
 {
@@ -122,11 +134,8 @@ void test_GetRootView_None(void **state)
 
 void test_GetRootView_OneView(void **state)
 {
-    struct view *test_view;
-    Interface_Init();
-
-    Interface_AddView(test_view);
-    assert_ptr_equal(Interface_GetRootView(), test_view);
+    Interface_AddView(view_ptr(0));
+    assert_ptr_equal(Interface_GetRootView(), view_ptr(0));
 }
 
 void test_GetRootView_TwoViews(void **state)
@@ -536,6 +545,7 @@ int main(void)
 {
     const struct CMUnitTest tests[] =
     {
+        cmocka_unit_test(test_Init),
         cmocka_unit_test_setup(test_InitView, Setup),
         cmocka_unit_test_setup(test_GetRootView_None, Setup),
         cmocka_unit_test_setup(test_GetRootView_OneView, Setup),
