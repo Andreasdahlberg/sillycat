@@ -26,7 +26,18 @@ DIRECTORIES = ['encoder', 'drivers', 'gui', 'fonts', 'interface', '../utility', 
 Import(['*'])
 
 
-env.Append(CPPPATH=['#src/utility', '#src/main' ,'#src/common', '#src/common/ADC', 'encoder', 'drivers', 'gui', 'fonts', 'interface'])
+env.Append(CPPPATH=[
+    '#src/utility',
+    '#src/main',
+    '#src/common',
+    '#src/common/ADC',
+    '#src/common/timer',
+    'encoder',
+    'drivers',
+    'gui',
+    'fonts',
+    'interface'
+])
 
 source = Glob('*.c')
 objects = env.Object(source=source)

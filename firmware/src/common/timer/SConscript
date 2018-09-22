@@ -19,21 +19,7 @@ import os
 
 Import(['*'])
 
-env.Append(CPPPATH=[
-    '#src/main',
-    '#src/main/gui',
-    '#src/main/interface',
-    '#src/common'
-    ])
-
-env.Append(LINKFLAGS=[
-    '-Wl,--wrap=libDisplay_Init',
-    '-Wl,--wrap=libDisplay_On',
-    '-Wl,--wrap=Timer_TimeDifference',
-    '-Wl,--wrap=Timer_GetMilliseconds',
-    '-Wl,--wrap=guiInterface_DrawViewIndicator',
-    '-Wl,--wrap=libUI_Update',
-    ])
+env.Append(CPPPATH=['#src/common'])
 
 SOURCE = Glob('*.c')
 OBJECTS = env.Object(source=SOURCE)

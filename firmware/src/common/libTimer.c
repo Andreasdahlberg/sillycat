@@ -1,10 +1,8 @@
 /**
  * @file   libTimer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-14 (Last edit)
- * @brief  Implementation of low level timer functions
- *
- * Detailed description of file.
+ * @date   2018-09-22 (Last edit)
+ * @brief  Module with low level timer functions.
  */
 
 /*
@@ -28,12 +26,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include <avr/interrupt.h>
 #include <util/atomic.h>
-
 #include "libTimer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,12 +58,6 @@ ISR(TIMER0_COMPA_vect)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Initialize the timer hardware to trigger an interrupt every 1 ms
-///
-/// @param  None
-/// @return None
-///
 void libTimer_Init()
 {
     system_timer = 0;
@@ -94,12 +83,6 @@ void libTimer_Init()
     return;
 }
 
-///
-/// @brief Reset the system timer
-///
-/// @param  None
-/// @return None
-///
 void libTimer_Reset()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -108,12 +91,6 @@ void libTimer_Reset()
     }
 }
 
-///
-/// @brief Get the current time(ms)
-///
-/// @param  None
-/// @return uint32_t The current system time in milliseconds
-///
 uint32_t libTimer_GetMilliseconds()
 {
     uint32_t current_timer;

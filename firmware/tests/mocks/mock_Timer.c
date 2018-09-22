@@ -1,7 +1,7 @@
 /**
  * @file   mock_Timer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-18 (Last edit)
+ * @date   2018-09-22 (Last edit)
  * @brief  Mock functions for Timer module.
  */
 
@@ -57,6 +57,21 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+void __wrap_Timer_Init(void)
+{
+    function_called();
+}
+
+void __wrap_Timer_Reset(void)
+{
+    function_called();
+}
+
+uint32_t __wrap_Timer_GetMilliseconds(void)
+{
+    return mock_type(int);
+}
 
 uint32_t __wrap_Timer_GetSeconds(void)
 {

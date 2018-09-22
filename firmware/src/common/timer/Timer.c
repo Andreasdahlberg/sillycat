@@ -1,10 +1,8 @@
 /**
- * @file   Timer.h
+ * @file   Timer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-05 (Last edit)
- * @brief  Header of Timer functions
- *
- * Detailed description of file.
+ * @date   2018-09-22 (Last edit)
+ * @brief  Module with timer related functions.
  */
 
 /*
@@ -24,31 +22,72 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TIMER_H_
-#define TIMER_H_
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
 #include "libTimer.h"
+#include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define Timer_Init() libTimer_Init()
-#define Timer_GetMilliseconds() libTimer_GetMilliseconds()
+#define TIMERMAX (uint32_t)0xFFFFFFFF
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-//FUNCTION PROTOTYPES
+//VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-uint32_t Timer_GetSeconds();
-uint32_t Timer_TimeDifference(uint32_t time_ms);
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
-#endif /* TIMER_H_ */
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+void Timer_Init(void)
+{
+    libTimer_Init();
+}
+
+void Timer_Reset(void)
+{
+    libTimer_Reset();
+}
+
+uint32_t Timer_GetMilliseconds(void)
+{
+    return libTimer_GetMilliseconds();
+}
+
+uint32_t Timer_GetSeconds(void)
+{
+    return ((Timer_GetMilliseconds() + 500) / 1000);
+}
+
+uint32_t Timer_TimeDifference(uint32_t time_ms)
+{
+    uint32_t time_difference;
+    uint32_t current_time = Timer_GetMilliseconds();
+
+    //Check for timer overflow
+    if (time_ms > current_time)
+    {
+        time_difference = (TIMERMAX - time_ms) + current_time;
+    }
+    else
+    {
+        time_difference = current_time - time_ms;
+    }
+    return time_difference;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
