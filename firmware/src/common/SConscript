@@ -3,7 +3,7 @@ import os
 
 Import(['*'])
 
-modules = ['ADC']
+modules = ['ADC', 'timer']
 module_objects = []
 
 source = Glob('*.c')

@@ -52,7 +52,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static struct view test_views[8];
+static struct view test_views[NUM_TEST_VIEWS];
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
@@ -207,7 +207,7 @@ void test_RemoveView_ActiveView(void **state)
     Interface_AddView(view_ptr(0));
     Interface_AddView(view_ptr(1));
 
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
     Interface_NextView();
 
     Interface_RemoveView(view_ptr(1));
@@ -220,7 +220,7 @@ void test_RemoveView_ActiveViewWithParent(void **state)
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddView(view_ptr(0));
 
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
     Interface_ActivateView();
 
     Interface_RemoveView(view_ptr(1));
@@ -347,7 +347,7 @@ void test_NextView_NoRootView(void **state)
 
 void test_NextView_OneView(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_NextView();
@@ -357,7 +357,7 @@ void test_NextView_OneView(void **state)
 
 void test_NextView_TwoViews(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_AddView(view_ptr(1));
@@ -374,7 +374,7 @@ void test_PreviousView_NoRootView(void **state)
 
 void test_PreviousView_OneView(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_PreviousView();
@@ -384,8 +384,8 @@ void test_PreviousView_OneView(void **state)
 
 void test_PreviousView_TwoViews(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_AddView(view_ptr(1));
@@ -403,7 +403,7 @@ void test_ActivateView_NoRootView(void **state)
 
 void test_ActivateView_ActivateOnceWithNoChild(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_ActivateView();
@@ -413,7 +413,7 @@ void test_ActivateView_ActivateOnceWithNoChild(void **state)
 
 void test_ActivateView_ActivateOnceWithChild(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddView(view_ptr(0));
@@ -424,8 +424,8 @@ void test_ActivateView_ActivateOnceWithChild(void **state)
 
 void test_ActivateView_ActivateTwiceWithChild(void **state)
 {
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddChild(view_ptr(0), view_ptr(1));
     Interface_AddView(view_ptr(0));
@@ -438,7 +438,7 @@ void test_ActivateView_ActivateTwiceWithChild(void **state)
 void test_Update_NoRootView(void **state)
 {
     will_return(__wrap_Timer_TimeDifference, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_Update();
 }
@@ -446,7 +446,7 @@ void test_Update_NoRootView(void **state)
 void test_Update_ViewWithNoDrawFunction(void **state)
 {
     will_return(__wrap_Timer_TimeDifference, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     Interface_AddView(view_ptr(0));
     Interface_Update();
@@ -456,7 +456,7 @@ void test_Update_ViewWithDrawFunction(void **state)
 {
     will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
 
     const uint16_t context = 1;
 
@@ -472,7 +472,7 @@ void test_Update_AutoRefresh(void **state)
 {
     /* First update */
     will_return(__wrap_Timer_TimeDifference, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
 
     /* Second update */
@@ -480,7 +480,7 @@ void test_Update_AutoRefresh(void **state)
 
     /* Third update */
     will_return(__wrap_Timer_TimeDifference, 110);
-    will_return(__wrap_libTimer_GetMilliseconds, 110);
+    will_return(__wrap_Timer_GetMilliseconds, 110);
     will_return(__wrap_Timer_TimeDifference, 0);
 
     /* Fourth update */
@@ -505,7 +505,7 @@ void test_Update_ForcedRefresh(void **state)
 {
     /* First update */
     will_return(__wrap_Timer_TimeDifference, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
 
     /* Second update */
@@ -513,7 +513,7 @@ void test_Update_ForcedRefresh(void **state)
 
     /* Third update */
     will_return(__wrap_Timer_TimeDifference, 0);
-    will_return(__wrap_libTimer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_GetMilliseconds, 0);
     will_return(__wrap_Timer_TimeDifference, 0);
     /* Fourth update */
     will_return(__wrap_Timer_TimeDifference, 0);

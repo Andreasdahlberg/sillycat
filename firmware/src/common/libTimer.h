@@ -1,10 +1,8 @@
 /**
  * @file   libTimer.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-05 (Last edit)
- * @brief  Header of low level timer functions
- *
- * Detailed description of file.
+ * @date   2018-09-22 (Last edit)
+ * @brief  Module with low level timer functions.
  */
 
 /*
@@ -45,7 +43,21 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libTimer_Init();
-uint32_t libTimer_GetMilliseconds();
+/**
+ * Initialize the timer hardware to trigger an interrupt every 1 ms
+ */
+void libTimer_Init(void);
 
-#endif /* LIBTIMER_H_ */
+/**
+ * Reset the system timer.
+ */
+void libTimer_Reset(void);
+
+/**
+ *  Get the current time(ms).
+ *
+ * @return The current system time in milliseconds.
+ */
+uint32_t libTimer_GetMilliseconds(void);
+
+#endif

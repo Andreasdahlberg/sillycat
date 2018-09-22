@@ -21,7 +21,7 @@ Import(['*'])
 
 source = Glob('*.c')
 
-env.Append(CPPPATH=['#src/common'])
+env.Append(CPPPATH=['#src/common', '#src/common/timer'])
 
 objects = env.Object(source=source)
 

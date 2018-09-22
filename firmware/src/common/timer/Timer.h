@@ -1,8 +1,8 @@
 /**
- * @file   mock_Timer.h
+ * @file   Timer.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-09-22 (Last edit)
- * @brief  Mock functions for Timer module.
+ * @brief  Module with timer related functions.
  */
 
 /*
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WRAP_TIMER_H_
-#define WRAP_TIMER_H_
+#ifndef TIMER_H_
+#define TIMER_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -41,10 +41,40 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_Timer_Init(void);
-void __wrap_Timer_Reset(void);
-uint32_t __wrap_Timer_GetMilliseconds(void);
-uint32_t __wrap_Timer_GetSeconds(void);
-uint32_t __wrap_Timer_TimeDifference(uint32_t time_ms);
+/**
+ * Initialize the system timer.
+ */
+void Timer_Init(void);
+
+/**
+ * Reset the system timer.
+ */
+void Timer_Reset(void);
+
+/**
+ *  Get the current time(ms).
+ *
+ * @return The current system time in milliseconds.
+ */
+uint32_t Timer_GetMilliseconds(void);
+
+/**
+ *  Get the current time(s).
+ *
+ * @return The current system time in seconds.
+ */
+uint32_t Timer_GetSeconds(void);
+
+/**
+ * Get the difference between the system time and the supplied timestamp(ms).
+ *
+ * Protected against timer wrap-around. CAUTION: Does not detect several
+ * wrap-arounds but this is a very long time(over 49 days).
+ *
+ * @param time_ms Timestamp in ms.
+ *
+ * @return The difference in ms between the timestamp and the system time.
+ */
+uint32_t Timer_TimeDifference(uint32_t time_ms);
 
 #endif
