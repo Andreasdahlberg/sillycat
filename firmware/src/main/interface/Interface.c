@@ -56,7 +56,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 static bool refresh_flag;
 static uint32_t activity_timer;
-
 static struct view *root_view;
 static struct view *active_view;
 
@@ -81,9 +80,10 @@ void Interface_Init(void)
     libDisplay_Init();
     libDisplay_On();
 
+    refresh_flag = true;
+    activity_timer = 0;
     root_view = NULL;
     active_view = NULL;
-    refresh_flag = true;
 
     INFO("Init done");
     return;
