@@ -161,31 +161,33 @@ for target in TARGETS:
         Help('\n')
 
 def add_test(module_under_test, mocks):
+    unit_env = test_env.Clone()
+
     module_under_test_name = module_under_test.split(os.path.sep)[-1]
 
     unit_test_dir = os.path.join('build', 'unit_tests', module_under_test_name, 'unit')
     unit_test_sconscript = os.path.join('tests', module_under_test, 'SConscript')
-    test_object = test_env.SConscript(unit_test_sconscript,
+    test_object = unit_env.SConscript(unit_test_sconscript,
         variant_dir=unit_test_dir,
         duplicate=0,
-        exports={'env': test_env, 'project_name': PROJECT_NAME}
+        exports={'env': unit_env, 'project_name': PROJECT_NAME}
     )
 
-    test_env.Append(CCFLAGS='--coverage')
+    unit_env.Append(CCFLAGS='--coverage')
 
     module_under_test_dir = os.path.join('build', 'unit_tests', module_under_test_name, 'module')
     module_under_test_sconscript = os.path.join('src', module_under_test, 'SConscript')
-    module_object = test_env.SConscript(module_under_test_sconscript,
+    module_object = unit_env.SConscript(module_under_test_sconscript,
         variant_dir=module_under_test_dir,
         duplicate=0,
-        exports={'env': test_env, 'project_name': PROJECT_NAME}
+        exports={'env': unit_env, 'project_name': PROJECT_NAME}
     )
 
     coverage_file = os.path.join(module_under_test_dir, '{}.gcno'.format(module_under_test_name))
     Clean(module_object, coverage_file)
 
     runner_name = os.path.join('build', 'unit_tests', module_under_test_name, 'TestRunner')
-    runner = test_env.Program(target=runner_name, source=[test_object, module_object]+mock_object)
+    runner = unit_env.Program(target=runner_name, source=[test_object, module_object]+mock_object)
 
     return runner
 
@@ -200,7 +202,8 @@ modules = [
     os.path.join('utility', 'CRC'),
     os.path.join('utility', 'List'),
     os.path.join('main', 'encoder'),
-    os.path.join('main', 'interface')
+    os.path.join('main', 'interface'),
+    os.path.join('common', 'timer')
 ]
 
 tests = []
