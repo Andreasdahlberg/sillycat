@@ -1,7 +1,7 @@
 /**
  * @file   test_Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-20 (Last edit)
+ * @date   2018-09-22 (Last edit)
  * @brief  Test suite for the Interface module.
  */
 
@@ -53,16 +53,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 static struct view test_views[8];
-static uint16_t DummyDrawView_context;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-static void DummyDrawView(uint16_t context)
-{
-    DummyDrawView_context = context;
-}
 
 static void MockDrawView(uint16_t context)
 {
@@ -76,24 +70,21 @@ static void MockAction(uint16_t context)
 
 static void ResetViews(void)
 {
-    uint8_t index;
-
-    for (index = 0; index < NUM_TEST_VIEWS; ++index)
+    for (uint8_t index = 0; index < NUM_TEST_VIEWS; ++index)
     {
-        test_views[index].draw_function = NULL;
-        test_views[index].child = NULL;
-        test_views[index].prev = NULL;
-        test_views[index].next = NULL;
-        test_views[index].parent = NULL;
+        view_ptr(index)->draw_function = NULL;
+        view_ptr(index)->child = NULL;
+        view_ptr(index)->prev = NULL;
+        view_ptr(index)->next = NULL;
+        view_ptr(index)->parent = NULL;
     }
 }
 
-static int setup(void **state)
+static int Setup(void **state)
 {
-    DummyDrawView_context = 0;
-
     ResetViews();
     Interface_Init();
+
     return 0;
 }
 
@@ -101,7 +92,7 @@ static int setup(void **state)
 //TESTS
 //////////////////////////////////////////////////////////////////////////
 
-static void test_InitView(void **state)
+void test_InitView(void **state)
 {
     const uint16_t context = 2;
 
@@ -140,23 +131,23 @@ void test_GetRootView_OneView(void **state)
 
 void test_GetRootView_TwoViews(void **state)
 {
-    Interface_AddView(&test_views[0]);
-    Interface_AddView(&test_views[1]);
-    assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
+    Interface_AddView(view_ptr(0));
+    Interface_AddView(view_ptr(1));
+    assert_ptr_equal(Interface_GetRootView(), view_ptr(0));
 }
 
 void test_GetRootView_OneViewWithOneChild(void **state)
 {
-    Interface_AddChild(&test_views[0], &test_views[1]);
-    Interface_AddView(&test_views[0]);
-    assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
+    Interface_AddChild(view_ptr(0), view_ptr(1));
+    Interface_AddView(view_ptr(0));
+    assert_ptr_equal(Interface_GetRootView(), view_ptr(0));
 }
 
 void test_AddView_NullWithRootView(void **state)
 {
     struct view *root_view;
 
-    Interface_AddView(&test_views[0]);
+    Interface_AddView(view_ptr(0));
     Interface_AddView(NULL);
 
     root_view = Interface_GetRootView();
@@ -173,19 +164,19 @@ void test_AddView_NullWithoutRootView(void **state)
 void test_AddView_OneView(void **state)
 {
     Interface_AddView(view_ptr(0));
-    assert_ptr_equal(Interface_GetRootView(), &test_views[0]);
+    assert_ptr_equal(Interface_GetRootView(), view_ptr(0));
 }
 
 void test_AddView_SeveralViews(void **state)
 {
-    Interface_AddView(&test_views[0]);
-    Interface_AddView(&test_views[1]);
-    Interface_AddView(&test_views[2]);
+    Interface_AddView(view_ptr(0));
+    Interface_AddView(view_ptr(1));
+    Interface_AddView(view_ptr(2));
 
-    assert_ptr_equal(test_views[0].next, &test_views[1]);
-    assert_ptr_equal(test_views[1].prev, &test_views[0]);
-    assert_ptr_equal(test_views[1].next, &test_views[2]);
-    assert_ptr_equal(test_views[2].prev, &test_views[1]);
+    assert_ptr_equal(test_views[0].next, view_ptr(1));
+    assert_ptr_equal(test_views[1].prev, view_ptr(0));
+    assert_ptr_equal(test_views[1].next, view_ptr(2));
+    assert_ptr_equal(test_views[2].prev, view_ptr(1));
 }
 
 void test_RemoveView_Null(void **state)
@@ -196,23 +187,23 @@ void test_RemoveView_Null(void **state)
 
 void test_RemoveView_RootViewAlone(void **state)
 {
-    Interface_AddView(&test_views[0]);
-    Interface_RemoveView(&test_views[0]);
+    Interface_AddView(view_ptr(0));
+    Interface_RemoveView(view_ptr(0));
 
     assert_null(Interface_GetRootView());
 }
 
 void test_RemoveView_ActiveView(void **state)
 {
-    Interface_AddView(&test_views[0]);
-    Interface_AddView(&test_views[1]);
+    Interface_AddView(view_ptr(0));
+    Interface_AddView(view_ptr(1));
 
     will_return(__wrap_libTimer_GetMilliseconds, 0);
     Interface_NextView();
 
-    Interface_RemoveView(&test_views[1]);
+    Interface_RemoveView(view_ptr(1));
 
-    assert_ptr_not_equal(Interface_GetActiveView(), &test_views[1]);
+    assert_ptr_not_equal(Interface_GetActiveView(), view_ptr(1));
 }
 
 void test_RemoveView_ActiveViewWithParent(void **state)
@@ -250,9 +241,9 @@ void test_RemoveView_ViewWithPrevSibling(void **state)
 {
     struct view *test_view;
 
-    Interface_AddView(&test_views[0]);
-    Interface_AddView(&test_views[1]);
-    Interface_RemoveView(&test_views[1]);
+    Interface_AddView(view_ptr(0));
+    Interface_AddView(view_ptr(1));
+    Interface_RemoveView(view_ptr(1));
 
     test_view = Interface_GetRootView();
     assert_null(test_view->next);
@@ -260,13 +251,13 @@ void test_RemoveView_ViewWithPrevSibling(void **state)
 
 void test_RemoveView_ViewWithPrevAndNextSibling(void **state)
 {
-    Interface_AddView(&test_views[0]);
-    Interface_AddView(&test_views[1]);
-    Interface_AddView(&test_views[2]);
-    Interface_RemoveView(&test_views[1]);
+    Interface_AddView(view_ptr(0));
+    Interface_AddView(view_ptr(1));
+    Interface_AddView(view_ptr(2));
+    Interface_RemoveView(view_ptr(1));
 
-    assert_ptr_equal(test_views[0].next, &test_views[2]);
-    assert_ptr_equal(test_views[2].prev, &test_views[0]);
+    assert_ptr_equal(test_views[0].next, view_ptr(2));
+    assert_ptr_equal(test_views[2].prev, view_ptr(0));
 }
 
 void test_RemoveView_ChildViewWithSibling(void **state)
@@ -458,14 +449,14 @@ void test_Update_ViewWithDrawFunction(void **state)
     will_return(__wrap_Timer_TimeDifference, 0);
     will_return(__wrap_libTimer_GetMilliseconds, 0);
 
-    view_ptr(0)->draw_function = DummyDrawView;
-    view_ptr(0)->context = 1;
+    const uint16_t context = 1;
 
+    Interface_InitView(view_ptr(0), MockDrawView, context);
     Interface_AddView(view_ptr(0));
-    expect_function_call(__wrap_libUI_Update);
-    Interface_Update();
 
-    assert_int_equal(DummyDrawView_context, 1);
+    expect_function_call(__wrap_libUI_Update);
+    expect_value(MockDrawView, context, context);
+    Interface_Update();
 }
 
 void test_Update_AutoRefresh(void **state)
@@ -486,15 +477,17 @@ void test_Update_AutoRefresh(void **state)
     /* Fourth update */
     will_return(__wrap_Timer_TimeDifference, 211);
 
-    view_ptr(0)->draw_function = DummyDrawView;
-    view_ptr(0)->context = 1;
+    const uint16_t context = 2;
+    Interface_InitView(view_ptr(0), MockDrawView, context);
+    Interface_AddView(view_ptr(0));
 
     /* Expect a automatic refresh in the first and third update */
-    Interface_AddView(view_ptr(0));
     expect_function_call(__wrap_libUI_Update);
+    expect_value(MockDrawView, context, context);
     Interface_Update();
     Interface_Update();
     expect_function_call(__wrap_libUI_Update);
+    expect_value(MockDrawView, context, context);
     Interface_Update();
     Interface_Update();
 }
@@ -516,9 +509,8 @@ void test_Update_ForcedRefresh(void **state)
     /* Fourth update */
     will_return(__wrap_Timer_TimeDifference, 0);
 
-
-    view_ptr(0)->draw_function = DummyDrawView;
-    view_ptr(0)->context = 1;
+    const uint16_t context = 3;
+    Interface_InitView(view_ptr(0), MockDrawView, context);
 
     /**
      * Expect an automatic refresh in the first update and a forced refresh in
@@ -526,10 +518,12 @@ void test_Update_ForcedRefresh(void **state)
      */
     Interface_AddView(view_ptr(0));
     expect_function_call(__wrap_libUI_Update);
+    expect_value(MockDrawView, context, context);
     Interface_Update();
     Interface_Update();
     Interface_Refresh();
     expect_function_call(__wrap_libUI_Update);
+    expect_value(MockDrawView, context, context);
     Interface_Update();
     Interface_Update();
 }
@@ -542,45 +536,45 @@ int main(void)
 {
     const struct CMUnitTest tests[] =
     {
-        cmocka_unit_test_setup(test_InitView, setup),
-        cmocka_unit_test_setup(test_GetRootView_None, setup),
-        cmocka_unit_test_setup(test_GetRootView_OneView, setup),
-        cmocka_unit_test_setup(test_GetRootView_TwoViews, setup),
-        cmocka_unit_test_setup(test_GetRootView_OneViewWithOneChild, setup),
-        cmocka_unit_test_setup(test_AddView_NullWithRootView, setup),
-        cmocka_unit_test_setup(test_AddView_NullWithoutRootView, setup),
-        cmocka_unit_test_setup(test_AddView_SeveralViews, setup),
-        cmocka_unit_test_setup(test_RemoveView_Null, setup),
-        cmocka_unit_test_setup(test_RemoveView_RootViewAlone, setup),
-        cmocka_unit_test_setup(test_RemoveView_ActiveView, setup),
-        cmocka_unit_test_setup(test_RemoveView_ActiveViewWithParent, setup),
-        cmocka_unit_test_setup(test_RemoveView_RootViewWithChild, setup),
-        cmocka_unit_test_setup(test_RemoveView_RootViewWithOneSibling, setup),
-        cmocka_unit_test_setup(test_RemoveView_ViewWithPrevSibling, setup),
-        cmocka_unit_test_setup(test_RemoveView_ViewWithPrevAndNextSibling, setup),
-        cmocka_unit_test_setup(test_RemoveView_ChildViewWithSibling, setup),
-        cmocka_unit_test_setup(test_AddAction, setup),
-        cmocka_unit_test_setup(test_Action, setup),
-        cmocka_unit_test_setup(test_AddChild_NullChildWithNoExistingChild, setup),
-        cmocka_unit_test_setup(test_AddChild_NullChildWithExistingChild, setup),
-        cmocka_unit_test_setup(test_AddChild_NullParentWithNoExistingChild, setup),
-        cmocka_unit_test_setup(test_AddChild_OneChild, setup),
-        cmocka_unit_test_setup(test_AddChild_TwoChildren, setup),
-        cmocka_unit_test_setup(test_NextView_NoRootView, setup),
-        cmocka_unit_test_setup(test_NextView_OneView, setup),
-        cmocka_unit_test_setup(test_NextView_TwoViews, setup),
-        cmocka_unit_test_setup(test_PreviousView_NoRootView, setup),
-        cmocka_unit_test_setup(test_PreviousView_OneView, setup),
-        cmocka_unit_test_setup(test_PreviousView_TwoViews, setup),
-        cmocka_unit_test_setup(test_ActivateView_NoRootView, setup),
-        cmocka_unit_test_setup(test_ActivateView_ActivateOnceWithNoChild, setup),
-        cmocka_unit_test_setup(test_ActivateView_ActivateOnceWithChild, setup),
-        cmocka_unit_test_setup(test_ActivateView_ActivateTwiceWithChild, setup),
-        cmocka_unit_test_setup(test_Update_NoRootView, setup),
-        cmocka_unit_test_setup(test_Update_ViewWithNoDrawFunction, setup),
-        cmocka_unit_test_setup(test_Update_ViewWithDrawFunction, setup),
-        cmocka_unit_test_setup(test_Update_AutoRefresh, setup),
-        cmocka_unit_test_setup(test_Update_ForcedRefresh, setup),
+        cmocka_unit_test_setup(test_InitView, Setup),
+        cmocka_unit_test_setup(test_GetRootView_None, Setup),
+        cmocka_unit_test_setup(test_GetRootView_OneView, Setup),
+        cmocka_unit_test_setup(test_GetRootView_TwoViews, Setup),
+        cmocka_unit_test_setup(test_GetRootView_OneViewWithOneChild, Setup),
+        cmocka_unit_test_setup(test_AddView_NullWithRootView, Setup),
+        cmocka_unit_test_setup(test_AddView_NullWithoutRootView, Setup),
+        cmocka_unit_test_setup(test_AddView_SeveralViews, Setup),
+        cmocka_unit_test_setup(test_RemoveView_Null, Setup),
+        cmocka_unit_test_setup(test_RemoveView_RootViewAlone, Setup),
+        cmocka_unit_test_setup(test_RemoveView_ActiveView, Setup),
+        cmocka_unit_test_setup(test_RemoveView_ActiveViewWithParent, Setup),
+        cmocka_unit_test_setup(test_RemoveView_RootViewWithChild, Setup),
+        cmocka_unit_test_setup(test_RemoveView_RootViewWithOneSibling, Setup),
+        cmocka_unit_test_setup(test_RemoveView_ViewWithPrevSibling, Setup),
+        cmocka_unit_test_setup(test_RemoveView_ViewWithPrevAndNextSibling, Setup),
+        cmocka_unit_test_setup(test_RemoveView_ChildViewWithSibling, Setup),
+        cmocka_unit_test_setup(test_AddAction, Setup),
+        cmocka_unit_test_setup(test_Action, Setup),
+        cmocka_unit_test_setup(test_AddChild_NullChildWithNoExistingChild, Setup),
+        cmocka_unit_test_setup(test_AddChild_NullChildWithExistingChild, Setup),
+        cmocka_unit_test_setup(test_AddChild_NullParentWithNoExistingChild, Setup),
+        cmocka_unit_test_setup(test_AddChild_OneChild, Setup),
+        cmocka_unit_test_setup(test_AddChild_TwoChildren, Setup),
+        cmocka_unit_test_setup(test_NextView_NoRootView, Setup),
+        cmocka_unit_test_setup(test_NextView_OneView, Setup),
+        cmocka_unit_test_setup(test_NextView_TwoViews, Setup),
+        cmocka_unit_test_setup(test_PreviousView_NoRootView, Setup),
+        cmocka_unit_test_setup(test_PreviousView_OneView, Setup),
+        cmocka_unit_test_setup(test_PreviousView_TwoViews, Setup),
+        cmocka_unit_test_setup(test_ActivateView_NoRootView, Setup),
+        cmocka_unit_test_setup(test_ActivateView_ActivateOnceWithNoChild, Setup),
+        cmocka_unit_test_setup(test_ActivateView_ActivateOnceWithChild, Setup),
+        cmocka_unit_test_setup(test_ActivateView_ActivateTwiceWithChild, Setup),
+        cmocka_unit_test_setup(test_Update_NoRootView, Setup),
+        cmocka_unit_test_setup(test_Update_ViewWithNoDrawFunction, Setup),
+        cmocka_unit_test_setup(test_Update_ViewWithDrawFunction, Setup),
+        cmocka_unit_test_setup(test_Update_AutoRefresh, Setup),
+        cmocka_unit_test_setup(test_Update_ForcedRefresh, Setup),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
