@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-20 (Last edit)
+ * @date   2018-09-22 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -103,7 +103,6 @@ void Interface_Update(void)
     {
         if (active_view != NULL && active_view->draw_function != NULL)
         {
-            libDisplay_ClearVRAM();
             active_view->draw_function(active_view->context);
             if (Timer_TimeDifference(activity_timer) < 2000)
             {

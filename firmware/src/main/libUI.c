@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-02-19 (Last edit)
+ * @date   2018-09-22 (Last edit)
  * @brief  Implementation of UI library.
  *
  * The UI library contains functions for drawing simple shapes and for
@@ -72,6 +72,7 @@ static inline void PrintChar(const glyph_info_t *char_ptr, uint8_t x_pos,
 void libUI_Update(void)
 {
     libDisplay_Flush();
+    libDisplay_ClearVRAM();
     return;
 }
 
