@@ -19,6 +19,10 @@ import os
 
 Import(['*'])
 
+env.Append(CPPPATH=[
+    '#src/common'
+    ])
+
 source = Glob('*.c')
 objects = env.Object(source)
 

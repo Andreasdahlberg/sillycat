@@ -1,10 +1,8 @@
 /**
  * @file   test_FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-03-26 (Last edit)
- * @brief  Unit tests for the FIFO module.
- *
- * Detailed description of file.
+ * @date   2018-09-22 (Last edit)
+ * @brief  Test suite for the FIFO module.
  */
 
 /*
@@ -32,6 +30,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stddef.h>
 #include <setjmp.h>
 #include <cmocka.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "FIFO.h"
 
@@ -48,23 +49,27 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-//LOCAL FUNCTION PROTOTYPES
+//LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static void FillBuffer(fifo_type *fifo, size_t number_of_elements);
+static void FillBuffer(fifo_type *fifo, size_t number_of_elements)
+{
+    for (size_t cnt = 0; cnt < number_of_elements; ++cnt)
+    {
+        FIFO_Push(fifo, &cnt);
+    }
+    return;
+}
 
 //////////////////////////////////////////////////////////////////////////
-//FUNCTIONS
+//TESTS
 //////////////////////////////////////////////////////////////////////////
 
-void test_FIFO_New_Byte_Buffer(void **state __attribute__((__unused__)))
+void test_FIFO_New(void **state)
 {
     uint8_t buffer[8];
 
-
-    fifo_type fifo = {NULL, 0xFF, 0xFF, 0xFF, 0xFF};
-
-    fifo = FIFO_New(buffer);
+    fifo_type fifo = FIFO_New(buffer);
 
     assert_ptr_equal(fifo.data, buffer);
     assert_int_equal(fifo.head, 0);
@@ -73,7 +78,7 @@ void test_FIFO_New_Byte_Buffer(void **state __attribute__((__unused__)))
     assert_int_equal(fifo.item_size, 1);
 }
 
-void test_FIFO_Push_NULL_arguments(void **state __attribute__((__unused__)))
+void test_FIFO_Push_NULL_arguments(void **state)
 {
     uint8_t dummy_item;
     fifo_type dummy_fifo;
@@ -84,7 +89,7 @@ void test_FIFO_Push_NULL_arguments(void **state __attribute__((__unused__)))
 }
 
 
-void test_FIFO_Push_Empty(void **state __attribute__((__unused__)))
+void test_FIFO_Push_Empty(void **state)
 {
     uint8_t buffer[8] = {0};
     uint8_t item = 0xAA;
@@ -94,14 +99,20 @@ void test_FIFO_Push_Empty(void **state __attribute__((__unused__)))
     assert_true(FIFO_Push(&fifo, &item));
 
     // Make sure the FIFO content is correct.
-    uint8_t expected_buffer_content[8] = {0xAA, 0, 0, 0, 0, 0, 0, 0};
+    //
+    for (uint8_t i = 0; i < 8; ++i)
+    {
+        printf("BUFFER[%u]0x%X\n", i, buffer[i]);
+    }
+
+    uint8_t expected_buffer_content[8] = {0x00, 0xAA, 0, 0, 0, 0, 0, 0};
     assert_memory_equal(expected_buffer_content, buffer,
                         sizeof(expected_buffer_content));
 }
 
-void test_FIFO_Push_Full(void **state __attribute__((__unused__)))
+void test_FIFO_Push_Full(void **state)
 {
-    uint8_t buffer[8];
+    uint8_t buffer[8] = {0};
     uint8_t item = 0xAA;
     fifo_type fifo = FIFO_New(buffer);
 
@@ -112,12 +123,12 @@ void test_FIFO_Push_Full(void **state __attribute__((__unused__)))
     assert_false(FIFO_Push(&fifo, &item));
 
     // Make sure the FIFO content is unchanged.
-    uint8_t expected_buffer_content[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+    uint8_t expected_buffer_content[8] = {0, 0, 1, 2, 3, 4, 5, 6};
     assert_memory_equal(expected_buffer_content, buffer,
                         sizeof(expected_buffer_content));
 }
 
-void test_FIFO_Pop_NULL_arguments(void **state __attribute__((__unused__)))
+void test_FIFO_Pop_NULL_arguments(void **state)
 {
     uint8_t dummy_item;
     fifo_type dummy_fifo;
@@ -127,7 +138,7 @@ void test_FIFO_Pop_NULL_arguments(void **state __attribute__((__unused__)))
     expect_assert_failure(FIFO_Pop(NULL, NULL));
 }
 
-void test_FIFO_Pop_Empty(void **state __attribute__((__unused__)))
+void test_FIFO_Pop_Empty(void **state)
 {
     uint8_t buffer[8];
     uint8_t item;
@@ -137,7 +148,7 @@ void test_FIFO_Pop_Empty(void **state __attribute__((__unused__)))
     assert_false(FIFO_Pop(&fifo, &item));
 }
 
-void test_FIFO_Pop_NonEmpty(void **state __attribute__((__unused__)))
+void test_FIFO_Pop_NonEmpty(void **state)
 {
     uint8_t buffer[8];
     uint8_t item = 0xAA;
@@ -158,7 +169,7 @@ void test_FIFO_Pop_NonEmpty(void **state __attribute__((__unused__)))
     assert_true(FIFO_IsEmpty(&fifo));
 }
 
-void test_FIFO_Peek_NULL_arguments(void **state __attribute__((__unused__)))
+void test_FIFO_Peek_NULL_arguments(void **state)
 {
     uint8_t dummy_item;
     fifo_type dummy_fifo;
@@ -168,7 +179,7 @@ void test_FIFO_Peek_NULL_arguments(void **state __attribute__((__unused__)))
     expect_assert_failure(FIFO_Peek(NULL, NULL));
 }
 
-void test_FIFO_Peek_Empty(void **state __attribute__((__unused__)))
+void test_FIFO_Peek_Empty(void **state)
 {
     uint8_t buffer[8];
     uint8_t item;
@@ -178,7 +189,7 @@ void test_FIFO_Peek_Empty(void **state __attribute__((__unused__)))
     assert_false(FIFO_Peek(&fifo, &item));
 }
 
-void test_FIFO_Peek_NonEmpty(void **state __attribute__((__unused__)))
+void test_FIFO_Peek_NonEmpty(void **state)
 {
     uint8_t buffer[8];
     uint8_t item = 0xAA;
@@ -199,12 +210,12 @@ void test_FIFO_Peek_NonEmpty(void **state __attribute__((__unused__)))
     assert_false(FIFO_IsEmpty(&fifo));
 }
 
-void test_FIFO_IsEmpty_NULL(void **state __attribute__((__unused__)))
+void test_FIFO_IsEmpty_NULL(void **state)
 {
     expect_assert_failure(FIFO_IsEmpty(NULL));
 }
 
-void test_FIFO_IsEmpty_Empty(void **state __attribute__((__unused__)))
+void test_FIFO_IsEmpty_Empty(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -212,7 +223,7 @@ void test_FIFO_IsEmpty_Empty(void **state __attribute__((__unused__)))
     assert_true(FIFO_IsEmpty(&fifo));
 }
 
-void test_FIFO_IsEmpty_Full(void **state __attribute__((__unused__)))
+void test_FIFO_IsEmpty_Full(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -221,7 +232,7 @@ void test_FIFO_IsEmpty_Full(void **state __attribute__((__unused__)))
     assert_false(FIFO_IsEmpty(&fifo));
 }
 
-void test_FIFO_IsEmpty_NotEmpty(void **state __attribute__((__unused__)))
+void test_FIFO_IsEmpty_NotEmpty(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -230,12 +241,12 @@ void test_FIFO_IsEmpty_NotEmpty(void **state __attribute__((__unused__)))
     assert_false(FIFO_IsEmpty(&fifo));
 }
 
-void test_FIFO_IsFull_NULL(void **state __attribute__((__unused__)))
+void test_FIFO_IsFull_NULL(void **state)
 {
     expect_assert_failure(FIFO_IsFull(NULL));
 }
 
-void test_FIFO_IsFull_Empty(void **state __attribute__((__unused__)))
+void test_FIFO_IsFull_Empty(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -243,7 +254,7 @@ void test_FIFO_IsFull_Empty(void **state __attribute__((__unused__)))
     assert_false(FIFO_IsFull(&fifo));
 }
 
-void test_FIFO_IsFull_Full(void **state __attribute__((__unused__)))
+void test_FIFO_IsFull_Full(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -252,7 +263,7 @@ void test_FIFO_IsFull_Full(void **state __attribute__((__unused__)))
     assert_true(FIFO_IsFull(&fifo));
 }
 
-void test_FIFO_IsFull_NotEmpty(void **state __attribute__((__unused__)))
+void test_FIFO_IsFull_NotEmpty(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -261,12 +272,12 @@ void test_FIFO_IsFull_NotEmpty(void **state __attribute__((__unused__)))
     assert_false(FIFO_IsFull(&fifo));
 }
 
-void test_FIFO_Clear_NULL(void **state __attribute__((__unused__)))
+void test_FIFO_Clear_NULL(void **state)
 {
     expect_assert_failure(FIFO_Clear(NULL));
 }
 
-void test_FIFO_Clear_Full(void **state __attribute__((__unused__)))
+void test_FIFO_Clear_Full(void **state)
 {
     uint8_t buffer[8];
     fifo_type fifo = FIFO_New(buffer);
@@ -277,77 +288,33 @@ void test_FIFO_Clear_Full(void **state __attribute__((__unused__)))
 }
 
 //////////////////////////////////////////////////////////////////////////
-//LOCAL FUNCTIONS
+//FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-static void FillBuffer(fifo_type *fifo, size_t number_of_elements)
-{
-    for (size_t cnt = 0; cnt < number_of_elements; ++cnt)
-    {
-        FIFO_Push(fifo, &cnt);
-    }
-    return;
-}
 
 int main(void)
 {
-
-    const struct CMUnitTest test_FIFO_New[] =
+    const struct CMUnitTest test_FIFO[] =
     {
-        cmocka_unit_test(test_FIFO_New_Byte_Buffer),
-    };
-
-    const struct CMUnitTest test_FIFO_Push[] =
-    {
+        cmocka_unit_test(test_FIFO_New),
         cmocka_unit_test(test_FIFO_Push_NULL_arguments),
         cmocka_unit_test(test_FIFO_Push_Empty),
         cmocka_unit_test(test_FIFO_Push_Full),
-    };
-
-    const struct CMUnitTest test_FIFO_Pop[] =
-    {
         cmocka_unit_test(test_FIFO_Pop_NULL_arguments),
         cmocka_unit_test(test_FIFO_Pop_Empty),
         cmocka_unit_test(test_FIFO_Pop_NonEmpty),
-    };
-
-    const struct CMUnitTest test_FIFO_Peek[] =
-    {
         cmocka_unit_test(test_FIFO_Peek_NULL_arguments),
         cmocka_unit_test(test_FIFO_Peek_Empty),
         cmocka_unit_test(test_FIFO_Peek_NonEmpty),
-    };
-
-    const struct CMUnitTest test_FIFO_IsEmpty[] =
-    {
         cmocka_unit_test(test_FIFO_IsEmpty_NULL),
         cmocka_unit_test(test_FIFO_IsEmpty_Empty),
         cmocka_unit_test(test_FIFO_IsEmpty_Full),
         cmocka_unit_test(test_FIFO_IsEmpty_NotEmpty),
-    };
-
-    const struct CMUnitTest test_FIFO_IsFull[] =
-    {
         cmocka_unit_test(test_FIFO_IsFull_NULL),
         cmocka_unit_test(test_FIFO_IsFull_Empty),
         cmocka_unit_test(test_FIFO_IsFull_Full),
         cmocka_unit_test(test_FIFO_IsFull_NotEmpty),
-    };
-
-    const struct CMUnitTest test_FIFO_Clear[] =
-    {
         cmocka_unit_test(test_FIFO_Clear_NULL),
-        cmocka_unit_test(test_FIFO_Clear_Full),
+        cmocka_unit_test(test_FIFO_Clear_Full)
     };
-
-    int result = 0;
-    result += cmocka_run_group_tests(test_FIFO_New, NULL, NULL);
-    result += cmocka_run_group_tests(test_FIFO_Push, NULL, NULL);
-    result += cmocka_run_group_tests(test_FIFO_Pop, NULL, NULL);
-    result += cmocka_run_group_tests(test_FIFO_Peek, NULL, NULL);
-    result += cmocka_run_group_tests(test_FIFO_IsEmpty, NULL, NULL);
-    result += cmocka_run_group_tests(test_FIFO_IsFull, NULL, NULL);
-    result += cmocka_run_group_tests(test_FIFO_Clear, NULL, NULL);
-
-    return result;
+    return cmocka_run_group_tests(test_FIFO, NULL, NULL);
 }
