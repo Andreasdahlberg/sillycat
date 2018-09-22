@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-20 (Last edit)
+ * @date   2018-09-22 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -127,9 +127,11 @@ void guiNodes_Init(void)
 
 static void DrawNodeView(uint16_t context)
 {
-    //Add one to node index(context) since end users are more familiar
-    //with indexing starting at 1.
-    libUI_Print("%u", 1, 12, context + 1);
+    /**
+     * Add three to node index(context) so the indexing continues after the
+     * two temperature sensors.
+     */
+    libUI_Print("%u", 1, 12, context + 3);
 
     struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
     sc_assert(node_p != NULL);
