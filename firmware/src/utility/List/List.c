@@ -2,9 +2,7 @@
  * @file   List.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-09-25 (Last edit)
- * @brief  Implementation of a single linked list
- *
- * Detailed description of file.
+ * @brief  Implementation of a single linked list.
  */
 
 /*
@@ -28,7 +26,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <stdio.h>
 #include "List.h"
 #include "sc_assert.h"
 
@@ -52,117 +49,89 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Append a node to the list
-///
-/// @param  *list Pointer to list.
-/// @param  *node Pointer to node.
-/// @return None.
-///
-void List_Append(list_type *list, list_node_type *node)
+void List_Append(struct list_t *self_p, struct list_node_t *node_p)
 {
-    sc_assert(list != NULL);
-    sc_assert(node != NULL);
+    sc_assert(self_p != NULL);
+    sc_assert(node_p != NULL);
 
-    if (list->root == NULL)
+    if (self_p->root == NULL)
     {
-        list->root = node;
+        self_p->root = node_p;
     }
     else
     {
-        list_node_type *node_ptr;
-        node_ptr = list->root;
+        struct list_node_t *current_p;
+        current_p = self_p->root;
 
-        while (node_ptr->next != NULL)
+        while (current_p->next != NULL)
         {
-            node_ptr = node_ptr->next;
+            current_p = current_p->next;
         }
 
-        node_ptr->next = node;
+        current_p->next = node_p;
     }
-    node->next = NULL;
+    node_p->next = NULL;
 }
 
-///
-/// @brief Remove a node from the list
-///
-/// @param  *list Pointer to list.
-/// @param  *node Pointer to node.
-/// @return Status of remove.
-///
-void List_Remove(list_type *list, list_node_type *node)
+void List_Remove(struct list_t *self_p, struct list_node_t *node_p)
 {
-    sc_assert(list != NULL);
-    sc_assert(node != NULL);
+    sc_assert(self_p != NULL);
+    sc_assert(node_p != NULL);
 
-    list_node_type *curr_node;
-    list_node_type *prev_node;
+    struct list_node_t *curr_node_p;
+    struct list_node_t *prev_node_p;
 
-    curr_node = list->root;
-    prev_node = NULL;
+    curr_node_p = self_p->root;
+    prev_node_p = NULL;
 
-    while (curr_node != NULL )
+    while (curr_node_p != NULL )
     {
-        if (curr_node == node && prev_node != NULL)
+        if (curr_node_p == node_p && prev_node_p != NULL)
         {
-            prev_node->next = curr_node->next;
+            prev_node_p->next = curr_node_p->next;
             return;
         }
-        else if (curr_node == node && prev_node == NULL)
+        else if (curr_node_p == node_p && prev_node_p == NULL)
         {
-            list->root = curr_node->next;
+            self_p->root = curr_node_p->next;
             return;
         }
 
-        prev_node = curr_node;
-        curr_node = curr_node->next;
+        prev_node_p = curr_node_p;
+        curr_node_p = curr_node_p->next;
     }
-    return;
 }
 
-///
-/// @brief Get length of the list
-///
-/// @param  *list Pointer to list.
-/// @return Length of list
-///
-uint32_t List_GetLength(list_type *list)
+uint32_t List_GetLength(struct list_t *self_p)
 {
-    sc_assert(list != NULL);
+    sc_assert(self_p != NULL);
 
     uint32_t node_count = 0;
-    list_node_type *node_ptr;
-    node_ptr = list->root;
+    struct list_node_t *current_p;
+    current_p = self_p->root;
 
-    while (node_ptr != NULL)
+    while (current_p != NULL)
     {
-        node_ptr = node_ptr->next;
+        current_p = current_p->next;
         ++node_count;
     }
 
     return node_count;
 }
 
-///
-/// @brief Iterate over all nodes and call a function on each one.
-///
-/// @param  *list Pointer to list.
-/// @param  *list Pointer to function with pointer to node and index as arguments.
-/// @return None
-///
-void List_Iterate(list_type *list, list_fp function)
+void List_Iterate(struct list_t *self_p, list_fp function_p)
 {
-    sc_assert(list != NULL);
-    sc_assert(function != NULL);
+    sc_assert(self_p != NULL);
+    sc_assert(function_p != NULL);
 
     uint32_t node_count = 0;
-    list_node_type *node_ptr;
-    node_ptr = list->root;
+    struct list_node_t *current_p;
+    current_p = self_p->root;
 
-    while (node_ptr != NULL)
+    while (current_p != NULL)
     {
-        function(node_ptr, node_count);
-        node_ptr = node_ptr->next;
+        function_p(current_p, node_count);
+        current_p = current_p->next;
         ++node_count;
     }
 }

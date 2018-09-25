@@ -1,10 +1,8 @@
 /**
  * @file   List.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-9 (Last edit)
- * @brief  Header of List
- *
- * Detailed description of file.
+ * @date   2018-09-25 (Last edit)
+ * @brief  Implementation of a single linked list.
  */
 
 /*
@@ -24,7 +22,6 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef LIST_H_
 #define LIST_H_
 
@@ -39,35 +36,63 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define List_New(type_id) (list_type){type_id, NULL};
-#define List_NewNode(data_ptr) (list_node_type){data_ptr, NULL};
-//#define List_Reset(list) (list_node_type){list->type_id, NULL};
+#define List_New(type_id) (struct list_t){type_id, NULL};
+#define List_NewNode(data_ptr) (struct list_node_t){data_ptr, NULL};
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef struct list_node_type
+struct list_node_t
 {
     void *data;
-    struct list_node_type *next;
-} list_node_type;
+    struct list_node_t *next;
+};
 
-typedef struct list_type
+struct list_t
 {
     uint32_t type_id;
-    struct list_node_type *root;
-} list_type;
+    struct list_node_t *root;
+};
 
-typedef void (*list_fp)(list_node_type *node, uint32_t index);
+typedef void (*list_fp)(struct list_node_t *node, uint32_t index);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void List_Append(list_type *list, list_node_type *item);
-void List_Remove(list_type *list, list_node_type *item);
-uint32_t List_GetLength(list_type *list);
-void List_Iterate(list_type *list, list_fp function);
+/**
+ * Append a node to the list.
+ *
+ * @param self_p Pointer to list.
+ * @param node_p Pointer to node.
+ */
+void List_Append(struct list_t *self_p, struct list_node_t *node_p);
 
-#endif /* LIST_H_ */
+/**
+ * Remove a node from the list.
+ *
+ * @param self_p Pointer to list.
+ * @param node_p Pointer to node.
+ */
+void List_Remove(struct list_t *self_p, struct list_node_t *node_p);
+
+/**
+ * Get length of the list
+ *
+ * @param self_p Pointer to list.
+ *
+ * @return Length of the list.
+ */
+uint32_t List_GetLength(struct list_t *self_p);
+
+/**
+ * Iterate over all nodes and call a function on each one.
+ *
+ * @param self_p     Pointer to list.
+ * @param function_p Pointer to function with pointer to node and index as
+ *                   arguments.
+ */
+void List_Iterate(struct list_t *self_p, list_fp function_p);
+
+#endif
