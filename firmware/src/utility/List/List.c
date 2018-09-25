@@ -1,7 +1,7 @@
 /**
  * @file   List.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-12-9 (Last edit)
+ * @date   2018-09-25 (Last edit)
  * @brief  Implementation of a single linked list
  *
  * Detailed description of file.
@@ -67,19 +67,20 @@ void List_Append(list_type *list, list_node_type *node)
     if (list->root == NULL)
     {
         list->root = node;
-        return;
     }
-
-    list_node_type *node_ptr;
-    node_ptr = list->root;
-
-    while (node_ptr->next != NULL)
+    else
     {
-        node_ptr = node_ptr->next;
-    }
+        list_node_type *node_ptr;
+        node_ptr = list->root;
 
-    node_ptr->next = node;
-    return;
+        while (node_ptr->next != NULL)
+        {
+            node_ptr = node_ptr->next;
+        }
+
+        node_ptr->next = node;
+    }
+    node->next = NULL;
 }
 
 ///
