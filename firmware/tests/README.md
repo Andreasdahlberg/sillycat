@@ -89,8 +89,8 @@ included below but the existing test suites is the best place to learn how to wr
 ## GDB
 If a test fails with segmentation fault [GDB](https://www.gnu.org/software/gdb/)
 is a great tool to use to track down the fault.
-    ```bash
-    gdb build/unit_tests/timer/TestRunner
-    ```
+```bash
+gdb build/unit_tests/timer/TestRunner
+```
 
 This will load the test application into GDB and present the GDB console.
