@@ -15,13 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
 
-__author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
-
 import SCons.Util
 import SCons.Tool.cc as cc
 
+__author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
+
 COMPILER = 'avr-gcc'
-OBJCOPY  = 'avr-objcopy'
+OBJCOPY = 'avr-objcopy'
 
 
 def generate(env):
@@ -31,8 +31,8 @@ def generate(env):
     env['CC'] = env.Detect(COMPILER)
     env['OBJCOPY'] = env.Detect(OBJCOPY)
     env['SHCCFLAGS'] = SCons.Util.CLVar('$CCFLAGS')
-        
-    env.Append(BUILDERS = {
+
+    env.Append(BUILDERS={
         'Elf': _get_elf_builder(),
         'Hex': _get_hex_builder(),
         'EEPROM': _get_eeprom_builder()
@@ -45,16 +45,25 @@ def exists(env):
 
 def _get_elf_builder():
     return SCons.Builder.Builder(
-        action=SCons.Action.Action('${CC} -mmcu=${MCU} -O${OPTIMIZATION} -Wl,--gc-sections -o ${TARGET} ${SOURCES}', '${AVRDUDE_ELF_COMSTR}')
+        action=SCons.Action.Action(
+            '${CC} -mmcu=${MCU} -O${OPTIMIZATION} -Wl,--gc-sections -o ${TARGET} ${SOURCES}',
+            '${AVRDUDE_ELF_COMSTR}'
+        )
     )
 
 
 def _get_hex_builder():
     return SCons.Builder.Builder(
-        action=SCons.Action.Action("${OBJCOPY} -O ihex -R .eeprom ${SOURCES} ${TARGET}", '${AVRDUDE_HEX_COMSTR}')
+        action=SCons.Action.Action(
+            "${OBJCOPY} -O ihex -R .eeprom ${SOURCES} ${TARGET}",
+            '${AVRDUDE_HEX_COMSTR}'
+        )
     )
 
 def _get_eeprom_builder():
     return SCons.Builder.Builder(
-        action=SCons.Action.Action('${OBJCOPY} -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${SOURCES} ${TARGET}', '${AVRDUDE_EEP_COMSTR}')
+        action=SCons.Action.Action(
+            '${OBJCOPY} -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O ihex ${SOURCES} ${TARGET}',
+            '${AVRDUDE_EEP_COMSTR}'
+        )
     )
