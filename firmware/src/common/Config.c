@@ -1,7 +1,7 @@
 /**
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-08 (Last edit)
+ * @date   2018-10-03 (Last edit)
  * @brief  Implementation of a module handling storage and validation of
  *         configuration data.
  */
@@ -34,6 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/eeprom.h>
 
 #include "CRC.h"
+#include "Config.h"
 #include "libDebug.h"
 
 //////////////////////////////////////////////////////////////////////////
