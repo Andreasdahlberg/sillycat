@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-17 (Last edit)
+ * @date   2018-10-03 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -202,7 +202,7 @@ void CheckHealth(void)
     {
         if (!high_mcu_temp_flag && temperature > HICH_MCU_TEMP_LIMIT)
         {
-            ErrorHandler_LogError(HICH_MCU_TEMP_LIMIT, (int8_t)temperature);
+            ErrorHandler_LogError(HIGH_MCU_TEMPERATURE, (int8_t)temperature);
             high_mcu_temp_flag = true;
             WARNING("High MCU temperature: %d", temperature);
         }

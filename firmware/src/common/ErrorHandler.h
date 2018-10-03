@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-08 (Last edit)
+ * @date   2018-10-03 (Last edit)
  * @brief  Implementation of ErrorHandler
  *
  * Detailed description of file.
@@ -53,7 +53,8 @@ enum
     ASSFAIL,
     LOW_STACK,
     RTC_FAIL,
-    CORRUPT_CONFIG
+    CORRUPT_CONFIG,
+    HIGH_MCU_TEMPERATURE
 };
 
 //////////////////////////////////////////////////////////////////////////
