@@ -230,7 +230,11 @@ class ErrorMessage(object):
     @property
     def description(self):
         """Get a short error description."""
-        return ErrorMessage._DESCRIPTIONS[self._code]
+        try:
+            description = ErrorMessage._DESCRIPTIONS[self._code]
+        except KeyError:
+            description = 'UNKNOWN({})'.format(self._code)
+        return description
 
     @property
     def time(self):
