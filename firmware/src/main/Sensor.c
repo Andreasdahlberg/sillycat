@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-02 (Last edit)
+ * @date   2018-10-06 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -30,12 +30,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 //NOTE: Include before all other headers
 #include "common.h"
-#include "Timer.h"
 #include "Sensor.h"
 #include "CRC.h"
 #include "libDebug.h"
 #include "libDS3234.h"
-#include "driverNTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
