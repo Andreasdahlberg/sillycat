@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-17 (Last edit)
+ * @date   2018-10-06 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -140,8 +140,8 @@ void Transceiver_Init(void)
     libRFM69_SetSyncWordSize(6);
     libRFM69_SetSyncWord(Config_GetNetworkId(), 6);
     libRFM69_SetTXStartCondition(RFM_TX_START_NOT_EMPTY);
-    libRFM69_SetNodeAddress(Config_GetNodeId());
-    libRFM69_SetBroadcastAddress(BROADCAST_ADDRESS);
+    libRFM69_SetNodeAddress(Config_GetAddress());
+    libRFM69_SetBroadcastAddress(Config_GetBroadcastAddress());
     libRFM69_SetAddressFiltering(RFM_ADDRESS_FILTER_ADDRESS_BROADCAST);
     libRFM69_ClearFIFO();
     libRFM69_SetPacketFormat(RFM_PACKET_VARIABLE_LEN);
@@ -227,7 +227,7 @@ bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
         packet_frame_type packet;
 
         packet.header.target = target;
-        packet.header.source = Config_GetNodeId();
+        packet.header.source = Config_GetAddress();
         packet.header.rssi = 0;
         packet.header.total_size = sizeof(packet_header_type) + 8 +
                                    content->size; //TODO: sizeof or define!

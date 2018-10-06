@@ -1,7 +1,7 @@
 /**
  * @file   Config.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-03 (Last edit)
+ * @date   2018-10-06 (Last edit)
  * @brief  Implementation of a module handling storage and validation of
  *         configuration data.
  */
@@ -53,7 +53,12 @@ struct config_t
     uint8_t network_id[6];
     uint32_t report_interval;
     char aes_key[17];
-    uint8_t node_id;
+    struct
+    {
+        uint8_t master;
+        uint8_t device;
+        uint8_t broadcast;
+    } address;
     uint16_t crc;
 };
 
@@ -68,8 +73,12 @@ static struct config_t EEMEM nvm_config =
     .network_id = {0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF},
     .report_interval = 60,
     .aes_key = "1DUMMYKEYFOOBAR1",
-    .node_id = 128,
-    .crc = 0x45e7
+    .address = {
+        .master = 170,
+        .device = 128,
+        .broadcast = 255
+    },
+    .crc = 0x9C54
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -136,9 +145,19 @@ uint32_t Config_GetReportInterval(void)
     return active_config.report_interval;
 }
 
-uint8_t Config_GetNodeId(void)
+uint8_t Config_GetMasterAddress(void)
 {
-    return active_config.node_id;
+    return active_config.address.master;
+}
+
+uint8_t Config_GetAddress(void)
+{
+    return active_config.address.device;
+}
+
+uint8_t Config_GetBroadcastAddress(void)
+{
+    return active_config.address.broadcast;
 }
 
 void Config_SetNetworkId(const uint8_t *network_id_p)

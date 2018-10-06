@@ -1,7 +1,7 @@
 /**
  * @file   Config.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-25 (Last edit)
+ * @date   2018-10-06 (Last edit)
  * @brief  Implementation of a module handling storage and validation of
  *         configuration data.
  */
@@ -82,11 +82,25 @@ char *Config_GetAESKey(void);
 uint32_t Config_GetReportInterval(void);
 
 /**
- * Get the node ID from the active configuration.
+ * Get the master address from the active configuration.
  *
- * @return Node ID.
+ * @return Master address.
  */
-uint8_t Config_GetNodeId(void);
+uint8_t Config_GetMasterAddress(void);
+
+/**
+ * Get the device address from the active configuration.
+ *
+ * @return Device address.
+ */
+uint8_t Config_GetAddress(void);
+
+/**
+ * Get the broadcast address from the active configuration.
+ *
+ * @return Broadcast address.
+ */
+uint8_t Config_GetBroadcastAddress(void);
 
 /**
  * Set the network ID in the active configuration.

@@ -33,16 +33,27 @@ class ConfigCrcException(Exception):
 class Config(object):
     """An object representing the device configuration."""
 
-    _FMT = 'H6sI17sB'
+    _FMT = 'H6sI17sBBB'
     _FMT_CRC = _FMT + 'H'
     START_ADDRESS = 0x00
 
-    def __init__(self, version, network_id, report_interval, aes_key, node_id):
+    def __init__(
+            self,
+            version,
+            network_id,
+            report_interval,
+            aes_key,
+            master_address,
+            address,
+            broadcast_address
+        ):
         self._version = version
         self._network_id = network_id
         self._report_interval = report_interval
         self._aes_key = aes_key
-        self._node_id = node_id
+        self._master_address = master_address
+        self._address = address
+        self._broadcast_address = broadcast_address
 
     @staticmethod
     def calculate_crc(data):
@@ -92,7 +103,9 @@ class Config(object):
                 self._network_id,
                 self._report_interval,
                 self._aes_key,
-                self._node_id,
+                self._master_address,
+                self._address,
+                self._broadcast_address,
                 self.crc
             )
         else:
@@ -102,7 +115,9 @@ class Config(object):
                 self._network_id,
                 self._report_interval,
                 self._aes_key,
-                self._node_id
+                self._master_address,
+                self._address,
+                self._broadcast_address
             )
 
     @property
@@ -157,17 +172,43 @@ class Config(object):
         self._report_interval = report_interval
 
     @property
-    def node_id(self):
-        """Get node ID."""
-        return self._node_id
+    def master_address(self):
+        """Get master address."""
+        return self._master_address
 
-    @node_id.setter
-    def node_id(self, node_id):
-        """Set node ID."""
-        node_id = int(node_id)
-        if node_id == 0 and node_id > 255:
-            raise Exception('Invalid node ID')
-        self._node_id = node_id
+    @master_address.setter
+    def master_address(self, master_address):
+        """Set master address."""
+        master_address = int(master_address)
+        if master_address == 0 and master_address > 255:
+            raise Exception('Invalid master address')
+        self._master_address = master_address
+
+    @property
+    def address(self):
+        """Get address."""
+        return self._address
+
+    @address.setter
+    def address(self, address):
+        """Set address."""
+        address = int(address)
+        if address == 0 and address > 255:
+            raise Exception('Invalid address')
+        self._address = address
+
+    @property
+    def broadcast_address(self):
+        """Get broadcast address."""
+        return self._broadcast_address
+
+    @broadcast_address.setter
+    def broadcast_address(self, broadcast_address):
+        """Set broadcast address."""
+        broadcast_address = int(broadcast_address)
+        if broadcast_address == 0 and broadcast_address > 255:
+            raise Exception('Invalid broadcast address')
+        self._broadcast_address = broadcast_address
 
     @property
     def crc(self):

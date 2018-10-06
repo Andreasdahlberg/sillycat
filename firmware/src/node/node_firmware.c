@@ -61,7 +61,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define MAX_AWAKE_TIME_MS 1000
-#define MASTER_ADDRESS 0xAA
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -252,7 +251,8 @@ static void RHTAvailable(const event_type *event __attribute__ ((unused)))
     struct packet_t packet;
 
     FillPacket(&packet);
-    Com_Send(MASTER_ADDRESS, COM_PACKET_TYPE_READING, &packet, sizeof(packet));
+    Com_Send(Config_GetMasterAddress(),
+             COM_PACKET_TYPE_READING, &packet, sizeof(packet));
 }
 
 static void CriticalBatteryVoltageHandler(const event_type *event __attribute__ ((unused)))
