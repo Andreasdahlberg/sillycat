@@ -122,7 +122,6 @@ void Transceiver_Init(void)
     libRFM69_SetPacketRxDelay(1);
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
-    libRFM69_SetAddressFiltering(RFM_ADDRESS_FILTER_ADDRESS_BROADCAST);
     libRFM69_SetPreambleLength(8);
     libRFM69_SetLNAGain(RFM_LNA_GAIN_AUTO);
     libRFM69_SetLNAInputImpedance(RFM_LNA_ZIN_50OHM);
