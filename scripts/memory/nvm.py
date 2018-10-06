@@ -113,6 +113,7 @@ class Config(object):
     @version.setter
     def version(self, version):
         """Set configuration version."""
+        version = int(version)
         if version == 0 or version > 0xffff:
             raise Exception('Invalid version')
         self._version = version
@@ -121,6 +122,14 @@ class Config(object):
     def network_id(self):
         """Get network ID."""
         return self._network_id
+
+    @network_id.setter
+    def network_id(self, network_id):
+        """Set network ID."""
+        network_id = bytes.fromhex(network_id)
+        if len(network_id) != 6:
+            raise Exception('Invalid network ID length')
+        self._network_id = network_id
 
     @property
     def aes_key(self):
@@ -139,10 +148,26 @@ class Config(object):
         """Get report interval in seconds."""
         return self._report_interval
 
+    @report_interval.setter
+    def report_interval(self, report_interval):
+        """Set report interval in seconds."""
+        report_interval = int(report_interval)
+        if report_interval < 10 or report_interval > 0xffffffff:
+            raise Exception('Invalid report interval')
+        self._report_interval = report_interval
+
     @property
     def node_id(self):
         """Get node ID."""
         return self._node_id
+
+    @node_id.setter
+    def node_id(self, node_id):
+        """Set node ID."""
+        node_id = int(node_id)
+        if node_id == 0 and node_id > 255:
+            raise Exception('Invalid node ID')
+        self._node_id = node_id
 
     @property
     def crc(self):
