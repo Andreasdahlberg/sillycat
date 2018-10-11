@@ -20,7 +20,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['encoder', 'drivers', 'gui', 'fonts', 'interface', '../utility', '../common']
+DIRECTORIES = ['encoder', 'drivers', 'gui', 'fonts', 'interface', 'sensor', '../utility', '../common']
 
 #Import all exported variables
 Import(['*'])
