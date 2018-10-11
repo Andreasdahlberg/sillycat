@@ -14,17 +14,18 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 import os
 
 Import(['*'])
 
-source = Glob('*.c')
+DRIVERS = ['MCUTemperature', 'PEC11']
+DRIVER_OBJECTS = []
 
-env.Append(CPPPATH=['#src/common', '#src/common/timer'])
+for driver in DRIVERS:
+    sconscript_file = os.path.join(driver, 'SConscript')
 
-objects = env.Object(source=source)
+    driver_object = SConscript(sconscript_file, exports='env')
+    DRIVER_OBJECTS.append(driver_object)
 
-Return('objects')
-
-
+Return('DRIVER_OBJECTS')

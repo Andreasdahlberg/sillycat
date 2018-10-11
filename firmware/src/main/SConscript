@@ -33,7 +33,8 @@ env.Append(CPPPATH=[
     '#src/common/ADC',
     '#src/common/timer',
     'encoder',
-    'drivers',
+    'drivers/PEC11',
+    'drivers/MCUTemperature',
     'gui',
     'fonts',
     'interface'
