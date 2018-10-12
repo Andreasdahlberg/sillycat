@@ -119,7 +119,7 @@ static void BasicMockUpdate(struct sensor_t *super)
 
 static void MockUpdate(struct sensor_t *super)
 {
-    struct mock_sensor_t *self = (struct mcu_sensor_t *)super;
+    struct mock_sensor_t *self = (struct mock_sensor_t *)super;
 
     self->base.value = mock_type(int16_t);
     self->base.valid = mock_type(bool);
