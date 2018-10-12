@@ -19,13 +19,21 @@ import os
 
 Import(['*'])
 
-modules = ['encoder', 'interface', 'sensor']
-objects = []
 
-for module in modules:
-    sconscript_file = os.path.join(module, 'SConscript')
+env.Append(CPPPATH=[
+    '#src/main',
+    '#src/common',
+    '#src/common/timer',
+    '#src/utility/CRC'
+    ])
 
-    object = SConscript(sconscript_file, exports={'env': env})
-    objects.append(object)
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=libDS3234_WriteToSRAM',
+    '-Wl,--wrap=libDS3234_ReadFromSRAM',
+    '-Wl,--wrap=CRC_16'
+    ])
 
-Return('objects')
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
