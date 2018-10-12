@@ -1,7 +1,7 @@
 /**
  * @file   mock_libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-11 (Last edit)
+ * @date   2018-10-12 (Last edit)
  * @brief  Mock functions for the DS3234 driver.
  */
 
@@ -32,6 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmocka.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "mock_libDS3234.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -60,12 +61,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 bool __wrap_libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
-
+    function_called();
 }
 
 bool __wrap_libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
 {
-
+    memset(data, 0, length);
 }
 
 //////////////////////////////////////////////////////////////////////////
