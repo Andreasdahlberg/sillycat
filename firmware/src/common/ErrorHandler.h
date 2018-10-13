@@ -1,10 +1,8 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-03 (Last edit)
+ * @date   2018-10-13 (Last edit)
  * @brief  Implementation of ErrorHandler
- *
- * Detailed description of file.
  */
 
 /*
@@ -61,12 +59,49 @@ enum
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the error handler.
+ *
+ * Set the current index and id in the error log. This needs to be run once
+ * after power on before the error logging can begin.
+ */
 void ErrorHandler_Init(void);
+
+/**
+ * Log an error code with data and timestamp to the error log.
+ *
+ * The error log is stored in EEPROM so it's preserved between restarts.
+ * If the log is full the oldest entries will be overwritten.
+ *
+ * @param code        Error code to save.
+ * @param information Additional information to save.
+ */
 void ErrorHandler_LogError(uint8_t code, uint8_t information);
+
+/**
+ * Halt the device and indicate that an fault has occurred.
+ *
+ * This function does never return, a manual reboot is needed to exit this
+ * state.
+ */
 void ErrorHandler_PointOfNoReturn(void) __attribute__((noreturn));
+
+/**
+ * Print information about the failed an assert and then halt.
+ *
+ * This function does never return, a manual reboot is needed to exit this
+ * state.
+ *
+ * @param __file   String with the name of the file where the assert failed.
+ * @param __lineno Line number of the failed assert.
+ * @param __exp    String with the assert expression that returned false.
+ */
 void ErrorHandler_AssertFail(const char *__file, int __lineno,
-                             const char *__sexp) __attribute__((noreturn));
+                             const char *__exp) __attribute__((noreturn));
 #ifdef DEBUG_ENABLE
+/**
+ * Print all logged errors.
+ */
 void ErrorHandler_DumpLog(void);
 #endif
 
