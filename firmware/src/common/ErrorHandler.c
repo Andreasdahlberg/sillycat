@@ -45,22 +45,22 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef struct
+struct error_message_type
 {
     uint32_t id;
     uint32_t timestamp;
     uint8_t code;
     uint8_t information;
-} error_message_type;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static error_message_type EEMEM error_log[ERROR_LOG_SIZE] = {{0}};
+static struct error_message_type EEMEM error_log[ERROR_LOG_SIZE] = {{0}};
 
-static uint8_t current_index = 0;
-static uint8_t current_id = 0;
+static uint8_t current_index;
+static uint8_t current_id;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -76,15 +76,12 @@ static uint8_t current_id = 0;
 
 void ErrorHandler_Init(void)
 {
-    sc_assert(ERROR_LOG_SIZE < 256);
-
     uint32_t prev_id = 0;
-    uint8_t index;
 
-    for (index = 0; index < sizeof(error_log) / sizeof(*error_log); ++index)
+    _Static_assert(ERROR_LOG_SIZE <= UINT8_MAX, "Invalid error log size!");
+
+    for (uint8_t index = 0; index < ElementsIn(error_log); ++index)
     {
-        sc_assert(index < ERROR_LOG_SIZE);
-
         uint32_t id;
         eeprom_read_block(&id, &error_log[index].id, sizeof(id));
 
@@ -101,7 +98,6 @@ void ErrorHandler_Init(void)
     /* If we come here the log is full and we wrap around to the start. */
     current_index = 0;
     current_id = ++prev_id;
-    return;
 }
 
 void ErrorHandler_LogError(uint8_t code, uint8_t information)
@@ -109,7 +105,7 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
     sc_assert(current_index < ERROR_LOG_SIZE);
     sc_assert(current_id  != 0);
 
-    error_message_type log_entry;
+    struct error_message_type log_entry;
 
     /**
      * Save log entry even if we fail to get a timestamp. It's better then
@@ -124,7 +120,7 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
     eeprom_write_block(&log_entry, &error_log[current_index], sizeof(*error_log));
 
     /* Increment log index and wrap around if the end is reached. */
-    current_index = (current_index + 1) % sizeof(error_log) / sizeof(*error_log);
+    current_index = (current_index + 1) % ElementsIn(error_log);
 
     /**
      * No need for wrap around here, if uint32 is used the id will never overflow
@@ -132,7 +128,6 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
      * this still works!
      */
     ++current_id;
-    return;
 }
 
 void ErrorHandler_AssertFail(const char *__file, int __lineno,
@@ -166,12 +161,10 @@ void ErrorHandler_PointOfNoReturn(void)
 #ifdef DEBUG_ENABLE
 void ErrorHandler_DumpLog(void)
 {
-    uint8_t index;
-
     DEBUG("****Error log****\r\n");
-    for (index = 0; index < sizeof(error_log) / sizeof(*error_log); ++index)
+    for (uint8_t index = 0; index < ElementsIn(error_log); ++index)
     {
-        error_message_type entry;
+        struct error_message_type entry;
         eeprom_read_block(&entry, &error_log[index], sizeof(entry));
 
         if (entry.id == 0)
@@ -186,7 +179,6 @@ void ErrorHandler_DumpLog(void)
         DEBUG("Timestamp: %lu\r\n", entry.timestamp);
         DEBUG("*****************\r\n");
     }
-    return;
 }
 #endif
 
