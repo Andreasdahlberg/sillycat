@@ -53,18 +53,27 @@ struct error_message_type
     uint8_t information;
 };
 
+struct module_t
+{
+    uint8_t current_index;
+    uint8_t current_id;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static struct error_message_type EEMEM error_log[ERROR_LOG_SIZE] = {{0}};
-
-static uint8_t current_index;
-static uint8_t current_id;
+static struct error_message_type EEMEM error_log[ERROR_LOG_SIZE];
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+void FillLogEntry(struct error_message_type *entry,
+                  uint8_t code,
+                  uint8_t information
+                 );
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -80,54 +89,42 @@ void ErrorHandler_Init(void)
 
     _Static_assert(ERROR_LOG_SIZE <= UINT8_MAX, "Invalid error log size!");
 
-    for (uint8_t index = 0; index < ElementsIn(error_log); ++index)
+    for (uint8_t i = 0; i < ElementsIn(error_log); ++i)
     {
         uint32_t id;
-        eeprom_read_block(&id, &error_log[index].id, sizeof(id));
+        eeprom_read_block(&id, &error_log[i].id, sizeof(id));
 
         if (id <= prev_id)
         {
-            current_index = index;
-            current_id = ++prev_id;
-            DEBUG("Current error log index: %u\r\n", index);
+            module.current_index = i;
+            module.current_id = ++prev_id;
+            DEBUG("Current error log index: %u\r\n", i);
             return;
         }
         prev_id = id;
     }
 
     /* If we come here the log is full and we wrap around to the start. */
-    current_index = 0;
-    current_id = ++prev_id;
+    module.current_index = 0;
+    module.current_id = ++prev_id;
 }
 
 void ErrorHandler_LogError(uint8_t code, uint8_t information)
 {
-    sc_assert(current_index < ERROR_LOG_SIZE);
-    sc_assert(current_id  != 0);
-
     struct error_message_type log_entry;
+    FillLogEntry(&log_entry, code, information);
 
-    /**
-     * Save log entry even if we fail to get a timestamp. It's better then
-     * nothing and it makes no sense to make an error log entry about a failed
-     * error log entry.
-     */
-    RTC_GetTimeStamp(&log_entry.timestamp);
-    log_entry.id = current_id;
-    log_entry.code = code;
-    log_entry.information = information;
-
-    eeprom_write_block(&log_entry, &error_log[current_index], sizeof(*error_log));
+    eeprom_write_block(&log_entry, &error_log[module.current_index], sizeof(*error_log));
 
     /* Increment log index and wrap around if the end is reached. */
-    current_index = (current_index + 1) % ElementsIn(error_log);
+    module.current_index = (module.current_index + 1) % ElementsIn(error_log);
 
     /**
      * No need for wrap around here, if uint32 is used the id will never overflow
      * during normal operation. One log entry per second for 100 years and
      * this still works!
      */
-    ++current_id;
+    ++module.current_id;
 }
 
 void ErrorHandler_AssertFail(const char *__file, int __lineno,
@@ -162,17 +159,17 @@ void ErrorHandler_PointOfNoReturn(void)
 void ErrorHandler_DumpLog(void)
 {
     DEBUG("****Error log****\r\n");
-    for (uint8_t index = 0; index < ElementsIn(error_log); ++index)
+    for (uint8_t i = 0; i < ElementsIn(error_log); ++i)
     {
         struct error_message_type entry;
-        eeprom_read_block(&entry, &error_log[index], sizeof(entry));
+        eeprom_read_block(&entry, &error_log[i], sizeof(entry));
 
         if (entry.id == 0)
         {
             return;
         }
 
-        DEBUG("Index: %u\r\n", index);
+        DEBUG("Index: %u\r\n", i);
         DEBUG("Id: %u\r\n", entry.id);
         DEBUG("Code: %u\r\n", entry.code);
         DEBUG("Info: %u\r\n", entry.information);
@@ -185,3 +182,19 @@ void ErrorHandler_DumpLog(void)
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+void FillLogEntry(struct error_message_type *entry,
+                  uint8_t code,
+                  uint8_t information
+                 )
+{
+    /**
+     * Fill log entry even if we fail to get a timestamp. It's better then
+     * nothing and it makes no sense to make an error log entry about a failed
+     * error log entry.
+     */
+    RTC_GetTimeStamp(&entry->timestamp);
+    entry->id = module.current_id;
+    entry->code = code;
+    entry->information = information;
+}
