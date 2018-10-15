@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-13 (Last edit)
+ * @date   2018-10-15 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -57,6 +57,7 @@ struct module_t
 {
     uint8_t current_index;
     uint8_t current_id;
+    error_handler_assert_fail_t assert_fail_handler_p;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -109,6 +110,12 @@ void ErrorHandler_Init(void)
     module.current_id = ++prev_id;
 }
 
+void ErrorHandler_SetAssertFailHandler(
+    error_handler_assert_fail_t error_handler_p)
+{
+    module.assert_fail_handler_p = error_handler_p;
+}
+
 void ErrorHandler_LogError(uint8_t code, uint8_t information)
 {
     struct error_message_type log_entry;
@@ -127,7 +134,8 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
     ++module.current_id;
 }
 
-void ErrorHandler_AssertFail(const char *__file, int __lineno,
+void ErrorHandler_AssertFail(const char *__file,
+                             int __lineno,
                              const char *__exp)
 {
 #ifdef DEBUG_ENABLE
@@ -141,6 +149,11 @@ void ErrorHandler_AssertFail(const char *__file, int __lineno,
     UNUSED(__lineno);
     UNUSED(__exp);
 #endif
+
+    if (module.assert_fail_handler_p != NULL)
+    {
+        module.assert_fail_handler_p(__file, __lineno, __exp);
+    }
 
     ErrorHandler_PointOfNoReturn();
 }

@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-13 (Last edit)
+ * @date   2018-10-15 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -55,6 +55,12 @@ enum
     HIGH_MCU_TEMPERATURE
 };
 
+typedef void (*error_handler_assert_fail_t)(
+    const char *file,
+    int line_number,
+    const char *expression
+);
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -66,6 +72,15 @@ enum
  * after power on before the error logging can begin.
  */
 void ErrorHandler_Init(void);
+
+/**
+ * Set a handler function for assert failures.
+ *
+ * @param error_handler_p Handler function pointer. NULL can be used to
+ *                        disable the assert failure handler.
+ */
+void ErrorHandler_SetAssertFailHandler(
+    error_handler_assert_fail_t error_handler_p);
 
 /**
  * Log an error code with data and timestamp to the error log.
@@ -96,7 +111,8 @@ void ErrorHandler_PointOfNoReturn(void) __attribute__((noreturn));
  * @param __lineno Line number of the failed assert.
  * @param __exp    String with the assert expression that returned false.
  */
-void ErrorHandler_AssertFail(const char *__file, int __lineno,
+void ErrorHandler_AssertFail(const char *__file,
+                             int __lineno,
                              const char *__exp) __attribute__((noreturn));
 #ifdef DEBUG_ENABLE
 /**
