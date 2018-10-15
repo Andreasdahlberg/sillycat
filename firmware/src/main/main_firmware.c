@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-06 (Last edit)
+ * @date   2018-10-15 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -40,6 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 #include "libDS3234.h"
 #include "libRFM69.h"
+#include "libUI.h"
 
 #include "ADC.h"
 #include "Sensor.h"
@@ -88,6 +89,9 @@ static struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 void CheckHealth(void);
+void assert_fail_handler(const char *file,
+                         int line_number,
+                         const char *expression);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -109,6 +113,7 @@ int main(void)
     INFO("Main unit started");
     INFO("Last reset: 0x%02X", mcu_status);
     ErrorHandler_Init();
+    ErrorHandler_SetAssertFailHandler(assert_fail_handler);
     ADC_Init();
     Timer_Init();
     libSPI_Init(1);
@@ -207,4 +212,17 @@ void CheckHealth(void)
     }
 
     sc_assert(unused_memory > 0);
+}
+
+void assert_fail_handler(const char *file,
+                         int line_number,
+                         const char *expression
+                        )
+{
+    UNUSED(expression);
+    const char *file_name = strrchr_P(file, '/');
+
+    libUI_Print("Assert: %i", 2, UI_DOUBLE_ROW_FIRST, line_number);
+    libUI_Print_P(file_name, 2, UI_DOUBLE_ROW_SECOND);
+    libUI_Update();
 }

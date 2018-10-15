@@ -115,7 +115,7 @@ TARGETS = ['node', 'main']
 
 MODES = {
     'debug': ['DEBUG_ENABLE'],
-    'release': ['NDEBUG']
+    'release': ['']
 }
 
 
