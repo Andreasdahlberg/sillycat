@@ -56,7 +56,7 @@ def main(args):
     f = Font(args.font, args.size, args.monospace)
     f.add_chars(string.ascii_letters)
     f.add_chars(string.digits)
-    f.add_chars(' -:%.')
+    f.add_chars(' -:%./_')
 
     offset = 0
     index = 0
