@@ -70,6 +70,14 @@ void libNHD223_WriteData(uint8_t data);
 void libNHD223_ResetDisplay(void);
 
 /**
+ * Configure the display to use horizontal addressing mode.
+ *
+ * In this mode both the column- and page-address are incremented
+ * automatically.
+ */
+void libNHD223_SetHorizontalAddressingMode(void);
+
+/**
  * Set the active page address.
  *
  * @param address Page address to set.

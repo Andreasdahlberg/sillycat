@@ -33,7 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define SSD1305_SETHIGHCOLUMN       0x10
 #define SSD1305_SETSTARTCOLUMN      0x21
 #define SSD1305_SETSTARTPAGE        0x22
-#define SSD1305_MEMORYMODE          0x20
+#define SSD1305_ADDRESSINGMODE      0x20
 #define SSD1305_SETSTARTLINE        0x40
 #define SSD1305_SETCONTRAST         0x81
 #define SSD1305_SEGREMAP            0xA0
@@ -61,6 +61,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define SSD1305_SETCONTSCROLL       0x29
 #define SSD1305_CLRSCROLL           0x2E
 #define SSD1305_SETSCROLL           0x2F
+
+#define SSD1305_HORIZONTALADDRESSINGMODE    0x00
+#define SSD1305_VERTICALADDRESSINGMODE      0x01
+#define SSD1305_PAGEADDRESSINGMODE          0x02
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS

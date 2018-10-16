@@ -89,6 +89,7 @@ void libNHD223_Init(void)
     SelectDevice(false);
     EnableDataLatch(false);
 
+    libNHD223_SetHorizontalAddressingMode();
     libNHD223_SetColumnAddressRange(0, 127);
     libNHD223_SetPageAddressRange(0, 3);
 }
@@ -118,6 +119,12 @@ void libNHD223_ResetDisplay(void)
     EnableReset(true);
     _delay_us(5);
     EnableReset(false);
+}
+
+void libNHD223_SetHorizontalAddressingMode(void)
+{
+    libNHD223_WriteCommand(SSD1305_ADDRESSINGMODE);
+    libNHD223_WriteCommand(SSD1305_HORIZONTALADDRESSINGMODE);
 }
 
 void libNHD223_SetPageAddress(uint8_t address)
