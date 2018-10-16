@@ -73,6 +73,9 @@ void libDisplay_Init(void)
     //UART is using the same pins.
 #ifndef DEBUG_ENABLE
     libNHD223_Init();
+    libNHD223_SetHorizontalAddressingMode();
+    libNHD223_SetColumnAddressRange(0, VRAM_COLUMNS - 1);
+    libNHD223_SetPageAddressRange(0, VRAM_PAGES - 1);
 #endif
 
     module.rotated = false;
@@ -109,7 +112,6 @@ void libDisplay_Flush(void)
 #ifndef DEBUG_ENABLE
     for (uint8_t page = 0; page < VRAM_PAGES; ++page)
     {
-        libNHD223_SetPageAddress(page);
         for (uint8_t column = 0; column < VRAM_COLUMNS; ++column)
         {
             libNHD223_WriteData(module.VRAM[page][column]);
