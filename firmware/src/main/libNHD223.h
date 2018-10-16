@@ -1,10 +1,8 @@
 /**
  * @file   libNHD223.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
- * @brief  Header of NHD223-library.
- *
- * Detailed description of file.
+ * @date   2018-10-16 (Last edit)
+ * @brief  NHD2.23 graphic OLED display driver.
  */
 
 /*
@@ -45,15 +43,67 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Init the display hardware.
+ */
 void libNHD223_Init(void);
-void libNHD223_WriteCommand(uint8_t command);
-void libNHD223_WriteData(uint8_t data);
-void libNHD223_ResetDisplay(void);
-void libNHD223_ReadByte(uint8_t *data);
-void libNHD223_SetPageAddress(uint8_t page_address);
-void libNHD223_SetPageAddressRange(uint8_t start_page, uint8_t end_page);
-void libNHD223_SetColumnAddress(uint8_t column_address);
-void libNHD223_SetColumnAddressRange(uint8_t start_address,
-                                     uint8_t end_address);
 
-#endif /* LIBNHD223_H_ */
+/**
+ * Write a command to the display.
+ *
+ * @param command Command to write.
+ */
+void libNHD223_WriteCommand(uint8_t command);
+
+/**
+ * Write data to the display.
+ *
+ * @param data Data to write.
+ */
+void libNHD223_WriteData(uint8_t data);
+
+/**
+ * Reset the display.
+ *
+ * Reset the display by pulling the reset pin high for 5 µs.
+ */
+void libNHD223_ResetDisplay(void);
+
+/**
+ * Set the active page address.
+ *
+ * @param address Page address to set.
+ */
+void libNHD223_SetPageAddress(uint8_t address);
+
+/**
+ * Set the page address range.
+ *
+ * @param start_address Address to starting page.
+ * @param end_address   Address to ending page.
+ */
+void libNHD223_SetPageAddressRange(uint8_t start_address, uint8_t end_address);
+
+/**
+ * Set the active column address.
+ *
+ * @param address Column address to set.
+ */
+void libNHD223_SetColumnAddress(uint8_t address);
+
+/**
+ * Set the column address range.
+ *
+ * @param start_address Address to starting column.
+ * @param end_address   Address to ending column.
+ */
+void libNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address);
+
+/**
+ * Read data from the display memory.
+ *
+ * @param data_p Pointer to byte where the result will be stored.
+ */
+void libNHD223_ReadByte(uint8_t *data_p);
+
+#endif

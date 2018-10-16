@@ -1,10 +1,8 @@
 /**
  * @file   SSD1305_Commands.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
- * @brief  Header with SSD1305 commands
- *
- * Detailed description of file.
+ * @date   2018-10-16 (Last edit)
+ * @brief  Header with SSD1305 commands.
  */
 
 /*
@@ -23,7 +21,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 
 #ifndef SSD1305COMMANDS_H_
 #define SSD1305COMMANDS_H_
@@ -73,4 +70,4 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-#endif /* SSD1305COMMANDS_H_ */
+#endif
