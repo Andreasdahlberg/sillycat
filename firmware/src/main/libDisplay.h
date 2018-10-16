@@ -1,10 +1,8 @@
 /**
- * @file   libDisplay.h
+ * @file   libDisplay.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-03 (Last edit)
- * @brief  Header of display-library.
- *
- * Detailed description of file.
+ * @date   2018-10-16 (Last edit)
+ * @brief  Implementation of display-library.
  */
 
 /*
@@ -31,24 +29,80 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the display.
+ *
+ * The VRAM will be cleared.
+ */
 void libDisplay_Init(void);
+
+/**
+ * Turn the display on.
+ */
 void libDisplay_On(void);
+
+/**
+ * Turn the display off.
+ */
 void libDisplay_Off(void);
+
+/**
+ * Clear the display.
+ *
+ * VRAM is cleared and flushed to the display.
+ */
 void libDisplay_Clear(void);
+
+/**
+ * Clear VRAM.
+ */
 void libDisplay_ClearVRAM(void);
-void libDisplay_Reset(void);
+
+/**
+ * Flush the VRAM to the display.
+ */
 void libDisplay_Flush(void);
+
+/**
+ * Reset the display.
+ *
+ * The display is set to it's initial state and the VRAM is cleared.
+ */
+void libDisplay_Reset(void);
+
+/**
+ * Set a specific pixel on the display.
+ *
+ * @param x Pixel coordinate on the x-axis.
+ * @param y Pixel coordinate on the y-axis.
+ */
 void libDisplay_SetPixel(uint8_t x, uint8_t y);
+
+/**
+ * Set the display brightness.
+ *
+ * @param brightness Brightness to set.
+ */
 void libDisplay_SetBrightness(uint8_t brightness);
+
+/**
+ * Rotate display contents.
+ *
+ * The VRAM is cleared after the rotation.
+ *
+ * @param state Set to true if contents should be rotated.
+ */
 void libDisplay_Rotate(bool state);
 
 #ifdef DEBUG_ENABLE
+/**
+ * Dump the data in VRAM to debug UART.
+ */
 void libDisplay_DumpVRAMToUART(void);
 #endif
 
-#endif /* LIBDISPLAY_H_ */
+#endif
