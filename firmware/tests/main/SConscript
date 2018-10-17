@@ -19,7 +19,7 @@ import os
 
 Import(['*'])
 
-modules = ['encoder', 'interface', 'sensor']
+modules = ['encoder', 'interface', 'sensor', 'driver']
 objects = []
 
 for module in modules:

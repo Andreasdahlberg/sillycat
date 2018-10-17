@@ -20,7 +20,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['encoder', 'drivers', 'gui', 'fonts', 'interface', 'sensor', '../utility', '../common']
+DIRECTORIES = ['encoder', 'driver', 'gui', 'fonts', 'interface', 'sensor', '../utility', '../common']
 
 #Import all exported variables
 Import(['*'])
@@ -33,8 +33,8 @@ env.Append(CPPPATH=[
     '#src/common/ADC',
     '#src/common/timer',
     'encoder',
-    'drivers/PEC11',
-    'drivers/MCUTemperature',
+    'driver/PEC11',
+    'driver/MCUTemperature',
     'gui',
     'fonts',
     'interface'

@@ -21,7 +21,7 @@ Import(['*'])
 
 
 env.Append(CPPPATH=[
-    '#src/main/drivers/MCUTemperature',
+    '#src/main/driver/MCUTemperature',
     '#src/main',
     '#src/common',
     '#src/common/ADC'

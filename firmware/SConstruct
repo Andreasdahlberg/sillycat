@@ -205,7 +205,7 @@ modules = [
     os.path.join('main', 'encoder'),
     os.path.join('main', 'interface'),
     os.path.join('main', 'sensor'),
-    os.path.join('main', 'drivers', 'MCUTemperature'),
+    os.path.join('main', 'driver', 'MCUTemperature'),
     os.path.join('common', 'timer')
 ]
 
