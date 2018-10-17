@@ -88,10 +88,6 @@ void libNHD223_Init(void)
     libNHD223_ResetDisplay();
     SelectDevice(false);
     EnableDataLatch(false);
-
-    libNHD223_SetHorizontalAddressingMode();
-    libNHD223_SetColumnAddressRange(0, 127);
-    libNHD223_SetPageAddressRange(0, 3);
 }
 
 void libNHD223_WriteCommand(uint8_t command)
