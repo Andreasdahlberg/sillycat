@@ -35,6 +35,7 @@ env.Append(CPPPATH=[
     'encoder',
     'driver/PEC11',
     'driver/MCUTemperature',
+    'driver/NTC',
     'gui',
     'fonts',
     'interface'
