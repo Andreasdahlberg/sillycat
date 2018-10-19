@@ -1,10 +1,8 @@
 /**
  * @file   Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-06 (Last edit)
+ * @date   2018-10-19 (Last edit)
  * @brief  Implementation of the Communications module.
- *
- * Detailed description of file.
  */
 
 /*
@@ -28,17 +26,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include common.h before all other headers
 #include "common.h"
-
 #include <string.h>
-
 #include "libDebug.h"
-
-#include "Com.h"
 #include "ErrorHandler.h"
 #include "Timer.h"
 #include "RTC.h"
+#include "Com.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -48,55 +42,38 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-struct packet_statistics_t
+struct module_t
 {
-    uint32_t sent;
-    uint32_t received;
-    uint32_t lost;
+    struct
+    {
+        uint32_t sent;
+        uint32_t received;
+        uint32_t lost;
+    } statistics;
+    com_packet_handler_t packet_handlers[COM_PACKET_NR_TYPES];
 };
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static com_packet_handler_t packet_handlers[COM_PACKET_NR_TYPES];
-static struct packet_statistics_t packet_stats;
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void ClearPacketHandlers(void);
 static bool HandlePacket(packet_frame_type *packet);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Initialize the Communications module.
-///
-/// @param  None
-///
-/// @return None
-///
 void Com_Init(void)
 {
-    ClearPacketHandlers();
-
-    // Reset packet statistics.
-    packet_stats = (struct packet_statistics_t) {0};
-
-    return;
+    module = (struct module_t) { {0}, {0}};
 }
 
-///
-/// @brief Update the internal module state.
-///
-/// @param  None
-///
-/// @return None
-///
 void Com_Update(void)
 {
     packet_frame_type rx_packet;
@@ -106,48 +83,23 @@ void Com_Update(void)
         // We are not using the status here since ACKs are not implemented yet.
         HandlePacket(&rx_packet);
 
-        ++packet_stats.received;
+        ++module.statistics.received;
     }
-
-    return;
 }
 
-///
-/// @brief Register a packet handler for a specific packet type.
-///
-/// @param  *packet_handler Pointer to packet handler function. This function will
-///                         be called when the corresponding packet type is received.
-///                         NULL can be used to remove a packet handler.
-/// @param  packet_type Packet type.
-///
-/// @return None
-///
 void Com_SetPacketHandler(com_packet_handler_t packet_handler,
                           com_packet_type_t packet_type)
 {
-    sc_assert(packet_type < ElementsIn(packet_handlers));
+    sc_assert(packet_type < ElementsIn(module.packet_handlers));
 
-    packet_handlers[packet_type] = packet_handler;
-    return;
+    module.packet_handlers[packet_type] = packet_handler;
 }
 
-
-///
-/// @brief Send data to a another node.
-///
-/// @param  target Address of the target node.
-/// @param  packet_type Packet type.
-/// @param  *data Pointer to data to send.
-/// @param  size Size of the data.
-///
-/// @return None
-///
-void Com_Send(uint8_t target, uint8_t packet_type, void *data,
-              size_t size)
+void Com_Send(uint8_t target, uint8_t packet_type, void *data_p, size_t size)
 
 {
     sc_assert(target != 0);
-    sc_assert(data != NULL);
+    sc_assert(data_p != NULL);
 
     rtc_time_type timestamp;
     if (!RTC_GetCurrentTime(&timestamp))
@@ -166,48 +118,36 @@ void Com_Send(uint8_t target, uint8_t packet_type, void *data,
     packet.type = packet_type;
     packet.size = size;
     packet.timestamp = timestamp;
-    memcpy(packet.data, data, packet.size);
+    memcpy(packet.data, data_p, packet.size);
 
     if (Transceiver_SendPacket(target, &packet))
     {
         DEBUG("Packet sent to 0x%02X. \r\n", target);
-        ++packet_stats.sent;
+        ++module.statistics.sent;
     }
     else
     {
         ERROR("Failed to send packet.");
-        ++packet_stats.lost;
+        ++module.statistics.lost;
     }
-
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static void ClearPacketHandlers(void)
-{
-    for (size_t index = 0; index < ElementsIn(packet_handlers); ++index)
-    {
-        packet_handlers[index] = NULL;
-    }
-
-    return;
-}
-
 static bool HandlePacket(packet_frame_type *packet)
 {
     sc_assert(packet != NULL);
 
     bool status;
-    if (packet->content.type >= ElementsIn(packet_handlers))
+    if (packet->content.type >= ElementsIn(module.packet_handlers))
     {
         WARNING("Invalid packet type [%u:%u]", packet->header.source,
                 packet->content.type);
         status = false;
     }
-    else if (NULL == packet_handlers[packet->content.type])
+    else if (NULL == module.packet_handlers[packet->content.type])
     {
         INFO("No packet handler set [%u:%u]", packet->header.source,
              packet->content.type);
@@ -215,7 +155,7 @@ static bool HandlePacket(packet_frame_type *packet)
     }
     else
     {
-        status = packet_handlers[packet->content.type](packet);
+        status = module.packet_handlers[packet->content.type](packet);
     }
 
     return status;

@@ -1,10 +1,8 @@
 /**
  * @file   Com.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-06-06 (Last edit)
- * @brief  Header for the Communications module.
- *
- * Detailed description of file.
+ * @date   2018-10-19 (Last edit)
+ * @brief  Implementation of the Communications module.
  */
 
 /*
@@ -51,18 +49,41 @@ typedef enum
 } com_packet_type_t;
 
 typedef bool (*com_packet_handler_t)(packet_frame_type *packet);
-
 typedef void (*com_sent_callback_t)(bool status);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the Communications module.
+ */
 void Com_Init(void);
+
+/**
+ * Handle any incoming packets.
+ */
 void Com_Update(void);
+
+/**
+ * Register a packet handler for a specific packet type.
+ *
+ * @param packet_handler Pointer to packet handler function. This function will
+ *                       be called when the corresponding packet type is
+ *                       received. NULL can be used to remove a packet handler.
+ * @param packet_type    Packet type.
+ */
 void Com_SetPacketHandler(com_packet_handler_t packet_handler,
                           com_packet_type_t packet_type);
-void Com_Send(uint8_t target, uint8_t packet_type, void *data,
-              size_t size);
 
-#endif /* COM_H_ */
+/**
+ * Send data to a another node.
+ *
+ * @param target      Address of the target node.
+ * @param packet_type Packet type.
+ * @param data_p      Pointer to data to send.
+ * @param size        Size of the data.
+ */
+void Com_Send(uint8_t target, uint8_t packet_type, void *data_p, size_t size);
+
+#endif
