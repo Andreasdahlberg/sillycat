@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import datetime
 import argparse
 from pyclibrary import CParser
 
@@ -32,7 +34,7 @@ class Argument(object):
         self.const = const
 
     def to_string(self):
-        if self.c_type != 'void':
+        if self.name:
             name = ' ' + self.name
         else:
             name = ''
@@ -123,16 +125,31 @@ def is_const(arg_type):
 
 def parse(args):
     """Parse header file and print the mock functions."""
-    header_parser = HeaderParser(args.file)
+    header_parser = HeaderParser(args.header)
 
     functions = header_parser.get_functions()
-    print('\r\n\r\n'.join([x.to_string() for x in functions]))
+    c_code = '\r\n\r\n'.join([x.to_string() for x in functions])
+
+    with open(args.template) as template_file:
+        template = template_file.read()
+
+        now = datetime.datetime.now()
+        params = {
+            'filename': os.path.basename(args.header).split('.')[0],
+            'author': 'Andreas Dahlberg',
+            'date': now.strftime('%Y-%m-%d'),
+            'brief': 'Mock functions.',
+            'mock_functions': c_code
+        }
+
+        print(template.format(**params))
 
 
 def main():
     """Main function handling command line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('file')
+    parser.add_argument('header')
+    parser.add_argument('template')
 
     args = parser.parse_args()
     parse(args)
