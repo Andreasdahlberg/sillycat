@@ -14,22 +14,17 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
-
+#
 import os
 
 Import(['*'])
 
-mock_env = env.Clone()
-mock_env.Append(CPPPATH=[
-    '#src/main',
-    '#src/main/gui',
-    '#src/common',
-    '#src/common/ADC',
-    '#src/common/timer',
-    '#src/common/event',
-    ])
+SOURCE = Glob('*.c')
 
-source = Glob('*.c')
-objects = mock_env.Object(source=source)
+env.Append(CPPPATH=['#src/common', '#src/common/timer'])
 
-Return('objects')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
+
+

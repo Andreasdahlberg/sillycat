@@ -19,12 +19,17 @@ import os
 
 Import(['*'])
 
-source = Glob('*.c')
+SOURCE = Glob('*.c')
 
-env.Append(CPPPATH=['#src/common', '#src/main/driver/PEC11', '#src/common/timer'])
+env.Append(CPPPATH=[
+    '#src/main/driver/PEC11',
+    '#src/common',
+    '#src/common/timer',
+    '#src/common/event'
+])
 
-objects = env.Object(source=source)
+OBJECTS = env.Object(source=SOURCE)
 
-Return('objects')
+Return('OBJECTS')
 
 
