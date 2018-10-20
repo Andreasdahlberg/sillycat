@@ -49,6 +49,7 @@ struct module_t
         uint32_t sent;
         uint32_t received;
         uint32_t lost;
+        uint32_t invalid;
     } statistics;
     com_packet_handler_t packet_handlers[COM_PACKET_NR_TYPES];
 };
@@ -82,8 +83,6 @@ void Com_Update(void)
     {
         // We are not using the status here since ACKs are not implemented yet.
         HandlePacket(&rx_packet);
-
-        ++module.statistics.received;
     }
 }
 
@@ -147,16 +146,19 @@ static bool HandlePacket(packet_frame_type *packet)
         WARNING("Invalid packet type [%u:%u]", packet->header.source,
                 packet->content.type);
         status = false;
+        ++module.statistics.invalid;
     }
     else if (NULL == module.packet_handlers[packet->content.type])
     {
         INFO("No packet handler set [%u:%u]", packet->header.source,
              packet->content.type);
         status = false;
+        ++module.statistics.received;
     }
     else
     {
         status = module.packet_handlers[packet->content.type](packet);
+        ++module.statistics.received;
     }
 
     return status;
