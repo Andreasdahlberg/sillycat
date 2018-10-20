@@ -1,7 +1,7 @@
 /**
  * @file   Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-19 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of the Communications module.
  */
 
@@ -99,6 +99,7 @@ void Com_Send(uint8_t target, uint8_t packet_type, void *data_p, size_t size)
 
 {
     sc_assert(target != 0);
+    sc_assert(packet_type < ElementsIn(module.packet_handlers));
     sc_assert(data_p != NULL);
 
     rtc_time_type timestamp;
