@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -108,7 +108,7 @@ void libDebug_Print_P(const char *text, ...)
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void libDebug_Sleep(const event_type *event __attribute__ ((unused)))
+void libDebug_Sleep(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
@@ -123,7 +123,7 @@ void libDebug_Sleep(const event_type *event __attribute__ ((unused)))
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void libDebug_WakeUp(const event_type *event __attribute__ ((unused)))
+void libDebug_WakeUp(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 

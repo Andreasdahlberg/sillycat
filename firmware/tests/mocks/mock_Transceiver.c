@@ -81,7 +81,7 @@ bool __wrap_Transceiver_SendPacket(uint8_t target, packet_content_type *content)
     mock_type(bool);
 }
 
-void __wrap_Transceiver_EventHandler(const event_type *event)
+void __wrap_Transceiver_EventHandler(const event_t *event)
 {
 }
 

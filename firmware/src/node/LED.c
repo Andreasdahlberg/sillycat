@@ -1,7 +1,7 @@
 /**
  * @file   LED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-31 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of LED
  *
  * Detailed description of file.
@@ -160,7 +160,7 @@ void LED_ChangeState(led_state_type state)
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void LED_EventHandler(const event_type *event)
+void LED_EventHandler(const event_t *event)
 {
     switch (event->id)
     {

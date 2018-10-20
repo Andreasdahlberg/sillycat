@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-21 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -84,8 +84,8 @@ static sleep_status_type sleep_status = {0};
 
 static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
-static void RHTAvailable(const event_type *event __attribute__ ((unused)));
-static void CriticalBatteryVoltageHandler(const event_type *event __attribute__ ((unused)));
+static void RHTAvailable(const event_t *event __attribute__ ((unused)));
+static void CriticalBatteryVoltageHandler(const event_t *event __attribute__ ((unused)));
 static bool TimePacketHandler(packet_frame_type *packet);
 static void FillPacket(struct packet_t *packet_p);
 
@@ -246,7 +246,7 @@ static void FillPacket(struct packet_t *packet_p)
     packet_p->timestamp = timestamp;
 }
 
-static void RHTAvailable(const event_type *event __attribute__ ((unused)))
+static void RHTAvailable(const event_t *event __attribute__ ((unused)))
 {
     struct packet_t packet;
 
@@ -255,9 +255,9 @@ static void RHTAvailable(const event_type *event __attribute__ ((unused)))
              COM_PACKET_TYPE_READING, &packet, sizeof(packet));
 }
 
-static void CriticalBatteryVoltageHandler(const event_type *event __attribute__ ((unused)))
+static void CriticalBatteryVoltageHandler(const event_t *event __attribute__ ((unused)))
 {
-    event_type sleep_event = Event_New(EVENT_SLEEP);
+    event_t sleep_event = Event_New(EVENT_SLEEP);
     Event_Trigger(&sleep_event);
 
     /**
@@ -288,7 +288,7 @@ static void NotifyAndEnterSleep(void)
     RTC_SetAlarmTime(&time);
     RTC_EnableAlarm(true);
 
-    event_type event = Event_New(EVENT_SLEEP);
+    event_t event = Event_New(EVENT_SLEEP);
     Event_Trigger(&event);
 
     //Enter sleep mode, execution will continue from this point

@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-11 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -118,7 +118,7 @@ void Sensor_Update(void)
         }
         FIFO_Push(&reading_fifo, &reading);
 
-        event_type event;
+        event_t event;
         event = Event_New(EVENT_RHT_AVAILABLE);
         Event_Trigger(&event);
     }
@@ -144,7 +144,7 @@ bool Sensor_GetReading(sensor_data_type *reading)
 /// @param  *event Pointer to triggered event.
 /// @return None
 ///
-void Sensor_WakeUp(const event_type *event __attribute__ ((unused)))
+void Sensor_WakeUp(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
@@ -158,7 +158,7 @@ void Sensor_WakeUp(const event_type *event __attribute__ ((unused)))
 /// @param  *event Pointer to triggered event.
 /// @return None
 ///
-void Sensor_Sleep(const event_type *event __attribute__ ((unused)))
+void Sensor_Sleep(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 

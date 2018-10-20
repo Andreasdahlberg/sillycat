@@ -1,10 +1,8 @@
 /**
  * @file   Event.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-20 (Last edit)
- * @brief  Implementation of Events
- *
- * Detailed description of file.
+ * @date   2018-10-20 (Last edit)
+ * @brief  Implementation of Event module
  */
 
 /*
@@ -28,10 +26,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include "libDebug.h"
+#include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -43,12 +40,23 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct event_listener_t
+{
+    event_id_t id;
+    event_callback_t callback;
+};
+
+struct module_t
+{
+    uint8_t number_of_listeners;
+    struct event_listener_t listeners[MAX_NR_LISTENERS];
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static uint8_t nr_listeners = 0;
-static event_listener_type listener_pool[MAX_NR_LISTENERS] = {{0}};
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -58,46 +66,35 @@ static event_listener_type listener_pool[MAX_NR_LISTENERS] = {{0}};
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Connect an listener to an event type.
-///
-/// @param  listener Function pointer to an listener function
-/// @param  id Event id to register to
-/// @return None
-///
-void Event_AddListener(event_callback listener, event_id_type id)
+void Event_Init(void)
 {
-    sc_assert(listener != NULL);
-    sc_assert(nr_listeners < MAX_NR_LISTENERS);
-
-    listener_pool[nr_listeners].callback = listener;
-    listener_pool[nr_listeners].id = id;
-    ++nr_listeners;
-
-    return;
+    module = (struct module_t) {0};
 }
 
-///
-/// @brief Notify all listeners connected to the triggered event.
-///
-/// @param  event Pointer to triggered event
-/// @return None
-///
-void Event_Trigger(const event_type *event)
+void Event_AddListener(event_callback_t listener_p, event_id_t id)
 {
-    sc_assert(nr_listeners < MAX_NR_LISTENERS);
+    sc_assert(listener_p != NULL);
+    sc_assert(module.number_of_listeners < ElementsIn(module.listeners));
+
+    module.listeners[module.number_of_listeners].callback = listener_p;
+    module.listeners[module.number_of_listeners].id = id;
+    ++module.number_of_listeners;
+}
+
+void Event_Trigger(const event_t *event_p)
+{
+    sc_assert(event_p != NULL);
 
     uint8_t index;
-    for (index = 0; index < nr_listeners; ++index)
+    for (index = 0; index < module.number_of_listeners; ++index)
     {
-        if (listener_pool[index].id == event->id ||
-                listener_pool[index].id == EVENT_ALL)
+        if (module.listeners[index].id == event_p->id ||
+                module.listeners[index].id == EVENT_ALL)
         {
-            sc_assert(listener_pool[index].callback != NULL);
-            listener_pool[index].callback(event);
+            sc_assert(module.listeners[index].callback != NULL);
+            module.listeners[index].callback(event_p);
         }
     }
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////

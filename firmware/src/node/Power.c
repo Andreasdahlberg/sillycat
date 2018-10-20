@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-11 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of the power management module.
  */
 
@@ -87,7 +87,7 @@ void Power_Update(void)
     return;
 }
 
-void Power_WakeUp(const event_type *event_p __attribute__ ((unused)))
+void Power_WakeUp(const event_t *event_p __attribute__ ((unused)))
 {
     sc_assert(event_p != NULL);
 
@@ -108,14 +108,14 @@ static void BatteryMonitoringSM(void)
             if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
-                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_t event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
             else if (driverCharger_GetBatteryVoltage() < BATTERY_LOW_VOLTAGE_MV)
             {
                 INFO("Low battery voltage[%u mV]", driverCharger_GetBatteryVoltage());
-                event_type event = Event_New(EVENT_BATTERY_LOW);
+                event_t event = Event_New(EVENT_BATTERY_LOW);
                 Event_Trigger(&event);
                 battery_state = POWER_LOW;
             }
@@ -125,14 +125,14 @@ static void BatteryMonitoringSM(void)
             if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
-                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_t event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
             else if (driverCharger_GetBatteryVoltage() < BATTERY_CRITICAL_VOLTAGE_MV)
             {
                 WARNING("Critical battery voltage");
-                event_type event = Event_New(EVENT_BATTERY_CRITICAL);
+                event_t event = Event_New(EVENT_BATTERY_CRITICAL);
                 Event_Trigger(&event);
                 battery_state = POWER_CRITICAL;
             }
@@ -142,7 +142,7 @@ static void BatteryMonitoringSM(void)
             if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
-                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_t event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
@@ -152,7 +152,7 @@ static void BatteryMonitoringSM(void)
             if (driverCharger_IsCharging() == false)
             {
                 INFO("Charging stopped");
-                event_type event = Event_New(EVENT_BATTERY_CHARGING_STOPPED);
+                event_t event = Event_New(EVENT_BATTERY_CHARGING_STOPPED);
                 Event_Trigger(&event);
                 battery_state = POWER_CONNECTED;
             }
@@ -162,7 +162,7 @@ static void BatteryMonitoringSM(void)
             if (driverCharger_IsCharging() == true)
             {
                 INFO("Charging started");
-                event_type event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
+                event_t event = Event_New(EVENT_BATTERY_CHARGING_STARTED);
                 Event_Trigger(&event);
                 battery_state = POWER_CHARGING;
             }
@@ -170,7 +170,7 @@ static void BatteryMonitoringSM(void)
             if (driverCharger_IsConnected() == false)
             {
                 INFO("Charger disconnected");
-                event_type event = Event_New(EVENT_BATTERY_CHARGER_DISCONNECTED);
+                event_t event = Event_New(EVENT_BATTERY_CHARGER_DISCONNECTED);
                 Event_Trigger(&event);
                 battery_state = POWER_NORMAL;
             }

@@ -1,7 +1,7 @@
 /**
  * @file   LED.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-01-25 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Header of LED
  *
  * Detailed description of file.
@@ -57,6 +57,6 @@ typedef enum
 void LED_Init(void);
 void LED_Update(void);
 void LED_ChangeState(led_state_type state);
-void LED_EventHandler(const event_type *event);
+void LED_EventHandler(const event_t *event);
 
 #endif /* LED_H_ */

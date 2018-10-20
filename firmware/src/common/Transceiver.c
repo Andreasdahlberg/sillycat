@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-06 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of Transceiver interface.
  *
  * Detailed description of file.
@@ -248,7 +248,7 @@ bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
 /// @param  *event Pointer to triggered event
 /// @return None
 ///
-void Transceiver_EventHandler(const event_type *event)
+void Transceiver_EventHandler(const event_t *event)
 {
     sc_assert(event != NULL);
 

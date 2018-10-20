@@ -1,7 +1,7 @@
 /**
  * @file   mock_Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-19 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Mock functions for the Transceiver module.
  */
 
@@ -46,7 +46,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 bool __wrap_Transceiver_ReceivePacket(packet_frame_type *packet);
 bool __wrap_Transceiver_SendPacket(uint8_t target, packet_content_type *content);
-void __wrap_Transceiver_EventHandler(const event_type *event);
+void __wrap_Transceiver_EventHandler(const event_t *event);
 void __wrap_Transceiver_Init(void);
 void __wrap_Transceiver_Update(void);
 

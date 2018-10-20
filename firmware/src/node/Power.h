@@ -1,7 +1,7 @@
 /**
  * @file   Power.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-11 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of the power management module.
  */
 
@@ -56,6 +56,6 @@ void Power_Update(void);
  *
  * @param event_p Pointer to triggered event.
  */
-void Power_WakeUp(const event_type *event_p __attribute__ ((unused)));
+void Power_WakeUp(const event_t *event_p __attribute__ ((unused)));
 
 #endif

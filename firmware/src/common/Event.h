@@ -1,10 +1,8 @@
 /**
  * @file   Event.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-10-23 (Last edit)
- * @brief  Header of Event
- *
- * Detailed description of file.
+ * @date   2018-10-20 (Last edit)
+ * @brief  Implementation of Event module
  */
 
 /*
@@ -37,7 +35,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define Event_New(typeid) ((event_type){Timer_GetMilliseconds(), typeid})
+#define Event_New(typeid) ((event_t){Timer_GetMilliseconds(), typeid})
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -54,27 +52,40 @@ typedef enum
     EVENT_BATTERY_CRITICAL,
     EVENT_BATTERY_LOW,
     EVENT_RHT_AVAILABLE
-} event_id_type;
+} event_id_t;
 
 typedef struct
 {
     uint32_t timestamp;
-    event_id_type id;
-} event_type;
+    event_id_t id;
+} event_t;
 
-typedef void (*event_callback)(const event_type *event);
-
-typedef struct
-{
-    event_id_type id;
-    event_callback callback;
-} event_listener_type;
+typedef void (*event_callback_t)(const event_t *event_p);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void Event_AddListener(event_callback listener, event_id_type id);
-void Event_Trigger(const event_type *event);
+/**
+ * Initialize the Event module.
+ */
+void Event_Init(void);
 
-#endif /* EVENT_H_ */
+/**
+ * Connect a listener to an event type.
+ *
+ * @param listener_p Function pointer to a listener function.
+ * @param id         Event id to register to.
+ */
+void Event_AddListener(event_callback_t listener_p, event_id_t id);
+
+/**
+ * Trigger an event.
+ *
+ * This will notify all listeners connected to the triggered event.
+ *
+ * @param event_p Pointer to event to trigger.
+ */
+void Event_Trigger(const event_t *event_p);
+
+#endif
