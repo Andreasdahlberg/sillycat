@@ -24,7 +24,8 @@ mock_env.Append(CPPPATH=[
     '#src/main',
     '#src/main/gui',
     '#src/common',
-    '#src/common/ADC'
+    '#src/common/ADC',
+    '#src/common/timer',
     ])
 
 source = Glob('*.c')
