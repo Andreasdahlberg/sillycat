@@ -95,7 +95,7 @@ void Com_SetPacketHandler(com_packet_handler_t packet_handler,
     module.packet_handlers[packet_type] = packet_handler;
 }
 
-void Com_Send(uint8_t target, uint8_t packet_type, void *data_p, size_t size)
+void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t size)
 
 {
     sc_assert(target != 0);

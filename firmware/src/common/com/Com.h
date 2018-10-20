@@ -1,7 +1,7 @@
 /**
  * @file   Com.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-19 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Implementation of the Communications module.
  */
 
@@ -84,6 +84,6 @@ void Com_SetPacketHandler(com_packet_handler_t packet_handler,
  * @param data_p      Pointer to data to send.
  * @param size        Size of the data.
  */
-void Com_Send(uint8_t target, uint8_t packet_type, void *data_p, size_t size);
+void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t size);
 
 #endif
