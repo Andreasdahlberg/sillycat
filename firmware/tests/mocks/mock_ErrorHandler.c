@@ -1,7 +1,7 @@
 /**
  * @file   mock_ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-19 (Last edit)
+ * @date   2018-10-20 (Last edit)
  * @brief  Mock functions for the ErrorHandler module.
  */
 
@@ -56,6 +56,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void __wrap_ErrorHandler_LogError(uint8_t code, uint8_t information)
 {
+    check_expected(code);
 }
 
 void __wrap_ErrorHandler_Init(void)
