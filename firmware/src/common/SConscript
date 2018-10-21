@@ -3,15 +3,16 @@ import os
 
 Import(['*'])
 
-modules = ['ADC', 'timer', 'com', 'event']
+modules = ['ADC', 'timer', 'com', 'event', 'transceiver']
 module_objects = []
 
 source = Glob('*.c')
 env.Append(CPPPATH=[
+    '#src/common',
     '#src/common/com',
     '#src/common/event',
+    '#src/common/transceiver',
     '#src/utility/FIFO',
-    '#src/common',
     '#src/{}'.format(target)
 ])
 

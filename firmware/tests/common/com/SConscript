@@ -4,6 +4,7 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/common/com',
+    '#src/common/transceiver',
     '#tests/common/com',
 ])
 
