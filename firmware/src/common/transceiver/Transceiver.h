@@ -2,9 +2,7 @@
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-10-21 (Last edit)
- * @brief  Header for Transceiver interface.
- *
- * Detailed description of file.
+ * @brief  Implementation of the Transceiver interface.
  */
 
 /*
@@ -31,7 +29,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "libRFM69.h"
 #include "RTC.h"
 #include "Event.h"
 

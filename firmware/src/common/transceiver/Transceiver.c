@@ -2,9 +2,7 @@
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2018-10-21 (Last edit)
- * @brief  Implementation of Transceiver interface.
- *
- * Detailed description of file.
+ * @brief  Implementation of the Transceiver interface.
  */
 
 /*
@@ -28,22 +26,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
-#include <util/delay.h>
 #include <string.h>
-
 #include "libDebug.h"
 #include "libRFM69.h"
-
 #include "Timer.h"
-#include "Transceiver.h"
 #include "Config.h"
 #include "ErrorHandler.h"
 #include "FIFO.h"
-
-#include "RFM69Registers.h"
+#include "Transceiver.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
