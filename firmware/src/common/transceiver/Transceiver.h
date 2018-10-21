@@ -101,7 +101,7 @@ bool Transceiver_ReceivePacket(packet_frame_type *packet_p);
  *
  * @return [description]
  */
-bool Transceiver_SendPacket(uint8_t target, packet_content_type *content_p);
+bool Transceiver_SendPacket(uint8_t target, const packet_content_type *content_p);
 
 /**
  * Handle events.

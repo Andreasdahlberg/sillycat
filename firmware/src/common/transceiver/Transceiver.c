@@ -91,7 +91,7 @@ static bool IsActive(void);
 static bool PacketToSend(void);
 
 #ifdef DEBUG_ENABLE
-static void DumpPacket(packet_frame_type *packet);
+static void DumpPacket(const packet_frame_type *packet_p);
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -166,23 +166,23 @@ void Transceiver_Update(void)
     }
 }
 
-bool Transceiver_ReceivePacket(packet_frame_type *packet)
+bool Transceiver_ReceivePacket(packet_frame_type *packet_p)
 {
-    sc_assert(packet != NULL);
+    sc_assert(packet_p != NULL);
 
     bool status;
-    status = FIFO_Pop(&rx_packet_fifo, packet);
+    status = FIFO_Pop(&rx_packet_fifo, packet_p);
 
     return status;
 }
 
-bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
+bool Transceiver_SendPacket(uint8_t target, const packet_content_type *content_p)
 {
-    sc_assert(content != NULL);
+    sc_assert(content_p != NULL);
     sc_assert(target != 0);
 
     bool status = false;
-    if (content->size <= CONTENT_DATA_SIZE && !FIFO_IsFull(&tx_packet_fifo))
+    if (content_p->size <= CONTENT_DATA_SIZE && !FIFO_IsFull(&tx_packet_fifo))
     {
         packet_frame_type packet;
 
@@ -190,12 +190,12 @@ bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
         packet.header.source = Config_GetAddress();
         packet.header.rssi = 0;
         packet.header.total_size = sizeof(packet_header_type) + 8 +
-                                   content->size; //TODO: sizeof or define!
+                                   content_p->size; //TODO: sizeof or define!
 
-        packet.content.timestamp = content->timestamp;
-        packet.content.type = content->type;
-        packet.content.size = content->size;
-        memcpy(packet.content.data, content->data, content->size);
+        packet.content.timestamp = content_p->timestamp;
+        packet.content.type = content_p->type;
+        packet.content.size = content_p->size;
+        memcpy(packet.content.data, content_p->data, content_p->size);
 
         status = FIFO_Push(&tx_packet_fifo, &packet);
     }
@@ -252,11 +252,11 @@ static bool PacketToSend(void)
 static bool HandlePayload(void)
 {
     packet_frame_type packet;
-    uint8_t *packet_ptr = (uint8_t *)&packet;
+    uint8_t *packet_p = (uint8_t *)&packet;
 
     // Read the first byte containing the payload length.
-    libRFM69_ReadFromFIFO(packet_ptr, 1);
-    ++packet_ptr;
+    libRFM69_ReadFromFIFO(packet_p, 1);
+    ++packet_p;
 
     if (packet.header.total_size > RFM_FIFO_SIZE - 1)
     {
@@ -267,7 +267,7 @@ static bool HandlePayload(void)
     }
 
     // Read the payload.
-    libRFM69_ReadFromFIFO(packet_ptr, packet.header.total_size);
+    libRFM69_ReadFromFIFO(packet_p, packet.header.total_size);
 
     packet.header.rssi = libRFM69_GetRSSI();
 
@@ -379,21 +379,21 @@ static transceiver_state_type SendingStateMachine(void)
 }
 
 #ifdef DEBUG_ENABLE
-static void DumpPacket(packet_frame_type *packet)
+static void DumpPacket(const packet_frame_type *packet_p)
 {
     DEBUG("<PCK>");
-    DEBUG("%u,", packet->header.target);
-    DEBUG("%u,", packet->header.source);
-    DEBUG("%d,", packet->header.rssi);
-    DEBUG("%u,", packet->header.total_size);
+    DEBUG("%u,", packet_p->header.target);
+    DEBUG("%u,", packet_p->header.source);
+    DEBUG("%d,", packet_p->header.rssi);
+    DEBUG("%u,", packet_p->header.total_size);
     DEBUG("20%02u-%02u-%02u %02u:%02u:%02u,",
-          packet->content.timestamp.year,
-          packet->content.timestamp.month,
-          packet->content.timestamp.date,
-          packet->content.timestamp.hour,
-          packet->content.timestamp.minute,
-          packet->content.timestamp.second);
-    DEBUG("%u,", packet->content.type);
-    DEBUG("%u\r\n", packet->content.size);
+          packet_p->content.timestamp.year,
+          packet_p->content.timestamp.month,
+          packet_p->content.timestamp.date,
+          packet_p->content.timestamp.hour,
+          packet_p->content.timestamp.minute,
+          packet_p->content.timestamp.second);
+    DEBUG("%u,", packet_p->content.type);
+    DEBUG("%u\r\n", packet_p->content.size);
 }
 #endif
