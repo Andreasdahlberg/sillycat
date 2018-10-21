@@ -28,6 +28,7 @@ mock_env.Append(CPPPATH=[
     '#src/common/timer',
     '#src/common/event',
     '#src/common/transceiver',
+    '#src/utility/FIFO'
     ])
 
 source = Glob('*.c')
