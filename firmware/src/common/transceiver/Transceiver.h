@@ -71,10 +71,49 @@ typedef struct
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the transceiver.
+ *
+ * The transceiver hardware is configured with device specific parameters.
+ */
 void Transceiver_Init(void);
+
+/**
+ * Update the internal transceiver state machine.
+ */
 void Transceiver_Update(void);
-bool Transceiver_ReceivePacket(packet_frame_type *packet);
-bool Transceiver_SendPacket(uint8_t target, packet_content_type *content);
+
+/**
+ * Receive a packet.
+ *
+ * @param packet_p Pointer to location where the packet will be stored.
+ *
+ * @return True if a packet was received, otherwise false.
+ */
+bool Transceiver_ReceivePacket(packet_frame_type *packet_p);
+
+/**
+ * Send a packet.
+ *
+ * The packet is added to the send queue and is sent when the transceiver
+ * is ready.
+ *
+ * @param target    Address of target.
+ * @param content_p Pointer to packet content. A complete packet with a header
+ *                  will be created from this content.
+ *
+ * @return [description]
+ */
+bool Transceiver_SendPacket(uint8_t target, packet_content_type *content_p);
+
+/**
+ * Handle events.
+ *
+ * The function currently handles the sleep and wakeup events. All other events
+ * are silently ignored.
+ *
+ * @param event_p Pointer to triggered event.
+ */
 void Transceiver_EventHandler(const event_t *event_p);
 
 #endif

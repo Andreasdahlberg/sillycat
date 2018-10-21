@@ -107,12 +107,6 @@ static void DumpPacket(packet_frame_type *packet);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Set the transceiver to an known state.
-///
-/// @param  None
-/// @return None
-///
 void Transceiver_Init(void)
 {
     libRFM69_Init();
@@ -161,15 +155,8 @@ void Transceiver_Init(void)
     transceiver_state = TR_STATE_LISTENING;
 
     INFO("Transceiver initiated");
-    return;
 }
 
-///
-/// @brief Update the internal transceiver state machine.
-///
-/// @param  None
-/// @return None
-///
 void Transceiver_Update(void)
 {
     switch (transceiver_state)
@@ -186,15 +173,8 @@ void Transceiver_Update(void)
             sc_assert_fail();
             break;
     }
-    return;
 }
 
-///
-/// @brief Receive a packet
-///
-/// @param  *packet Pointer to packet.
-/// @return True if a packet was available, otherwise False.
-///
 bool Transceiver_ReceivePacket(packet_frame_type *packet)
 {
     sc_assert(packet != NULL);
@@ -205,16 +185,6 @@ bool Transceiver_ReceivePacket(packet_frame_type *packet)
     return status;
 }
 
-///
-/// @brief Send a packet.
-///
-/// The packet is added to the send queue and is sent when the transceiver is ready.
-///
-/// @param  target Address of target.
-/// @param  *content Pointer to packet content. A complete packet with a header
-///                  will be created from this content.
-/// @return None
-///
 bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
 {
     sc_assert(content != NULL);
@@ -242,12 +212,6 @@ bool Transceiver_SendPacket(uint8_t target, packet_content_type *content)
     return status;
 }
 
-///
-/// @brief Handle events
-///
-/// @param  *event_p Pointer to triggered event
-/// @return None
-///
 void Transceiver_EventHandler(const event_t *event_p)
 {
     sc_assert(event_p != NULL);
@@ -277,7 +241,6 @@ void Transceiver_EventHandler(const event_t *event_p)
             //Do nothing if an unknown event is received
             break;
     }
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
