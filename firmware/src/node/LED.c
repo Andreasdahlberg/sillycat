@@ -1,7 +1,7 @@
 /**
  * @file   LED.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-21 (Last edit)
  * @brief  Implementation of LED
  *
  * Detailed description of file.
@@ -157,12 +157,12 @@ void LED_ChangeState(led_state_type state)
 ///
 /// @brief Handle events
 ///
-/// @param  *event Pointer to triggered event
+/// @param  *event_p Pointer to triggered event
 /// @return None
 ///
-void LED_EventHandler(const event_t *event)
+void LED_EventHandler(const event_t *event_p)
 {
-    switch (event->id)
+    switch (Event_GetId(event_p))
     {
         case EVENT_SLEEP:
             LED_ChangeState(LED_STATE_SLEEPING);
