@@ -208,6 +208,7 @@ modules = [
     os.path.join('main', 'driver', 'MCUTemperature'),
     os.path.join('common', 'timer'),
     os.path.join('common', 'com'),
+    os.path.join('common', 'event'),
 ]
 
 tests = []
