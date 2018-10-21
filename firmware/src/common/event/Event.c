@@ -1,7 +1,7 @@
 /**
  * @file   Event.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-21 (Last edit)
  * @brief  Implementation of Event module
  */
 
@@ -95,6 +95,20 @@ void Event_Trigger(const event_t *event_p)
             module.listeners[index].callback(event_p);
         }
     }
+}
+
+event_id_t Event_GetId(const event_t *event_p)
+{
+    sc_assert(event_p != NULL);
+
+    return event_p->id;
+}
+
+uint32_t Event_GetTimestamp(const event_t *event_p)
+{
+    sc_assert(event_p != NULL);
+
+    return event_p->timestamp;
 }
 
 //////////////////////////////////////////////////////////////////////////

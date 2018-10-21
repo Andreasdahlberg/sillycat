@@ -1,7 +1,7 @@
 /**
  * @file   Event.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-21 (Last edit)
  * @brief  Implementation of Event module
  */
 
@@ -51,7 +51,8 @@ typedef enum
     EVENT_BATTERY_CHARGER_DISCONNECTED,
     EVENT_BATTERY_CRITICAL,
     EVENT_BATTERY_LOW,
-    EVENT_RHT_AVAILABLE
+    EVENT_RHT_AVAILABLE,
+    EVENT_NR_EVENTS
 } event_id_t;
 
 typedef struct
@@ -87,5 +88,23 @@ void Event_AddListener(event_callback_t listener_p, event_id_t id);
  * @param event_p Pointer to event to trigger.
  */
 void Event_Trigger(const event_t *event_p);
+
+/**
+ * Get event ID.
+ *
+ * @param event_p Pointer to event struct.
+ *
+ * @return Event ID.
+ */
+event_id_t Event_GetId(const event_t *event_p);
+
+/**
+ * Get the time when the event was triggered.
+ *
+ * @param event_p Pointer to event struct.
+ *
+ * @return Event trigger timestamp.
+ */
+uint32_t Event_GetTimestamp(const event_t *event_p);
 
 #endif
