@@ -54,3 +54,4 @@
 *.ms14 (Security copy)
 compile_commands.json
 *.ewprj (Security copy)
+*.orig
