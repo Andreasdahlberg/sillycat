@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-21 (Last edit)
+ * @date   2018-10-22 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -69,11 +69,21 @@ typedef enum
     TR_STATE_LISTENING_DONE,
 } transceiver_listening_state_type;
 
+struct module_t
+{
+    struct
+    {
+        transceiver_state_type transceiver;
+        transceiver_sending_state_type sending;
+        transceiver_listening_state_type listening;
+    } state;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static transceiver_state_type transceiver_state = TR_STATE_NO_INIT;
+static struct module_t module;
 
 static packet_frame_type tx_packet_buffer[TX_PACKET_FIFO_SIZE];
 static packet_frame_type rx_packet_buffer[RX_PACKET_FIFO_SIZE];
@@ -100,6 +110,8 @@ static void DumpPacket(const packet_frame_type *packet_p);
 
 void Transceiver_Init(void)
 {
+    module = (struct module_t) { {.transceiver = TR_STATE_LISTENING}};
+
     libRFM69_Init();
     libRFM69_EnableEncryption(false);
     libRFM69_EnableSequencer(true);
@@ -143,21 +155,19 @@ void Transceiver_Init(void)
     tx_packet_fifo = FIFO_New(tx_packet_buffer);
     rx_packet_fifo = FIFO_New(rx_packet_buffer);
 
-    transceiver_state = TR_STATE_LISTENING;
-
     INFO("Transceiver initiated");
 }
 
 void Transceiver_Update(void)
 {
-    switch (transceiver_state)
+    switch (module.state.transceiver)
     {
         case TR_STATE_LISTENING:
-            transceiver_state = ListeningStateMachine();
+            module.state.transceiver = ListeningStateMachine();
             break;
 
         case TR_STATE_SENDING:
-            transceiver_state = SendingStateMachine();
+            module.state.transceiver = SendingStateMachine();
             break;
 
         default:
@@ -240,7 +250,7 @@ void Transceiver_EventHandler(const event_t *event_p)
 
 static bool IsActive(void)
 {
-    return (transceiver_state == TR_STATE_SENDING ||
+    return (module.state.transceiver == TR_STATE_SENDING ||
             libRFM69_IsPayloadReady() || PacketToSend());
 }
 
@@ -280,16 +290,15 @@ static bool HandlePayload(void)
 
 static transceiver_state_type ListeningStateMachine(void)
 {
-    static transceiver_listening_state_type state = TR_STATE_LISTENING_INIT;
     transceiver_state_type next_state = TR_STATE_LISTENING;
 
-    switch (state)
+    switch (module.state.listening)
     {
         case TR_STATE_LISTENING_INIT:
             libRFM69_SetMode(RFM_RECEIVER);
             libRFM69_WaitForModeReady();
             INFO("Next state: TR_STATE_LISTENING_WAITING");
-            state = TR_STATE_LISTENING_WAITING;
+            module.state.listening = TR_STATE_LISTENING_WAITING;
             break;
 
         case TR_STATE_LISTENING_WAITING:
@@ -304,7 +313,7 @@ static transceiver_state_type ListeningStateMachine(void)
                 }
 
                 INFO("Next state: TR_STATE_LISTENING_INIT");
-                state = TR_STATE_LISTENING_INIT;
+                module.state.listening = TR_STATE_LISTENING_INIT;
 
             }
             else if (libRFM69_IsRxTimeoutFlagSet())
@@ -315,7 +324,7 @@ static transceiver_state_type ListeningStateMachine(void)
             else if (PacketToSend())
             {
                 INFO("Next state: SENDING");
-                state = TR_STATE_LISTENING_INIT;
+                module.state.listening = TR_STATE_LISTENING_INIT;
                 next_state = TR_STATE_SENDING;
             }
             break;
@@ -329,15 +338,14 @@ static transceiver_state_type ListeningStateMachine(void)
 
 static transceiver_state_type SendingStateMachine(void)
 {
-    static transceiver_sending_state_type state = TR_STATE_SENDING_INIT;
     transceiver_state_type next_state = TR_STATE_SENDING;
 
-    switch (state)
+    switch (module.state.sending)
     {
         case TR_STATE_SENDING_INIT:
             // Change to standby mode before starting to write to the FIFO.
             libRFM69_SetMode(RFM_STANDBY);
-            state = TR_STATE_SENDING_WRITING;
+            module.state.sending = TR_STATE_SENDING_WRITING;
             break;
 
         case TR_STATE_SENDING_WRITING:
@@ -352,12 +360,12 @@ static transceiver_state_type SendingStateMachine(void)
                                          packet.content.size + 8);
 
                     libRFM69_SetMode(RFM_TRANSMITTER);
-                    state = TR_STATE_SENDING_TRANSMITTING;
+                    module.state.sending = TR_STATE_SENDING_TRANSMITTING;
                 }
                 else
                 {
                     WARNING("No packets available, aborting TX sequence.");
-                    state = TR_STATE_SENDING_INIT;
+                    module.state.sending = TR_STATE_SENDING_INIT;
                     next_state = TR_STATE_LISTENING;
                 }
             }
@@ -366,7 +374,7 @@ static transceiver_state_type SendingStateMachine(void)
         case TR_STATE_SENDING_TRANSMITTING:
             if (libRFM69_IsPacketSent())
             {
-                state = TR_STATE_SENDING_INIT;
+                module.state.sending = TR_STATE_SENDING_INIT;
                 next_state = TR_STATE_LISTENING;
             }
             break;
