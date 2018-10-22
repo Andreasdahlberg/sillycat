@@ -209,6 +209,7 @@ modules = [
     os.path.join('common', 'timer'),
     os.path.join('common', 'com'),
     os.path.join('common', 'event'),
+    os.path.join('common', 'transceiver'),
 ]
 
 tests = []

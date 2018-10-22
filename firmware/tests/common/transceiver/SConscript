@@ -1,0 +1,76 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/common',
+    '#src/common/event',
+    '#src/common/timer',
+    '#src/common/transceiver',
+    '#src/utility/FIFO',
+    '#tests/common/transceiver',
+])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=libRFM69_Init',
+    '-Wl,--wrap=libRFM69_EnableEncryption',
+    '-Wl,--wrap=libRFM69_EnableSequencer',
+    '-Wl,--wrap=libRFM69_EnableListenMode',
+    '-Wl,--wrap=libRFM69_SetPacketRxDelay',
+    '-Wl,--wrap=libRFM69_SetMode',
+    '-Wl,--wrap=libRFM69_WaitForModeReady',
+    '-Wl,--wrap=libRFM69_SetPreambleLength',
+    '-Wl,--wrap=libRFM69_SetLNAGain',
+    '-Wl,--wrap=libRFM69_SetLNAInputImpedance',
+    '-Wl,--wrap=libRFM69_EnableAFCLowBeta',
+    '-Wl,--wrap=libRFM69_EnableContinuousDAGC',
+    '-Wl,--wrap=libRFM69_SetBitRate',
+    '-Wl,--wrap=libRFM69_SetDataMode',
+    '-Wl,--wrap=libRFM69_SetModulationType',
+    '-Wl,--wrap=libRFM69_SetModulationShaping',
+    '-Wl,--wrap=libRFM69_SetFrequencyDeviation',
+    '-Wl,--wrap=libRFM69_SetCarrierFrequency',
+    '-Wl,--wrap=libRFM69_EnableSyncWordGeneration',
+    '-Wl,--wrap=libRFM69_SetFIFOFillCondition',
+    '-Wl,--wrap=libRFM69_SetRSSIThreshold',
+    '-Wl,--wrap=libRFM69_SetSyncWordSize',
+    '-Wl,--wrap=libRFM69_SetSyncWord',
+    '-Wl,--wrap=libRFM69_SetTXStartCondition',
+    '-Wl,--wrap=libRFM69_SetNodeAddress',
+    '-Wl,--wrap=libRFM69_SetBroadcastAddress',
+    '-Wl,--wrap=libRFM69_SetAddressFiltering',
+    '-Wl,--wrap=libRFM69_SetPacketFormat',
+    '-Wl,--wrap=libRFM69_EnableCRC',
+    '-Wl,--wrap=libRFM69_EnableCRCAutoClear',
+    '-Wl,--wrap=libRFM69_SetRxTimeout',
+    '-Wl,--wrap=libRFM69_SetRSSIThresholdTimeout',
+    '-Wl,--wrap=libRFM69_SetClockOutFrequency',
+    '-Wl,--wrap=libRFM69_EnableOCP',
+    '-Wl,--wrap=libRFM69_SetPowerAmplifierMode',
+    '-Wl,--wrap=libRFM69_EnableHighPowerSetting',
+    '-Wl,--wrap=libRFM69_SetPowerLevel',
+    '-Wl,--wrap=libRFM69_SetAESKey',
+    '-Wl,--wrap=libRFM69_IsPayloadReady',
+    '-Wl,--wrap=libRFM69_ReadFromFIFO',
+    '-Wl,--wrap=libRFM69_ClearFIFO',
+    '-Wl,--wrap=libRFM69_GetRSSI',
+    '-Wl,--wrap=libRFM69_IsRxTimeoutFlagSet',
+    '-Wl,--wrap=libRFM69_RestartRx',
+    '-Wl,--wrap=libRFM69_IsModeReady',
+    '-Wl,--wrap=libRFM69_WriteToFIFO',
+    '-Wl,--wrap=libRFM69_IsPacketSent',
+    '-Wl,--wrap=Config_GetNetworkId',
+    '-Wl,--wrap=Config_GetAddress',
+    '-Wl,--wrap=Config_GetBroadcastAddress',
+    '-Wl,--wrap=Config_GetAESKey',
+    '-Wl,--wrap=FIFO_IsFull',
+    '-Wl,--wrap=FIFO_IsEmpty',
+    '-Wl,--wrap=FIFO_Push',
+    '-Wl,--wrap=FIFO_Pop',
+    '-Wl,--wrap=Event_GetId'
+])
+
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
