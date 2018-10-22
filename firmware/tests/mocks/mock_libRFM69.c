@@ -1,7 +1,7 @@
 /**
  * @file   mock_libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-21 (Last edit)
+ * @date   2018-10-22 (Last edit)
  * @brief  Mock functions for the RFM69HW driver.
  */
 
@@ -130,6 +130,7 @@ bool __wrap_libRFM69_ClearFIFOOverrun(void)
 
 void __wrap_libRFM69_SetMode(libRFM69_mode_type mode)
 {
+    check_expected(mode);
 }
 
 void __wrap_libRFM69_Reset(void)
@@ -174,7 +175,7 @@ void __wrap_libRFM69_SetPreambleLength(uint16_t length)
 
 bool __wrap_libRFM69_SetRSSIThresholdTimeout(uint16_t timeout_ms)
 {
-    mock_type(bool);
+    false;
 }
 
 int8_t __wrap_libRFM69_GetOutputPower(void)
@@ -211,6 +212,7 @@ void __wrap_libRFM69_InitHW(void)
 
 void __wrap_libRFM69_RestartRx(void)
 {
+    function_called();
 }
 
 void __wrap_libRFM69_Update(void)
@@ -236,7 +238,7 @@ void __wrap_libRFM69_EnableCRCAutoClear(bool enable)
 
 bool __wrap_libRFM69_SetRxTimeout(uint16_t timeout_ms)
 {
-    mock_type(bool);
+    true;
 }
 
 bool __wrap_libRFM69_IsAFCLowBetaEnabled(void)
@@ -246,7 +248,7 @@ bool __wrap_libRFM69_IsAFCLowBetaEnabled(void)
 
 bool __wrap_libRFM69_SetSyncWord(const uint8_t *sync_word, uint8_t length)
 {
-    mock_type(bool);
+    true;
 }
 
 void __wrap_libRFM69_EnableListenMode(bool enabled)
