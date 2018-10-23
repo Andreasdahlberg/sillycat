@@ -1,7 +1,7 @@
 /**
  * @file   test_Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-22 (Last edit)
+ * @date   2018-10-23 (Last edit)
  * @brief  Test suite for the Transceiver interface.
  */
 
@@ -61,10 +61,29 @@ static void PrepareTransceiverInitMocks(void)
     will_return(__wrap_Config_GetAESKey, &aes_key);
 }
 
+static void PrepareSendingState(void)
+{
+    expect_any(__wrap_libRFM69_SetMode, mode);
+    Transceiver_Update();
+
+    will_return(__wrap_libRFM69_IsPayloadReady, false);
+    will_return(__wrap_libRFM69_IsRxTimeoutFlagSet, false);
+    will_return(__wrap_FIFO_IsEmpty, false);
+    Transceiver_Update();
+}
+
 static int Setup(void **state)
 {
     PrepareTransceiverInitMocks();
     Transceiver_Init();
+
+    return 0;
+}
+
+static int SetupSending(void **state)
+{
+    Setup(state);
+    PrepareSendingState();
 
     return 0;
 }
@@ -236,6 +255,75 @@ static void test_Transceiver_Update_PacketToSend(void **state)
     Transceiver_Update();
 }
 
+static void test_Transceiver_Update_SendingInit(void **state)
+{
+    expect_value(__wrap_libRFM69_SetMode, mode, RFM_STANDBY);
+    Transceiver_Update();
+}
+
+static void test_Transceiver_Update_SendingModeNotReady(void **state)
+{
+    /* Change to writing state. */
+    expect_any(__wrap_libRFM69_SetMode, mode);
+    Transceiver_Update();
+
+    will_return(__wrap_libRFM69_IsModeReady, false);
+    Transceiver_Update();
+
+    /* Call update again to make sure that the state has not changed. */
+    will_return(__wrap_libRFM69_IsModeReady, false);
+    Transceiver_Update();
+}
+
+static void test_Transceiver_Update_SendingNoPacket(void **state)
+{
+    /* Change to writing state. */
+    expect_any(__wrap_libRFM69_SetMode, mode);
+    Transceiver_Update();
+
+    will_return(__wrap_libRFM69_IsModeReady, true);
+    will_return(__wrap_FIFO_Pop, false);
+    Transceiver_Update();
+
+    /**
+     * Call update so that we can determine if the transmit sequence was
+     * aborted by checking if the transceiver is set to receive mode.
+     */
+    expect_value(__wrap_libRFM69_SetMode, mode, RFM_RECEIVER);
+    Transceiver_Update();
+}
+
+static void test_Transceiver_Update_SendingPacket(void **state)
+{
+    /* Change to writing state. */
+    expect_any(__wrap_libRFM69_SetMode, mode);
+    Transceiver_Update();
+
+    will_return(__wrap_libRFM69_IsModeReady, true);
+    will_return(__wrap_FIFO_Pop, true);
+    /* These return values are not used right now. */
+    will_return_always(__wrap_libRFM69_WriteToFIFO, 0);
+    expect_value(__wrap_libRFM69_SetMode, mode, RFM_TRANSMITTER);
+    Transceiver_Update();
+
+    /**
+     * Call twice to make sure that the state is unchanged if the packet is
+     * not sent.
+     */
+    will_return(__wrap_libRFM69_IsPacketSent, false);
+    Transceiver_Update();
+    will_return(__wrap_libRFM69_IsPacketSent, true);
+    Transceiver_Update();
+
+    /**
+     * Call update so that we can determine if the transmit sequence is done
+     * and the listening sequence is started by checking if the transceiver is
+     * set to receive mode.
+     */
+    expect_value(__wrap_libRFM69_SetMode, mode, RFM_RECEIVER);
+    Transceiver_Update();
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -262,6 +350,10 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_Transceiver_Update_PayloadReadyFullFIFO, Setup),
         cmocka_unit_test_setup(test_Transceiver_Update_RxTimeout, Setup),
         cmocka_unit_test_setup(test_Transceiver_Update_PacketToSend, Setup),
+        cmocka_unit_test_setup(test_Transceiver_Update_SendingInit, SetupSending),
+        cmocka_unit_test_setup(test_Transceiver_Update_SendingModeNotReady, SetupSending),
+        cmocka_unit_test_setup(test_Transceiver_Update_SendingNoPacket, SetupSending),
+        cmocka_unit_test_setup(test_Transceiver_Update_SendingPacket, SetupSending)
     };
 
     if (argc >= 2)
