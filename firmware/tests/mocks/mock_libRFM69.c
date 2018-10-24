@@ -1,7 +1,7 @@
 /**
  * @file   mock_libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-22 (Last edit)
+ * @date   2018-10-24 (Last edit)
  * @brief  Mock functions for the RFM69HW driver.
  */
 
@@ -32,6 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmocka.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "mock_libRFM69.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,6 +95,13 @@ void __wrap_libRFM69_Init(void)
 
 uint8_t __wrap_libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length)
 {
+    uint8_t *mock_data_p = mock_ptr_type(uint8_t *);
+
+    if (mock_data_p != NULL)
+    {
+        memcpy(data, mock_data_p, max_length);
+    }
+
     mock_type(uint8_t);
 }
 
@@ -318,6 +326,7 @@ bool __wrap_libRFM69_IsFIFOLevel(void)
 
 void __wrap_libRFM69_ClearFIFO(void)
 {
+    function_called();
 }
 
 void __wrap_libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)

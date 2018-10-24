@@ -1,7 +1,7 @@
 /**
  * @file   test_Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-23 (Last edit)
+ * @date   2018-10-24 (Last edit)
  * @brief  Test suite for the Transceiver interface.
  */
 
@@ -55,6 +55,7 @@ static char aes_key[17];
 static void PrepareTransceiverInitMocks(void)
 {
     expect_any(__wrap_libRFM69_SetMode, mode);
+    expect_function_call(__wrap_libRFM69_ClearFIFO);
     will_return(__wrap_Config_GetNetworkId, &network_id);
     will_return(__wrap_Config_GetAddress, 1);
     will_return(__wrap_Config_GetBroadcastAddress, 255);
@@ -175,6 +176,25 @@ static void test_Transceiver_EventHandler_Sleep(void **state)
     Transceiver_EventHandler(&dummy_event);
 }
 
+static void test_Transceiver_EventHandler_SleepWhenActive(void **state)
+{
+    const event_t dummy_event;
+
+    will_return(__wrap_Event_GetId, EVENT_SLEEP);
+    will_return(__wrap_libRFM69_IsPayloadReady, true);
+
+    /**
+     * Since the transceiver is active we expect a call to
+     * 'Transceiver_Update()' where the mode will be set.
+     */
+    expect_value(__wrap_libRFM69_SetMode, mode, RFM_RECEIVER);
+
+    will_return_maybe(__wrap_libRFM69_IsPayloadReady, false);
+    will_return_maybe(__wrap_FIFO_IsEmpty, true);
+    expect_value(__wrap_libRFM69_SetMode, mode, RFM_SLEEP);
+    Transceiver_EventHandler(&dummy_event);
+}
+
 static void test_Transceiver_EventHandler_WakeUp(void **state)
 {
     const event_t dummy_event;
@@ -221,7 +241,20 @@ static void test_Transceiver_Update_PayloadReady(void **state)
 
 static void test_Transceiver_Update_PayloadReadyInvalidSize(void **state)
 {
-    skip();
+    packet_frame_type invalid_packet;
+    invalid_packet.header.total_size = RFM_FIFO_SIZE;
+
+    expect_any(__wrap_libRFM69_SetMode, mode);
+    Transceiver_Update();
+
+    will_return(__wrap_libRFM69_IsPayloadReady, true);
+    expect_any(__wrap_libRFM69_SetMode, mode);
+
+    will_return(__wrap_libRFM69_ReadFromFIFO, (uint8_t *)&invalid_packet);
+    will_return(__wrap_libRFM69_ReadFromFIFO, 1);
+    expect_function_call(__wrap_libRFM69_ClearFIFO);
+
+    Transceiver_Update();
 }
 
 static void test_Transceiver_Update_PayloadReadyFullFIFO(void **state)
@@ -342,6 +375,7 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_Transceiver_SendPacket, Setup),
         cmocka_unit_test_setup(test_Transceiver_EventHandler_NULL, Setup),
         cmocka_unit_test_setup(test_Transceiver_EventHandler_Sleep, Setup),
+        cmocka_unit_test_setup(test_Transceiver_EventHandler_SleepWhenActive, Setup),
         cmocka_unit_test_setup(test_Transceiver_EventHandler_WakeUp, Setup),
         cmocka_unit_test_setup(test_Transceiver_EventHandler_Unknown, Setup),
         cmocka_unit_test_setup(test_Transceiver_Update_Listening, Setup),
