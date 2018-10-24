@@ -109,18 +109,8 @@ static void Update(struct sensor_t *super)
 
     if (Timer_TimeDifference(self->timer) > SAMPLE_PERIOD_MS)
     {
-        int16_t temperature;
-
-        if (GetTemperature(self, &temperature))
-        {
-            self->base.value = temperature;
-            self->base.valid = true;
-        }
-        else
-        {
-            self->base.valid = false;
-        }
-
+        GetTemperature(self, &self->base.value);
+        self->base.valid = true;
         self->timer = Timer_GetMilliseconds();
     }
 }
