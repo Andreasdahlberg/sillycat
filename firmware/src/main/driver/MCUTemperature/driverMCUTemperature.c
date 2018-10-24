@@ -1,7 +1,7 @@
 /**
  * @file   driverMCUTemperature.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-10-24 (Last edit)
  * @brief  MCU temperature driver
  *
  * Driver for the internal MCU temperature sensor.
@@ -89,6 +89,7 @@ static struct mcu_sensor_t mcu_sensor =
 void driverMCUTemperature_Init(void)
 {
     ADC_InitChannel(&mcu_sensor.adc.channel, mcu_sensor.adc.index);
+    mcu_sensor.timer = 0;
 
     INFO("MCU temperature sensor initialized");
 }
