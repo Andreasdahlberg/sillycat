@@ -1,7 +1,7 @@
 /**
  * @file   test_Encoder.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2018-10-25 (Last edit)
  * @brief  Test suite for the Encoder module.
  */
 
@@ -89,6 +89,18 @@ static void FakeExtendedPushCallback(void)
     function_called();
 }
 
+static void SetCallbacks(void)
+{
+    struct encoder_callbacks_t callbacks =
+    {
+        .right = FakeRightCallback,
+        .left = FakeLeftCallback,
+        .brief_push = FakeBriefPushCallback,
+        .extended_push = FakeExtendedPushCallback
+    };
+    Encoder_SetCallbacks(&callbacks);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
@@ -108,19 +120,14 @@ static void test_Encoder_Init(void **state)
  */
 static void test_Encoder_Init_ClearCallbacks(void **state)
 {
-    struct encoder_callbacks_t callbacks =
-    {
-        .right = FakeRightCallback,
-        .left = FakeLeftCallback,
-        .brief_push = FakeBriefPushCallback,
-        .extended_push = FakeExtendedPushCallback
-    };
-    Encoder_SetCallbacks(&callbacks);
+    SetCallbacks();
 
     expect_function_call(__wrap_driverPEC11_Init);
     Encoder_Init();
 
+    struct encoder_callbacks_t callbacks;
     callbacks = Encoder_GetCallbacks();
+
     assert_null(callbacks.right);
     assert_null(callbacks.left);
     assert_null(callbacks.brief_push);
@@ -162,6 +169,42 @@ static void test_Encoder_Update_NoCallbacks(void **state)
     Encoder_Update();
 }
 
+static void test_Encoder_Update_NoInput(void **state)
+{
+    SetCallbacks();
+
+    will_return(__wrap_driverPEC11_PopRightRotation, false);
+    will_return(__wrap_driverPEC11_PopLeftRotation, false);
+    will_return(__wrap_driverPEC11_PopBriefPush, false);
+    will_return(__wrap_driverPEC11_PopExtendedPush, false);
+
+    Encoder_Update();
+}
+
+static void test_Encoder_Update(void **state)
+{
+    SetCallbacks();
+
+    will_return(__wrap_driverPEC11_PopRightRotation, true);
+    expect_function_call(FakeRightCallback);
+    Encoder_Update();
+
+    will_return_always(__wrap_driverPEC11_PopRightRotation, false);
+    will_return(__wrap_driverPEC11_PopLeftRotation, true);
+    expect_function_call(FakeLeftCallback);
+    Encoder_Update();
+
+    will_return_always(__wrap_driverPEC11_PopLeftRotation, false);
+    will_return(__wrap_driverPEC11_PopBriefPush, true);
+    expect_function_call(FakeBriefPushCallback);
+    Encoder_Update();
+
+    will_return_always(__wrap_driverPEC11_PopBriefPush, false);
+    will_return(__wrap_driverPEC11_PopExtendedPush, true);
+    expect_function_call(FakeExtendedPushCallback);
+    Encoder_Update();
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -173,7 +216,9 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_Encoder_Init),
         cmocka_unit_test_setup(test_Encoder_Init_ClearCallbacks, Setup),
         cmocka_unit_test_setup(test_Encoder_SetGetCallbacks, Setup),
-        cmocka_unit_test_setup(test_Encoder_Update_NoCallbacks, Setup)
+        cmocka_unit_test_setup(test_Encoder_Update_NoCallbacks, Setup),
+        cmocka_unit_test_setup(test_Encoder_Update_NoInput, Setup),
+        cmocka_unit_test_setup(test_Encoder_Update, Setup)
     };
 
     if (argc >= 2)
