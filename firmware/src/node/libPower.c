@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-16 (Last edit)
+ * @date   2018-10-25 (Last edit)
  * @brief  Implementation of low level power functions.
  *
  * Detailed description of file.
@@ -126,7 +126,7 @@ uint32_t libPower_GetMaxOutputCurrent(uint16_t vin)
     }
     else
     {
-        iout_max = (K_CONST * vin + M_CONST) / 1000000;
+        iout_max = ((K_CONST * (uint32_t)vin) + M_CONST) / 1000000;
     }
 
     return iout_max;
