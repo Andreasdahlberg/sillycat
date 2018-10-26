@@ -19,20 +19,28 @@ import os
 
 Import(['*'])
 
-mock_env = env.Clone()
-mock_env.Append(CPPPATH=[
+env.Append(CPPPATH=[
+    '#src/main/driver/NTC',
     '#src/main',
-    '#src/main/gui',
     '#src/common',
     '#src/common/ADC',
-    '#src/common/timer',
     '#src/common/event',
-    '#src/common/transceiver',
-    '#src/utility/FIFO',
+    '#tests/main/driver/NTC',
     '#src/utility/Filter'
     ])
 
-source = Glob('*.c')
-objects = mock_env.Object(source=source)
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=ADC_InitChannel',
+    '-Wl,--wrap=Timer_TimeDifference',
+    '-Wl,--wrap=Timer_GetMilliseconds',
+    '-Wl,--wrap=ADC_Convert',
+    '-Wl,--wrap=Filter_IsInitialized',
+    '-Wl,--wrap=Filter_Process',
+    '-Wl,--wrap=Filter_Init',
+    '-Wl,--wrap=Filter_Output'
+])
 
-Return('objects')
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
