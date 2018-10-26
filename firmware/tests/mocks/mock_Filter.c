@@ -1,0 +1,81 @@
+/**
+ * @file   mock_Filter.c
+ * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
+ * @date   2018-10-26 (Last edit)
+ * @brief  Mock functions for the filter module.
+ */
+
+/*
+This file is part of SillyCat firmware.
+
+SillyCat firmware is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+SillyCat firmware is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+#include <stdio.h>
+#include <stdint.h>
+#include "Filter.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//TYPE DEFINITIONS
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//VARIABLES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
+
+bool __wrap_Filter_IsInitialized(const struct filter_t *self_p)
+{
+    mock_type(bool);
+}
+
+void __wrap_Filter_Init(struct filter_t *self_p, int16_t initial_value, uint16_t alpha)
+{
+    assert_non_null(self_p);
+    check_expected(initial_value);
+}
+
+void __wrap_Filter_Process(struct filter_t *self_p, int16_t sample)
+{
+    assert_non_null(self_p);
+    function_called();
+}
+
+int16_t __wrap_Filter_Output(const struct filter_t *self_p)
+{
+    mock_type(int16_t);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
