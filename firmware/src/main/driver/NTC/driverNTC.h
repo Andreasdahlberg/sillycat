@@ -1,7 +1,7 @@
 /**
  * @file   driverNTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-08 (Last edit)
+ * @date   2018-10-26 (Last edit)
  * @brief  NTC sensor driver
  *
  * Driver for NTC sensors.
@@ -26,6 +26,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef DRIVERNTC_H_
 #define DRIVERNTC_H_
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include "Sensor.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
