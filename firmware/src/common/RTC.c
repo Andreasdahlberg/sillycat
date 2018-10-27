@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-23 (Last edit)
+ * @date   2018-10-27 (Last edit)
  * @brief  Implementation of RTC interface
  *
  * Detailed description of file.
@@ -41,6 +41,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TIMESTAMP_FORMAT "20%02u-%02u-%02u %02u:%02u:%02u"
 
+#define DAYS_IN_JAN 31
+#define DAYS_IN_FEB 28
+#define DAYS_IN_MAR 31
+#define DAYS_IN_APR 30
+#define DAYS_IN_MAY 31
+#define DAYS_IN_JUN 30
+#define DAYS_IN_JUL 31
+#define DAYS_IN_AUG 31
+#define DAYS_IN_SEP 30
+#define DAYS_IN_OCT 31
+#define DAYS_IN_NOV 30
+#define DAYS_IN_DEC 31
 #define DAYS_IN_MARCH_OCTOBER 31
 #define DAYS_IN_WEEK 7
 
