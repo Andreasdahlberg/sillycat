@@ -1,7 +1,7 @@
 /**
  * @file   mock_RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-19 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Mock functions for the RTC module.
  */
 
@@ -30,7 +30,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include <stdbool.h>
-#include "RTC.h"
+#include "Time.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -44,21 +44,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_RTC_AddSeconds(rtc_time_type *time, uint8_t seconds);
-void __wrap_RTC_AddMonths(rtc_time_type *time, uint8_t months);
-bool __wrap_RTC_GetCurrentTime(rtc_time_type *time);
-bool __wrap_RTC_SetAlarmTime(const rtc_time_type *time);
-bool __wrap_RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day);
-bool __wrap_RTC_IsLeapYear(uint16_t year);
-uint8_t __wrap_RTC_CalculateDayOfWeek(rtc_time_type *time);
-bool __wrap_RTC_GetTimeStamp(uint32_t *timestamp);
-uint8_t __wrap_RTC_GetDaysInMonth(const rtc_time_type *time);
-void __wrap_RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
-bool __wrap_RTC_SetCurrentTime(const rtc_time_type *time);
-void __wrap_RTC_AddHours(rtc_time_type *time, uint8_t hours);
-void __wrap_RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp, size_t size);
-uint32_t __wrap_RTC_ConvertToTimestamp(const rtc_time_type *timeptr);
-void __wrap_RTC_AddYears(rtc_time_type *time, uint8_t year);
-void __wrap_RTC_AddDays(rtc_time_type *time, uint8_t days);
+bool __wrap_RTC_GetCurrentTime(struct time_t *time_p);
+bool __wrap_RTC_SetAlarmTime(const struct time_t *time_p);
+bool __wrap_RTC_SetCurrentTime(const struct time_t *time_p);
+bool __wrap_RTC_GetTimeStamp(uint32_t *timestamp_p);
 
 #endif

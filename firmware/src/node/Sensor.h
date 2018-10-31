@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -31,7 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "RTC.h"
+#include "Time.h"
 #include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ typedef struct
 {
     uint16_t humidity;
     uint16_t temperature;
-    rtc_time_type timestamp;
+    struct time_t timestamp;
 } sensor_data_type;
 
 //////////////////////////////////////////////////////////////////////////

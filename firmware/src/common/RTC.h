@@ -1,10 +1,8 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-27 (Last edit)
- * @brief  Header of RTC interface
- *
- * Detailed description of file.
+ * @date   2018-10-31 (Last edit)
+ * @brief  Implementation of RTC interface
  */
 
 /*
@@ -41,59 +39,54 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RTC_HAL.h"
 #endif
 
+#include <stdbool.h>
+#include "Time.h"
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
-
-typedef struct
-{
-    uint8_t year;
-    uint8_t month;
-    uint8_t date;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
-} rtc_time_type;
-
-typedef enum
-{
-    JANUARY = 1,
-    FEBRUARY,
-    MARCH,
-    APRIL,
-    MAY,
-    JUNE,
-    JULY,
-    AUGUST,
-    SEPTEMBER,
-    OCTOBER,
-    NOVEMBER,
-    DECEMBER
-} rtc_months_type;
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 #ifdef RTC_HAL
-bool RTC_GetTimeStamp(uint32_t *timestamp);
-bool RTC_GetCurrentTime(rtc_time_type *time);
-uint8_t RTC_GetDaysInMonth(const rtc_time_type *time);
-bool RTC_SetCurrentTime(const rtc_time_type *time);
-bool RTC_SetAlarmTime(const rtc_time_type *time);
-#endif
 
-void RTC_FormatTimestamp(const rtc_time_type *time, char *timestamp,
-                         size_t size);
-bool RTC_IsDaylightSavingActive(const rtc_time_type *time, uint8_t week_day);
-bool RTC_IsLeapYear(uint16_t year);
-uint8_t RTC_CalculateDayOfWeek(rtc_time_type *time);
-void RTC_AddSeconds(rtc_time_type *time, uint8_t seconds);
-void RTC_AddMinutes(rtc_time_type *time, uint8_t minutes);
-void RTC_AddHours(rtc_time_type *time, uint8_t hours);
-void RTC_AddDays(rtc_time_type *time, uint8_t days);
-void RTC_AddMonths(rtc_time_type *time, uint8_t months);
-void RTC_AddYears(rtc_time_type *time, uint8_t year);
-uint32_t RTC_ConvertToTimestamp(const rtc_time_type *timeptr);
+/**
+ * Get the number of seconds since midnight, January 1 2000, UTC.
+ *
+ * @param timestamp_p Pointer to timestamp where the result will be stored.
+ *
+ * @return True if current time was successfully read, otherwise false.
+ */
+bool RTC_GetTimeStamp(uint32_t *timestamp_p);
+
+/**
+ * Get a time struct with fields for different time periods.
+ *
+ * @param time_p Pointer to struct where the result will be stored.
+ *
+ * @return True, if current time was successfully read, otherwise false.
+ */
+bool RTC_GetCurrentTime(struct time_t *time_p);
+
+/**
+ * Set the current time.
+ *
+ * @param time_p Pointer to struct with time to set.
+ *
+ * @return True if new time was set successfully, otherwise false.
+ */
+bool RTC_SetCurrentTime(const struct time_t *time_p);
+
+/**
+ * Set an alarm time.
+ *
+ * @param time_p Pointer to struct with alarm time to set.
+ *
+ * @return True if new alarm time was set successfully, otherwise false.
+ */
+bool RTC_SetAlarmTime(const struct time_t *time_p);
+#endif
 
 #endif

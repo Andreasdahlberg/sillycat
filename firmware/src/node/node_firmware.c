@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -44,6 +44,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "driverCharger.h"
 
 #include "ADC.h"
+#include "Time.h"
 #include "Timer.h"
 #include "LED.h"
 #include "Sensor.h"
@@ -196,14 +197,14 @@ static bool TimePacketHandler(packet_frame_type *packet)
 
     bool status = true;
 
-    rtc_time_type current_time;
+    struct time_t current_time;
     RTC_GetCurrentTime(&current_time);
 
     uint32_t current_timestamp;
-    current_timestamp = RTC_ConvertToTimestamp(&current_time);
+    current_timestamp = Time_ConvertToTimestamp(&current_time);
 
     uint32_t received_timestamp;
-    received_timestamp = RTC_ConvertToTimestamp(&packet->content.timestamp);
+    received_timestamp = Time_ConvertToTimestamp(&packet->content.timestamp);
 
     if (current_timestamp != received_timestamp)
     {
@@ -241,7 +242,7 @@ static void FillPacket(struct packet_t *packet_p)
      * Use a temporary variable since the packet struct is packed and thus
      * are pointers to the members not allowed.
      */
-    rtc_time_type timestamp;
+    struct time_t timestamp;
     RTC_GetCurrentTime(&timestamp);
     packet_p->timestamp = timestamp;
 }
@@ -278,13 +279,13 @@ static bool IsTimeForSleep(void)
 
 static void NotifyAndEnterSleep(void)
 {
-    rtc_time_type time;
+    struct time_t time;
 
     RTC_GetCurrentTime(&time);
     INFO("Sleep: %u:%u:%u", time.hour, time.minute, time.second);
 
     //TODO: Compensate for time awake
-    RTC_AddSeconds(&time, Config_GetReportInterval());
+    Time_AddSeconds(&time, Config_GetReportInterval());
     RTC_SetAlarmTime(&time);
     RTC_EnableAlarm(true);
 

@@ -25,6 +25,7 @@ mock_env.Append(CPPPATH=[
     '#src/main/gui',
     '#src/common',
     '#src/common/ADC',
+    '#src/common/time',
     '#src/common/timer',
     '#src/common/event',
     '#src/common/transceiver',

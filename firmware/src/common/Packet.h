@@ -1,7 +1,7 @@
 /**
  * @file   packet.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Definition of packet format used for battery and sensor data.
  */
 
@@ -29,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "RTC.h"
+#include "Time.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -52,7 +52,7 @@ struct __attribute__((packed)) packet_t
         int16_t temperature;
         bool valid;
     } sensor;
-    rtc_time_type timestamp;
+    struct time_t timestamp;
 };
 
 //////////////////////////////////////////////////////////////////////////

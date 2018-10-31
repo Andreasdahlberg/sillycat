@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-17 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -32,6 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Encoder.h"
 #include "Interface.h"
 #include "RTC.h"
+#include "Time.h"
 #include "guiRTC.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,7 +57,7 @@ struct module_t
     {
         bool active;
         size_t index;
-        rtc_time_type time;
+        struct time_t time;
         struct encoder_callbacks_t callbacks;
     } set_time;
 };
@@ -81,10 +82,10 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)));
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
 static void DrawUnderLine(void);
 static void DrawSetTimeView(uint16_t context __attribute__ ((unused)));
-static void AdjustTimeForView(rtc_time_type *time);
+static void AdjustTimeForView(struct time_t *time);
 static void SetTimeAction(uint16_t context __attribute__ ((unused)));
-static struct limits_t GetCurrentFieldLimits(size_t field_index, rtc_time_type *time_p);
-static void AdjustTimeToLimits(rtc_time_type *time_p);
+static struct limits_t GetCurrentFieldLimits(size_t field_index, struct time_t *time_p);
+static void AdjustTimeToLimits(struct time_t *time_p);
 static void IncreaseField(void);
 static void DecreaseField(void);
 
@@ -113,7 +114,7 @@ void guiRTC_Init(void)
 
 static void DrawClockView(uint16_t context __attribute__ ((unused)))
 {
-    rtc_time_type time;
+    struct time_t time;
     RTC_GetCurrentTime(&time);
 
     AdjustTimeForView(&time);
@@ -123,7 +124,7 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)))
 
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
 {
-    rtc_time_type time;
+    struct time_t time;
     RTC_GetCurrentTime(&time);
 
     AdjustTimeForView(&time);
@@ -182,7 +183,7 @@ static void DrawUnderLine(void)
 
 static void DrawSetTimeView(uint16_t context __attribute__ ((unused)))
 {
-    rtc_time_type time;
+    struct time_t time;
     time = module.set_time.time;
 
     AdjustTimeForView(&time);
@@ -193,18 +194,16 @@ static void DrawSetTimeView(uint16_t context __attribute__ ((unused)))
     DrawUnderLine();
 }
 
-static void AdjustTimeForView(rtc_time_type *time_p)
+static void AdjustTimeForView(struct time_t *time_p)
 {
     /**
      * Always add offset since time is stored as UTC,
      */
-    RTC_AddMinutes(time_p, UTC_OFFSET_MIN);
+    Time_AddMinutes(time_p, UTC_OFFSET_MIN);
 
-    uint8_t day = RTC_CalculateDayOfWeek(time_p);
-
-    if (RTC_IsDaylightSavingActive(time_p, day))
+    if (Time_IsDaylightSavingActive(time_p))
     {
-        RTC_AddMinutes(time_p, DST_OFFSET_MIN);
+        Time_AddMinutes(time_p, DST_OFFSET_MIN);
     }
 }
 
@@ -228,7 +227,7 @@ static void NextField(void)
 
 static struct limits_t GetCurrentFieldLimits(
     size_t field_index,
-    rtc_time_type *time_p)
+    struct time_t *time_p)
 {
     struct limits_t limits;
 
@@ -245,7 +244,7 @@ static struct limits_t GetCurrentFieldLimits(
             break;
 
         case 2:
-            limits.max = RTC_GetDaysInMonth(time_p);
+            limits.max = Time_GetDaysInMonth(time_p);
             limits.min = 1;
             break;
 
@@ -268,7 +267,7 @@ static struct limits_t GetCurrentFieldLimits(
     return limits;
 }
 
-static void AdjustTimeToLimits(rtc_time_type *time_p)
+static void AdjustTimeToLimits(struct time_t *time_p)
 {
     for (size_t i = 0; i < sizeof(*time_p); ++i)
     {

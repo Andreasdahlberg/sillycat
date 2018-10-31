@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -31,6 +31,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Nodes.h"
 #include "Node.h"
 #include "Com.h"
+#include "Time.h"
+#include "RTC.h"
 #include "ErrorHandler.h"
 #include "libDebug.h"
 #include <string.h>
@@ -91,7 +93,7 @@ bool PacketHandler_HandleReadingPacket(packet_frame_type *packet_p)
 
 static void SendAck(uint8_t target)
 {
-    rtc_time_type timestamp;
+    struct time_t timestamp;
     if (RTC_GetCurrentTime(&timestamp))
     {
         Com_Send(target, COM_PACKET_TYPE_TIME, &timestamp,

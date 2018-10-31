@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -38,6 +38,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Sensor.h"
 #include "Timer.h"
+#include "RTC.h"
 #include "LED.h"
 #include "Transceiver.h"
 #include "FIFO.h"
