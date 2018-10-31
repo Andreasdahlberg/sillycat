@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-21 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -29,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "RTC.h"
+#include "Time.h"
 #include "Event.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ typedef struct
 
 typedef struct
 {
-    rtc_time_type timestamp;
+    struct time_t timestamp;
     uint8_t type;
     uint8_t size;
     uint8_t data[CONTENT_DATA_SIZE];

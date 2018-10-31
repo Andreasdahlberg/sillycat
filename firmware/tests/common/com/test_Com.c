@@ -94,7 +94,7 @@ static void ReceiveMockPacket(packet_frame_type *packet_p, uint8_t type)
     will_return(__wrap_Transceiver_ReceivePacket, true);
 }
 
-static void AssertTimestampEqual(rtc_time_type *a_p, rtc_time_type *b_p)
+static void AssertTimestampEqual(struct time_t *a_p, struct time_t *b_p)
 {
     assert_int_equal(a_p->year, b_p->year);
     assert_int_equal(a_p->month, b_p->month);
@@ -222,7 +222,7 @@ static void test_Com_Send_RTCFailure(void **state)
      * All fields in the timestamp should be zero to indicate that the
      * timestamp is invalid.
      */
-    rtc_time_type timestamp = {0};
+    struct time_t timestamp = {0};
     AssertTimestampEqual(&packet_content.timestamp, &timestamp);
 }
 

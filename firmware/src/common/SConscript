@@ -10,6 +10,7 @@ source = Glob('*.c')
 env.Append(CPPPATH=[
     '#src/common',
     '#src/common/com',
+    '#src/common/time',
     '#src/common/event',
     '#src/common/transceiver',
     '#src/utility/FIFO',

@@ -1,7 +1,7 @@
 /**
  * @file   Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Implementation of the Communications module.
  */
 
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "ErrorHandler.h"
 #include "Timer.h"
+#include "Time.h"
 #include "RTC.h"
 #include "Com.h"
 
@@ -101,7 +102,7 @@ void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t si
     sc_assert(packet_type < ElementsIn(module.packet_handlers));
     sc_assert(data_p != NULL);
 
-    rtc_time_type timestamp;
+    struct time_t timestamp;
     if (!RTC_GetCurrentTime(&timestamp))
     {
         // Log error and continue, an invalid timestamp is not critical.
@@ -110,7 +111,7 @@ void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t si
 
         // Set all fields to zero so the receiver can detect the invalid
         // timestamp.
-        timestamp = (rtc_time_type) {0};
+        timestamp = (struct time_t) {0};
     }
 
     // Construct the package.
