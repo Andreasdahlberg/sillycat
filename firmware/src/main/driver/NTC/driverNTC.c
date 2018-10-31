@@ -1,7 +1,7 @@
 /**
  * @file   driverNTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-01 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  NTC sensor driver
  *
  * Driver for NTC sensors.
@@ -234,7 +234,7 @@ static bool IsValid(uint16_t adc_value)
     const uint16_t offset = pgm_read_word(&ntc_lut.offset);
 
     return (adc_value >= offset) &&
-           (adc_value - offset <= ElementsIn(ntc_lut.temperatures));
+           (adc_value - offset < ElementsIn(ntc_lut.temperatures));
 }
 
 static int16_t FilterTemperature(struct ntc_sensor_t *self, int16_t temperature)

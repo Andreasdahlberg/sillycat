@@ -1,7 +1,7 @@
 /**
  * @file   test_driverNTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-26 (Last edit)
+ * @date   2018-10-31 (Last edit)
  * @brief  Test suite for the NTC driver.
  */
 
@@ -95,7 +95,7 @@ static void test_driverNTC_GetSensor(void **state)
 
 static void test_driverNTC_UpdateInvalidValue(void **state)
 {
-    const uint16_t test_data[] = {0, 1023};
+    const uint16_t test_data[] = {0, 119, 939, 1023};
     struct sensor_t *sensor_p = driverNTC_GetSensor(0);
 
     for (size_t i = 0; i < sizeof(test_data) / sizeof(test_data[0]); ++i)
