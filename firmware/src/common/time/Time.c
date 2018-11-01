@@ -1,7 +1,7 @@
 /**
  * @file   Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-27 (Last edit)
+ * @date   2018-11-01 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -94,6 +94,7 @@ void Time_FormatTimestamp(const struct time_t *time_p,
 {
     sc_assert(time_p != NULL);
     sc_assert(timestamp_p != NULL);
+    sc_assert(size > 0);
 
     snprintf(timestamp_p,
              size,
@@ -105,8 +106,6 @@ void Time_FormatTimestamp(const struct time_t *time_p,
              time_p->minute,
              time_p->second
             );
-
-    timestamp_p[size] = '\0';
 }
 
 bool Time_IsDaylightSavingActive(const struct time_t *time_p)
@@ -344,7 +343,8 @@ uint32_t Time_ConvertToTimestamp(const struct time_t *time_p)
 uint8_t Time_GetDaysInMonth(const struct time_t *time_p)
 {
     sc_assert(time_p != NULL);
-    sc_assert(time_p->month <= ElementsIn(days_in_months));
+    sc_assert(time_p->month > 0 && time_p->month <= ElementsIn(days_in_months));
+
     if (time_p->month == FEBRUARY && Time_IsLeapYear(time_p))
     {
         return days_in_months[time_p->month - 1] + 1;
