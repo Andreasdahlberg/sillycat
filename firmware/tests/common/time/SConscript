@@ -1,0 +1,17 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/common/time',
+    '#tests/common/time',
+])
+
+env.Append(LINKFLAGS=[
+    #'-Wl,--wrap=Timer_GetMilliseconds',
+])
+
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
