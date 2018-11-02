@@ -1,7 +1,7 @@
 /**
  * @file   test_Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-01 (Last edit)
+ * @date   2018-11-02 (Last edit)
  * @brief  Test suite for the Time module.
  */
 
@@ -212,6 +212,63 @@ static void test_Time_AddHours(void **state)
     }
 }
 
+static void test_Time_AddYears_NULL(void **state)
+{
+    expect_assert_failure(Time_AddYears(NULL, 1));
+}
+
+static void test_Time_AddYears(void **state)
+{
+    struct time_t time = {0};
+
+    Time_AddYears(&time, 1);
+    assert_int_equal(time.year, 1);
+    Time_AddYears(&time, 98);
+    assert_int_equal(time.year, 99);
+    Time_AddYears(&time, 1);
+    assert_int_equal(time.year, 99);
+}
+
+static void test_Time_IsDaylightSavingActive_NULL(void **state)
+{
+    expect_assert_failure(Time_IsDaylightSavingActive(NULL));
+}
+
+static void test_Time_IsDaylightSavingActive(void **state)
+{
+    struct time_t time = {.year = 18, .date = 1};
+    time_month_t months_without_dst[] = {11, 12, 1, 2};
+    time_month_t months_with_dst[] = {4, 5, 6, 7, 8, 9};
+
+    for (size_t i = 0; i < ElementsIn(months_with_dst); ++i)
+    {
+        time.month = months_with_dst[i];
+        assert_true(Time_IsDaylightSavingActive(&time));
+    }
+
+    for (size_t i = 0; i < ElementsIn(months_without_dst); ++i)
+    {
+        time.month = months_without_dst[i];
+        assert_false(Time_IsDaylightSavingActive(&time));
+    }
+
+    time.month = OCTOBER;
+    time.date = 1;
+    assert_true(Time_IsDaylightSavingActive(&time));
+    time.date = 27;
+    assert_true(Time_IsDaylightSavingActive(&time));
+    time.date = 28;
+    assert_false(Time_IsDaylightSavingActive(&time));
+
+    time.month = MARCH;
+    time.date = 1;
+    assert_false(Time_IsDaylightSavingActive(&time));
+    time.date = 24;
+    assert_false(Time_IsDaylightSavingActive(&time));
+    time.date = 25;
+    assert_true(Time_IsDaylightSavingActive(&time));
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -229,7 +286,11 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_Time_GetDaysInMonth_InvalidMonth),
         cmocka_unit_test(test_Time_GetDaysInMonth),
         cmocka_unit_test(test_Time_AddHours_NULL),
-        cmocka_unit_test(test_Time_AddHours)
+        cmocka_unit_test(test_Time_AddHours),
+        cmocka_unit_test(test_Time_AddYears_NULL),
+        cmocka_unit_test(test_Time_AddYears),
+        cmocka_unit_test(test_Time_IsDaylightSavingActive_NULL),
+        cmocka_unit_test(test_Time_IsDaylightSavingActive)
     };
 
     if (argc >= 2)

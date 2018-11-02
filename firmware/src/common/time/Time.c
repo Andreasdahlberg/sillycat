@@ -1,7 +1,7 @@
 /**
  * @file   Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-01 (Last edit)
+ * @date   2018-11-02 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -140,7 +140,7 @@ bool Time_IsDaylightSavingActive(const struct time_t *time_p)
         }
 
         //TODO: Fix edge cases!
-        dst_active = ((time_p->month == MARCH && time_p->date > next_sunday) ||
+        dst_active = ((time_p->month == MARCH && time_p->date >= next_sunday) ||
                       (time_p->month == OCTOBER && time_p->date < next_sunday));
     }
     return dst_active;
