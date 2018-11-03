@@ -1,7 +1,7 @@
 /**
  * @file   Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-02 (Last edit)
+ * @date   2018-11-05 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -261,6 +261,7 @@ uint32_t Time_ConvertToTimestamp(const struct time_t *time_p)
     int n;
     int d;
     int leaps;
+    int month;
 
     /**
      * Determine elapsed whole days since the epoch to the beginning of this
@@ -287,10 +288,13 @@ uint32_t Time_ConvertToTimestamp(const struct time_t *time_p)
      */
     d = time_p->date - 1; /* Date is one based. */
 
+    /* Month has offset of one. */
+    month = time_p->month - 1;
+
     /* Handle Jan/Feb as a special case. */
-    if (time_p->month < 2)
+    if (month < 2)
     {
-        if (time_p->month)
+        if (month)
         {
             d += 31;
         }
@@ -300,7 +304,7 @@ uint32_t Time_ConvertToTimestamp(const struct time_t *time_p)
         uint32_t m;
         n = 59 + Time_IsLeapYear(time_p);
         d += n;
-        n = time_p->month - MARCH;
+        n = month - MARCH + 1;
 
         /* Account for phase change. */
         if (n > (JULY - MARCH))
