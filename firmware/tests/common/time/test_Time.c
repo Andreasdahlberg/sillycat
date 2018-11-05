@@ -1,7 +1,7 @@
 /**
  * @file   test_Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-02 (Last edit)
+ * @date   2018-11-05 (Last edit)
  * @brief  Test suite for the Time module.
  */
 
@@ -269,6 +269,108 @@ static void test_Time_IsDaylightSavingActive(void **state)
     assert_true(Time_IsDaylightSavingActive(&time));
 }
 
+static void test_Time_ConvertToTimestamp_NULL(void **state)
+{
+    expect_assert_failure(Time_ConvertToTimestamp(NULL));
+}
+
+static void test_Time_ConvertToTimestamp(void **state)
+{
+    struct test_data_t
+    {
+        struct time_t time;
+        uint32_t expected_timestamp;
+    };
+
+    const struct test_data_t data[] =
+    {
+        {
+            .time = {
+                .year = 0,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .expected_timestamp = 0
+        },
+        {
+            .time = {
+                .year = 0,
+                .month = FEBRUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .expected_timestamp = 2678400
+        },
+        {
+            .time = {
+                .year = 0,
+                .month = MARCH,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .expected_timestamp = 5184000
+        },
+        {
+            .time = {
+                .year = 0,
+                .month = AUGUST,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .expected_timestamp = 18403200
+        },
+        {
+            .time = {
+                .year = 0,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 1,
+                .minute = 2,
+                .second = 3
+            },
+            .expected_timestamp = 3723
+        },
+        {
+            .time = {
+                .year = 1,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .expected_timestamp = 31622400
+        },
+        {
+            .time = {
+                .year = 4,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .expected_timestamp = 126230400
+        },
+    };
+
+    for (size_t i = 0; i < ElementsIn(data); ++i)
+    {
+        assert_int_equal(Time_ConvertToTimestamp(&data[i].time),
+                         data[i].expected_timestamp
+                        );
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -290,7 +392,9 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_Time_AddYears_NULL),
         cmocka_unit_test(test_Time_AddYears),
         cmocka_unit_test(test_Time_IsDaylightSavingActive_NULL),
-        cmocka_unit_test(test_Time_IsDaylightSavingActive)
+        cmocka_unit_test(test_Time_IsDaylightSavingActive),
+        cmocka_unit_test(test_Time_ConvertToTimestamp_NULL),
+        cmocka_unit_test(test_Time_ConvertToTimestamp)
     };
 
     if (argc >= 2)
