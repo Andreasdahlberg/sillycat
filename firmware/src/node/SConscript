@@ -20,7 +20,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['../utility', '../common']
+DIRECTORIES = ['../utility', '../common', 'driver/DHT22']
 
 #Import all exported variables
 Import(['*'])
@@ -29,6 +29,7 @@ Import(['*'])
 env.Append(CPPPATH=[
     '#src/utility',
     '#src/node',
+    '#src/node/driver/DHT22',
     '#src/common',
     '#src/common/ADC',
     '#src/common/timer'
