@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2018-11-06 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -34,7 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "libDebug.h"
-#include "libDHT22.h"
+#include "driverDHT22.h"
 
 #include "Sensor.h"
 #include "Timer.h"
@@ -90,13 +90,13 @@ void Sensor_Init(void)
 ///
 void Sensor_Update(void)
 {
-    if (libDHT22_IsReadingValid())
+    if (driverDHT22_IsReadingValid())
     {
         dht22_data_type dht22_reading;
-        dht22_reading = libDHT22_GetSensorReading();
+        dht22_reading = driverDHT22_GetSensorReading();
 
         // No need to check the reading status since it is already done in
-        // the call to libDHT22_IsReadingValid().
+        // the call to driverDHT22_IsReadingValid().
 
         sensor_data_type reading;
         reading.temperature = dht22_reading.temperature;
@@ -149,7 +149,7 @@ void Sensor_WakeUp(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
-    libDHT22_StartReading();
+    driverDHT22_StartReading();
     return;
 }
 
@@ -163,9 +163,9 @@ void Sensor_Sleep(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
-    while (!libDHT22_IsIdle())
+    while (!driverDHT22_IsIdle())
     {
-        libDHT22_Update();
+        driverDHT22_Update();
     }
 }
 

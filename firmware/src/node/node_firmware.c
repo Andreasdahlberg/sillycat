@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2018-11-06 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -38,9 +38,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "libSPI.h"
 #include "libRFM69.h"
-#include "libDHT22.h"
 #include "libPower.h"
 #include "libS25FL1K.h"
+#include "driverDHT22.h"
 #include "driverCharger.h"
 
 #include "ADC.h"
@@ -112,7 +112,7 @@ int main(void)
     Timer_Init();
     ADC_Init();
     libSPI_Init(0);
-    libDHT22_Init();
+    driverDHT22_Init();
     libPower_Init();
     driverCharger_Init();
 
@@ -174,7 +174,7 @@ int main(void)
     {
         driverCharger_Update();
         Power_Update();
-        libDHT22_Update();
+        driverDHT22_Update();
         Sensor_Update();
         Transceiver_Update();
         Com_Update();

@@ -1,10 +1,8 @@
 /**
- * @file   libDHT22.h
+ * @file   driverDHT22.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-09 (Last edit)
- * @brief  Header of libDht22
- *
- * Detailed description of file.
+ * @date   2018-11-06 (Last edit)
+ * @brief  DHT22 RHT sensor driver.
  */
 
 /*
@@ -24,9 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-#ifndef LIBDHT22_H_
-#define LIBDHT22_H_
+#ifndef DRIVERDHT22_H_
+#define DRIVERDHT22_H_
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -47,11 +44,11 @@ typedef struct
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void libDHT22_Init(void);
-void libDHT22_Update(void);
-dht22_data_type libDHT22_GetSensorReading(void);
-bool libDHT22_IsIdle(void);
-void libDHT22_StartReading(void);
-bool libDHT22_IsReadingValid(void);
+void driverDHT22_Init(void);
+void driverDHT22_Update(void);
+dht22_data_type driverDHT22_GetSensorReading(void);
+bool driverDHT22_IsIdle(void);
+void driverDHT22_StartReading(void);
+bool driverDHT22_IsReadingValid(void);
 
 #endif

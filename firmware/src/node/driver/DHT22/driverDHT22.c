@@ -1,10 +1,8 @@
 /**
- * @file   libDHT22.c
+ * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-09 (Last edit)
- * @brief  Implementation of low level functions for the DHT22 RHT sensor
- *
- * Detailed description of file.
+ * @date   2018-11-06 (Last edit)
+ * @brief  DHT22 RHT sensor driver.
  */
 
 /*
@@ -28,15 +26,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
-#include "libDHT22.h"
 #include "libDebug.h"
 #include "Timer.h"
+#include "driverDHT22.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -106,7 +101,7 @@ ISR(TIMER1_CAPT_vect)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libDHT22_Init(void)
+void driverDHT22_Init(void)
 {
     //Set data pin as output and high
     DDRB |= (1 << DATAPIN);
@@ -120,7 +115,7 @@ void libDHT22_Init(void)
     return;
 }
 
-void libDHT22_Update(void)
+void driverDHT22_Update(void)
 {
     switch (dht22_state)
     {
@@ -160,7 +155,7 @@ void libDHT22_Update(void)
 /// @param  None
 /// @return dht22_data_type Struct with the sensor readings and its status
 ///
-dht22_data_type libDHT22_GetSensorReading(void)
+dht22_data_type driverDHT22_GetSensorReading(void)
 {
     dht22_data_type return_data = sensor_reading;
     sensor_reading.status = false;
@@ -173,7 +168,7 @@ dht22_data_type libDHT22_GetSensorReading(void)
 /// @param  None
 /// @return bool true if valid, otherwise false
 ///
-bool libDHT22_IsReadingValid(void)
+bool driverDHT22_IsReadingValid(void)
 {
     return sensor_reading.status;
 }
@@ -184,7 +179,7 @@ bool libDHT22_IsReadingValid(void)
 /// @param  None
 /// @return bool true if idle, otherwise false
 ///
-bool libDHT22_IsIdle(void)
+bool driverDHT22_IsIdle(void)
 {
     return (dht22_state == DHT_IDLE);
 }
@@ -195,9 +190,9 @@ bool libDHT22_IsIdle(void)
 /// @param  None
 /// @return bool true if a new reading is started, otherwise false
 ///
-void libDHT22_StartReading(void)
+void driverDHT22_StartReading(void)
 {
-    if (libDHT22_IsIdle() == true)
+    if (driverDHT22_IsIdle() == true)
     {
         dht22_state = DHT_READING;
     }
