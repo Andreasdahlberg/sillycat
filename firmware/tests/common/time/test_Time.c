@@ -1,7 +1,7 @@
 /**
  * @file   test_Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-05 (Last edit)
+ * @date   2018-11-06 (Last edit)
  * @brief  Test suite for the Time module.
  */
 
@@ -175,6 +175,72 @@ static void test_Time_GetDaysInMonth(void **state)
     {
         time.month = (uint8_t)(i + 1);
         assert_int_equal(Time_GetDaysInMonth(&time), expected_days[i]);
+    }
+}
+
+static void test_Time_AddSeconds_NULL(void **state)
+{
+    expect_assert_failure(Time_AddSeconds(NULL, 1));
+}
+
+static void test_Time_AddSeconds(void **state)
+{
+    struct test_data_t
+    {
+        uint8_t seconds;
+        uint8_t expected_second;
+        uint8_t expected_minute;
+    };
+
+    struct time_t time = {.month = 1, .date = 1};
+    struct test_data_t data[] =
+    {
+        {.seconds = 0, .expected_second = 0, .expected_minute = 0},
+        {.seconds = 1, .expected_second = 1, .expected_minute = 0},
+        {.seconds = 1, .expected_second = 2, .expected_minute = 0},
+        {.seconds = 57, .expected_second = 59, .expected_minute = 0},
+        {.seconds = 1, .expected_second = 0, .expected_minute = 1},
+        {.seconds = 121, .expected_second = 1, .expected_minute = 3},
+    };
+
+    for (size_t i = 0; i < ElementsIn(data); ++i)
+    {
+        Time_AddSeconds(&time, data[i].seconds);
+        assert_int_equal(time.second, data[i].expected_second);
+        assert_int_equal(time.minute, data[i].expected_minute);
+    }
+}
+
+static void test_Time_AddMinutes_NULL(void **state)
+{
+    expect_assert_failure(Time_AddMinutes(NULL, 1));
+}
+
+static void test_Time_AddMinutes(void **state)
+{
+    struct test_data_t
+    {
+        uint8_t minutes;
+        uint8_t expected_minute;
+        uint8_t expected_hour;
+    };
+
+    struct time_t time = {.month = 1, .date = 1};
+    struct test_data_t data[] =
+    {
+        {.minutes = 0, .expected_minute = 0, .expected_hour = 0},
+        {.minutes = 1, .expected_minute = 1, .expected_hour = 0},
+        {.minutes = 1, .expected_minute = 2, .expected_hour = 0},
+        {.minutes = 57, .expected_minute = 59, .expected_hour = 0},
+        {.minutes = 1, .expected_minute = 0, .expected_hour = 1},
+        {.minutes = 121, .expected_minute = 1, .expected_hour = 3},
+    };
+
+    for (size_t i = 0; i < ElementsIn(data); ++i)
+    {
+        Time_AddMinutes(&time, data[i].minutes);
+        assert_int_equal(time.minute, data[i].expected_minute);
+        assert_int_equal(time.hour, data[i].expected_hour);
     }
 }
 
@@ -387,6 +453,10 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_Time_GetDaysInMonth_NULL),
         cmocka_unit_test(test_Time_GetDaysInMonth_InvalidMonth),
         cmocka_unit_test(test_Time_GetDaysInMonth),
+        cmocka_unit_test(test_Time_AddSeconds_NULL),
+        cmocka_unit_test(test_Time_AddSeconds),
+        cmocka_unit_test(test_Time_AddMinutes_NULL),
+        cmocka_unit_test(test_Time_AddMinutes),
         cmocka_unit_test(test_Time_AddHours_NULL),
         cmocka_unit_test(test_Time_AddHours),
         cmocka_unit_test(test_Time_AddYears_NULL),
