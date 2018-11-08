@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-06 (Last edit)
+ * @date   2018-11-08 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -56,33 +56,50 @@ typedef enum
     DHT_POWERUP,
     DHT_READING,
     DHT_DECODING,
-} dht_state_type;
+} dht_state_t;
 
 typedef enum
 {
     DHT_READING_REQUEST = 0,
     DHT_READING_REQUEST_WAIT,
     DHT_READING_CAPTURE_DATA
-} dht_reading_state_type;
+} dht_reading_state_t;
+
+struct module_t
+{
+    dht_state_t state;
+    struct
+    {
+        int16_t temperature;
+        int16_t humidity;
+        bool valid;
+    } measurement;
+    struct
+    {
+        dht_reading_state_t state;
+        uint32_t timer;
+    } reading;
+    uint32_t initialization_time;
+    volatile uint32_t pulse_counter;
+    volatile uint16_t pulse_timings[EXPECTED_NR_PULSES];
+};
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static dht_state_type dht22_state = DHT_UNINITIALIZED;
-static dht22_data_type sensor_reading;
-static uint32_t init_time;
-static volatile uint32_t pulse_counter;
-static volatile uint16_t pulse_timings[EXPECTED_NR_PULSES];
+struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+static void InitHardware(void);
+static void EnableInputCapture(bool enabled);
 static void DecodeTimings(void);
 static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional);
 static bool IsDataValid(uint8_t *data);
-static dht_state_type ReadingStateMachine(void);
+static dht_state_t ReadingStateMachine(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -90,10 +107,10 @@ static dht_state_type ReadingStateMachine(void);
 
 ISR(TIMER1_CAPT_vect)
 {
-    if (pulse_counter < EXPECTED_NR_PULSES)
+    if (module.pulse_counter < EXPECTED_NR_PULSES)
     {
-        pulse_timings[pulse_counter] = ICR1;
-        ++pulse_counter;
+        module.pulse_timings[module.pulse_counter] = ICR1;
+        ++module.pulse_counter;
     }
 }
 
@@ -103,26 +120,24 @@ ISR(TIMER1_CAPT_vect)
 
 void driverDHT22_Init(void)
 {
-    //Set data pin as output and high
-    DDRB |= (1 << DATAPIN);
-    PORTB |= (1 << DATAPIN);
+    InitHardware();
 
-    dht22_state = DHT_POWERUP;
-    init_time = Timer_GetMilliseconds();
-    sensor_reading.status = false;
+    module = (struct module_t){
+        .state = DHT_POWERUP,
+        .initialization_time = Timer_GetMilliseconds(),
+    };
 
     INFO("DHT22 RHT sensor initialized");
-    return;
 }
 
 void driverDHT22_Update(void)
 {
-    switch (dht22_state)
+    switch (module.state)
     {
         case DHT_POWERUP:
-            if (Timer_TimeDifference(init_time) > POWERUP_DELAY_MS)
+            if (Timer_TimeDifference(module.initialization_time) > POWERUP_DELAY_MS)
             {
-                dht22_state = DHT_IDLE;
+                module.state = DHT_IDLE;
             }
             break;
 
@@ -130,15 +145,15 @@ void driverDHT22_Update(void)
             break;
 
         case DHT_READING:
-            dht22_state = ReadingStateMachine();
+            module.state = ReadingStateMachine();
             break;
 
         case DHT_DECODING:
             DecodeTimings();
-            init_time = Timer_GetMilliseconds();
+            module.initialization_time = Timer_GetMilliseconds();
 
             //TODO: Power up or new state? save last reading time?
-            dht22_state = DHT_IDLE;
+            module.state = DHT_IDLE;
             break;
 
         case DHT_UNINITIALIZED:
@@ -146,68 +161,59 @@ void driverDHT22_Update(void)
             sc_assert_fail();
             break;
     }
-    return;
 }
 
-///
-/// @brief Get the latest sensor reading
-///
-/// @param  None
-/// @return dht22_data_type Struct with the sensor readings and its status
-///
-dht22_data_type driverDHT22_GetSensorReading(void)
+int16_t driverDHT22_GetTemperature(void)
 {
-    dht22_data_type return_data = sensor_reading;
-    sensor_reading.status = false;
-    return return_data;
+    return module.measurement.temperature;
 }
 
-///
-/// @brief Check if the last reading was valid
-///
-/// @param  None
-/// @return bool true if valid, otherwise false
-///
-bool driverDHT22_IsReadingValid(void)
+int16_t driverDHT22_GetHumidity(void)
 {
-    return sensor_reading.status;
+    return module.measurement.humidity;
 }
 
-///
-/// @brief Check if the sensor is idle
-///
-/// @param  None
-/// @return bool true if idle, otherwise false
-///
+bool driverDHT22_IsMeasurmentValid(void)
+{
+    return module.measurement.valid;
+}
+
+void driverDHT22_ClearValidFlag(void)
+{
+    module.measurement.valid = false;
+}
+
 bool driverDHT22_IsIdle(void)
 {
-    return (dht22_state == DHT_IDLE);
+    return (module.state == DHT_IDLE);
 }
 
-///
-/// @brief Start a new reading
-///
-/// @param  None
-/// @return bool true if a new reading is started, otherwise false
-///
-void driverDHT22_StartReading(void)
+void driverDHT22_StartMeasurement(void)
 {
     if (driverDHT22_IsIdle() == true)
     {
-        dht22_state = DHT_READING;
+        module.state = DHT_READING;
     }
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+static void InitHardware(void)
+{
+    //Set data pin as output and high
+    DDRB |= (1 << DATAPIN);
+    PORTB |= (1 << DATAPIN);
+
+    EnableInputCapture(false);
+}
+
 static void EnableInputCapture(bool enabled)
 {
     if (enabled == true)
     {
-        pulse_counter = 0;
+        module.pulse_counter = 0;
 
         //Set clock source to CLK
         TCCR1B |= (1 << CS11);
@@ -229,59 +235,56 @@ static void EnableInputCapture(bool enabled)
         //Reset the timer register
         TCNT1 = 0x00;
     }
-    return;
 }
 
-static dht_state_type ReadingStateMachine(void)
+static dht_state_t ReadingStateMachine(void)
 {
-    static dht_reading_state_type state = DHT_READING_REQUEST;
-    static uint32_t reading_timer;
-    dht_state_type next_dht_state = DHT_READING;
+    dht_state_t next_dht_state = DHT_READING;
 
-    switch (state)
+    switch (module.reading.state)
     {
         case DHT_READING_REQUEST:
-            reading_timer = Timer_GetMilliseconds();
+            module.reading.timer = Timer_GetMilliseconds();
 
             //Pull data pin low
             DDRB |= (1 << DATAPIN);
             PORTB &= ~(1 << DATAPIN);
 
-            state = DHT_READING_REQUEST_WAIT;
+            module.reading.state = DHT_READING_REQUEST_WAIT;
             break;
 
         case DHT_READING_REQUEST_WAIT:
             //NOTE: A delay of minimum 1 ms is required
-            if (Timer_TimeDifference(reading_timer) >= REQUEST_READING_TIME_MS)
+            if (Timer_TimeDifference(module.reading.timer) >= REQUEST_READING_TIME_MS)
             {
                 //Pull data pin high and then reconfigure as input
                 PORTB |= (1 << DATAPIN);
                 DDRB &= ~(1 << DATAPIN);
 
-                reading_timer = Timer_GetMilliseconds();
+                module.reading.timer = Timer_GetMilliseconds();
 
                 EnableInputCapture(true);
-                state = DHT_READING_CAPTURE_DATA;
+                module.reading.state = DHT_READING_CAPTURE_DATA;
             }
             break;
 
         case DHT_READING_CAPTURE_DATA:
-            if (pulse_counter == EXPECTED_NR_PULSES)
+            if (module.pulse_counter == EXPECTED_NR_PULSES)
             {
                 EnableInputCapture(false);
-                state = DHT_READING_REQUEST;
+                module.reading.state = DHT_READING_REQUEST;
                 next_dht_state =  DHT_DECODING;
             }
 
             //NOTE: According to the DHT22-datasheet a measurement takes 5 mS,
             //      with FOSC 8 MHz and 8 as prescaler the timer overflows in 64 mS.
             //      A timeout between 5 mS and 64 mS is therefore needed.
-            if (Timer_TimeDifference(reading_timer) > READING_TIMEOUT_MS)
+            if (Timer_TimeDifference(module.reading.timer) > READING_TIMEOUT_MS)
             {
                 ERROR("Timeout while capturing data");
                 EnableInputCapture(false);
-                state = DHT_READING_REQUEST;
-                init_time = Timer_GetMilliseconds();
+                module.reading.state = DHT_READING_REQUEST;
+                module.initialization_time = Timer_GetMilliseconds();
                 return DHT_POWERUP;
             }
             break;
@@ -298,53 +301,40 @@ static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional)
     return (integral << 8) + (fractional);
 }
 
-///
-/// @brief  Decode pulse timings and convert them into usable data
-///
-/// @param  None
-/// @return None
-///
 static void DecodeTimings(void)
 {
     uint8_t bit_index;
     uint8_t byte_index;
     uint8_t index;
     uint8_t data[5] = {0, 0, 0, 0, 0};
-    uint16_t prev = pulse_timings[TIMINGS_INDEX_OFFSET - 1];
+    uint16_t prev = module.pulse_timings[TIMINGS_INDEX_OFFSET - 1];
 
     for (byte_index = 0; byte_index < 5; ++byte_index)
     {
         for (bit_index = 0; bit_index < 8; ++bit_index)
         {
             index = (byte_index << 3) + bit_index + TIMINGS_INDEX_OFFSET;
-            if (pulse_timings[index] - prev > LOW_HIGH_LIMIT)
+            if (module.pulse_timings[index] - prev > LOW_HIGH_LIMIT)
             {
                 data[byte_index] |= (1 << (7 - bit_index));
             }
-            prev = pulse_timings[index];
+            prev = module.pulse_timings[index];
         }
     }
 
     if (IsDataValid(data) == true)
     {
-        sensor_reading.humidity = ConvertToScaledInteger(data[0], data[1]);
-        sensor_reading.temperature = ConvertToScaledInteger(data[2], data[3]);
-        sensor_reading.status = true;
+        module.measurement.humidity = ConvertToScaledInteger(data[0], data[1]);
+        module.measurement.temperature = ConvertToScaledInteger(data[2], data[3]);
+        module.measurement.valid = true;
     }
     else
     {
         ERROR("Invalid data");
-        sensor_reading.status = false;
+        module.measurement.valid = false;
     }
-    return;
 }
 
-///
-/// @brief Check if the sensor data is valid
-///
-/// @param  *data Pointer to array with data
-/// @return bool Result
-///
 static bool IsDataValid(uint8_t *data)
 {
     return (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF));

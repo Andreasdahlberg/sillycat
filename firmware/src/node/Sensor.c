@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-06 (Last edit)
+ * @date   2018-11-08 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -58,7 +58,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static dht22_data_type reading_buffer[READING_BUFFER_SIZE];
+static sensor_data_type reading_buffer[READING_BUFFER_SIZE];
 static fifo_type reading_fifo;
 
 //////////////////////////////////////////////////////////////////////////
@@ -90,17 +90,12 @@ void Sensor_Init(void)
 ///
 void Sensor_Update(void)
 {
-    if (driverDHT22_IsReadingValid())
+    if (driverDHT22_IsMeasurmentValid())
     {
-        dht22_data_type dht22_reading;
-        dht22_reading = driverDHT22_GetSensorReading();
-
-        // No need to check the reading status since it is already done in
-        // the call to driverDHT22_IsReadingValid().
-
         sensor_data_type reading;
-        reading.temperature = dht22_reading.temperature;
-        reading.humidity = dht22_reading.humidity;
+        reading.temperature = driverDHT22_GetTemperature();
+        reading.humidity = driverDHT22_GetHumidity();
+        driverDHT22_ClearValidFlag();
         if (!RTC_GetCurrentTime(&reading.timestamp))
         {
             // Log error and continue, an invalid timestamp is not critical.
@@ -149,7 +144,7 @@ void Sensor_WakeUp(const event_t *event __attribute__ ((unused)))
 {
     sc_assert(event != NULL);
 
-    driverDHT22_StartReading();
+    driverDHT22_StartMeasurement();
     return;
 }
 

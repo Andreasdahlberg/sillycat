@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-06 (Last edit)
+ * @date   2018-11-08 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -33,22 +33,58 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    uint16_t humidity;
-    uint16_t temperature;
-    bool status;
-} dht22_data_type;
-
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the DHT22 hardware and driver.
+ */
 void driverDHT22_Init(void);
+
+/**
+ * Update the internal state of the driver.
+ */
 void driverDHT22_Update(void);
-dht22_data_type driverDHT22_GetSensorReading(void);
+
+/**
+ * Get the temperature.
+ *
+ * @return Temperature in °C.
+ */
+int16_t driverDHT22_GetTemperature(void);
+
+/**
+ * Get the relative humidity.
+ *
+ * @return Relative humidity in percent.
+ */
+int16_t driverDHT22_GetHumidity(void);
+
+/**
+ * Check if the last measurement was valid.
+ *
+ * @return True if valid, otherwise false.
+ */
+bool driverDHT22_IsMeasurmentValid(void);
+
+/**
+ * Clear the measurement valid flag.
+ */
+void driverDHT22_ClearValidFlag(void);
+
+/**
+ * Check if the sensor is idle.
+ *
+ * When the sensor is idle it's ready to start a new measurements.
+ *
+ * @return True if idle, otherwise false.
+ */
 bool driverDHT22_IsIdle(void);
-void driverDHT22_StartReading(void);
-bool driverDHT22_IsReadingValid(void);
+
+/**
+ * Start a new measurement.
+ */
+void driverDHT22_StartMeasurement(void);
 
 #endif
