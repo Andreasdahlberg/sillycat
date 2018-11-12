@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-11 (Last edit)
+ * @date   2018-11-12 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -33,12 +33,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libDebug.h"
 #include "Packet.h"
 #include "Battery.h"
+#include "Config.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define NODE_INACTIVE_TIME_LIMIT    20000
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -51,6 +50,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+static inline uint32_t InactivityTimeoutTime(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -92,7 +93,7 @@ bool Node_IsActive(struct node_t *self_p)
     sc_assert(self_p != NULL);
 
     return self_p->connected &&
-           Timer_TimeDifference(self_p->last_active) <= NODE_INACTIVE_TIME_LIMIT;
+           Timer_TimeDifference(self_p->last_active) <= InactivityTimeoutTime();
 }
 
 struct sensor_t *Node_GetTemperatureSensor(struct node_t *self_p)
@@ -208,3 +209,8 @@ void Node_Update(struct node_t *self_p, void *data_p, size_t length)
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static inline uint32_t InactivityTimeoutTime(void)
+{
+    return Config_GetReportInterval() * 1000;
+}
