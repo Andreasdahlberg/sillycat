@@ -26,11 +26,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include <avr/io.h>
-
 #include "libDebug.h"
 #include "libSPI.h"
 #include "driverMCP79510.h"
@@ -85,25 +82,22 @@ void driverMCP79510_Init(void)
     }
 
     INFO("MCP79510 initialized");
-    return;
 }
 
 void driverMCP79510_HWInit(void)
 {
-    //Set SS as output and pull high to release device.
+    /* Set SS as output and pull high to release device. */
     DDRD |= (1 << SS);
     PORTD |= (1 << SS);
 
-    //Set MFP as input with an pull-up active.
+    /* Set MFP as input with an pull-up active. */
     DDRD &= ~(1 << MFP);
     PORTD |= (1 << MFP);
-    return;
 }
 
 void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p)
 {
     *hsec_p = GetDecimalRegisterValue(REG_TC_SEC_CENT);
-    return;
 }
 
 bool driverMCP79510_SetHundredthSecond(uint8_t hsec)
@@ -139,7 +133,6 @@ void driverMCP79510_GetSecond(uint8_t *sec_p)
     register_content &= ~(1 << REG_TC_SEC_OSC_BIT);
 
     *sec_p = BCDToDecimal(register_content);
-    return;
 }
 
 bool driverMCP79510_SetSecond(uint8_t sec)
@@ -182,7 +175,6 @@ bool driverMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
 void driverMCP79510_GetMinute(uint8_t *minute_p)
 {
     *minute_p = GetDecimalRegisterValue(REG_TC_MIN);
-    return;
 }
 
 bool driverMCP79510_SetMinute(uint8_t minute)
@@ -233,7 +225,6 @@ void driverMCP79510_GetHour(uint8_t *hour_p)
     }
 
     *hour_p = BCDToDecimal(register_content);
-    return;
 }
 
 bool driverMCP79510_SetHour(uint8_t hour)
@@ -300,7 +291,6 @@ void driverMCP79510_GetDay(uint8_t *day_p)
     register_content &= 0x07;
 
     *day_p = BCDToDecimal(register_content);
-    return;
 }
 
 bool driverMCP79510_SetDay(uint8_t day)
@@ -322,7 +312,6 @@ bool driverMCP79510_SetDay(uint8_t day)
 void driverMCP79510_GetDate(uint8_t *date_p)
 {
     *date_p = GetDecimalRegisterValue(REG_TC_DATE);
-    return;
 }
 
 bool driverMCP79510_SetDate(uint8_t date)
@@ -364,7 +353,6 @@ void driverMCP79510_GetMonth(uint8_t *month_p)
     register_content &= 0x1F;
 
     *month_p = BCDToDecimal(register_content);
-    return;
 }
 
 bool driverMCP79510_SetMonth(uint8_t month)
@@ -386,7 +374,6 @@ bool driverMCP79510_SetMonth(uint8_t month)
 void driverMCP79510_GetYear(uint8_t *year_p)
 {
     *year_p = GetDecimalRegisterValue(REG_TC_YEAR);
-    return;
 }
 
 bool driverMCP79510_SetYear(uint8_t year)
@@ -417,7 +404,6 @@ void driverMCP79510_Enable24HourMode(bool enabled)
     }
 
     WriteRegister(REG_TC_HOUR, register_content);
-    return;
 }
 
 bool driverMCP79510_Is24HourMode(void)
@@ -443,7 +429,6 @@ void driverMCP79510_EnableOscillator(bool enabled)
     }
 
     WriteRegister(REG_TC_SEC, register_content);
-    return;
 }
 
 bool driverMCP79510_IsLeapYear(void)
@@ -470,7 +455,6 @@ void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
     }
 
     WriteRegister(REG_TC_CONTROL, register_data);
-    return;
 }
 
 void driverMCP79510_EnableSquareWave(bool enable)
@@ -480,7 +464,6 @@ void driverMCP79510_EnableSquareWave(bool enable)
     SetBit(REG_TC_CONTROL_SQWE_BIT, enable, &register_data);
     WriteRegister(REG_TC_CONTROL, register_data);
 
-    return;
 }
 
 bool driverMCP79510_IsOscillatorRunning(void)
@@ -499,7 +482,6 @@ void driverMCP79510_ClearBatterySwitchFlag(void)
     ClearBit(register_content, REG_TC_DAY_VBAT_BIT);
 
     WriteRegister(REG_TC_DAY, register_content);
-    return;
 }
 
 void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)
@@ -515,7 +497,6 @@ void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)
 
     ClearBit(register_content, REG_ALARM_DAY_ALM0IF_BIT);
     WriteRegister(register_address, register_content);
-    return;
 }
 
 bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
@@ -528,13 +509,12 @@ bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
         libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
         libSPI_WriteByte(SRAM_ADDRESS + address, NULL, NULL);
 
-        uint8_t index;
-        for (index = 0; index < length; ++index)
+        for (uint8_t i = 0; i < length; ++i)
         {
             const uint8_t *tmp_p = (uint8_t *)data_p;
 
             //TODO: Verify that address is auto incremented for write.
-            libSPI_WriteByte(tmp_p[index], NULL, NULL);
+            libSPI_WriteByte(tmp_p[i], NULL, NULL);
         }
         PostCallback();
         status = true;
@@ -551,13 +531,12 @@ bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
         libSPI_WriteByte(INST_READ, &PreCallback, NULL);
         libSPI_WriteByte(SRAM_ADDRESS + address, NULL, NULL);
 
-        uint8_t index;
-        for (index = 0; index < length; ++index)
+        for (uint8_t i = 0; i < length; ++i)
         {
             uint8_t *tmp_p = (uint8_t *)data_p;
 
             //SRAM address is auto incremented after each read
-            libSPI_ReadByte(&tmp_p[index], NULL, NULL);
+            libSPI_ReadByte(&tmp_p[i], NULL, NULL);
         }
         PostCallback();
         status = true;
@@ -569,7 +548,6 @@ void driverMCP79510_ClearSRAM(void)
 {
     libSPI_WriteByte(INST_CLRRAM, &PreCallback, NULL);
     libSPI_WriteByte(0x00, NULL, &PostCallback); //Dummy byte
-    return;
 }
 
 void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
@@ -579,14 +557,12 @@ void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
     libSPI_WriteByte(INST_IDREAD, &PreCallback, NULL);
     libSPI_WriteByte(EUI_MAX_SIZE - length, NULL, NULL);
 
-    uint8_t idx;
-    for (idx = 0; idx < length; ++idx)
+    for (uint8_t i = 0; i < length; ++i)
     {
-        libSPI_ReadByte(&eui[idx], NULL, NULL);
+        libSPI_ReadByte(&eui[i], NULL, NULL);
     }
 
     PostCallback();
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -596,10 +572,8 @@ void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
 #ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void)
 {
-    uint8_t address;
-
     DEBUG("****MCP79510 REGISTERS****\r\n");
-    for (address = REG_TC_SEC_CENT; address <= REG_PU_MONTH; ++address)
+    for (uint8_t address = REG_TC_SEC_CENT; address <= REG_PU_MONTH; ++address)
     {
         //Skip reserved registers
         if (address != 0x0A && address != 0x0B)
@@ -611,7 +585,6 @@ static void DumpRegisterValues(void)
                   register_content);
         }
     }
-    return;
 }
 #endif
 
@@ -622,7 +595,6 @@ static void WriteRegister(uint8_t address, uint8_t register_data)
     libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
     libSPI_WriteByte(address, NULL, NULL);
     libSPI_WriteByte(register_data, NULL, &PostCallback);
-    return;
 }
 
 static uint8_t ReadRegister(uint8_t address)
@@ -641,11 +613,9 @@ static void PreCallback(void)
 {
     libSPI_SetMode(SPIMODE);
     PORTD &= ~(1 << SS); //Pull SS low to select device
-    return;
 }
 
 static void PostCallback(void)
 {
     PORTD |= (1 << SS); //Pull SS high to release device
-    return;
 }
