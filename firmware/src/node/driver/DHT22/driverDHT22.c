@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-08 (Last edit)
+ * @date   2018-11-12 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/interrupt.h>
 #include "libDebug.h"
 #include "Timer.h"
+#include "driverInputCapture.h"
 #include "driverDHT22.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,24 +96,11 @@ struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 static void InitHardware(void);
-static void EnableInputCapture(bool enabled);
 static void DecodeTimings(void);
 static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional);
 static bool IsDataValid(uint8_t *data);
 static dht_state_t ReadingStateMachine(void);
-
-//////////////////////////////////////////////////////////////////////////
-//INTERUPT SERVICE ROUTINES
-//////////////////////////////////////////////////////////////////////////
-
-ISR(TIMER1_CAPT_vect)
-{
-    if (module.pulse_counter < EXPECTED_NR_PULSES)
-    {
-        module.pulse_timings[module.pulse_counter] = ICR1;
-        ++module.pulse_counter;
-    }
-}
+static void InterruptHandler(uint16_t value);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -121,8 +109,11 @@ ISR(TIMER1_CAPT_vect)
 void driverDHT22_Init(void)
 {
     InitHardware();
+    driverInputCapture_Init();
+    driverInputCapture_DisableNoiseCanceling();
+    driverInputCapture_RegisterInterruptHandler(InterruptHandler);
 
-    module = (struct module_t){
+    module = (__typeof__(module)){
         .state = DHT_POWERUP,
         .initialization_time = Timer_GetMilliseconds(),
     };
@@ -205,36 +196,6 @@ static void InitHardware(void)
     //Set data pin as output and high
     DDRB |= (1 << DATAPIN);
     PORTB |= (1 << DATAPIN);
-
-    EnableInputCapture(false);
-}
-
-static void EnableInputCapture(bool enabled)
-{
-    if (enabled == true)
-    {
-        module.pulse_counter = 0;
-
-        //Set clock source to CLK
-        TCCR1B |= (1 << CS11);
-
-        //Disable noise canceling
-        TCCR1B &= ~(1 << ICNC1);
-
-        //Enabled input capture interrupts
-        TIMSK1 |= (1 << ICIE1);
-    }
-    else
-    {
-        //Disabled input capture interrupts
-        TIMSK1 &= ~(1 << ICIE1);
-
-        //Stop timer by removing the clock source
-        TCCR1B &= ~(1 << CS12 | 1 << CS11 | 1 << CS10);
-
-        //Reset the timer register
-        TCNT1 = 0x00;
-    }
 }
 
 static dht_state_t ReadingStateMachine(void)
@@ -263,7 +224,7 @@ static dht_state_t ReadingStateMachine(void)
 
                 module.reading.timer = Timer_GetMilliseconds();
 
-                EnableInputCapture(true);
+                driverInputCapture_Enable();
                 module.reading.state = DHT_READING_CAPTURE_DATA;
             }
             break;
@@ -271,7 +232,7 @@ static dht_state_t ReadingStateMachine(void)
         case DHT_READING_CAPTURE_DATA:
             if (module.pulse_counter == EXPECTED_NR_PULSES)
             {
-                EnableInputCapture(false);
+                driverInputCapture_Disable();
                 module.reading.state = DHT_READING_REQUEST;
                 next_dht_state =  DHT_DECODING;
             }
@@ -282,7 +243,8 @@ static dht_state_t ReadingStateMachine(void)
             if (Timer_TimeDifference(module.reading.timer) > READING_TIMEOUT_MS)
             {
                 ERROR("Timeout while capturing data");
-                EnableInputCapture(false);
+                INFO("pulse_counter: %lu", module.pulse_counter);
+                driverInputCapture_Disable();
                 module.reading.state = DHT_READING_REQUEST;
                 module.initialization_time = Timer_GetMilliseconds();
                 return DHT_POWERUP;
@@ -338,4 +300,13 @@ static void DecodeTimings(void)
 static bool IsDataValid(uint8_t *data)
 {
     return (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF));
+}
+
+static void InterruptHandler(uint16_t value)
+{
+    if (module.pulse_counter < EXPECTED_NR_PULSES)
+    {
+        module.pulse_timings[module.pulse_counter] = value;
+        ++module.pulse_counter;
+    }
 }

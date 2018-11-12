@@ -67,7 +67,6 @@ static struct module_t module;
 //INTERUPT SERVICE ROUTINES
 //////////////////////////////////////////////////////////////////////////
 
-#if 0
 ISR(TIMER1_CAPT_vect)
 {
     if (module.InterruptHandler != NULL)
@@ -75,7 +74,6 @@ ISR(TIMER1_CAPT_vect)
         module.InterruptHandler(ICR1);
     }
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
