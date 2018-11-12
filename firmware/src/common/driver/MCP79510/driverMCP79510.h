@@ -1,8 +1,8 @@
 /**
- * @file   libMCP79510.h
+ * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-25 (Last edit)
- * @brief  Implementation of a driver for the MCP79510 RTC.
+ * @date   2018-11-12 (Last edit)
+ * @brief  Driver for the MCP79510 RTC.
  */
 
 /*
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBMCP79510_H_
-#define LIBMCP79510_H_
+#ifndef DRIVERMCP79510_H_
+#define DRIVERMCP79510_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -44,20 +44,20 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Initialize the MCP79510 RTC IC.
  */
-void libMCP79510_Init(void);
+void driverMCP79510_Init(void);
 
 /**
  * Set the SS pin as output and pull high. This function should be called as
  * early as possible in a system with several SPI-devices.
  */
-void libMCP79510_HWInit(void);
+void driverMCP79510_HWInit(void);
 
 /**
  * Get hundredth of second.
  *
  * @param hsec_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetHundredthSecond(uint8_t *hsec_p);
+void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p);
 
 /**
  * Set hundredth of second.
@@ -66,7 +66,7 @@ void libMCP79510_GetHundredthSecond(uint8_t *hsec_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetHundredthSecond(uint8_t hsec);
+bool driverMCP79510_SetHundredthSecond(uint8_t hsec);
 
 /**
  * Set alarm hundredth of second.
@@ -77,14 +77,14 @@ bool libMCP79510_SetHundredthSecond(uint8_t hsec);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetAlarmHundredthSecond(uint8_t hsec);
+bool driverMCP79510_SetAlarmHundredthSecond(uint8_t hsec);
 
 /**
  * Get second.
  *
  * @param sec_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetSecond(uint8_t *sec_p);
+void driverMCP79510_GetSecond(uint8_t *sec_p);
 
 /**
  * Set second.
@@ -93,7 +93,7 @@ void libMCP79510_GetSecond(uint8_t *sec_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetSecond(uint8_t sec);
+bool driverMCP79510_SetSecond(uint8_t sec);
 
 /**
  * Set alarm second.
@@ -103,14 +103,14 @@ bool libMCP79510_SetSecond(uint8_t sec);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index);
+bool driverMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index);
 
 /**
  * Get minute.
  *
  * @param minute_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetMinute(uint8_t *minute_p);
+void driverMCP79510_GetMinute(uint8_t *minute_p);
 
 /**
  * Set minute.
@@ -119,7 +119,7 @@ void libMCP79510_GetMinute(uint8_t *minute_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetMinute(uint8_t minute);
+bool driverMCP79510_SetMinute(uint8_t minute);
 
 /**
  * Set alarm minute.
@@ -129,14 +129,14 @@ bool libMCP79510_SetMinute(uint8_t minute);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index);
+bool driverMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index);
 
 /**
  * Get hour.
  *
  * @param hour_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetHour(uint8_t *hour_p);
+void driverMCP79510_GetHour(uint8_t *hour_p);
 
 /**
  * Set hour
@@ -145,7 +145,7 @@ void libMCP79510_GetHour(uint8_t *hour_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetHour(uint8_t hour);
+bool driverMCP79510_SetHour(uint8_t hour);
 
 /**
  * Set alarm hour.
@@ -155,14 +155,14 @@ bool libMCP79510_SetHour(uint8_t hour);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index);
+bool driverMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index);
 
 /**
  * Get day.
  *
  * @param day_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetDay(uint8_t *day_p);
+void driverMCP79510_GetDay(uint8_t *day_p);
 
 /**
  * Set day
@@ -171,13 +171,13 @@ void libMCP79510_GetDay(uint8_t *day_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetDay(uint8_t day);
+bool driverMCP79510_SetDay(uint8_t day);
 /**
  * Get date.
  *
  * @param day_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetDate(uint8_t *date_p);
+void driverMCP79510_GetDate(uint8_t *date_p);
 
 /**
  * Set date
@@ -186,7 +186,7 @@ void libMCP79510_GetDate(uint8_t *date_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetDate(uint8_t date);
+bool driverMCP79510_SetDate(uint8_t date);
 
 /**
  * Set alarm date.
@@ -196,13 +196,13 @@ bool libMCP79510_SetDate(uint8_t date);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index);
+bool driverMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index);
 /**
  * Get month.
  *
  * @param day_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetMonth(uint8_t *month_p);
+void driverMCP79510_GetMonth(uint8_t *month_p);
 /**
  * Set hour
  *
@@ -210,13 +210,13 @@ void libMCP79510_GetMonth(uint8_t *month_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetMonth(uint8_t month);
+bool driverMCP79510_SetMonth(uint8_t month);
 /**
  * Get year.
  *
  * @param day_p Pointer to variable where the result will be stored.
  */
-void libMCP79510_GetYear(uint8_t *year_p);
+void driverMCP79510_GetYear(uint8_t *year_p);
 
 /**
  * Set year.
@@ -225,35 +225,35 @@ void libMCP79510_GetYear(uint8_t *year_p);
  *
  * @return True if the value was set, otherwise false.
  */
-bool libMCP79510_SetYear(uint8_t year);
+bool driverMCP79510_SetYear(uint8_t year);
 
 /**
  * Enable/disable 24-hour mode.
  *
  Enable/disable the MCP79510 on-board oscillator.
  */
-void libMCP79510_Enable24HourMode(bool enabled);
+void driverMCP79510_Enable24HourMode(bool enabled);
 
 /**
  * Check if 24-hour mode is enabled.
  *
  * @return True if enabled, otherwise false.
  */
-bool libMCP79510_Is24HourMode(void);
+bool driverMCP79510_Is24HourMode(void);
 
 /**
  * Enable/disable the MCP79510 on-board oscillator.
  *
  * @param enabled Enable/disable the MCP79510 on-board oscillator.
  */
-void libMCP79510_EnableOscillator(bool enabled);
+void driverMCP79510_EnableOscillator(bool enabled);
 
 /**
  * Check if the current year is a leap year.
  *
  * @return True if leap year, otherwise false.
  */
-bool libMCP79510_IsLeapYear(void);
+bool driverMCP79510_IsLeapYear(void);
 
 /**
  * Enabled an alarm.
@@ -261,7 +261,7 @@ bool libMCP79510_IsLeapYear(void);
  * @param enable True for enable, otherwise false.
  * @param alarm  Index of alarm, 0 or 1.
  */
-void libMCP79510_EnableAlarm(bool enable, uint8_t alarm);
+void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm);
 
 /**
  * Enable the square wave output.
@@ -270,7 +270,7 @@ void libMCP79510_EnableAlarm(bool enable, uint8_t alarm);
  *
  * @param enable True for enabled, otherwise false.
  */
-void libMCP79510_EnableSquareWave(bool enable);
+void driverMCP79510_EnableSquareWave(bool enable);
 
 /**
  * Check if the oscillator is running.
@@ -282,7 +282,7 @@ void libMCP79510_EnableSquareWave(bool enable);
  *
  * @return True if running, otherwise false.
  */
-bool libMCP79510_IsOscillatorRunning(void);
+bool driverMCP79510_IsOscillatorRunning(void);
 
 /**
  * Clear the external battery switched flag.
@@ -291,14 +291,14 @@ bool libMCP79510_IsOscillatorRunning(void);
  * power the oscillator and the RTCC registers. This flag is cleared by
  * software.
  */
-void libMCP79510_ClearBatterySwitchFlag(void);
+void driverMCP79510_ClearBatterySwitchFlag(void);
 
 /**
  * Clear the alarm flag.
  *
  * @param alarm_index Index of alarm, 0 or 1.
  */
-void libMCP79510_ClearAlarmFlag(uint8_t alarm_index);
+void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index);
 
 /**
  * Write data to SRAM.
@@ -312,7 +312,7 @@ void libMCP79510_ClearAlarmFlag(uint8_t alarm_index);
  *
  * @return True if address and length is valid, otherwise false.
  */
-bool libMCP79510_WriteToSRAM(uint8_t address,
+bool driverMCP79510_WriteToSRAM(uint8_t address,
                              const void *data_p,
                              uint8_t length);
 
@@ -328,14 +328,14 @@ bool libMCP79510_WriteToSRAM(uint8_t address,
  *
  * @return True if address and length is valid, otherwise false.
  */
-bool libMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length);
+bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length);
 
 /**
  * Clear SRAM.
  *
  * Clear SRAM by reseting all locations to 0x00.
  */
-void libMCP79510_ClearSRAM(void);
+void driverMCP79510_ClearSRAM(void);
 
 /**
  * Get unique device ID.
@@ -346,6 +346,6 @@ void libMCP79510_ClearSRAM(void);
  * @param eui_p  Pointer to buffer where the ID will be stored.
  * @param length  Length of ID.
  */
-void libMCP79510_GetEUI(uint8_t *eui_p, size_t length);
+void driverMCP79510_GetEUI(uint8_t *eui_p, size_t length);
 
 #endif

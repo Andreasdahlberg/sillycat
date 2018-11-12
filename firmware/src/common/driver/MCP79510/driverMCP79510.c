@@ -1,8 +1,8 @@
 /**
- * @file   libMCP79510.c
+ * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-25 (Last edit)
- * @brief  Implementation of a driver for the MCP79510 RTC.
+ * @date   2018-11-12 (Last edit)
+ * @brief  Driver for the MCP79510 RTC.
  */
 
 /*
@@ -33,8 +33,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libSPI.h"
-#include "libMCP79510.h"
-#include "MCP79510Registers.h"
+#include "driverMCP79510.h"
+#include "driverMCP79510Registers.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -75,12 +75,12 @@ static void DumpRegisterValues(void) __attribute__((unused));
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libMCP79510_Init(void)
+void driverMCP79510_Init(void)
 {
-    libMCP79510_EnableSquareWave(false);
-    libMCP79510_EnableOscillator(true);
+    driverMCP79510_EnableSquareWave(false);
+    driverMCP79510_EnableOscillator(true);
 
-    while(!libMCP79510_IsOscillatorRunning())
+    while(!driverMCP79510_IsOscillatorRunning())
     {
     }
 
@@ -88,7 +88,7 @@ void libMCP79510_Init(void)
     return;
 }
 
-void libMCP79510_HWInit(void)
+void driverMCP79510_HWInit(void)
 {
     //Set SS as output and pull high to release device.
     DDRD |= (1 << SS);
@@ -100,13 +100,13 @@ void libMCP79510_HWInit(void)
     return;
 }
 
-void libMCP79510_GetHundredthSecond(uint8_t *hsec_p)
+void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p)
 {
     *hsec_p = GetDecimalRegisterValue(REG_TC_SEC_CENT);
     return;
 }
 
-bool libMCP79510_SetHundredthSecond(uint8_t hsec)
+bool driverMCP79510_SetHundredthSecond(uint8_t hsec)
 {
     bool status = false;
 
@@ -119,7 +119,7 @@ bool libMCP79510_SetHundredthSecond(uint8_t hsec)
     return status;
 }
 
-bool libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
+bool driverMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
 {
     bool status = false;
 
@@ -132,7 +132,7 @@ bool libMCP79510_SetAlarmHundredthSecond(uint8_t hsec)
     return status;
 }
 
-void libMCP79510_GetSecond(uint8_t *sec_p)
+void driverMCP79510_GetSecond(uint8_t *sec_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_SEC);
@@ -142,7 +142,7 @@ void libMCP79510_GetSecond(uint8_t *sec_p)
     return;
 }
 
-bool libMCP79510_SetSecond(uint8_t sec)
+bool driverMCP79510_SetSecond(uint8_t sec)
 {
     bool status = false;
 
@@ -159,7 +159,7 @@ bool libMCP79510_SetSecond(uint8_t sec)
     return status;
 }
 
-bool libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
+bool driverMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
@@ -179,13 +179,13 @@ bool libMCP79510_SetAlarmSeconds(uint8_t sec, uint8_t alarm_index)
     return status;
 }
 
-void libMCP79510_GetMinute(uint8_t *minute_p)
+void driverMCP79510_GetMinute(uint8_t *minute_p)
 {
     *minute_p = GetDecimalRegisterValue(REG_TC_MIN);
     return;
 }
 
-bool libMCP79510_SetMinute(uint8_t minute)
+bool driverMCP79510_SetMinute(uint8_t minute)
 {
     bool status = false;
 
@@ -198,7 +198,7 @@ bool libMCP79510_SetMinute(uint8_t minute)
     return status;
 }
 
-bool libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
+bool driverMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
@@ -217,7 +217,7 @@ bool libMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
     return status;
 }
 
-void libMCP79510_GetHour(uint8_t *hour_p)
+void driverMCP79510_GetHour(uint8_t *hour_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_HOUR);
@@ -236,7 +236,7 @@ void libMCP79510_GetHour(uint8_t *hour_p)
     return;
 }
 
-bool libMCP79510_SetHour(uint8_t hour)
+bool driverMCP79510_SetHour(uint8_t hour)
 {
     bool status = false;
 
@@ -263,7 +263,7 @@ bool libMCP79510_SetHour(uint8_t hour)
     return status;
 }
 
-bool libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
+bool driverMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
@@ -293,7 +293,7 @@ bool libMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
     return status;
 }
 
-void libMCP79510_GetDay(uint8_t *day_p)
+void driverMCP79510_GetDay(uint8_t *day_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_DAY);
@@ -303,7 +303,7 @@ void libMCP79510_GetDay(uint8_t *day_p)
     return;
 }
 
-bool libMCP79510_SetDay(uint8_t day)
+bool driverMCP79510_SetDay(uint8_t day)
 {
     bool status = false;
 
@@ -319,13 +319,13 @@ bool libMCP79510_SetDay(uint8_t day)
     return status;
 }
 
-void libMCP79510_GetDate(uint8_t *date_p)
+void driverMCP79510_GetDate(uint8_t *date_p)
 {
     *date_p = GetDecimalRegisterValue(REG_TC_DATE);
     return;
 }
 
-bool libMCP79510_SetDate(uint8_t date)
+bool driverMCP79510_SetDate(uint8_t date)
 {
     bool status = false;
 
@@ -338,7 +338,7 @@ bool libMCP79510_SetDate(uint8_t date)
     return status;
 }
 
-bool libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
+bool driverMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
@@ -357,7 +357,7 @@ bool libMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index)
     return status;
 }
 
-void libMCP79510_GetMonth(uint8_t *month_p)
+void driverMCP79510_GetMonth(uint8_t *month_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_MONTH);
@@ -367,7 +367,7 @@ void libMCP79510_GetMonth(uint8_t *month_p)
     return;
 }
 
-bool libMCP79510_SetMonth(uint8_t month)
+bool driverMCP79510_SetMonth(uint8_t month)
 {
     bool status = false;
 
@@ -383,13 +383,13 @@ bool libMCP79510_SetMonth(uint8_t month)
     return status;
 }
 
-void libMCP79510_GetYear(uint8_t *year_p)
+void driverMCP79510_GetYear(uint8_t *year_p)
 {
     *year_p = GetDecimalRegisterValue(REG_TC_YEAR);
     return;
 }
 
-bool libMCP79510_SetYear(uint8_t year)
+bool driverMCP79510_SetYear(uint8_t year)
 {
     bool status = false;
 
@@ -402,7 +402,7 @@ bool libMCP79510_SetYear(uint8_t year)
     return status;
 }
 
-void libMCP79510_Enable24HourMode(bool enabled)
+void driverMCP79510_Enable24HourMode(bool enabled)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_HOUR);
@@ -420,7 +420,7 @@ void libMCP79510_Enable24HourMode(bool enabled)
     return;
 }
 
-bool libMCP79510_Is24HourMode(void)
+bool driverMCP79510_Is24HourMode(void)
 {
     uint8_t register_content;
 
@@ -428,7 +428,7 @@ bool libMCP79510_Is24HourMode(void)
     return !IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content);
 }
 
-void libMCP79510_EnableOscillator(bool enabled)
+void driverMCP79510_EnableOscillator(bool enabled)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_SEC);
@@ -446,7 +446,7 @@ void libMCP79510_EnableOscillator(bool enabled)
     return;
 }
 
-bool libMCP79510_IsLeapYear(void)
+bool driverMCP79510_IsLeapYear(void)
 {
     uint8_t register_content;
 
@@ -454,7 +454,7 @@ bool libMCP79510_IsLeapYear(void)
     return IsBitSet(REG_TC_MONTH_LP_BIT, &register_content);
 }
 
-void libMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
+void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
@@ -473,7 +473,7 @@ void libMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
     return;
 }
 
-void libMCP79510_EnableSquareWave(bool enable)
+void driverMCP79510_EnableSquareWave(bool enable)
 {
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
 
@@ -483,7 +483,7 @@ void libMCP79510_EnableSquareWave(bool enable)
     return;
 }
 
-bool libMCP79510_IsOscillatorRunning(void)
+bool driverMCP79510_IsOscillatorRunning(void)
 {
     uint8_t register_content;
 
@@ -491,7 +491,7 @@ bool libMCP79510_IsOscillatorRunning(void)
     return IsBitSet(REG_TC_DAY_OSCON_BIT, &register_content);
 }
 
-void libMCP79510_ClearBatterySwitchFlag(void)
+void driverMCP79510_ClearBatterySwitchFlag(void)
 {
     uint8_t register_content;
 
@@ -502,7 +502,7 @@ void libMCP79510_ClearBatterySwitchFlag(void)
     return;
 }
 
-void libMCP79510_ClearAlarmFlag(uint8_t alarm_index)
+void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
@@ -518,7 +518,7 @@ void libMCP79510_ClearAlarmFlag(uint8_t alarm_index)
     return;
 }
 
-bool libMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
+bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
                              uint8_t length)
 {
     bool status = false;
@@ -542,7 +542,7 @@ bool libMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
     return status;
 }
 
-bool libMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
+bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
 {
     bool status = false;
 
@@ -565,14 +565,14 @@ bool libMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
     return status;
 }
 
-void libMCP79510_ClearSRAM(void)
+void driverMCP79510_ClearSRAM(void)
 {
     libSPI_WriteByte(INST_CLRRAM, &PreCallback, NULL);
     libSPI_WriteByte(0x00, NULL, &PostCallback); //Dummy byte
     return;
 }
 
-void libMCP79510_GetEUI(uint8_t *eui, size_t length)
+void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
 {
     sc_assert(length <= EUI_MAX_SIZE);
 

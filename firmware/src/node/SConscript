@@ -20,11 +20,15 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['../utility', '../common', 'driver/DHT22', 'driver/InputCapture']
+DIRECTORIES = [
+    '../utility',
+    '../common',
+    'driver/DHT22',
+    'driver/InputCapture'
+]
 
 #Import all exported variables
 Import(['*'])
-
 
 env.Append(CPPPATH=[
     '#src/utility',
@@ -32,7 +36,8 @@ env.Append(CPPPATH=[
     '#src/node/driver/DHT22',
     '#src/common',
     '#src/common/ADC',
-    '#src/common/timer'
+    '#src/common/timer',
+    '#src/common/driver/MCP79510'
 ])
 
 source = Glob('*.c')

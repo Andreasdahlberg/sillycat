@@ -1,10 +1,8 @@
 /**
- * @file   MCP79510Registers.h
+ * @file   driverMCP79510Registers.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-07 (Last edit)
- * @brief  Registers and bit defines for MCP79510.
- *
- * Detailed description of file.
+ * @date   2018-11-12 (Last edit)
+ * @brief  Driver for the MCP79510 RTC.
  */
 
 /*
@@ -24,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MCP79510REGISTERS_H_
-#define MCP79510REGISTERS_H_
+#ifndef DRIVERMCP79510REGISTERS_H_
+#define DRIVERMCP79510REGISTERS_H_
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -108,4 +106,4 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REG_ALARM_DAY_ALM0C1_BIT    0x05
 #define REG_ALARM_DAY_ALM0C2_BIT    0x06
 
-#endif /* MCP79510REGISTERS_H_ */
+#endif
