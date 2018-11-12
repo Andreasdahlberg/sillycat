@@ -20,7 +20,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['../utility', '../common', 'driver/DHT22']
+DIRECTORIES = ['../utility', '../common', 'driver/DHT22', 'driver/InputCapture']
 
 #Import all exported variables
 Import(['*'])
