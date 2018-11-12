@@ -27,14 +27,14 @@ $ ./config load <PORT> <FILENAME>
 
 Print configuration values from the supplied configuration file:
 ```bash
-$ ./config get <FILENAME> version node_id
+$ ./config get <FILENAME> version address
 version=1
-node_id=170
+address=170
 ```
 
 Set a configuration value in the configuration file:
 ```bash
-$ ./config set <FILENAME> node_id 128
+$ ./config set <FILENAME> address 128
 ```
 
 Save the configuration file to device:
