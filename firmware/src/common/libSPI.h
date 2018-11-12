@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-24 (Last edit)
+ * @date   2018-11-12 (Last edit)
  * @brief  Header for SPI-library.
  *
  * Detailed description of file.
@@ -31,7 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/io.h>
 #include "common.h"
 
 //////////////////////////////////////////////////////////////////////////
