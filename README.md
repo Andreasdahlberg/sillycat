@@ -10,3 +10,5 @@ SillyCat
 [Docker](docker/README.md)
 
 [Testing](firmware/tests/README.md)
+
+[Configuration](scripts/memory/README.md)
