@@ -23,6 +23,7 @@ import os
 DIRECTORIES = [
     '../utility',
     '../common',
+    'board',
     'driver/DHT22',
     'driver/InputCapture'
 ]
@@ -33,6 +34,7 @@ Import(['*'])
 env.Append(CPPPATH=[
     '#src/utility',
     '#src/node',
+    '#src/node/board',
     '#src/node/driver/DHT22',
     '#src/common',
     '#src/common/ADC',
