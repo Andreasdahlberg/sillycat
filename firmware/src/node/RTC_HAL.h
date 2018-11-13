@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-12 (Last edit)
+ * @date   2018-11-13 (Last edit)
  * @brief  RTC HAL.
  */
 
@@ -38,8 +38,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_ALARM_INDEX 1
 #define RTC_IsAlarmsSupported() true
 
-#define RTC_InitHW()    driverMCP79510_HWInit()
-#define RTC_Init()      driverMCP79510_Init()
+#define RTC_InitHW()
+#define RTC_Init()      driverMCP79510_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback)
 
 #define RTC_GetYear(year)           driverMCP79510_GetYear(year)
 #define RTC_GetMonth(month)         driverMCP79510_GetMonth(month)

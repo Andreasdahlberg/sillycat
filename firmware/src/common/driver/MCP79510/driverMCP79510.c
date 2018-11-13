@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-12 (Last edit)
+ * @date   2018-11-13 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -27,19 +27,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include "common.h"
-#include <avr/io.h>
 #include "libDebug.h"
-#include "libSPI.h"
 #include "driverMCP79510.h"
 #include "driverMCP79510Registers.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define MFP DD3
-#define SS  DDD4
-#define SPIMODE 0
 
 #define SRAM_SIZE 64
 #define EUI_MAX_SIZE 8
@@ -51,9 +45,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct module_t
+{
+    libSPI_callback_type PreSPI;
+    libSPI_callback_type PostSPI;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+static struct module_t module;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -61,8 +63,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 static uint8_t ReadRegister(uint8_t address);
 static void WriteRegister(uint8_t address, uint8_t register_data);
-static void PreCallback(void);
-static void PostCallback(void);
 
 #ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void) __attribute__((unused));
@@ -72,8 +72,16 @@ static void DumpRegisterValues(void) __attribute__((unused));
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void driverMCP79510_Init(void)
+void driverMCP79510_Init(libSPI_callback_type pre_fp,
+                         libSPI_callback_type post_fp
+                        )
 {
+    sc_assert(pre_fp != NULL);
+    sc_assert(post_fp != NULL);
+
+    module.PreSPI = pre_fp;
+    module.PostSPI = post_fp;
+
     driverMCP79510_EnableSquareWave(false);
     driverMCP79510_EnableOscillator(true);
 
@@ -82,17 +90,6 @@ void driverMCP79510_Init(void)
     }
 
     INFO("MCP79510 initialized");
-}
-
-void driverMCP79510_HWInit(void)
-{
-    /* Set SS as output and pull high to release device. */
-    DDRD |= (1 << SS);
-    PORTD |= (1 << SS);
-
-    /* Set MFP as input with an pull-up active. */
-    DDRD &= ~(1 << MFP);
-    PORTD |= (1 << MFP);
 }
 
 void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p)
@@ -506,7 +503,7 @@ bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
-        libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
+        libSPI_WriteByte(INST_WRITE, module.PreSPI, NULL);
         libSPI_WriteByte(SRAM_ADDRESS + address, NULL, NULL);
 
         for (uint8_t i = 0; i < length; ++i)
@@ -516,7 +513,7 @@ bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
             //TODO: Verify that address is auto incremented for write.
             libSPI_WriteByte(tmp_p[i], NULL, NULL);
         }
-        PostCallback();
+        module.PostSPI();
         status = true;
     }
     return status;
@@ -528,7 +525,7 @@ bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
     {
-        libSPI_WriteByte(INST_READ, &PreCallback, NULL);
+        libSPI_WriteByte(INST_READ, module.PreSPI, NULL);
         libSPI_WriteByte(SRAM_ADDRESS + address, NULL, NULL);
 
         for (uint8_t i = 0; i < length; ++i)
@@ -538,7 +535,7 @@ bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
             //SRAM address is auto incremented after each read
             libSPI_ReadByte(&tmp_p[i], NULL, NULL);
         }
-        PostCallback();
+        module.PostSPI();
         status = true;
     }
     return status;
@@ -546,15 +543,15 @@ bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
 
 void driverMCP79510_ClearSRAM(void)
 {
-    libSPI_WriteByte(INST_CLRRAM, &PreCallback, NULL);
-    libSPI_WriteByte(0x00, NULL, &PostCallback); //Dummy byte
+    libSPI_WriteByte(INST_CLRRAM, module.PreSPI, NULL);
+    libSPI_WriteByte(0x00, NULL, module.PostSPI); //Dummy byte
 }
 
 void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
 {
     sc_assert(length <= EUI_MAX_SIZE);
 
-    libSPI_WriteByte(INST_IDREAD, &PreCallback, NULL);
+    libSPI_WriteByte(INST_IDREAD, module.PreSPI, NULL);
     libSPI_WriteByte(EUI_MAX_SIZE - length, NULL, NULL);
 
     for (uint8_t i = 0; i < length; ++i)
@@ -562,7 +559,7 @@ void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
         libSPI_ReadByte(&eui[i], NULL, NULL);
     }
 
-    PostCallback();
+    module.PostSPI();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -592,9 +589,9 @@ static void WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address < 0x20);
 
-    libSPI_WriteByte(INST_WRITE, &PreCallback, NULL);
+    libSPI_WriteByte(INST_WRITE, module.PreSPI, NULL);
     libSPI_WriteByte(address, NULL, NULL);
-    libSPI_WriteByte(register_data, NULL, &PostCallback);
+    libSPI_WriteByte(register_data, NULL, module.PostSPI);
 }
 
 static uint8_t ReadRegister(uint8_t address)
@@ -603,19 +600,8 @@ static uint8_t ReadRegister(uint8_t address)
 
     uint8_t register_data;
 
-    libSPI_WriteByte(INST_READ, &PreCallback, NULL);
+    libSPI_WriteByte(INST_READ, module.PreSPI, NULL);
     libSPI_WriteByte(address, NULL, NULL);
-    libSPI_ReadByte(&register_data, NULL, &PostCallback);
+    libSPI_ReadByte(&register_data, NULL, module.PostSPI);
     return register_data;
-}
-
-static void PreCallback(void)
-{
-    libSPI_SetMode(SPIMODE);
-    PORTD &= ~(1 << SS); //Pull SS low to select device
-}
-
-static void PostCallback(void)
-{
-    PORTD |= (1 << SS); //Pull SS high to release device
 }

@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-12 (Last edit)
+ * @date   2018-11-13 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -29,6 +29,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include "libSPI.h"
+
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
@@ -43,14 +45,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Initialize the MCP79510 RTC IC.
+ *
+ * @param pre_fp  Function for preparing a SPI-transfer.
+ * @param post_fp Function for ending a SPI-transfer.
  */
-void driverMCP79510_Init(void);
-
-/**
- * Set the SS pin as output and pull high. This function should be called as
- * early as possible in a system with several SPI-devices.
- */
-void driverMCP79510_HWInit(void);
+void driverMCP79510_Init(libSPI_callback_type pre_fp,
+                         libSPI_callback_type post_fp
+                        );
 
 /**
  * Get hundredth of second.
@@ -313,8 +314,9 @@ void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index);
  * @return True if address and length is valid, otherwise false.
  */
 bool driverMCP79510_WriteToSRAM(uint8_t address,
-                             const void *data_p,
-                             uint8_t length);
+                                const void *data_p,
+                                uint8_t length
+                               );
 
 /**
  * Read data from SRAM.

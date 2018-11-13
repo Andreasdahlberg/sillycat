@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-06 (Last edit)
+ * @date   2018-11-13 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -44,6 +44,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "driverCharger.h"
 
 #include "ADC.h"
+#include "Board.h"
 #include "Time.h"
 #include "Timer.h"
 #include "LED.h"
@@ -101,9 +102,9 @@ int main(void)
     wdt_disable();
 
     //Init hardware early to ensure all CS are disabled.
+    Board_Init();
     libRFM69_InitHW();
     libS25FL1K_InitHW();
-    RTC_InitHW();
     libDebug_Init();
 
     INFO("Node unit started");
