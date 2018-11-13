@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-12 (Last edit)
+ * @date   2018-11-13 (Last edit)
  * @brief  Header for SPI-library.
  *
  * Detailed description of file.
@@ -37,15 +37,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-typedef enum SPI_status
-{
-    IDLE = 0,
-    READ,
-    READ_DONE,
-    WRITE,
-    WRITE_DONE,
-} SPI_status;
-
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -58,9 +49,7 @@ typedef void (*libSPI_callback_type)(void);
 
 void libSPI_Init(uint8_t spi_mode);
 void libSPI_SetMaster(bool master_value);
-SPI_status libSPI_GetStatus(void);
 bool libSPI_SetMode(uint8_t mode);
-bool SetActiveSlave(bool state);
 void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
                       libSPI_callback_type post_write);
 void libSPI_Write(void *data, size_t length, libSPI_callback_type pre_write,

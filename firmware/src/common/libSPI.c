@@ -65,14 +65,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static SPI_status spi_status;
-static bool slave_active;
-
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
-
-bool SPIBusy();
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -100,7 +95,6 @@ void libSPI_Init(uint8_t spi_mode)
     if (libSPI_SetMode(spi_mode) == true)
     {
         SPCR |= (1 << SPE);
-        spi_status = IDLE;
 
         INFO("Init done");
     }
@@ -109,7 +103,6 @@ void libSPI_Init(uint8_t spi_mode)
         ERROR("Failed to init SPI, invalid mode: %u", spi_mode);
     }
 
-    slave_active = false;
     return;
 }
 
@@ -234,17 +227,6 @@ void libSPI_Read(void *buffer, size_t length, libSPI_callback_type pre_read,
 }
 
 ///
-/// @brief Get the status of the SPI-bus
-///
-/// @param None
-/// @return SPI_status SPI-bus status
-///
-SPI_status libSPI_GetStatus(void)
-{
-    return spi_status;
-}
-
-///
 /// @brief Select if master or slave mode
 ///
 /// @param bool true if master, else slave  //TODO: Fix this description
@@ -304,38 +286,3 @@ bool libSPI_SetMode(uint8_t mode)
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-//TODO: Fix this description
-///
-/// @brief Set slave to active, this prevents other modules to use the SPI-bus. Keep in mind that there is now control if its the same module...
-///
-///
-/// @param state true if SPI is active, otherwise false
-/// @return bool Status of operation
-///
-bool SetActiveSlave(bool state)
-{
-    bool status = false;
-    if (slave_active == false)
-    {
-        slave_active = true;
-        status = true;
-    }
-    else if (slave_active == true && state == false)
-    {
-        slave_active = false;
-        status = true;
-    }
-    return status;
-}
-
-///
-/// @brief Check if the SPI-bus is busy
-///
-/// @param None
-/// @return bool Status of SPI-bus
-///
-bool SPIBusy(void)
-{
-    return ((SPSR & (1 << SPIF)) == 0);
-}
