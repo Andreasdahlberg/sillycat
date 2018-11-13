@@ -1,10 +1,8 @@
 /**
  * @file   libSPI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-04-24 (Last edit)
- * @brief  Implementation of SPI-library.
- *
- * Detailed description of file.
+ * @date   2018-11-13 (Last edit)
+ * @brief  Driver for the ATmega328 SPI-peripheral.
  */
 
 /*
@@ -28,10 +26,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include "common.h"
 #include <avr/io.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "libDebug.h"
 #include "libSPI.h"
 
@@ -69,220 +65,147 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+static inline void InitializePins(void);
+static inline void SetClockRateDividerTo16(void);
+static inline void EnableSPI(void);
+static inline void TryExecuteCallback(libSPI_callback_type callback);
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Create functions for changing data order, clock freq and to enable/disable SPI
-
-///
-/// @brief Init the SPI module
-///
-/// @param  None
-/// @return None
-///
 void libSPI_Init(uint8_t spi_mode)
 {
-    //Always set SS as output even if not used, otherwise the device can't
-    //act as master.
-    DDRB |= ((1 << MOSI) | (1 << SCK) | (1 << SS));
-    DDRB &= ~(1 << MISO);
+    InitializePins();
+    SetClockRateDividerTo16();
+    libSPI_SetAsMaster();
+    libSPI_SetMode(spi_mode);
+    EnableSPI();
 
-    SPCR = (1 << SPR0);
-
-    libSPI_SetMaster(true);
-
-    if (libSPI_SetMode(spi_mode) == true)
-    {
-        SPCR |= (1 << SPE);
-
-        INFO("Init done");
-    }
-    else
-    {
-        ERROR("Failed to init SPI, invalid mode: %u", spi_mode);
-    }
-
-    return;
+    INFO("SPI driver initialized");
 }
 
-///
-/// @brief Perform a blocking write of a single byte.
-///
-/// @param  data_byte Byte to write
-/// @param  pre_write Pointer to function called before writing
-/// @param  post_write Pointer to function called after writing
-/// @return None
-///
-void libSPI_WriteByte(uint8_t data_byte, libSPI_callback_type pre_write,
-                      libSPI_callback_type post_write)
+void libSPI_WriteByte(uint8_t data,
+                      libSPI_callback_type pre_callback,
+                      libSPI_callback_type post_callback)
 {
-    if (pre_write != NULL)
-    {
-        pre_write();
-    }
-
-    SPI_Write(data_byte);
-
-    if (post_write != NULL)
-    {
-        post_write();
-    }
-    return;
+    TryExecuteCallback(pre_callback);
+    SPI_Write(data);
+    TryExecuteCallback(post_callback);
 }
 
-///
-/// @brief Perform a blocking write.
-///
-/// @param  data Pointer to data to write.
-/// @param  length Number of bytes to write.
-/// @param  pre_write Pointer to function called before writing
-/// @param  post_write Pointer to function called after writing
-/// @return None
-///
-void libSPI_Write(void *data, size_t length, libSPI_callback_type pre_write,
-                  libSPI_callback_type post_write)
+void libSPI_Write(void *data_p,
+                  size_t length,
+                  libSPI_callback_type pre_callback,
+                  libSPI_callback_type post_callback)
 {
-    sc_assert(data != NULL);
+    sc_assert(data_p != NULL);
 
-    if (pre_write != NULL)
-    {
-        pre_write();
-    }
+    TryExecuteCallback(pre_callback);
 
-    uint8_t idx;
-    uint8_t *data_ptr = (uint8_t *)data;
-    for (idx = 0; idx < length; ++idx)
+    uint8_t *data_ptr = (uint8_t *)data_p;
+    for (uint8_t i = 0; i < length; ++i)
     {
         SPI_Write(*data_ptr);
         ++data_ptr;
-
     }
 
-    if (post_write != NULL)
-    {
-        post_write();
-    }
-    return;
+    TryExecuteCallback(post_callback);
 }
 
-///
-/// @brief Perform a blocking read of a single byte.
-///
-/// @param  data_byte Pointer to byte where the read byte will be stored
-/// @param  pre_read Pointer to function called before reading
-/// @param  post_read Pointer to function called after reading
-/// @return None
-///
-void libSPI_ReadByte(uint8_t *data_byte, libSPI_callback_type pre_read,
-                     libSPI_callback_type post_read)
+void libSPI_ReadByte(uint8_t *data_p,
+                     libSPI_callback_type pre_callback,
+                     libSPI_callback_type post_callback)
 {
-    if (pre_read != NULL)
-    {
-        pre_read();
-    }
-
-    SPI_Read(*data_byte);
-
-    if (post_read != NULL)
-    {
-        post_read();
-    }
-    return;
+    TryExecuteCallback(pre_callback);
+    SPI_Read(*data_p);
+    TryExecuteCallback(post_callback);
 }
 
-///
-/// @brief Perform a blocking read.
-///
-/// @param  buffer Pointer to buffer where the data will be stored.
-/// @param  length Number of bytes to read.
-/// @param  pre_read Pointer to function called before reading
-/// @param  post_read Pointer to function called after reading
-/// @return None
-///
-void libSPI_Read(void *buffer, size_t length, libSPI_callback_type pre_read,
-                 libSPI_callback_type post_read)
+void libSPI_Read(void *data_p,
+                 size_t length,
+                 libSPI_callback_type pre_callback,
+                 libSPI_callback_type post_callback)
 {
-    sc_assert(buffer != NULL);
+    sc_assert(data_p != NULL);
 
-    if (pre_read != NULL)
+    TryExecuteCallback(pre_callback);
+
+    uint8_t *data_ptr = (uint8_t *)data_p;
+    for (uint8_t i = 0; i < length; ++i)
     {
-        pre_read();
+        SPI_Read(*data_ptr);
+        ++data_ptr;
     }
 
-    size_t idx;
-    uint8_t *buffer_ptr = (uint8_t *)buffer;
-    for (idx = 0; idx < length; ++idx)
-    {
-
-        SPI_Read(*buffer_ptr);
-        ++buffer_ptr;
-    }
-
-    if (post_read != NULL)
-    {
-        post_read();
-    }
-    return;
+    TryExecuteCallback(post_callback);
 }
 
-///
-/// @brief Select if master or slave mode
-///
-/// @param bool true if master, else slave  //TODO: Fix this description
-/// @return None
-///
-void libSPI_SetMaster(bool master_value)
+void libSPI_SetAsMaster(void)
 {
-    if (master_value == true)
-    {
-        SPCR |= (1 << MSTR);
-    }
-    else
-    {
-        SPCR &= ~(1 << MSTR);
-    }
-    return;
+    SPCR |= (1 << MSTR);
 }
 
-///
-/// @brief Set the SPI transfer mode
-///
-/// @param mode SPI mode, (0-3)
-/// @return bool Status of operation
-///
-bool libSPI_SetMode(uint8_t mode)
+void libSPI_SetMode(uint8_t mode)
 {
-    bool status = true;
     switch (mode)
     {
         case 0:
-            //Clock low when idle, sample on rising edge
+            /* Clock low when idle, sample on rising edge. */
             SPCR &= ~((1 << CPOL) | (1 << CPHA));
             break;
+
         case 1:
-            //Clock low when idle, sample on falling edge
+            /* Clock low when idle, sample on falling edge. */
             SPCR &= ~(1 << CPOL);
             SPCR |= (1 << CPHA);
             break;
+
         case 2:
-            //Clock high when idle, sample on rising edge
+            /* Clock high when idle, sample on rising edge. */
             SPCR |= (1 << CPOL);
             SPCR &= ~(1 << CPHA);
             break;
+
         case 3:
-            //Clock high when idle, sample on falling edge
+            /* Clock high when idle, sample on falling edge. */
             SPCR |= ((1 << CPOL) | (1 << CPHA));
             break;
+
         default:
-            //Invalid mode
-            WARNING("Invalid SPI-mode");
-            status = false;
+            sc_assert_fail();
             break;
     }
-    return status;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static inline void InitializePins(void)
+{
+    /**
+     * Always set SS as output even if not used, otherwise the device can't
+     * act as master.
+     */
+    DDRB |= ((1 << MOSI) | (1 << SCK) | (1 << SS));
+    DDRB &= ~(1 << MISO);
+}
+
+static inline void SetClockRateDividerTo16(void)
+{
+    SPCR = (1 << SPR0);
+}
+
+static inline void EnableSPI(void)
+{
+    SPCR |= (1 << SPE);
+}
+
+static inline void TryExecuteCallback(libSPI_callback_type callback)
+{
+    if (callback != NULL)
+    {
+        callback();
+    }
+}
