@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-12 (Last edit)
+ * @date   2018-11-21 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -235,18 +235,17 @@ static dht_state_t ReadingStateMachine(void)
                 module.reading.state = DHT_READING_REQUEST;
                 next_dht_state =  DHT_DECODING;
             }
-
             //NOTE: According to the DHT22-datasheet a measurement takes 5 mS,
             //      with FOSC 8 MHz and 8 as prescaler the timer overflows in 64 mS.
             //      A timeout between 5 mS and 64 mS is therefore needed.
-            if (Timer_TimeDifference(module.reading.timer) > READING_TIMEOUT_MS)
+            else if (Timer_TimeDifference(module.reading.timer) > READING_TIMEOUT_MS)
             {
                 ERROR("Timeout while capturing data");
                 INFO("pulse_counter: %lu", module.pulse_counter);
                 driverInputCapture_Disable();
                 module.reading.state = DHT_READING_REQUEST;
                 module.initialization_time = Timer_GetMilliseconds();
-                return DHT_POWERUP;
+                next_dht_state = DHT_POWERUP;
             }
             break;
 
