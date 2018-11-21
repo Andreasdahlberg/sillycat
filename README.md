@@ -11,4 +11,4 @@ SillyCat
 
 [Testing](firmware/tests/README.md)
 
-[Configuration](scripts/memory/README.md)
+[Configuration](scripts/memory/README.md#config)

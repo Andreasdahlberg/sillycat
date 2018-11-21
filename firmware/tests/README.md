@@ -5,23 +5,23 @@
 ## Build test suites
 Use the following command to build all test suites:
 ```bash
-scons scons build-tests
+$ scons scons build-tests
 ```
 
 It's also possible to build a specific test suite, e.g. the timer test suite:
 ```bash
-scons tests/common/timer/
+$ scons tests/common/timer/
 ```
 
 ## Run test suites
 Run all test suites:
 ```bash
-scons coverage
+$ scons coverage
 ```
 
 Run a specific test suite, e.g. the timer test suite.
 ```bash
-build/unit_tests/timer/TestRunner
+$ build/unit_tests/timer/TestRunner
 ```
 
 ## Add a new test suite
@@ -37,7 +37,7 @@ add a test suite for the *src/main/encoder* module, then we create
     Import(['*'])
 
     env.Append(CPPPATH=[
-        '<PATH_TO_INCLUDE'
+        '<PATH_TO_INCLUDE>'
     ])
 
     env.Append(LINKFLAGS=[
@@ -90,7 +90,7 @@ included below but the existing test suites is the best place to learn how to wr
 If a test fails with segmentation fault [GDB](https://www.gnu.org/software/gdb/)
 is a great tool to use to track down the fault.
 ```bash
-gdb build/unit_tests/timer/TestRunner
+$ gdb build/unit_tests/timer/TestRunner
 ```
 
 This will load the test application into GDB and present the GDB console.
