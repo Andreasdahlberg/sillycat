@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-22 (Last edit)
+ * @date   2018-11-25 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -42,6 +42,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TX_PACKET_FIFO_SIZE 3
 #define RX_PACKET_FIFO_SIZE 4
+
+#define BITRATE                         4800
+#define MIN_CHANNEL_FILTER_BANDWIDTH    (BITRATE * 2 + 1)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -124,11 +127,12 @@ void Transceiver_Init(void)
     libRFM69_SetLNAInputImpedance(RFM_LNA_ZIN_50OHM);
     libRFM69_EnableAFCLowBeta(false);
     libRFM69_EnableContinuousDAGC(false);
-    libRFM69_SetBitRate(4800);
-    libRFM69_SetDataMode(RFM_PACKET_DATA);
+    libRFM69_SetBitRate(BITRATE);
     libRFM69_SetModulationType(RFM_FSK);
     libRFM69_SetModulationShaping(0x00);
     libRFM69_SetFrequencyDeviation(5000);
+    libRFM69_SetChannelFilterBandwidth(MIN_CHANNEL_FILTER_BANDWIDTH);
+    libRFM69_SetDataMode(RFM_PACKET_DATA);
     libRFM69_SetCarrierFrequency(868000000);
     libRFM69_EnableSyncWordGeneration(true);
     libRFM69_SetFIFOFillCondition(RFM_FIFO_FILL_AUTO);

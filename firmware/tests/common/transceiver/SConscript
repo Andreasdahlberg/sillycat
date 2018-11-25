@@ -29,6 +29,7 @@ env.Append(LINKFLAGS=[
     '-Wl,--wrap=libRFM69_SetModulationType',
     '-Wl,--wrap=libRFM69_SetModulationShaping',
     '-Wl,--wrap=libRFM69_SetFrequencyDeviation',
+    '-Wl,--wrap=libRFM69_SetChannelFilterBandwidth',
     '-Wl,--wrap=libRFM69_SetCarrierFrequency',
     '-Wl,--wrap=libRFM69_EnableSyncWordGeneration',
     '-Wl,--wrap=libRFM69_SetFIFOFillCondition',
