@@ -46,6 +46,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define BITRATE                         9600
 #define MIN_CHANNEL_FILTER_BANDWIDTH    (BITRATE * 2 + 1)
 
+#ifdef DEBUG_ENABLE
+    #define DUMPPACKET(packet) DumpPacket(packet);
+#else
+    #define DUMPPACKET(packet)
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -285,10 +291,7 @@ static bool HandlePayload(void)
 
     packet.header.rssi = libRFM69_GetRSSI();
 
-#ifdef DEBUG_ENABLE
-    DumpPacket(&packet);
-#endif
-
+    DUMPPACKET(&packet);
     return FIFO_Push(&rx_packet_fifo, &packet);
 }
 
@@ -358,6 +361,7 @@ static transceiver_state_type SendingStateMachine(void)
                 packet_frame_type packet;
                 if (FIFO_Pop(&tx_packet_fifo, &packet))
                 {
+                    DUMPPACKET(&packet);
                     libRFM69_WriteToFIFO((uint8_t *)&packet.header,
                                          sizeof(packet_header_type));
                     libRFM69_WriteToFIFO((uint8_t *)&packet.content,
