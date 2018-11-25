@@ -138,6 +138,7 @@ void Transceiver_Init(void)
     libRFM69_SetModulationShaping(0x00);
     libRFM69_SetFrequencyDeviation(5000);
     libRFM69_SetChannelFilterBandwidth(MIN_CHANNEL_FILTER_BANDWIDTH);
+    libRFM69_SetDcCancellationCutoffFrequency(RFM_DCC_FREQ_4);
     libRFM69_SetDataMode(RFM_PACKET_DATA);
     libRFM69_SetCarrierFrequency(868000000);
     libRFM69_EnableSyncWordGeneration(true);
