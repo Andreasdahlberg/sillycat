@@ -43,7 +43,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define TX_PACKET_FIFO_SIZE 3
 #define RX_PACKET_FIFO_SIZE 4
 
-#define BITRATE                         4800
+#define BITRATE                         9600
 #define MIN_CHANNEL_FILTER_BANDWIDTH    (BITRATE * 2 + 1)
 
 //////////////////////////////////////////////////////////////////////////
