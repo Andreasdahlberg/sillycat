@@ -116,6 +116,18 @@ typedef enum
     RFM_LNA_GAIN_G6,
 } libRFM69_lna_gain_type;
 
+typedef enum
+{
+    RFM_DCC_FREQ_16 = 0,
+    RFM_DCC_FREQ_8,
+    RFM_DCC_FREQ_4,
+    RFM_DCC_FREQ_2,
+    RFM_DCC_FREQ_1,
+    RFM_DCC_FREQ_05,
+    RFM_DCC_FREQ_025,
+    RFM_DCC_FREQ_0125,
+} libRFM69_dcc_freq_type;
+
 #ifndef NODE_ADDRESS
 #define NODE_ADDRESS 0xAA
 #endif
@@ -238,6 +250,16 @@ void libRFM69_EnableContinuousDAGC(bool enabled);
  * @return Actual channel filter bandwidth set.
  */
 uint32_t libRFM69_SetChannelFilterBandwidth(uint32_t frequency);
+
+/**
+ * Set the DC cancellation cutoff frequency.
+ *
+ * The cutoff frequency is set in percent of the channel filter
+ * bandwidth(RxBw).
+ *
+ * @param dcc_freq DC cancellation cutoff frequency.
+ */
+void libRFM69_SetDcCancellationCutoffFrequency(libRFM69_dcc_freq_type dcc_freq);
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data);
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 

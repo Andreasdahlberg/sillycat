@@ -417,7 +417,10 @@ uint32_t __wrap_libRFM69_SetChannelFilterBandwidth(uint32_t frequency)
     return frequency * 2 + 1;
 }
 
+void __wrap_libRFM69_SetDcCancellationCutoffFrequency(libRFM69_dcc_freq_type dcc_freq)
+{
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-

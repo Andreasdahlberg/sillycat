@@ -1448,6 +1448,17 @@ uint32_t libRFM69_SetChannelFilterBandwidth(uint32_t frequency)
     return 0;
 }
 
+void libRFM69_SetDcCancellationCutoffFrequency(libRFM69_dcc_freq_type dcc_freq)
+{
+    uint8_t register_content;
+    libRFM69_ReadRegister(REG_RXBW, &register_content);
+
+    register_content &= 0x1F;
+    register_content |= dcc_freq << 5;
+
+    libRFM69_WriteRegister(REG_RXBW, register_content);
+}
+
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address <= REG_TESTAFC);
