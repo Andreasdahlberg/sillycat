@@ -1,7 +1,7 @@
 /**
  * @file   mock_libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-24 (Last edit)
+ * @date   2018-11-25 (Last edit)
  * @brief  Mock functions for the RFM69HW driver.
  */
 
@@ -375,6 +375,11 @@ void __wrap_libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_
 {
 }
 
+libRFM69_modulation_type_type __wrap_libRFM69_GetModulationType(void)
+{
+    mock_type(libRFM69_modulation_type_type);
+}
+
 bool __wrap_libRFM69_IsPacketSent(void)
 {
     mock_type(bool);
@@ -405,6 +410,11 @@ void __wrap_libRFM69_GetTemperature(int8_t *temperature)
 
 void __wrap_libRFM69_SetSyncWordSize(uint8_t size)
 {
+}
+
+uint32_t __wrap_libRFM69_SetChannelFilterBandwidth(uint32_t frequency)
+{
+    return frequency * 2 + 1;
 }
 
 //////////////////////////////////////////////////////////////////////////

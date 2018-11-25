@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-11-07 (Last edit)
+ * @date   2018-11-25 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -163,6 +163,12 @@ void libRFM69_SetBitRate(uint32_t bit_rate);
 uint32_t libRFM69_GetBitRate(void);
 void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode);
 void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type);
+/**
+ * Get the transceiver modulation type.
+ *
+ * @return FSK- or OOK-modulation.
+ */
+libRFM69_modulation_type_type libRFM69_GetModulationType(void);
 void libRFM69_SetModulationShaping(uint8_t modulation_shaping);
 void libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation);
 void libRFM69_SetPowerAmplifierMode(uint8_t mode);
@@ -223,6 +229,15 @@ void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance);
 void libRFM69_EnableAFCLowBeta(bool enabled);
 bool libRFM69_IsAFCLowBetaEnabled(void);
 void libRFM69_EnableContinuousDAGC(bool enabled);
+
+/**
+ * Set the channel filter bandwidth.
+ *
+ * @param frequency Requested channel filter bandwidth in Hz.
+ *
+ * @return Actual channel filter bandwidth set.
+ */
+uint32_t libRFM69_SetChannelFilterBandwidth(uint32_t frequency);
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data);
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 
@@ -230,4 +245,4 @@ void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data);
 void libRFM69_DumpRegisterValues(void);
 #endif
 
-#endif /* LIBRFM69_H_ */
+#endif

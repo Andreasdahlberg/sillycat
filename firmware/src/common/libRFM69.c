@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-09 (Last edit)
+ * @date   2018-11-25 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -92,9 +92,9 @@ static uint32_t reset_time_ms;
 //////////////////////////////////////////////////////////////////////////
 
 static bool IsBitSetInRegister(uint8_t address, uint8_t bit);
-
 static void PreCallback(void);
 static void PostCallback(void);
+static uint32_t CalculateRxBw(uint8_t mant, uint8_t exp);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -700,6 +700,18 @@ void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
 
     libRFM69_WriteRegister(REG_DATAMODUL, register_content);
     return;
+}
+
+libRFM69_modulation_type_type libRFM69_GetModulationType(void)
+{
+    if (IsBitSetInRegister(REG_DATAMODUL, 3))
+    {
+        return RFM_OOK;
+    }
+    else
+    {
+        return RFM_FSK;
+    }
 }
 
 ///
@@ -1404,6 +1416,38 @@ bool libRFM69_SetRSSIThresholdTimeout(uint16_t timeout_ms)
     return status;
 }
 
+uint32_t libRFM69_SetChannelFilterBandwidth(uint32_t frequency)
+{
+    for (int8_t exp = 7; exp > 0; --exp)
+    {
+        for (uint8_t mant = 24; mant >= 16; mant -= 4)
+        {
+            uint64_t rxbw = CalculateRxBw(mant, (uint8_t)exp);
+
+            /**
+             * Rxbw must be larger then the frequency to respect oversampling
+             * rules in the decimation chain of the receiver.
+             */
+            if (rxbw >= frequency)
+            {
+                uint8_t register_content;
+                libRFM69_ReadRegister(REG_RXBW, &register_content);
+
+                register_content &= 0xE0;
+                register_content |= (((mant - 16) / 4) << 3) | exp;
+
+                DEBUG("Requested RXBW: %lu Hz\r\n", frequency);
+                DEBUG("Selected RXBW:  %lu Hz\r\n", rxbw);
+
+                libRFM69_WriteRegister(REG_RXBW, register_content);
+                return rxbw;
+            }
+        }
+    }
+
+    return 0;
+}
+
 void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address <= REG_TESTAFC);
@@ -1460,4 +1504,20 @@ static bool IsBitSetInRegister(uint8_t address, uint8_t bit)
 
     libRFM69_ReadRegister(address, &register_content);
     return ((register_content & (1 << bit)) > 0);
+}
+
+static uint32_t CalculateRxBw(uint8_t mant, uint8_t exp)
+{
+    uint32_t rxbw;
+
+    if (libRFM69_GetModulationType() == RFM_FSK)
+    {
+        rxbw = RFM_FXOSC / ((uint32_t)mant * (2 << ((uint32_t)exp + 1)));
+    }
+    else
+    {
+        rxbw = RFM_FXOSC / ((uint32_t)mant * (2 << ((uint32_t)exp + 2)));
+    }
+
+    return rxbw;
 }
