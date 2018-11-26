@@ -1,7 +1,7 @@
 /**
  * @file   libS25FL1K_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-17 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  Header with HAL defines for the S25FL1-K low level driver.
  *
  * Detailed description of file.
@@ -30,6 +30,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+#include <avr/io.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

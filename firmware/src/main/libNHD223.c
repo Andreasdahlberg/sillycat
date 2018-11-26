@@ -1,7 +1,7 @@
 /**
  * @file   libNHD223.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-16 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  NHD2.23 graphic OLED display driver.
  */
 
@@ -29,6 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //NOTE: Include before all other headers
 #include "common.h"
 
+#include <avr/io.h>
 #include <util/delay.h>
 
 #include "libNHD223.h"

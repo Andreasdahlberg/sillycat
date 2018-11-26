@@ -1,7 +1,7 @@
 /**
  * @file   RFM69_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-08 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  Header for RFM69 HAL.
  *
  * Detailed description of file.
@@ -31,6 +31,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <avr/io.h>
+
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
@@ -59,4 +61,4 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-#endif /* RFM69_HAL_H_ */
+#endif
