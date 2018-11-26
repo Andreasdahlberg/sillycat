@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-25 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -234,6 +234,16 @@ void libRFM69_EnableHighPowerSetting(bool enable);
 void libRFM69_SetPowerLevel(uint8_t power_level);
 void libRFM69_SetPacketRxDelay(uint8_t val);
 void libRFM69_RestartRx(void);
+
+/**
+ * Enable or disable automatic Rx restart.
+ *
+ * If enabled, Rx is restarted after PayloadReady occurred and packet has been
+ * completely read from the FIFO.
+ *
+ * @param enable Enable/disable.
+ */
+void libRFM69_EnableAutoRxRestart(bool enable);
 void libRFM69_SetClockOutFrequency(libRFM69_clkout_freq_type frequency);
 void libRFM69_SetLNAGain(libRFM69_lna_gain_type gain);
 libRFM69_lna_gain_type libRFM69_GetCurrentLNAGain(void);

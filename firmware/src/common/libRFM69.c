@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-25 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -520,6 +520,22 @@ void libRFM69_RestartRx(void)
 
     libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
     return;
+}
+
+void libRFM69_EnableAutoRxRestart(bool enable)
+{
+    uint8_t register_content;
+    libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
+
+    if (enable)
+    {
+        register_content |= (1 << 1);
+    }
+    else
+    {
+        register_content &= ~(1 << 1);
+    }
+    libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
 }
 
 ///

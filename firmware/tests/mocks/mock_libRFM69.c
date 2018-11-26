@@ -1,7 +1,7 @@
 /**
  * @file   mock_libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-25 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  Mock functions for the RFM69HW driver.
  */
 
@@ -221,6 +221,10 @@ void __wrap_libRFM69_InitHW(void)
 void __wrap_libRFM69_RestartRx(void)
 {
     function_called();
+}
+
+void __wrap_libRFM69_EnableAutoRxRestart(bool enable)
+{
 }
 
 void __wrap_libRFM69_Update(void)
