@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-25 (Last edit)
+ * @date   2018-11-26 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -125,7 +125,7 @@ void Transceiver_Init(void)
     libRFM69_EnableEncryption(false);
     libRFM69_EnableSequencer(true);
     libRFM69_EnableListenMode(false);
-    libRFM69_SetPacketRxDelay(1);
+    libRFM69_SetPacketRxDelay(2);
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();
     libRFM69_SetPreambleLength(8);
