@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -47,7 +47,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Board.h"
 #include "Time.h"
 #include "Timer.h"
-#include "LED.h"
 #include "Sensor.h"
 #include "Transceiver.h"
 #include "ErrorHandler.h"
@@ -117,7 +116,6 @@ int main(void)
     libPower_Init();
     driverCharger_Init();
 
-    LED_Init();
     RTC_Init();
     ErrorHandler_Init();
 
@@ -153,7 +151,6 @@ int main(void)
     Event_AddListener(Sensor_WakeUp, EVENT_WAKEUP);
     Event_AddListener(Sensor_Sleep, EVENT_SLEEP);
     Event_AddListener(Power_WakeUp, EVENT_WAKEUP);
-    Event_AddListener(LED_EventHandler, EVENT_ALL);
     Event_AddListener(Transceiver_EventHandler, EVENT_ALL);
     Event_AddListener(RHTAvailable, EVENT_RHT_AVAILABLE);
     Event_AddListener(CriticalBatteryVoltageHandler, EVENT_BATTERY_CRITICAL);
@@ -179,7 +176,6 @@ int main(void)
         Sensor_Update();
         Transceiver_Update();
         Com_Update();
-        LED_Update();
 
         if (IsTimeForSleep() == true)
         {
