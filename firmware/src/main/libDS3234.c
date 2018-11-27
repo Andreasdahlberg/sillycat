@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-18 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of DS3234-library.
  *
  * Detailed description of file.
@@ -28,12 +28,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include <avr/io.h>
-#include <string.h>
-
 #include "libDebug.h"
 #include "libSPI.h"
 #include "libDS3234.h"

@@ -28,18 +28,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
-#include <string.h>
-
 #include "libDebug.h"
 #include "driverDHT22.h"
-
 #include "Sensor.h"
-#include "Timer.h"
 #include "RTC.h"
-#include "Transceiver.h"
 #include "FIFO.h"
 #include "ErrorHandler.h"
 

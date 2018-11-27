@@ -1,7 +1,7 @@
 /**
  * @file   libDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-18 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Header of DS3234-library.
  *
  * Detailed description of file.
@@ -30,8 +30,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-
-#include "common.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

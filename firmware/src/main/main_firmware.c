@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-15 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -31,10 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/io.h>
 #include <avr/wdt.h>
-#include <util/delay.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 #include "libDebug.h"
 #include "libSPI.h"

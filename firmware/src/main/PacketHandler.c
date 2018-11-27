@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -35,7 +35,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RTC.h"
 #include "ErrorHandler.h"
 #include "libDebug.h"
-#include <string.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of the power management module.
  */
 
@@ -26,17 +26,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include "libDebug.h"
 #include "libPower.h"
 #include "driverCharger.h"
-
-#include "Timer.h"
 #include "Power.h"
-#include "RTC.h"
-#include "Config.h"
 #include "Event.h"
 #include "Battery.h"
 

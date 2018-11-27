@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of UI library.
  *
  * The UI library contains functions for drawing simple shapes and for
@@ -29,16 +29,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
-#include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
-
 #include "libDisplay.h"
 #include "libUI.h"
 #include "font.h"
