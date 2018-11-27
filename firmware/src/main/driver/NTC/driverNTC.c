@@ -1,7 +1,7 @@
 /**
  * @file   driverNTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  NTC sensor driver
  *
  * Driver for NTC sensors.
@@ -245,10 +245,7 @@ static int16_t FilterTemperature(struct ntc_sensor_t *self, int16_t temperature)
     }
     else
     {
-        /**
-         * Assuming a sample frequency of 10 Hz, α = 0.2 gives a cutoff of 4 Hz.
-         */
-        Filter_Init(&self->filter, temperature, FILTER_ALPHA(0.2));
+        Filter_Init(&self->filter, temperature, FILTER_ALPHA(0.1));
     }
 
     return Filter_Output(&self->filter);
