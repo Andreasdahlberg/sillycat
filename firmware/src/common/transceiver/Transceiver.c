@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-26 (Last edit)
+ * @date   2018-11-27 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -136,7 +136,7 @@ void Transceiver_Init(void)
     libRFM69_SetBitRate(BITRATE);
     libRFM69_SetModulationType(RFM_FSK);
     libRFM69_SetModulationShaping(0x00);
-    libRFM69_SetFrequencyDeviation(5000);
+    libRFM69_SetFrequencyDeviation(10000);
     libRFM69_SetChannelFilterBandwidth(MIN_CHANNEL_FILTER_BANDWIDTH);
     libRFM69_SetDcCancellationCutoffFrequency(RFM_DCC_FREQ_4);
     libRFM69_SetDataMode(RFM_PACKET_DATA);
