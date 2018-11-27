@@ -125,6 +125,7 @@ void Transceiver_Init(void)
     libRFM69_EnableEncryption(false);
     libRFM69_EnableSequencer(true);
     libRFM69_EnableListenMode(false);
+    libRFM69_EnableAutoRxRestart(true);
     libRFM69_SetPacketRxDelay(2);
     libRFM69_SetMode(RFM_STANDBY);
     libRFM69_WaitForModeReady();

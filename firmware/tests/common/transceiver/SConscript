@@ -16,6 +16,7 @@ env.Append(LINKFLAGS=[
     '-Wl,--wrap=libRFM69_EnableEncryption',
     '-Wl,--wrap=libRFM69_EnableSequencer',
     '-Wl,--wrap=libRFM69_EnableListenMode',
+    '-Wl,--wrap=libRFM69_EnableAutoRxRestart',
     '-Wl,--wrap=libRFM69_SetPacketRxDelay',
     '-Wl,--wrap=libRFM69_SetMode',
     '-Wl,--wrap=libRFM69_WaitForModeReady',
