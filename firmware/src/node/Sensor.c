@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2018-11-30 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -109,6 +109,8 @@ void Sensor_Update(void)
         event_t event;
         event = Event_New(EVENT_RHT_AVAILABLE);
         Event_Trigger(&event);
+
+        INFO("RHT: %i:%i", reading.humidity, reading.temperature);
     }
     return;
 }
