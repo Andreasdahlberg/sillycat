@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-21 (Last edit)
+ * @date   2018-11-30 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -222,6 +222,7 @@ static dht_state_t ReadingStateMachine(void)
                 DDRB &= ~(1 << DATAPIN);
 
                 module.reading.timer = Timer_GetMilliseconds();
+                module.pulse_counter = 0;
 
                 driverInputCapture_Enable();
                 module.reading.state = DHT_READING_CAPTURE_DATA;
@@ -241,7 +242,7 @@ static dht_state_t ReadingStateMachine(void)
             else if (Timer_TimeDifference(module.reading.timer) > READING_TIMEOUT_MS)
             {
                 ERROR("Timeout while capturing data");
-                INFO("pulse_counter: %lu", module.pulse_counter);
+                INFO("Pulse counter: %lu", module.pulse_counter);
                 driverInputCapture_Disable();
                 module.reading.state = DHT_READING_REQUEST;
                 module.initialization_time = Timer_GetMilliseconds();
