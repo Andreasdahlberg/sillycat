@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2018-11-30 (Last edit)
  * @brief  Driver for the ATmega328 SPI-peripheral.
  */
 
@@ -73,7 +73,7 @@ void libSPI_WriteByte(uint8_t data,
  * @param pre_callback  Function call before writing.
  * @param post_callback Function call after writing.
  */
-void libSPI_Write(void *data_p,
+void libSPI_Write(const void *data_p,
                   size_t length,
                   libSPI_callback_type pre_callback,
                   libSPI_callback_type post_callback);
