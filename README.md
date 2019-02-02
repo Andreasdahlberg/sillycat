@@ -7,8 +7,43 @@ SillyCat
 
 ## Development
 
-[Docker](docker/README.md)
+### Getting Started
+The following steps are required
 
-[Testing](firmware/tests/README.md)
+1. Install required packages
+    ```bash
+    $ sudo apt install scons gcc-avr avr-libc avrdude
+    ```
 
-[Configuration](scripts/memory/README.md#config)
+1. Install [cmocka](https://cmocka.org/)
+    ```bash
+    $ sudo apt install cmake
+    $ git clone git://git.cryptomilk.org/projects/cmocka.git
+    $ mkdir cmocka/build && cd cmocka/build
+    $ cmake -DCMAKE_INSTALL_PREFIX=/usr ..
+    $ make
+    $ sudo make install
+    ```
+
+1. Install [freetype-py](https://pypi.org/project/freetype-py/)
+    ```bash
+    $ sudo apt install python3-setuptools
+    $ git clone https://github.com/rougier/freetype-py.git freetype-py
+    $ cd freetype-py
+    $ python3 setup.py install
+    ```
+
+### Building
+```bash
+$ cd firmware
+$ scons build-main-firmware build-node-firmware
+```
+
+### Testing
+See [Testing](firmware/tests/README.md)
+
+### Configuration
+See [Configuration](scripts/memory/README.md#config)
+
+### CI
+See [Docker](docker/README.md)
