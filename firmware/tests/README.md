@@ -5,7 +5,7 @@
 ## Build test suites
 Use the following command to build all test suites:
 ```bash
-$ scons scons build-tests
+$ scons build-tests
 ```
 
 It's also possible to build a specific test suite, e.g. the timer test suite:
