@@ -2,9 +2,11 @@ dist: xenial
 language: c
 services:
   - docker
+env:
+  CI_ENV=`bash <(curl -s https://codecov.io/env)`
 before_install:
   - docker pull andreasdahlberg/docker-avr
-  - docker run -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
+  - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
   - docker exec build scons -C firmware coverage
   - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release
@@ -24,4 +26,4 @@ deploy:
   on:
     tags: true
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - docker exec build scripts/codecov.sh
