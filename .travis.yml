@@ -3,13 +3,16 @@ language: c
 services:
   - docker
 env:
-  CI_ENV=`bash <(curl -s https://codecov.io/env)`
+  global:
+    - CI_ENV=`bash <(curl -s https://codecov.io/env)`
+  matrix:
+    - SCONS_TARGET=coverage
+    - SCONS_TARGET="build-main-release eeprom-main-release build-node-release eeprom-node-release"
 before_install:
   - docker pull andreasdahlberg/docker-avr
   - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
-  - docker exec build scons -C firmware coverage
-  - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release
+  - docker exec build scons -C firmware $SCONS_TARGET
 notifications:
   email:
     - andreas.dahlberg90@gmail.com
