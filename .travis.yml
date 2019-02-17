@@ -8,8 +8,8 @@ before_install:
   - docker pull andreasdahlberg/docker-avr
   - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
-  - docker exec build scons -C firmware coverage
-  - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release
+  - docker exec build scons -C firmware coverage -j2
+  - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
 notifications:
   email:
     - andreas.dahlberg90@gmail.com
