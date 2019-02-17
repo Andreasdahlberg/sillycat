@@ -4,12 +4,19 @@ services:
   - docker
 env:
   CI_ENV=`bash <(curl -s https://codecov.io/env)`
-before_install:
-  - docker build -t andreasdahlberg/docker-avr docker
-  - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
-script:
-  - docker exec build scons -C firmware coverage -j2
-  - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
+
+jobs:
+  include:
+    - stage: Build docker image
+      script:
+        - docker build -t andreasdahlberg/docker-avr docker
+        - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
+    - stage: Test firmware
+      script:
+        - docker exec build scons -C firmware coverage -j2
+    - stage: Build firmware
+      script:
+        - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
 notifications:
   email:
     - andreas.dahlberg90@gmail.com
