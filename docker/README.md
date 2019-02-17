@@ -6,6 +6,7 @@ such as [Travis CI](https://travis-ci.org/).
 ## Build image
 ```bash
 $ cd docker
+$ docker login
 $ docker build -t andreasdahlberg/docker-avr .
 ```
 
