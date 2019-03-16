@@ -56,3 +56,4 @@ compile_commands.json
 *.ewprj (Security copy)
 *.orig
 *.log
+*@*.ewnet
