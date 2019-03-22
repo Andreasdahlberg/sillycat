@@ -11,10 +11,7 @@ env.Append(LINKFLAGS=[
     '-Wl,--wrap=CRC_16',
 ])
 
-objects = []
-#objects.append(SConscript('#src/utility/CRC/SConscript', exports={'env': env}))
-
 SOURCE = Glob('*.c')
-objects.append(env.Object(source=SOURCE))
+OBJECT = env.Object(source=SOURCE)
 
-Return('objects')
+Return('OBJECT')
