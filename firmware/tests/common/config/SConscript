@@ -1,0 +1,20 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/common/config',
+    '#tests/common/config',
+])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=CRC_16',
+])
+
+objects = []
+#objects.append(SConscript('#src/utility/CRC/SConscript', exports={'env': env}))
+
+SOURCE = Glob('*.c')
+objects.append(env.Object(source=SOURCE))
+
+Return('objects')
