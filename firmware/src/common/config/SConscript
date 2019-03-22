@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
 #
-import os
 
 Import(['*'])
 
@@ -23,13 +22,11 @@ SOURCE = Glob('*.c')
 
 env.Append(CPPPATH=[
     '#src/common',
-    '#src/common/config',
-    '#src/common/time',
-    '#src/common/timer'
+    '#src/common/event',
+    '#src/common/timer',
+    '#src/utility/CRC'
 ])
 
 OBJECTS = env.Object(source=SOURCE)
 
 Return('OBJECTS')
-
-

@@ -3,13 +3,14 @@ import os
 
 Import(['*'])
 
-modules = ['ADC', 'timer', 'time', 'com', 'event', 'transceiver', 'driver/MCP79510']
+modules = ['ADC', 'timer', 'time', 'com', 'config', 'event', 'transceiver', 'driver/MCP79510']
 module_objects = []
 
 source = Glob('*.c')
 env.Append(CPPPATH=[
     '#src/common',
     '#src/common/com',
+    '#src/common/config',
     '#src/common/time',
     '#src/common/event',
     '#src/common/transceiver',
