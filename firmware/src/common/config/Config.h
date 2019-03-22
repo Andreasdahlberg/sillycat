@@ -1,7 +1,7 @@
 /**
  * @file   Config.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-06 (Last edit)
+ * @date   2019-03-22 (Last edit)
  * @brief  Implementation of a module handling storage and validation of
  *         configuration data.
  */
@@ -65,14 +65,14 @@ uint16_t Config_GetVersion(void);
  *
  * @return Network ID.
  */
-uint8_t *Config_GetNetworkId(void);
+const uint8_t *Config_GetNetworkId(void);
 
 /**
  * Get the AES-key from the active configuration.
  *
  * @return AES-key.
  */
-char *Config_GetAESKey(void);
+const char *Config_GetAESKey(void);
 
 /**
  * Get the report interval from the active configuration.
