@@ -4,6 +4,7 @@ SillyCat
 [![Build Status](https://travis-ci.com/Andreasdahlberg/sillycat.svg?branch=master)](https://travis-ci.com/Andreasdahlberg/sillycat)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11957/badge.svg)](https://scan.coverity.com/projects/andreasdahlberg-sillycat)
 [![codecov](https://codecov.io/gh/Andreasdahlberg/sillycat/branch/master/graph/badge.svg)](https://codecov.io/gh/Andreasdahlberg/sillycat)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/2665/badge)](https://bestpractices.coreinfrastructure.org/projects/2665)
 
 ## Development
 
