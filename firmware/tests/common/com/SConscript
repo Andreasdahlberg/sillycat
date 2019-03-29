@@ -4,8 +4,10 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/common/com',
+    '#src/common/errorhandler',
     '#src/common/transceiver',
     '#tests/common/com',
+    '#tests/mocks/'
 ])
 
 env.Append(LINKFLAGS=[

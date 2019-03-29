@@ -212,6 +212,7 @@ modules = [
     os.path.join('common', 'com'),
     os.path.join('common', 'config'),
     os.path.join('common', 'event'),
+    os.path.join('common', 'errorhandler'),
     os.path.join('common', 'transceiver'),
 ]
 
