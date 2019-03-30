@@ -48,3 +48,6 @@ See [Configuration](scripts/memory/README.md#config)
 
 ### CI
 See [Docker](docker/README.md)
+
+## Support
+If you're having any problems, please raise an issue on GitHub and i will be happy to help.
