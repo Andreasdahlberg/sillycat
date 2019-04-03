@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-26 (Last edit)
+ * @date   2019-04-03 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -55,7 +55,7 @@ extern uint8_t __stack;
 //////////////////////////////////////////////////////////////////////////
 
 void StackPaint(void) __attribute__ ((naked)) __attribute__ ((
-            section (".init1")));
+            section (".init1"))) __attribute__((used));
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS

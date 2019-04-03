@@ -71,7 +71,8 @@ avr_ccflags = [
     '-Wextra',
     '-Wall',
     '-ffunction-sections',
-    '-fdata-sections'
+    '-fdata-sections',
+    '-flto'
 ]
 
 avr_cppdefines = {
