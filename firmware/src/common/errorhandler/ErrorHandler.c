@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-15 (Last edit)
+ * @date   2019-04-04 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -163,9 +163,12 @@ void ErrorHandler_PointOfNoReturn(void)
     CRITICAL("Entering fail state.");
 
     wdt_disable();
+
+#ifndef UNIT_TESTING
     while (1)
     {
     }
+#endif
 }
 
 #ifdef DEBUG_ENABLE

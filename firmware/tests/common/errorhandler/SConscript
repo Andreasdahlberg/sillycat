@@ -1,0 +1,21 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/common/errorhandler',
+    '#tests/common/errorhandler',
+    '#tests/mocks/'
+])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=RTC_GetTimeStamp',
+    '-Wl,--wrap=wdt_disable',
+    '-Wl,--wrap=eeprom_read_block',
+    '-Wl,--wrap=eeprom_write_block'
+])
+
+SOURCE = Glob('*.c')
+OBJECT = env.Object(source=SOURCE)
+
+Return('OBJECT')
