@@ -1,7 +1,7 @@
 /**
  * @file   test_Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-24 (Last edit)
+ * @date   2019-04-05 (Last edit)
  * @brief  Test suite for the Transceiver interface.
  */
 
@@ -225,14 +225,23 @@ static void test_Transceiver_Update_Listening(void **state)
 
 static void test_Transceiver_Update_PayloadReady(void **state)
 {
+    packet_frame_type mock_packet;
+    mock_packet.header.total_size = 10;
+
     expect_value(__wrap_libRFM69_SetMode, mode, RFM_RECEIVER);
     Transceiver_Update();
 
     will_return(__wrap_libRFM69_IsPayloadReady, true);
     expect_value(__wrap_libRFM69_SetMode, mode, RFM_STANDBY);
 
-    /* This return value is not used right now. */
-    will_return_always(__wrap_libRFM69_ReadFromFIFO, 0);
+    /* First read to get the packet size. */
+    will_return(__wrap_libRFM69_ReadFromFIFO, (uint8_t *)&mock_packet);
+    will_return(__wrap_libRFM69_ReadFromFIFO, 1);
+
+    /* Second read to get the rest of the packet. */
+    will_return(__wrap_libRFM69_ReadFromFIFO, (uint8_t *)&mock_packet);
+    will_return(__wrap_libRFM69_ReadFromFIFO, mock_packet.header.total_size);
+
     will_return(__wrap_libRFM69_GetRSSI, -10);
     will_return(__wrap_FIFO_Push, true);
 
