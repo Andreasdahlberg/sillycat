@@ -62,7 +62,7 @@ mcu_vars.Add('F_CPU', 'Target frequency in Hz')
 mcu_vars.Add('PORT', 'Port for the programmer')
 mcu_vars.Add('TOOL', 'The programmer to use')
 mcu_vars.Add('OPTIMIZATION', 'The optimization level to use for compilation(0, 1, 2, 3, s)', 's')
-mcu_vars.Add('STD', 'The C Dialect to use', 'c99')
+mcu_vars.Add('STD', 'The C Dialect to use', 'c11')
 
 avr_ccflags = [
     '-std=${STD}',
@@ -90,7 +90,7 @@ common_env = Environment(
 test_env = Environment(
     tools=['default', 'coverage'],
     CC='gcc',
-    CCFLAGS=['-g', '-O0'],
+    CCFLAGS=['-g', '-O0', '-std=c11'],
     CPPDEFINES='UNIT_TESTING',
     LIBS=['cmocka', 'gcov']
 )
