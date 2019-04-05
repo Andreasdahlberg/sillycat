@@ -43,7 +43,7 @@ def get_status_message(code):
 def build_function(target, source, env):
     """Executes the supplied tests in 'source' to generate coverage information."""
     for test_runner in source:
-        proc = subprocess.Popen([test_runner.abspath],
+        proc = subprocess.Popen(['valgrind', '--error-exitcode=1', '--track-origins=yes', test_runner.abspath],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT
                         )
