@@ -192,6 +192,16 @@ def add_test(module_under_test, mocks):
 
     return runner
 
+def get_astyle_exclude_flags(file_name='.astyle_exclude'):
+    with open(file_name) as f:
+        lines = f.readlines()
+        exclude_flags = ['--exclude={}'.format(line.strip()) for line in lines]
+        return ' '.join(exclude_flags)
+
+def get_astyle_command():
+    command_template = 'astyle --options=.astylerc {} --recursive src/*.c src/*.h'
+    return command_template.format(get_astyle_exclude_flags())
+
 mock_object = test_env.SConscript(
     'tests/mocks/SConscript',
     variant_dir='build/unit_tests/mocks',
@@ -223,3 +233,5 @@ for module in modules:
 
 test_env.Alias('build-tests', tests)
 test_env.Coverage(source=tests, target='coverage')
+
+env.Command("format", None, get_astyle_command())
