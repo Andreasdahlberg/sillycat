@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-21 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -41,7 +41,8 @@ struct sensor_t
     uint16_t id;
     int16_t value;
     bool valid;
-    struct {
+    struct
+    {
         int16_t max;
         int16_t min;
         bool valid;

@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-30 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -112,7 +112,8 @@ void driverDHT22_Init(void)
     driverInputCapture_DisableNoiseCanceling();
     driverInputCapture_RegisterInterruptHandler(InterruptHandler);
 
-    module = (__typeof__(module)){
+    module = (__typeof__(module))
+    {
         .state = DHT_POWERUP,
         .initialization_time = Timer_GetMilliseconds(),
     };

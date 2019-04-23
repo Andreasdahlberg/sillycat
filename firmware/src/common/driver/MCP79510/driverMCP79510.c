@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -497,7 +497,7 @@ void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)
 }
 
 bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
-                             uint8_t length)
+                                uint8_t length)
 {
     bool status = false;
 

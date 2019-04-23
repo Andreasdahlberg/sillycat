@@ -1,7 +1,7 @@
 /**
  * @file   sc_assert.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-03-30 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  Implementation of sc_assert
  *
  * Detailed description of file.
@@ -50,8 +50,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
     __LINE__, PSTR(#e)))
 #endif
 #else
-extern void mock_assert(const int result, const char* const expression,
-                        const char * const file, const int line);
+extern void mock_assert(const int result, const char *const expression,
+                        const char *const file, const int line);
 #define sc_assert_fail() mock_assert(0, "sc_assert_fail", __FILE__, __LINE__);
 #define sc_assert(e) mock_assert((int)(e), #e, __FILE__, __LINE__);
 #endif

@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -47,9 +47,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define MIN_CHANNEL_FILTER_BANDWIDTH    (BITRATE * 2 + 1)
 
 #ifdef DEBUG_ENABLE
-    #define DUMPPACKET(packet) DumpPacket(packet);
+#define DUMPPACKET(packet) DumpPacket(packet);
 #else
-    #define DUMPPACKET(packet)
+#define DUMPPACKET(packet)
 #endif
 
 //////////////////////////////////////////////////////////////////////////

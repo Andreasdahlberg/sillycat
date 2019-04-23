@@ -1,7 +1,7 @@
 /**
  * @file   packet.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  Definition of packet format used for battery and sensor data.
  */
 
@@ -41,13 +41,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 struct __attribute__((packed)) packet_t
 {
-    struct {
+    struct
+    {
         uint16_t voltage;
         int16_t temperature;
         bool charging;
         bool connected;
     } battery;
-    struct {
+    struct
+    {
         int16_t humidity;
         int16_t temperature;
         bool valid;

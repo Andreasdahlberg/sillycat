@@ -1,7 +1,7 @@
 /**
  * @file   driverInputCapture.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-12 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  ATmega328 Input Capture driver.
  *
  * Driver for the ATmega328 timer input capture mode.
@@ -86,7 +86,7 @@ void driverInputCapture_Init(void)
     ClearInputCaptureInterruptFlag();
     ResetTimer();
 
-    module = (__typeof__(module)){0};
+    module = (__typeof__(module)) {0};
 }
 
 void driverInputCapture_RegisterInterruptHandler(driverInputCapture_isr_t interrupt_handler)

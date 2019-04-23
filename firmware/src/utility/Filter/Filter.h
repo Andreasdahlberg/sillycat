@@ -1,7 +1,7 @@
 /**
  * @file   Filter.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2019-04-23 (Last edit)
  * @brief  Implementation of an exponential moving average(EMA) filter.
  *
  * Detailed description of file.
@@ -45,7 +45,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-struct filter_t {
+struct filter_t
+{
     int16_t value;
     uint16_t alpha;
 };
