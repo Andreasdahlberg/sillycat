@@ -12,7 +12,8 @@ RUN apt-get -y update && apt-get install -y \
     cmake \
     libfreetype6 \
     curl \
-    valgrind
+    valgrind \
+    astyle
 
 # Install cmocka
 RUN git clone git://git.cryptomilk.org/projects/cmocka.git && \
