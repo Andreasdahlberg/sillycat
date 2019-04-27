@@ -1,7 +1,7 @@
 /**
  * @file   libSPI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-30 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Driver for the ATmega328 SPI-peripheral.
  */
 
@@ -40,19 +40,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define MISO    DDB4
 #define SCK     DDB5
 
-#define SPI_Read(result) \
-    SPDR = 0x00; \
-    while (!(SPSR & (1 << SPIF))) \
-    {\
-    }\
-    result = SPDR
-
-#define SPI_Write(data) \
-    SPDR = data; \
-    while (!(SPSR & (1 << SPIF))) \
-    { \
-    }
-
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -69,6 +56,8 @@ static inline void InitializePins(void);
 static inline void SetClockRateDividerTo16(void);
 static inline void EnableSPI(void);
 static inline void TryExecuteCallback(libSPI_callback_type callback);
+static inline void ReadByte(uint8_t *data_p);
+static inline void WriteByte(uint8_t data);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -90,7 +79,7 @@ void libSPI_WriteByte(uint8_t data,
                       libSPI_callback_type post_callback)
 {
     TryExecuteCallback(pre_callback);
-    SPI_Write(data);
+    WriteByte(data);
     TryExecuteCallback(post_callback);
 }
 
@@ -106,7 +95,7 @@ void libSPI_Write(const void *data_p,
     const uint8_t *data_ptr = (uint8_t *)data_p;
     for (uint8_t i = 0; i < length; ++i)
     {
-        SPI_Write(*data_ptr);
+        WriteByte(*data_ptr);
         ++data_ptr;
     }
 
@@ -118,7 +107,7 @@ void libSPI_ReadByte(uint8_t *data_p,
                      libSPI_callback_type post_callback)
 {
     TryExecuteCallback(pre_callback);
-    SPI_Read(*data_p);
+    ReadByte(data_p);
     TryExecuteCallback(post_callback);
 }
 
@@ -134,7 +123,7 @@ void libSPI_Read(void *data_p,
     uint8_t *data_ptr = (uint8_t *)data_p;
     for (uint8_t i = 0; i < length; ++i)
     {
-        SPI_Read(*data_ptr);
+        ReadByte(data_ptr);
         ++data_ptr;
     }
 
@@ -207,5 +196,28 @@ static inline void TryExecuteCallback(libSPI_callback_type callback)
     if (callback != NULL)
     {
         callback();
+    }
+}
+
+static inline void ReadByte(uint8_t *data_p)
+{
+    SPDR = 0x00;
+    while (!(SPSR & (1 << SPIF)))
+    {
+        /**
+         * Wait for read to complete.
+         */
+    }
+    *data_p = SPDR;
+}
+
+static inline void WriteByte(uint8_t data)
+{
+    SPDR = data;
+    while (!(SPSR & (1 << SPIF)))
+    {
+        /**
+         * Wait for write to complete.
+         */
     }
 }
