@@ -22,7 +22,7 @@ __version__ = '0.1.0'
 
 def _bits(byte):
     data = []
-    for bit_index in range(8):
+    for _ in range(8):
         data.insert(0, int((byte & 1) == 1))
         byte = byte >> 1
     return data
@@ -54,7 +54,7 @@ class Glyph(object):
                 byte_idx = int(bit_count / 8)
                 bit_idx = int(bit_count % 8)
 
-                if (data[byte_idx] & (1 << (7 - bit_idx))):
+                if data[byte_idx] & (1 << (7 - bit_idx)):
                     out = out + '*'
                 else:
                     out = out + ' '

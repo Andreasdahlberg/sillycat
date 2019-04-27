@@ -42,7 +42,6 @@ def _detect(env):
     raise SCons.Errors.StopError(
         FontGeneratorNotFound,
         "Could not detect the font generator")
-    return None
 
 
 def build_function(target, source, env):

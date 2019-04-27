@@ -64,7 +64,6 @@ def build_function(target, source, env):
                 errstr="Unit test failed", status=code, exitstatus=2,
                 filename=test_runner.abspath, executor=None, action=None, command=None,
                 exc_info=(None, None, None))
-            return None
 
     return None
 
