@@ -1,7 +1,7 @@
 /**
  * @file   libUART.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Header of libUART
  *
  * Detailed description of file.
@@ -44,11 +44,44 @@ typedef bool (*libUART_isr_callback)(uint8_t *data);
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the UART peripheral.
+ */
 void libUART_Init(void);
+
+/**
+ * Set handler functions for Rx and Tx.
+ *
+ * @param rx_callback Pointer to rx handler.
+ * @param tx_callback Pointer to tx handler.
+ */
 void libUART_SetCallbacks(libUART_isr_callback rx_callback,
                           libUART_isr_callback tx_callback);
-bool libUART_SetBaudRate(uint32_t baud);
+
+/**
+ * Enable/disable the UART peripheral.
+ *
+ * @param enable True to enable, otherwise false.
+ */
 void libUART_Enable(bool enable);
+
+/**
+ * Start a Tx transfer.
+ *
+ *  When a Tx transfer is started the Tx handler is called to get data.
+ */
 void libUART_StartTx(void);
 
-#endif /* LIBUART_H_ */
+/**
+ * Set UART baud rate.
+ *
+ * Remember to check the error rate with the selected baud rate and
+ * the crystal frequency.
+ *
+ * @param  baud Baud rate to set.
+ *
+ * @return True if baud rate is valid, otherwise false.
+ */
+bool libUART_SetBaudRate(uint32_t baud);
+
+#endif

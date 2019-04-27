@@ -1,7 +1,7 @@
 /**
  * @file   libUART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Implementation of libUART functions
  *
  * Detailed description of file.
@@ -28,12 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
 #include "libUART.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -91,86 +88,46 @@ ISR(USART_UDRE_vect)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Init UART
-///
-/// @param  None
-/// @return None
-///
 void libUART_Init(void)
 {
-    //Set frame format: 1 stop bit 8 data
+    /**
+     * Set frame format: 1 stop bit, 8 data bits.
+     */
     UCSR0C =  (3 << UCSZ00);
-    return;
 }
 
-///
-/// @brief Set handler functions for Rx and Tx.
-///
-/// NULL can be used to remove a handler.
-///
-/// @param  rx_callback Pointer to rx handler.
-/// @param  tx_callback Pointer to tx handler.
-/// @return None
-///
 void libUART_SetCallbacks(libUART_isr_callback rx_callback,
                           libUART_isr_callback tx_callback)
 {
     rx_handler = rx_callback;
     tx_handler = tx_callback;
-    return;
 }
 
-///
-/// @brief Enable/disable the UART interface.
-///
-/// @param  enable True to enable, otherwise false.
-/// @return None
-///
 void libUART_Enable(bool enable)
 {
     if (enable == true)
     {
-        //PRR &= ~(1 << PRUSART0);
         UCSR0B |= ((1 << RXEN0) | (1 << TXEN0) | (1<<RXCIE0));
     }
     else
     {
         UCSR0B &= ~((1 << RXEN0) | (1 << TXEN0) | (1<<RXCIE0));
-        //PRR |= (1 << PRUSART0);
     }
-    return;
 }
 
-///
-/// @brief Start a Tx transfer.
-///
-/// When a Tx transfer is started the Tx handler is called to get data.
-///
-/// @param  None
-/// @return None
-///
 void libUART_StartTx(void)
 {
     UCSR0B |= (1<<UDRIE0);
-    return;
 }
 
-///
-/// @brief Set baud rate.
-///
-/// NOTE: Remember to check the error rate with the selected baud rate
-///       and the crystal frequency.
-///
-/// @param  baud Baud rate to set.
-/// @return bool True if baud rate is valid, otherwise false.
-///
 bool libUART_SetBaudRate(uint32_t baud)
 {
     bool status = false;
     uint32_t tmp = DIV_MUL * baud;
 
-    //Check for overflow and invalid baud rate
+    /**
+     * Check for overflow and invalid baud rate.
+     */
     if (tmp <= F_CPU && tmp > baud)
     {
         uint16_t UBRRn = CalculateUBRRn(baud);
