@@ -1,7 +1,7 @@
 /**
  * @file   libS25FL1K_reg.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-08-17 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Header with S25FL1-k registers and commands.
  *
  * Detailed description of file.
@@ -47,7 +47,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_PAGE_PROGRAM                0x02
 #define CMD_SECTOR_ERASE                0x20
 #define CMD_BLOCK_ERASE                 0xD8
-#define CMD_CHIP_ERASE                  0xC7 //TODO: Check why both 0xC7 and 0x60 is listed in datasheet
+#define CMD_CHIP_ERASE                  0xC7
 #define CMD_ERASE_PROGRAM_SUSPEND       0x75
 #define CMD_ERASE_PROGRAM_RESUME        0x75
 #define CMD_READ_DATA                   0x03

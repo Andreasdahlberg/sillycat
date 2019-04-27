@@ -1,7 +1,7 @@
 /**
  * @file   libTimer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Module with low level timer functions.
  */
 
@@ -78,9 +78,7 @@ void libTimer_Init()
     //Enabled interrupt on compare match A
     TIMSK0 |= (1 << OCIE0A);
 
-    //TODO: Can this global interrupt enable cause problems?
     sei();
-    return;
 }
 
 void libTimer_Reset()

@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-03 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -130,6 +130,9 @@ void SoftReset(void)
     wdt_enable(WDTO_15MS);
     while (1)
     {
+        /**
+         * Wait for the watchdog to reset the device.
+         */
     }
 }
 

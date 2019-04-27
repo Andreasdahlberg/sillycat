@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Implementation of UI library.
  *
  * The UI library contains functions for drawing simple shapes and for
@@ -68,16 +68,17 @@ void libUI_Update(void)
 {
     libDisplay_Flush();
     libDisplay_ClearVRAM();
-    return;
 }
 
 void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end,
                     uint8_t y_end)
 {
-    //TODO: Fix this function, does not follow code style!
-    int dx = abs(x_end - x_start), sx = x_start < x_end ? 1 : -1;
-    int dy = abs(y_end - y_start), sy = y_start < y_end ? 1 : -1;
-    int err = (dx > dy ? dx : -dy) / 2, e2;
+    int dx = abs(x_end - x_start);
+    int sx = x_start < x_end ? 1 : -1;
+    int dy = abs(y_end - y_start);
+    int sy = y_start < y_end ? 1 : -1;
+    int err = (dx > dy ? dx : -dy) / 2;
+    int e2;
 
     while (1)
     {
@@ -87,18 +88,19 @@ void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end,
             break;
         }
         e2 = err;
+
         if (e2 > -dx)
         {
             err -= dy;
             x_start += sx;
         }
+
         if (e2 < dy)
         {
             err += dx;
             y_start += sy;
         }
     }
-    return;
 }
 
 void libUI_DrawRectangle(uint8_t x_start, uint8_t y_start, uint8_t width,
@@ -108,7 +110,6 @@ void libUI_DrawRectangle(uint8_t x_start, uint8_t y_start, uint8_t width,
     libUI_DrawLine(x_start, y_start, x_start, y_start + height);
     libUI_DrawLine(x_start, y_start + height, x_start + width, y_start + height);
     libUI_DrawLine(x_start + width, y_start, x_start + width, y_start + height);
-    return;
 }
 
 void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
@@ -138,7 +139,6 @@ void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
             decisionOver2 += 2 * (y - x) + 1;   // Change for y -> y+1, x -> x-1
         }
     }
-    return;
 }
 
 ///
@@ -164,7 +164,6 @@ void libUI_Print_P(const char *text, uint8_t x_pos, uint8_t y_pos, ...)
 
     libUI_PrintText(buffer, x_pos, y_pos);
     va_end(args);
-    return;
 }
 
 void libUI_PrintText(const char *buffer, uint8_t x_pos, uint8_t y_pos)

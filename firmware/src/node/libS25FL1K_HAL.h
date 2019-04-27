@@ -1,7 +1,7 @@
 /**
  * @file   libS25FL1K_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-26 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Header with HAL defines for the S25FL1-K low level driver.
  *
  * Detailed description of file.
@@ -43,7 +43,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define InitCS() DDRD |= (1 << CS_PIN)
 
 #define WP_PIN DDC6
-#define InitWP()  DDRC &= ~(1 << WP_PIN);
+#define InitWP()  DDRC &= ~(1 << WP_PIN)
 #define PullWP() PORTC &= ~(1 << WP_PIN)
 
 #define SPIMODE 0

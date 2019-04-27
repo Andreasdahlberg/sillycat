@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-23 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -87,6 +87,9 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
 
     while(!driverMCP79510_IsOscillatorRunning())
     {
+        /**
+         * Wait for the oscillator to start.
+         */
     }
 
     INFO("MCP79510 initialized");
@@ -509,8 +512,6 @@ bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
         for (uint8_t i = 0; i < length; ++i)
         {
             const uint8_t *tmp_p = (uint8_t *)data_p;
-
-            //TODO: Verify that address is auto incremented for write.
             libSPI_WriteByte(tmp_p[i], NULL, NULL);
         }
         module.PostSPI();

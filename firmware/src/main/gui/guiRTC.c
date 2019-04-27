@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -262,7 +262,7 @@ static struct limits_t GetCurrentFieldLimits(
         default:
             sc_assert_fail();
             break;
-    };
+    }
 
     return limits;
 }

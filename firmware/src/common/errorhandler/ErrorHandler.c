@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-04 (Last edit)
+ * @date   2019-04-27 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -167,6 +167,9 @@ void ErrorHandler_PointOfNoReturn(void)
 #ifndef UNIT_TESTING
     while (1)
     {
+        /**
+         * Halt the device until hard reset by the user.
+         */
     }
 #endif
 }
