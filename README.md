@@ -16,6 +16,11 @@ The following steps are required
     $ sudo apt install scons gcc-avr avr-libc avrdude
     ```
 
+1. Install optional packages
+    ```bash
+    $ sudo apt install astyle valgrind
+    ```
+
 1. Install [cmocka](https://cmocka.org/)
     ```bash
     $ sudo apt install cmake
