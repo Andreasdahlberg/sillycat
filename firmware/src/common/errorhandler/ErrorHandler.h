@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-04 (Last edit)
+ * @date   2019-04-30 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -99,7 +99,11 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information);
  * This function does never return, a manual reboot is needed to exit this
  * state.
  */
+#ifndef UNIT_TESTING
+void ErrorHandler_PointOfNoReturn(void) __attribute__((noreturn));
+#else
 void ErrorHandler_PointOfNoReturn(void);
+#endif
 
 /**
  * Print information about the failed an assert and then halt.
@@ -111,9 +115,16 @@ void ErrorHandler_PointOfNoReturn(void);
  * @param __lineno Line number of the failed assert.
  * @param __exp    String with the assert expression that returned false.
  */
+#ifndef UNIT_TESTING
+void ErrorHandler_AssertFail(const char *__file,
+                             int __lineno,
+                             const char *__exp) __attribute__((noreturn));
+#else
 void ErrorHandler_AssertFail(const char *__file,
                              int __lineno,
                              const char *__exp);
+#endif
+
 #ifdef DEBUG_ENABLE
 /**
  * Print all logged errors.
