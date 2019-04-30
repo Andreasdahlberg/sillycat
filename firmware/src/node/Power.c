@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2019-04-30 (Last edit)
  * @brief  Implementation of the power management module.
  */
 
@@ -172,7 +172,6 @@ static void BatteryMonitoringSM(void)
 
         default:
             sc_assert_fail();
-            break;
     }
 
     return;

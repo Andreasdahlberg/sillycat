@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-23 (Last edit)
+ * @date   2019-04-30 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -150,7 +150,6 @@ void driverDHT22_Update(void)
         case DHT_UNINITIALIZED:
         default:
             sc_assert_fail();
-            break;
     }
 }
 

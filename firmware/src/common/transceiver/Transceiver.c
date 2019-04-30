@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-23 (Last edit)
+ * @date   2019-04-30 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -184,7 +184,6 @@ void Transceiver_Update(void)
 
         default:
             sc_assert_fail();
-            break;
     }
 }
 
@@ -340,7 +339,6 @@ static transceiver_state_type ListeningStateMachine(void)
 
         default:
             sc_assert_fail();
-            break;
     }
     return next_state;
 }
@@ -391,7 +389,6 @@ static transceiver_state_type SendingStateMachine(void)
 
         default:
             sc_assert_fail();
-            break;
     }
     return next_state;
 }
