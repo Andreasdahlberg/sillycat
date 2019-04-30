@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-03-04 (Last edit)
+ * @date   2019-04-30 (Last edit)
  * @brief  Implementation of an interface for handling a collection of nodes.
  */
 
@@ -62,8 +62,6 @@ static struct module_t module;
 void Nodes_Init(void)
 {
     module.number_of_nodes = 0;
-
-    return;
 }
 
 void Nodes_Add(struct node_t *node_p)
@@ -77,7 +75,7 @@ void Nodes_Add(struct node_t *node_p)
 
 struct node_t *Nodes_GetNodeFromID(uint8_t id)
 {
-    for (size_t i = 0; i < module.number_of_nodes; ++i)
+    for (size_t i = 0; i < ElementsIn(module.nodes); ++i)
     {
         if (Node_GetID(module.nodes[i]) == id)
         {
