@@ -9,7 +9,8 @@ env.Append(CPPPATH=[
     '#src/main/fonts',
     '#src/main/encoder',
     '#src/main/interface',
-    '#src/main/driver/NTC'
+    '#src/main/driver/NTC',
+    '#src/main/nodes',
     ])
 
 objects = env.Object(source=source)
