@@ -19,13 +19,18 @@ import os
 
 Import(['*'])
 
-modules = ['encoder', 'interface', 'sensor', 'driver', 'nodes']
-objects = []
 
-for module in modules:
-    sconscript_file = os.path.join(module, 'SConscript')
+env.Append(CPPPATH=[
+    '#src/main',
+    '#src/main/nodes',
+    '#src/common'
+    ])
 
-    object = SConscript(sconscript_file, exports={'env': env})
-    objects.append(object)
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=Node_GetID'
+    ])
 
-Return('objects')
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
