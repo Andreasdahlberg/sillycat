@@ -1,7 +1,7 @@
 /**
  * @file   Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-30 (Last edit)
+ * @date   2019-05-09 (Last edit)
  * @brief  Implementation of an interface for handling a collection of nodes.
  */
 
@@ -75,7 +75,9 @@ void Nodes_Add(struct node_t *node_p)
 
 struct node_t *Nodes_GetNodeFromID(uint8_t id)
 {
-    for (size_t i = 0; i < ElementsIn(module.nodes); ++i)
+    sc_assert(module.number_of_nodes <= ElementsIn(module.nodes));
+
+    for (size_t i = 0; i < module.number_of_nodes; ++i)
     {
         if (Node_GetID(module.nodes[i]) == id)
         {
