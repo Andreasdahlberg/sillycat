@@ -1,5 +1,12 @@
 dist: xenial
 language: c
+
+addons:
+  sonarcloud:
+    organization: "andreasdahlberg-github"
+    token:
+      secure: $SONAR_TOKEN
+
 services:
   - docker
 env:
@@ -8,6 +15,7 @@ before_install:
   - docker build -t andreasdahlberg/docker-avr docker
   - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
+  - sonar-scanner
   - docker exec build scripts/check_style.py
   - docker exec build scons -C firmware coverage -j2
   - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
