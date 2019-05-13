@@ -27,3 +27,8 @@ RUN git clone git://git.cryptomilk.org/projects/cmocka.git && \
 RUN git clone https://github.com/rougier/freetype-py.git freetype-py && \
     cd freetype-py && \
     python3 setup.py install
+
+# Download SonarCloud build wrapper and add to path
+RUN wget http://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip && \
+    unzip build-wrapper-linux-x86.zip
+ENV PATH build-wrapper-linux-x86:$PATH
