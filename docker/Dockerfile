@@ -32,5 +32,5 @@ RUN git clone https://github.com/rougier/freetype-py.git freetype-py && \
 
 # Download SonarCloud build wrapper and add to path
 RUN wget http://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip && \
-    unzip build-wrapper-linux-x86.zip
-ENV PATH build-wrapper-linux-x86:$PATH
+    unzip -j build-wrapper-linux-x86.zip -d /usr/local/bin && \
+    rm build-wrapper-linux-x86.zip
