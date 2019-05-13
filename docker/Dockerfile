@@ -33,4 +33,5 @@ RUN git clone https://github.com/rougier/freetype-py.git freetype-py && \
 # Download SonarCloud build wrapper and add to path
 RUN wget http://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip && \
     unzip -j build-wrapper-linux-x86.zip -d /usr/local/bin && \
+    cp /usr/local/bin/libinterceptor-x86_64.so /usr/local/bin/libinterceptor-haswell.so && \
     rm build-wrapper-linux-x86.zip
