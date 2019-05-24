@@ -1,12 +1,6 @@
 dist: xenial
 language: c
 
-addons:
-  sonarcloud:
-    organization: "andreasdahlberg-github"
-    token:
-      secure: $SONAR_TOKEN
-
 services:
   - docker
 env:
@@ -19,7 +13,7 @@ script:
   - docker exec build scons -C firmware coverage -j2
   - docker exec build build-wrapper-linux-x86-64 --out-dir bw-output scons -C firmware build-main-release build-node-release
   - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
-  - sonar-scanner
+  - docker exec build sonar-scanner -Dsonar.login=$SONAR_TOKEN
 notifications:
   email:
     - andreas.dahlberg90@gmail.com
