@@ -3,11 +3,9 @@ language: c
 
 services:
   - docker
-env:
-  CI_ENV=`bash <(curl -s https://codecov.io/env)`
 before_install:
   - docker build -t andreasdahlberg/docker-avr docker
-  - docker run $CI_ENV -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
+  - docker run -v ${TRAVIS_BUILD_DIR}:/home/travis/build -w /home/travis/build -it -d --name build andreasdahlberg/docker-avr bash
 script:
   - docker exec build scripts/check_style.py
   - docker exec build scons -C firmware coverage -j2
@@ -30,5 +28,3 @@ deploy:
     - firmware/build/release/node/node/node_release.eep
   on:
     tags: true
-after_success:
-  - docker exec build scripts/codecov.sh
