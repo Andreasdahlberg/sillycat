@@ -11,6 +11,7 @@ before_install:
 script:
   - docker exec build scripts/check_style.py
   - docker exec build scons -C firmware coverage -j2
+  - docker exec -w /home/travis/build/firmware build gcovr -k
   - docker exec build build-wrapper-linux-x86-64 --out-dir bw-output scons -C firmware build-main-release build-node-release
   - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
   - docker exec build sonar-scanner -Dsonar.login=$SONAR_TOKEN

@@ -15,7 +15,8 @@ RUN apt-get -y update && apt-get install -y \
     valgrind \
     astyle \
     wget \
-    unzip
+    unzip \
+    gcovr
 
 # Install cmocka
 RUN git clone git://git.cryptomilk.org/projects/cmocka.git && \
