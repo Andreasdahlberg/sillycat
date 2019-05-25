@@ -22,6 +22,7 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/main',
+    '#src/main/node',
     '#src/main/nodes',
     '#src/common'
     ])
