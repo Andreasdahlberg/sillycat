@@ -11,6 +11,7 @@ env.Append(CPPPATH=[
     '#src/main/interface',
     '#src/main/driver/NTC',
     '#src/main/nodes',
+    '#src/main/node'
     ])
 
 objects = env.Object(source=source)

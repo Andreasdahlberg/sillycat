@@ -20,7 +20,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 import os
 
 #Directories to compile
-DIRECTORIES = ['encoder', 'driver', 'gui', 'fonts', 'interface', 'sensor', 'nodes', '../utility', '../common']
+DIRECTORIES = ['encoder', 'driver', 'gui', 'fonts', 'interface', 'sensor', 'nodes', 'node', '../utility', '../common']
 
 #Import all exported variables
 Import(['*'])
@@ -39,7 +39,8 @@ env.Append(CPPPATH=[
     'gui',
     'fonts',
     'interface',
-    'nodes'
+    'nodes',
+    'node'
 ])
 
 source = Glob('*.c')
