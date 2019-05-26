@@ -1,7 +1,7 @@
 /**
  * @file   Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-05 (Last edit)
+ * @date   2019-05-26 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -302,7 +302,11 @@ uint32_t Time_ConvertToTimestamp(const struct time_t *time_p)
     else
     {
         uint32_t m;
-        n = 59 + Time_IsLeapYear(time_p);
+        n = 59;
+        if (Time_IsLeapYear(time_p))
+        {
+            n += 1;
+        }
         d += n;
         n = month - MARCH + 1;
 

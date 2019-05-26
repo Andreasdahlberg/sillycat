@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2019-05-26 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -77,10 +77,6 @@ bool PacketHandler_HandleReadingPacket(packet_frame_type *packet_p)
     }
     else
     {
-        /**
-         * TODO: The current implementation only accept predefined node IDs.
-         *       Register new nodes here.
-         */
         WARNING("Received packet from unknown node: %x", packet_p->header.source);
         return false;
     }

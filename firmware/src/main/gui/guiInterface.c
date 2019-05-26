@@ -1,7 +1,7 @@
 /**
  * @file   guiInterface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2015-11-10 (Last edit)
+ * @date   2019-05-26 (Last edit)
  * @brief  Implementation of guiInterface
  *
  * Detailed description of file.
@@ -72,8 +72,6 @@ void guiInterface_DrawViewIndicator(indicator_position_type position)
             libUI_DrawLine(0, 0, 0, DISPLAY_HEIGHT - 1);
             break;
 
-        case INDICATOR_POS_TOP:
-        case INDICATOR_POS_BOTTOM:
         default:
             WARNING("Invalid indicator position: %u", (uint8_t)position);
             break;

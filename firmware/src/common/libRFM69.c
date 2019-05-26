@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-26 (Last edit)
+ * @date   2019-05-26 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -175,7 +175,6 @@ bool libRFM69_IsPowerUpDone(void)
     return (Timer_TimeDifference(reset_time_ms) > POR_TIME_MS);
 }
 
-//TODO: Use remove these functions and use macros!
 bool libRFM69_IsFIFOFull(void)
 {
     return IsBitSetInRegister(REG_IRQFLAGS2, REG_IRQFLAGS2_BIT_FIFOFULL);

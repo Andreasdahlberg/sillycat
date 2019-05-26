@@ -1,7 +1,7 @@
 /**
  * @file   libS25FL1K_reg.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
+ * @date   2019-05-26 (Last edit)
  * @brief  Header with S25FL1-k registers and commands.
  *
  * Detailed description of file.
@@ -61,7 +61,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_RELEASE_POWER_DOWN          0xAB
 #define CMD_MANUFACTURER_DEVICE_ID      0x90
 #define CMD_JEDEC_ID                    0x9F
-#define CMD_READ_SFDP_REG               0x5A //TODO: Also unique id number
+#define CMD_READ_SFDP_REG               0x5A
 #define CMD_READ_SECURITY_REGISTER      0x48
 #define CMD_ERASE_SECURITY_REGISTER     0x44
 #define CMD_PROGRAM_SECURITY_REGISTERS  0x42

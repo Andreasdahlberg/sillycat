@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-30 (Last edit)
+ * @date   2019-05-26 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -143,11 +143,9 @@ void driverDHT22_Update(void)
             DecodeTimings();
             module.initialization_time = Timer_GetMilliseconds();
 
-            //TODO: Power up or new state? save last reading time?
             module.state = DHT_IDLE;
             break;
 
-        case DHT_UNINITIALIZED:
         default:
             sc_assert_fail();
     }
