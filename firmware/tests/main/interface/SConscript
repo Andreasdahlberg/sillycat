@@ -23,7 +23,8 @@ env.Append(CPPPATH=[
     '#src/main',
     '#src/main/gui',
     '#src/main/interface',
-    '#src/common'
+    '#src/common',
+    '#tests/mocks/'
     ])
 
 env.Append(LINKFLAGS=[
