@@ -1,6 +1,7 @@
 dist: xenial
 language: c
-
+git:
+  depth: false
 services:
   - docker
 before_install:

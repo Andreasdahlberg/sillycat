@@ -52,7 +52,8 @@ def main():
         cmd = 'docker exec build sonar-scanner ' \
             '-Dsonar.login=$SONAR_TOKEN ' \
             '-Dsonar.pullrequest.branch=$TRAVIS_PULL_REQUEST_BRANCH ' \
-            '-Dsonar.pullrequest.key=$TRAVIS_PULL_REQUEST -Dsonar.pullrequest.base=$TRAVIS_BRANCH'
+            '-Dsonar.pullrequest.key=$TRAVIS_PULL_REQUEST ' \
+            '-Dsonar.pullrequest.base=$TRAVIS_BRANCH'
     else:
         print('Detected push')
         cmd = 'docker exec build sonar-scanner ' \
