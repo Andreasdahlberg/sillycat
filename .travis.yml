@@ -1,6 +1,7 @@
 dist: xenial
 language: c
-
+git:
+  depth: false
 services:
   - docker
 before_install:
@@ -12,7 +13,7 @@ script:
   - docker exec -w /home/travis/build/firmware build gcovr -k
   - docker exec build build-wrapper-linux-x86-64 --out-dir bw-output scons -C firmware build-main-release build-node-release
   - docker exec build scons -C firmware build-node-release build-main-release eeprom-node-release eeprom-main-release -j2
-  - docker exec build sonar-scanner -Dsonar.login=$SONAR_TOKEN
+  - scripts/sonar.py
 notifications:
   email:
     - andreas.dahlberg90@gmail.com
