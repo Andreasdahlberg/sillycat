@@ -35,8 +35,8 @@ def main():
     """Run the Sonar Scanner with different options depending on the build type."""
 
     if tag_triggered_build():
-        print('Skip Sonar scan when build is triggered by a tag.')
-        return 0
+        print('Skip Sonar scan when build is triggered by a tag[DISABLED].')
+        print('TRAVIS_TAG:', os.environ['TRAVIS_TAG'])
 
     try:
         pull_request = os.environ['TRAVIS_PULL_REQUEST']
