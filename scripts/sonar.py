@@ -25,20 +25,15 @@ def execute_command(cmd):
     return output.decode('utf-8')
 
 
-def tag_triggered_build():
-    """Check if the build is triggered by a Git tag."""
-
-    return "TRAVIS_TAG" in os.environ
-
-
 def main():
     """Run the Sonar Scanner with different options depending on the build type."""
 
-    if tag_triggered_build():
-        print('Skip Sonar scan when build is triggered by a tag[DISABLED].')
-        print('TRAVIS_TAG:', os.environ['TRAVIS_TAG'])
-
     try:
+        if os.environ['TRAVIS_TAG']:
+            print('Skip Sonar scan when build is triggered by a tag.')
+            print('TRAVIS_TAG:', os.environ['TRAVIS_TAG'])
+            return 0
+
         pull_request = os.environ['TRAVIS_PULL_REQUEST']
         pull_request_branch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
         pull_request_base = os.environ['TRAVIS_BRANCH']
