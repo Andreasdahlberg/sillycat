@@ -135,22 +135,6 @@ void Time_AddHours(struct time_t *time_p, uint8_t hours);
 void Time_AddDays(struct time_t *time_p, uint8_t days);
 
 /**
- * Add months to the supplied time.
- *
- * @param time_p Pointer to time struct.
- * @param months Number of months to add.
- */
-void Time_AddMonths(struct time_t *time_p, uint8_t months);
-
-/**
- * Add years to the supplied time.
- *
- * @param time_p Pointer to time struct.
- * @param years  Number of years to add.
- */
-void Time_AddYears(struct time_t *time_p, uint8_t year);
-
-/**
  * Convert a timestamp into an broken down time struct.
  *
  * @author Michael Duane Rice, Original.

@@ -1,7 +1,7 @@
 /**
  * @file   mock_Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2019-06-05 (Last edit)
  * @brief  Mock functions for the Time module.
  */
 
@@ -68,10 +68,6 @@ bool __wrap_Time_IsLeapYear(const struct time_t *time_p)
     mock_type(bool);
 }
 
-void __wrap_Time_AddYears(struct time_t *time_p, uint8_t year)
-{
-}
-
 void __wrap_Time_AddDays(struct time_t *time_p, uint8_t days)
 {
 }
@@ -96,10 +92,6 @@ void __wrap_Time_AddHours(struct time_t *time_p, uint8_t hours)
 bool __wrap_Time_IsDaylightSavingActive(const struct time_t *time_p)
 {
     mock_type(bool);
-}
-
-void __wrap_Time_AddMonths(struct time_t *time_p, uint8_t months)
-{
 }
 
 uint32_t __wrap_Time_ConvertToTimestamp(const struct time_t *time_p)

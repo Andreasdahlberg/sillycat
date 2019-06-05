@@ -165,88 +165,37 @@ bool Time_IsLeapYear(const struct time_t *time_p)
 void Time_AddSeconds(struct time_t *time_p, uint8_t seconds)
 {
     sc_assert(time_p != NULL);
-    uint16_t carry;
 
-    carry = (time_p->second + seconds) / 60;
-    time_p->second = (time_p->second + seconds) % 60;
-
-    if (carry > 0)
-    {
-        Time_AddMinutes(time_p, carry);
-    }
+    uint32_t timestamp = Time_ConvertToTimestamp(time_p);
+    timestamp += seconds;
+    *time_p = Time_ConvertFromTimestamp(timestamp);
 }
 
 void Time_AddMinutes(struct time_t *time_p, uint8_t minutes)
 {
     sc_assert(time_p != NULL);
-    uint16_t carry;
 
-    carry = (time_p->minute + minutes) / 60;
-    time_p->minute = (time_p->minute + minutes) % 60;
-
-    if (carry > 0)
-    {
-        Time_AddHours(time_p, carry);
-    }
+    uint32_t timestamp = Time_ConvertToTimestamp(time_p);
+    timestamp += minutes * 60;
+    *time_p = Time_ConvertFromTimestamp(timestamp);
 }
 
 void Time_AddHours(struct time_t *time_p, uint8_t hours)
 {
     sc_assert(time_p != NULL);
-    uint16_t carry;
 
-    carry =  (time_p->hour + hours) / 24;
-    time_p->hour = (time_p->hour + hours) % 24;
-
-    if (carry > 0)
-    {
-        Time_AddDays(time_p, carry);
-    }
+    uint32_t timestamp = Time_ConvertToTimestamp(time_p);
+    timestamp += hours * 60 * 60;
+    *time_p = Time_ConvertFromTimestamp(timestamp);
 }
 
 void Time_AddDays(struct time_t *time_p, uint8_t days)
 {
     sc_assert(time_p != NULL);
-    uint16_t carry;
-    uint8_t days_in_month;
 
-    days_in_month = Time_GetDaysInMonth(time_p);
-
-    carry = (time_p->date + days) / days_in_month;
-    time_p->date = (time_p->date + days) % days_in_month;
-
-    //TODO: Fix cases when carry > 1
-    sc_assert(carry < 2);
-
-    if (carry > 0)
-    {
-        Time_AddMonths(time_p, carry);
-    }
-}
-
-void Time_AddMonths(struct time_t *time_p, uint8_t months)
-{
-    sc_assert(time_p != NULL);
-    uint16_t carry;
-
-    carry =  (time_p->month + months) / 12;
-    time_p->month = (time_p->month + months) % 12;
-
-    if (carry > 0)
-    {
-        Time_AddYears(time_p, carry);
-    }
-}
-
-void Time_AddYears(struct time_t *time_p, uint8_t years)
-{
-    sc_assert(time_p != NULL);
-    time_p->year += years;
-
-    if (time_p->year > 99)
-    {
-        time_p->year = 99;
-    }
+    uint32_t timestamp = Time_ConvertToTimestamp(time_p);
+    timestamp += days * 24 * 3600;
+    *time_p = Time_ConvertFromTimestamp(timestamp);
 }
 
 struct time_t Time_ConvertFromTimestamp(uint32_t timestamp)

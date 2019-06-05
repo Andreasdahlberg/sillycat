@@ -278,21 +278,37 @@ static void test_Time_AddHours(void **state)
     }
 }
 
-static void test_Time_AddYears_NULL(void **state)
+static void test_Time_AddDays_NULL(void **state)
 {
-    expect_assert_failure(Time_AddYears(NULL, 1));
+    expect_assert_failure(Time_AddDays(NULL, 1));
 }
 
-static void test_Time_AddYears(void **state)
+static void test_Time_AddDays(void **state)
 {
-    struct time_t time = {0};
+    struct test_data_t
+    {
+        uint8_t days;
+        uint8_t expected_date;
+        uint8_t expected_month;
+    };
 
-    Time_AddYears(&time, 1);
-    assert_int_equal(time.year, 1);
-    Time_AddYears(&time, 98);
-    assert_int_equal(time.year, 99);
-    Time_AddYears(&time, 1);
-    assert_int_equal(time.year, 99);
+    struct time_t time = {.month = 1, .date = 1};
+    struct test_data_t data[] =
+    {
+        {.days = 0, .expected_date = 1, .expected_month = 1},
+        {.days = 1, .expected_date = 2, .expected_month = 1},
+        {.days = 1, .expected_date = 3, .expected_month = 1},
+        {.days = 27, .expected_date = 30, .expected_month = 1},
+        {.days = 1, .expected_date = 31, .expected_month = 1},
+        {.days = 1, .expected_date = 1, .expected_month = 2},
+    };
+
+    for (size_t i = 0; i < ElementsIn(data); ++i)
+    {
+        Time_AddDays(&time, data[i].days);
+        assert_int_equal(time.date, data[i].expected_date);
+        assert_int_equal(time.month, data[i].expected_month);
+    }
 }
 
 static void test_Time_IsDaylightSavingActive_NULL(void **state)
@@ -542,7 +558,7 @@ static void test_Time_ConvertFromAndToTimestamp(void **state)
 {
     uint32_t timestamps[] = {0, UINT32_MAX / 2, UINT32_MAX};
 
-    for (size_t i = 0; i < sizeof(timestamps) / sizeof(timestamps[0]); ++i)
+    for (size_t i = 0; i < ElementsIn(timestamps); ++i)
     {
         struct time_t time = Time_ConvertFromTimestamp(timestamps[i]);
         assert_int_equal(timestamps[i], Time_ConvertToTimestamp(&time));
@@ -581,8 +597,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_Time_AddMinutes),
         cmocka_unit_test(test_Time_AddHours_NULL),
         cmocka_unit_test(test_Time_AddHours),
-        cmocka_unit_test(test_Time_AddYears_NULL),
-        cmocka_unit_test(test_Time_AddYears),
+        cmocka_unit_test(test_Time_AddDays_NULL),
+        cmocka_unit_test(test_Time_AddDays),
         cmocka_unit_test(test_Time_IsDaylightSavingActive_NULL),
         cmocka_unit_test(test_Time_IsDaylightSavingActive),
         cmocka_unit_test(test_Time_ConvertToTimestamp_NULL),
