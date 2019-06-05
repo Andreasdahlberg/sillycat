@@ -1,7 +1,7 @@
 /**
  * @file   test_Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-06 (Last edit)
+ * @date   2019-05-05 (Last edit)
  * @brief  Test suite for the Time module.
  */
 
@@ -131,7 +131,7 @@ static void test_Time_IsLeapYear(void **state)
         assert_true(Time_IsLeapYear(&time));
     }
 
-    const uint8_t non_leap_years[] = {1, 2, 3, 5, 6, 7, 9, 255};
+    const uint8_t non_leap_years[] = {1, 2, 3, 5, 6, 7, 9, 100, 255};
     for (size_t i = 0; i < ElementsIn(non_leap_years); ++i)
     {
         const struct time_t time = {.year = non_leap_years[i]};

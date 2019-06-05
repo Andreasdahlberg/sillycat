@@ -1,7 +1,7 @@
 /**
  * @file   Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-26 (Last edit)
+ * @date   2019-06-05 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -149,20 +149,16 @@ bool Time_IsDaylightSavingActive(const struct time_t *time_p)
 bool Time_IsLeapYear(const struct time_t *time_p)
 {
     sc_assert(time_p != NULL);
-    struct time_t tmp_time = *time_p;
+    uint16_t year = time_p->year;
     bool is_leap_year = false;
 
-    tmp_time.year += 2000;
+    year += 2000;
 
     //All leap years are divisible by 4
-    if (tmp_time.year % 4 == 0)
+    if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
     {
-        if (tmp_time.year % 100 != 0 || tmp_time.year % 400 == 0)
-        {
-            is_leap_year = true;
-        }
+        is_leap_year = true;
     }
-
     return is_leap_year;
 }
 
