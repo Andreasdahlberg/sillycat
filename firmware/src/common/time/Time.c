@@ -249,6 +249,115 @@ void Time_AddYears(struct time_t *time_p, uint8_t years)
     }
 }
 
+struct time_t Time_ConvertFromTimestamp(uint32_t timestamp)
+{
+    struct time_t time;
+    struct div_t result;
+    uint16_t days;
+    uint16_t n;
+    uint16_t leapyear;
+    uint16_t years;
+
+    /* break down timer into whole days */
+    days = timestamp / 86400UL;
+
+    /* Extract hour, minute, and second from the fractional day */
+    time.second = timestamp % 60;
+    timestamp /= 60;
+    time.minute = timestamp % 60;
+    timestamp /= 60;
+    time.hour = timestamp % 24;
+    timestamp /= 24;
+
+    /*
+     * Our epoch year has the property of being at the conjunction of all three 'leap cycles',
+     * 4, 100, and 400 years ( though we can ignore the 400 year cycle in this library).
+     *
+     * Using this property, we can easily 'map' the time stamp into the leap cycles, quickly
+     * deriving the year and day of year, along with the fact of whether it is a leap year.
+     */
+
+    /* map into a 100 year cycle */
+    result = Divide(days, 36525L);
+    years = 100 * result.quotient;
+
+    /* map into a 4 year cycle */
+    result = Divide(result.remainder, 1461L);
+    years += 4 * result.quotient;
+    days = result.remainder;
+    if (years > 100)
+    {
+        days++;
+    }
+
+    /*
+     * 'years' is now at the first year of a 4 year leap cycle, which will always be a leap year,
+     * unless it is 100. 'days' is now an index into that cycle.
+     */
+    leapyear = 1;
+    if (years == 100)
+    {
+        leapyear = 0;
+    }
+
+    /* compute length, in days, of first year of this cycle */
+    n = 364 + leapyear;
+
+    /*
+     * if the number of days remaining is greater than the length of the
+     * first year, we make one more division.
+     */
+    if (days > n)
+    {
+        days -= leapyear;
+        leapyear = 0;
+        result = Divide(days, 365);
+        years += result.quotient;
+        days = result.remainder;
+    }
+    time.year = years;
+
+    /*
+     * Given the year, day of year, and leap year indicator, we can break down the
+     * month and day of month. If the day of year is less than 59 (or 60 if a leap year), then
+     * we handle the Jan/Feb month pair as an exception.
+     */
+    n = 59 + leapyear;
+    if (days < n)
+    {
+        /* special case: Jan/Feb month pair */
+        result = Divide(days, 31);
+        time.month = result.quotient;
+        time.date = result.remainder;
+    }
+    else
+    {
+        /*
+        * The remaining 10 months form a regular pattern of 31 day months alternating with 30 day
+        * months, with a 'phase change' between July and August (153 days after March 1).
+        * We proceed by mapping our position into either March-July or August-December.
+        */
+        days -= n;
+        result = Divide(days, 153);
+        time.month = 2 + result.quotient * 5;
+
+        /* map into a 61 day pair of months */
+        result = Divide(result.remainder, 61);
+        time.month += result.quotient * 2;
+
+        /* map into a month */
+        result = Divide(result.remainder, 31);
+        time.month += result.quotient;
+        time.date = result.remainder;
+    }
+
+    /* Month and date has offset of one. */
+    time.month += 1;
+    time.date += 1;
+
+    return time;
+}
+
 uint32_t Time_ConvertToTimestamp(const struct time_t *time_p)
 {
     sc_assert(time_p != NULL);

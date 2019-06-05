@@ -437,6 +437,128 @@ static void test_Time_ConvertToTimestamp(void **state)
     }
 }
 
+static void test_Time_ConvertFromTimestamp(void **state)
+{
+    struct test_data_t
+    {
+        struct time_t expected_time;
+        uint32_t timestamp;
+    };
+
+    const struct test_data_t data[] =
+    {
+        {
+            .expected_time = {
+                .year = 0,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .timestamp = 0
+        },
+        {
+            .expected_time = {
+                .year = 0,
+                .month = FEBRUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .timestamp = 2678400
+        },
+        {
+            .expected_time = {
+                .year = 0,
+                .month = MARCH,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .timestamp = 5184000
+        },
+        {
+            .expected_time = {
+                .year = 0,
+                .month = AUGUST,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .timestamp = 18403200
+        },
+        {
+            .expected_time = {
+                .year = 0,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 1,
+                .minute = 2,
+                .second = 3
+            },
+            .timestamp = 3723
+        },
+        {
+            .expected_time = {
+                .year = 1,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .timestamp = 31622400
+        },
+        {
+            .expected_time = {
+                .year = 4,
+                .month = JANUARY,
+                .date = 1,
+                .hour = 0,
+                .minute = 0,
+                .second = 0
+            },
+            .timestamp = 126230400
+        },
+    };
+
+    for (size_t i = 0; i < ElementsIn(data); ++i)
+    {
+        struct time_t time = Time_ConvertFromTimestamp(data[i].timestamp);
+        assert_int_equal(time.year, data[i].expected_time.year);
+        assert_int_equal(time.month, data[i].expected_time.month);
+        assert_int_equal(time.date, data[i].expected_time.date);
+        assert_int_equal(time.hour, data[i].expected_time.hour);
+        assert_int_equal(time.minute, data[i].expected_time.minute);
+        assert_int_equal(time.second, data[i].expected_time.second);
+    }
+}
+
+static void test_Time_ConvertFromAndToTimestamp(void **state)
+{
+    uint32_t timestamps[] = {0, UINT32_MAX / 2, UINT32_MAX};
+
+    for (size_t i = 0; i < sizeof(timestamps) / sizeof(timestamps[0]); ++i)
+    {
+        struct time_t time = Time_ConvertFromTimestamp(timestamps[i]);
+        assert_int_equal(timestamps[i], Time_ConvertToTimestamp(&time));
+    }
+}
+
+struct div_t Divide(int32_t numerator, int32_t denominator)
+{
+    struct div_t result;
+
+    result.quotient = numerator / denominator;
+    result.remainder = numerator % denominator;
+
+    return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -464,7 +586,9 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_Time_IsDaylightSavingActive_NULL),
         cmocka_unit_test(test_Time_IsDaylightSavingActive),
         cmocka_unit_test(test_Time_ConvertToTimestamp_NULL),
-        cmocka_unit_test(test_Time_ConvertToTimestamp)
+        cmocka_unit_test(test_Time_ConvertToTimestamp),
+        cmocka_unit_test(test_Time_ConvertFromTimestamp),
+        cmocka_unit_test(test_Time_ConvertFromAndToTimestamp)
     };
 
     if (argc >= 2)

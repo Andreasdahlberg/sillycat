@@ -1,7 +1,7 @@
 /**
  * @file   Time.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-27 (Last edit)
+ * @date   2019-06-05 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -149,6 +149,18 @@ void Time_AddMonths(struct time_t *time_p, uint8_t months);
  * @param years  Number of years to add.
  */
 void Time_AddYears(struct time_t *time_p, uint8_t year);
+
+/**
+ * Convert a timestamp into an broken down time struct.
+ *
+ * @author Michael Duane Rice, Original.
+ * @author Andreas Dahlberg, Adaptations.
+ *
+ * @param  timestamp Timestamp in seconds.
+ *
+ * @return Time struct.
+ */
+struct time_t Time_ConvertFromTimestamp(uint32_t timestamp);
 
 /**
  * Convert an broken down time struct into number of seconds since midnight,
