@@ -3,7 +3,19 @@ import os
 
 Import(['*'])
 
-modules = ['ADC', 'timer', 'time', 'com', 'config', 'event', 'errorhandler', 'transceiver', 'driver/MCP79510']
+modules = [
+    'ADC',
+    'timer',
+    'time',
+    'com',
+    'config',
+    'event',
+    'errorhandler',
+    'transceiver',
+    'driver/MCP79510',
+    'UART'
+]
+
 module_objects = []
 
 source = Glob('*.c')
@@ -16,6 +28,7 @@ env.Append(CPPPATH=[
     '#src/common/errorhandler',
     '#src/common/transceiver',
     '#src/common/driver/MCP79510',
+    '#src/common/UART',
     '#src/utility/FIFO',
     '#src/{}'.format(target)
 ])
