@@ -1,10 +1,8 @@
 /**
- * @file   UART.h
+ * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-05-16 (Last edit)
- * @brief  Header of UART module
- *
- * Detailed description of file.
+ * @date   2019-06-13 (Last edit)
+ * @brief  Implementation of UART module.
  */
 
 /*
@@ -45,10 +43,46 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+/**
+ * Initialize the UART interface.
+ */
 void UART_Init(void);
+
+/**
+ * Enable/disable the UART interface.
+ *
+ * @param enable True to enable, otherwise false.
+ */
 void UART_Enable(bool enable);
-size_t UART_Write(const void *data, size_t length);
-size_t UART_Read(void *data, size_t length);
+
+/**
+ * Write data to the UART interface.
+ *
+ * @param data_p Pointer to data.
+ * @param length Number of bytes to write.
+ *
+ * @return Actual number of bytes written, a smaller number then the length
+ *         means that the TX buffer is full.
+ */
+size_t UART_Write(const void *data_p, size_t length);
+
+/**
+ * Read data from the UART interface.
+ *
+ * @param data_p Pointer to buffer where data will be stored.
+ * @param length Maximum number of bytes to read.
+ *
+ * @return Actual number of bytes read.
+ */
+size_t UART_Read(void *data_p, size_t length);
+
+/**
+ * Wait for TX to complete.
+ *
+ * @param timeout_ms Maximum time to wait, use 0 to disable the timeout.
+ *
+ * @return False if TX did not complete before the timeout, otherwise true.
+ */
 bool UART_WaitForTx(uint32_t timeout_ms);
 
 #endif /* UART_H_ */

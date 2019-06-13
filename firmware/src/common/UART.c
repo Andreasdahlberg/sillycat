@@ -1,10 +1,8 @@
 /**
  * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2016-06-21 (Last edit)
+ * @date   2019-06-13 (Last edit)
  * @brief  Implementation of UART module.
- *
- * Detailed description of file.
  */
 
 /*
@@ -28,11 +26,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include <avr/interrupt.h>
-
 #include "libUART.h"
 #include "FIFO.h"
 #include "Timer.h"
@@ -49,8 +44,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define InitTXBuffer() uart_tx_fifo = FIFO_New(tx_buffer)
 #define InitRXBuffer() uart_rx_fifo = FIFO_New(rx_buffer)
 
-#define AddToTXBuffer(data) FIFO_Push(&uart_tx_fifo, data)
-#define GetFromRXBuffer(data) FIFO_Pop(&uart_rx_fifo, data)
+#define AddToTXBuffer(data_p) FIFO_Push(&uart_tx_fifo, data_p)
+#define GetFromRXBuffer(data_p) FIFO_Pop(&uart_rx_fifo, data_p)
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -70,21 +65,13 @@ static fifo_type uart_rx_fifo;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-bool AddToRXBuffer(uint8_t *data);
-bool GetFromTXBuffer(uint8_t *data);
+static bool AddToRXBuffer(uint8_t *data_p);
+static bool GetFromTXBuffer(uint8_t *data_p);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Init the UART interface.
-///
-/// NOTE: UART is not active until enabled.
-///
-/// @param  None
-/// @return None
-///
 void UART_Init(void)
 {
     InitTXBuffer();
@@ -93,33 +80,17 @@ void UART_Init(void)
     libUART_Init();
     libUART_SetBaudRate(BAUDRATE);
     libUART_SetCallbacks(AddToRXBuffer, GetFromTXBuffer);
-    return;
 }
 
-///
-/// @brief Enable/disable the UART interface.
-///
-/// @param  enable True to enable, otherwise false.
-/// @return None
-///
 void UART_Enable(bool enable)
 {
     libUART_Enable(enable);
 }
 
-///
-/// @brief Write data to UART.
-///
-///
-/// @param  *data Pointer to data.
-/// @param  length Number of bytes to write.
-/// @return Actual number of bytes written, a smaller number then length means
-///         that the tx buffer is full.
-///
-size_t UART_Write(const void *data, size_t length)
+size_t UART_Write(const void *data_p, size_t length)
 {
     size_t cnt = 0;
-    uint8_t *data_ptr = (uint8_t *)data;
+    uint8_t *data_ptr = (uint8_t *)data_p;
 
     while (cnt < length)
     {
@@ -138,18 +109,10 @@ size_t UART_Write(const void *data, size_t length)
     return cnt;
 }
 
-///
-/// @brief Read data from UART.
-///
-///
-/// @param  *data Pointer to buffer where data will be stored.
-/// @param  length Max number of bytes to read.
-/// @return Actual number of bytes read.
-///
-size_t UART_Read(void *data, size_t length)
+size_t UART_Read(void *data_p, size_t length)
 {
     size_t cnt = 0;
-    uint8_t *data_ptr = (uint8_t *)data;
+    uint8_t *data_ptr = (uint8_t *)data_p;
 
     while (cnt < length)
     {
@@ -166,13 +129,6 @@ size_t UART_Read(void *data, size_t length)
     return cnt;
 }
 
-///
-/// @brief Wait for Tx to complete.
-///
-///
-/// @param  *timeout_ms Maximum time to wait, use 0 to disable the timeout.
-/// @return False if Tx did not complete before the timeout, otherwise true.
-///
 bool UART_WaitForTx(uint32_t timeout_ms)
 {
     bool status = true;
@@ -193,18 +149,18 @@ bool UART_WaitForTx(uint32_t timeout_ms)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-bool AddToRXBuffer(uint8_t *data)
+static bool AddToRXBuffer(uint8_t *data_p)
 {
     bool status;
 
-    status = FIFO_Push(&uart_rx_fifo, data);
+    status = FIFO_Push(&uart_rx_fifo, data_p);
     return status;
 }
 
-bool GetFromTXBuffer(uint8_t *data)
+static bool GetFromTXBuffer(uint8_t *data_p)
 {
     bool status;
 
-    status = FIFO_Pop(&uart_tx_fifo, data);
+    status = FIFO_Pop(&uart_tx_fifo, data_p);
     return status;
 }
