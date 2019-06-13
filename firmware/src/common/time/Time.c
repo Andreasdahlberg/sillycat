@@ -1,7 +1,7 @@
 /**
  * @file   Time.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-05 (Last edit)
+ * @date   2019-06-13 (Last edit)
  * @brief  Module with functions for manipulating time.
  */
 
@@ -216,7 +216,6 @@ struct time_t Time_ConvertFromTimestamp(uint32_t timestamp)
     time.minute = timestamp % 60;
     timestamp /= 60;
     time.hour = timestamp % 24;
-    timestamp /= 24;
 
     /*
      * Our epoch year has the property of being at the conjunction of all three 'leap cycles',
