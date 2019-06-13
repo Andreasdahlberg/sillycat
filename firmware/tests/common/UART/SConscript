@@ -1,0 +1,32 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/common',
+    '#src/common/timer',
+    '#src/common/UART',
+    '#src/utility/FIFO',
+    '#tests/common/UART',
+    '#tests/mocks',
+])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=cli',
+    '-Wl,--wrap=sei',
+    '-Wl,--wrap=Timer_TimeDifference',
+    '-Wl,--wrap=Timer_GetMilliseconds',
+    '-Wl,--wrap=libUART_Init',
+    '-Wl,--wrap=libUART_SetBaudRate',
+    '-Wl,--wrap=libUART_SetCallbacks',
+    '-Wl,--wrap=libUART_Enable',
+    '-Wl,--wrap=libUART_StartTx'
+])
+
+SOURCE = Glob('*.c')
+objects = env.Object(source=SOURCE)
+
+
+objects.append(SConscript('#src/utility/FIFO/SConscript', exports={'env': env}))
+
+Return('objects')

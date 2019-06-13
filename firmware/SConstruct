@@ -227,6 +227,7 @@ modules = [
     os.path.join('common', 'event'),
     os.path.join('common', 'errorhandler'),
     os.path.join('common', 'transceiver'),
+    os.path.join('common', 'UART'),
 ]
 
 tests = []
