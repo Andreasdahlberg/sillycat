@@ -72,6 +72,15 @@ static int Setup(void **state)
 //TESTS
 //////////////////////////////////////////////////////////////////////////
 
+static void test_UART_Enable(void **state)
+{
+    expect_value(__wrap_libUART_Enable, enable, true);
+    UART_Enable(true);
+
+    expect_value(__wrap_libUART_Enable, enable, false);
+    UART_Enable(false);
+}
+
 static void test_UART_Write_ZeroBytes(void **state)
 {
     uint8_t data = 0;
@@ -102,6 +111,69 @@ static void test_UART_Write(void **state)
     assert_string_equal(result, data);
 }
 
+static void test_UART_Read_ZeroBytes(void **state)
+{
+    uint8_t data = 0;
+
+    assert_int_equal(UART_Read(&data, 0), 0);
+}
+
+static void test_UART_Read_Truncated(void **state)
+{
+    /**
+     * Add received data to RX buffer.
+     */
+    char rx_data[] = "foobar";
+    for(size_t i = 0; i < strlen(rx_data); ++i)
+    {
+        assert_true(rx_handler(&rx_data[i]));
+    }
+
+    char data[4] = {0};
+    assert_int_equal(UART_Read(&data, sizeof(data)), sizeof(data));
+}
+
+static void test_UART_Read(void **state)
+{
+    /**
+     * Add received data to RX buffer.
+     */
+    char rx_data[] = "foobar";
+    for(size_t i = 0; i < strlen(rx_data); ++i)
+    {
+        assert_true(rx_handler(&rx_data[i]));
+    }
+
+    char result[8] = {0};
+    assert_int_equal(UART_Read(&result, sizeof(result)), strlen(rx_data));
+    assert_string_equal(result, rx_data);
+}
+
+static void test_UART_WaitForTx_Empty(void **state)
+{
+    const uint32_t timeout = 1000;
+
+    will_return_maybe(__wrap_Timer_GetMilliseconds, 0);
+    will_return_maybe(__wrap_Timer_TimeDifference, 0);
+
+    assert_true(UART_WaitForTx(timeout));
+}
+
+static void test_UART_WaitForTx_Timeout(void **state)
+{
+    const uint32_t timeout = 1000;
+
+    uint8_t data = 0;
+    assert_int_equal(UART_Write(&data, 1), 1);
+
+    will_return_always(__wrap_Timer_GetMilliseconds, 0);
+    will_return(__wrap_Timer_TimeDifference, 0);
+    will_return(__wrap_Timer_TimeDifference, timeout);
+    will_return(__wrap_Timer_TimeDifference, timeout + 1);
+
+    assert_false(UART_WaitForTx(timeout));
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -116,6 +188,11 @@ void __wrap_sei()
     function_called();
 }
 
+void __wrap_libUART_Enable(bool enable)
+{
+    check_expected(enable);
+}
+
 void __wrap_libUART_SetCallbacks(libUART_isr_callback rx_callback, libUART_isr_callback tx_callback)
 {
     rx_handler = rx_callback;
@@ -126,9 +203,15 @@ int main(int argc, char *argv[])
 {
     const struct CMUnitTest tests[] =
     {
+        cmocka_unit_test_setup(test_UART_Enable, Setup),
         cmocka_unit_test_setup(test_UART_Write_ZeroBytes, Setup),
         cmocka_unit_test_setup(test_UART_Write_BufferFull, Setup),
         cmocka_unit_test_setup(test_UART_Write, Setup),
+        cmocka_unit_test_setup(test_UART_Read_ZeroBytes, Setup),
+        cmocka_unit_test_setup(test_UART_Read_Truncated, Setup),
+        cmocka_unit_test_setup(test_UART_Read, Setup),
+        cmocka_unit_test_setup(test_UART_WaitForTx_Empty, Setup),
+        cmocka_unit_test_setup(test_UART_WaitForTx_Timeout, Setup),
     };
 
     if (argc >= 2)
