@@ -23,7 +23,8 @@ env.Append(CPPPATH=[
     '#src/common',
     '#src/common/timer',
     '#src/common/event',
-    '#src/main/gui'
+    '#src/common/debug',
+    '#src/main/gui',
 ])
 
 SOURCE = Glob('*.c')

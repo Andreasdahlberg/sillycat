@@ -14,7 +14,8 @@ modules = [
     'transceiver',
     'driver/MCP79510',
     'driver/UART',
-    'UART'
+    'UART',
+    'debug'
 ]
 
 module_objects = []
@@ -31,6 +32,7 @@ env.Append(CPPPATH=[
     '#src/common/driver/MCP79510',
     '#src/common/driver/UART',
     '#src/common/UART',
+    '#src/common/debug',
     '#src/utility/FIFO',
     '#src/{}'.format(target)
 ])

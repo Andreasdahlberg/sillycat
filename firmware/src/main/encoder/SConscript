@@ -25,7 +25,8 @@ env.Append(CPPPATH=[
     '#src/main/driver/PEC11',
     '#src/common',
     '#src/common/timer',
-    '#src/common/event'
+    '#src/common/event',
+    '#src/common/debug'
 ])
 
 OBJECTS = env.Object(source=SOURCE)

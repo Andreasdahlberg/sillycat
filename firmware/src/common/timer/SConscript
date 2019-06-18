@@ -19,7 +19,10 @@ import os
 
 Import(['*'])
 
-env.Append(CPPPATH=['#src/common'])
+env.Append(CPPPATH=[
+    '#src/common',
+    '#src/common/debug'
+])
 
 SOURCE = Glob('*.c')
 OBJECTS = env.Object(source=SOURCE)

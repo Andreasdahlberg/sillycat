@@ -26,6 +26,7 @@ env.Append(CPPPATH=[
     '#src/common/time',
     '#src/common/timer',
     '#src/common/event',
+    '#src/common/debug',
     '#src/main/sensor'
 ])
 

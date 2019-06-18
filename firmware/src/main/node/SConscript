@@ -28,7 +28,8 @@ env.Append(CPPPATH=[
     '#src/common/time',
     '#src/common/timer',
     '#src/common/event',
-    '#src/common/config'
+    '#src/common/config',
+    '#src/common/debug'
 ])
 
 OBJECTS = env.Object(source=SOURCE)

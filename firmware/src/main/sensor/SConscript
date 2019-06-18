@@ -24,7 +24,8 @@ SOURCE = Glob('*.c')
 env.Append(CPPPATH=[
     Dir('.').abspath,
     '#src/common',
-    '#src/common/event'
+    '#src/common/event',
+    '#src/common/debug'
 ])
 
 OBJECTS = env.Object(source=SOURCE)
