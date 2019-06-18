@@ -1,7 +1,7 @@
 /**
  * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-13 (Last edit)
+ * @date   2019-06-18 (Last edit)
  * @brief  Implementation of UART module.
  */
 
@@ -28,7 +28,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.h"
 #include <avr/interrupt.h>
-#include "libUART.h"
+#include "driverUART.h"
 #include "FIFO.h"
 #include "Timer.h"
 
@@ -77,14 +77,14 @@ void UART_Init(void)
     InitTXBuffer();
     InitRXBuffer();
 
-    libUART_Init();
-    libUART_SetBaudRate(BAUDRATE);
-    libUART_SetCallbacks(AddToRXBuffer, GetFromTXBuffer);
+    driverUART_Init();
+    driverUART_SetBaudRate(BAUDRATE);
+    driverUART_SetCallbacks(AddToRXBuffer, GetFromTXBuffer);
 }
 
 void UART_Enable(bool enable)
 {
-    libUART_Enable(enable);
+    driverUART_Enable(enable);
 }
 
 size_t UART_Write(const void *data_p, size_t length)
@@ -105,7 +105,7 @@ size_t UART_Write(const void *data_p, size_t length)
         ++cnt;
     }
 
-    libUART_StartTx();
+    driverUART_StartTx();
     return cnt;
 }
 

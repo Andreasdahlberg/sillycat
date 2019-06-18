@@ -13,6 +13,7 @@ modules = [
     'errorhandler',
     'transceiver',
     'driver/MCP79510',
+    'driver/UART',
     'UART'
 ]
 
@@ -28,6 +29,7 @@ env.Append(CPPPATH=[
     '#src/common/errorhandler',
     '#src/common/transceiver',
     '#src/common/driver/MCP79510',
+    '#src/common/driver/UART',
     '#src/common/UART',
     '#src/utility/FIFO',
     '#src/{}'.format(target)

@@ -1,7 +1,7 @@
 /**
- * @file   mock_libUART.h
+ * @file   mock_driverUART.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-13 (Last edit)
+ * @date   2019-06-18 (Last edit)
  * @brief  Mock functions for the UART module.
  */
 
@@ -22,15 +22,15 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WRAP_LIBUART_H_
-#define WRAP_LIBUART_H_
+#ifndef WRAP_driverUART_H_
+#define WRAP_driverUART_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
 #include <stdbool.h>
-#include "libUART.h"
+#include "driverUART.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -44,10 +44,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_libUART_Init(void) __attribute__((weak));
-void __wrap_libUART_SetCallbacks(libUART_isr_callback rx_callback, libUART_isr_callback tx_callback) __attribute__((weak));
-void __wrap_libUART_Enable(bool enable) __attribute__((weak));
-void __wrap_libUART_StartTx(void) __attribute__((weak));
-bool __wrap_libUART_SetBaudRate(uint32_t baud) __attribute__((weak));
+void __wrap_driverUART_Init(void) __attribute__((weak));
+void __wrap_driverUART_SetCallbacks(driverUART_isr_callback rx_callback, driverUART_isr_callback tx_callback) __attribute__((weak));
+void __wrap_driverUART_Enable(bool enable) __attribute__((weak));
+void __wrap_driverUART_StartTx(void) __attribute__((weak));
+bool __wrap_driverUART_SetBaudRate(uint32_t baud) __attribute__((weak));
 
 #endif
