@@ -1,7 +1,7 @@
 /**
  * @file   test_UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-14 (Last edit)
+ * @date   2019-06-18 (Last edit)
  * @brief  Test suite for the UART module.
  */
 
@@ -36,7 +36,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 
 #include "UART.h"
-#include "libUART.h"
+#include "driverUART.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -50,8 +50,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static libUART_isr_callback rx_handler;
-static libUART_isr_callback tx_handler;
+static driverUART_isr_callback rx_handler;
+static driverUART_isr_callback tx_handler;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
@@ -59,7 +59,7 @@ static libUART_isr_callback tx_handler;
 
 static int Setup(void **state)
 {
-    will_return(__wrap_libUART_SetBaudRate, true);
+    will_return(__wrap_driverUART_SetBaudRate, true);
     UART_Init();
 
     assert_non_null(rx_handler);
@@ -74,10 +74,10 @@ static int Setup(void **state)
 
 static void test_UART_Enable(void **state)
 {
-    expect_value(__wrap_libUART_Enable, enable, true);
+    expect_value(__wrap_driverUART_Enable, enable, true);
     UART_Enable(true);
 
-    expect_value(__wrap_libUART_Enable, enable, false);
+    expect_value(__wrap_driverUART_Enable, enable, false);
     UART_Enable(false);
 }
 
@@ -188,12 +188,12 @@ void __wrap_sei()
     function_called();
 }
 
-void __wrap_libUART_Enable(bool enable)
+void __wrap_driverUART_Enable(bool enable)
 {
     check_expected(enable);
 }
 
-void __wrap_libUART_SetCallbacks(libUART_isr_callback rx_callback, libUART_isr_callback tx_callback)
+void __wrap_driverUART_SetCallbacks(driverUART_isr_callback rx_callback, driverUART_isr_callback tx_callback)
 {
     rx_handler = rx_callback;
     tx_handler = tx_callback;

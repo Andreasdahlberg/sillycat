@@ -1,10 +1,8 @@
 /**
- * @file   libUART.c
+ * @file   driverUART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
- * @brief  Implementation of libUART functions
- *
- * Detailed description of file.
+ * @date   2019-06-18 (Last edit)
+ * @brief  Implementation of ATmega328 UART driver.
  */
 
 /*
@@ -31,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "libUART.h"
+#include "driverUART.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -50,8 +48,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-static libUART_isr_callback rx_handler;
-static libUART_isr_callback tx_handler;
+static driverUART_isr_callback rx_handler;
+static driverUART_isr_callback tx_handler;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
@@ -88,7 +86,7 @@ ISR(USART_UDRE_vect)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libUART_Init(void)
+void driverUART_Init(void)
 {
     /**
      * Set frame format: 1 stop bit, 8 data bits.
@@ -96,14 +94,14 @@ void libUART_Init(void)
     UCSR0C =  (3 << UCSZ00);
 }
 
-void libUART_SetCallbacks(libUART_isr_callback rx_callback,
-                          libUART_isr_callback tx_callback)
+void driverUART_SetCallbacks(driverUART_isr_callback rx_callback,
+                             driverUART_isr_callback tx_callback)
 {
     rx_handler = rx_callback;
     tx_handler = tx_callback;
 }
 
-void libUART_Enable(bool enable)
+void driverUART_Enable(bool enable)
 {
     if (enable == true)
     {
@@ -115,12 +113,12 @@ void libUART_Enable(bool enable)
     }
 }
 
-void libUART_StartTx(void)
+void driverUART_StartTx(void)
 {
     UCSR0B |= (1<<UDRIE0);
 }
 
-bool libUART_SetBaudRate(uint32_t baud)
+bool driverUART_SetBaudRate(uint32_t baud)
 {
     bool status = false;
     uint32_t tmp = DIV_MUL * baud;

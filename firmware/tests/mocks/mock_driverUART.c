@@ -1,10 +1,8 @@
 /**
- * @file   libUART.h
+ * @file   mock_driverUART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
- * @brief  Header of libUART
- *
- * Detailed description of file.
+ * @date   2019-06-18 (Last edit)
+ * @brief  Mock functions for the driverUART module.
  */
 
 /*
@@ -24,64 +22,59 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBUART_H_
-#define LIBUART_H_
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+#include <stdio.h>
 #include <stdint.h>
-#include <stdbool.h>
+#include "mock_driverUART.h"
+
+//////////////////////////////////////////////////////////////////////////
+//DEFINES
+//////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef bool (*libUART_isr_callback)(uint8_t *data);
-
 //////////////////////////////////////////////////////////////////////////
-//FUNCTION PROTOTYPES
+//VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-/**
- * Initialize the UART peripheral.
- */
-void libUART_Init(void);
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
-/**
- * Set handler functions for Rx and Tx.
- *
- * @param rx_callback Pointer to rx handler.
- * @param tx_callback Pointer to tx handler.
- */
-void libUART_SetCallbacks(libUART_isr_callback rx_callback,
-                          libUART_isr_callback tx_callback);
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
-/**
- * Enable/disable the UART peripheral.
- *
- * @param enable True to enable, otherwise false.
- */
-void libUART_Enable(bool enable);
+void __wrap_driverUART_Init(void)
+{
+}
 
-/**
- * Start a Tx transfer.
- *
- *  When a Tx transfer is started the Tx handler is called to get data.
- */
-void libUART_StartTx(void);
+void __wrap_driverUART_SetCallbacks(driverUART_isr_callback rx_callback, driverUART_isr_callback tx_callback)
+{
+}
 
-/**
- * Set UART baud rate.
- *
- * Remember to check the error rate with the selected baud rate and
- * the crystal frequency.
- *
- * @param  baud Baud rate to set.
- *
- * @return True if baud rate is valid, otherwise false.
- */
-bool libUART_SetBaudRate(uint32_t baud);
+void __wrap_driverUART_Enable(bool enable)
+{
+}
 
-#endif
+void __wrap_driverUART_StartTx(void)
+{
+}
+
+bool __wrap_driverUART_SetBaudRate(uint32_t baud)
+{
+    mock_type(bool);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
