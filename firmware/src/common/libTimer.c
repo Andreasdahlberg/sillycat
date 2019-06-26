@@ -1,7 +1,7 @@
 /**
  * @file   libTimer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
+ * @date   2019-06-26 (Last edit)
  * @brief  Module with low level timer functions.
  */
 
@@ -75,10 +75,21 @@ void libTimer_Init()
 #error "Unsupported frequency"
 #endif
 
-    //Enabled interrupt on compare match A
-    TIMSK0 |= (1 << OCIE0A);
+    libTimer_Start();
 
     sei();
+}
+
+void libTimer_Start()
+{
+    /* Enabled interrupt on compare match A. */
+    TIMSK0 |= (1 << OCIE0A);
+}
+
+void libTimer_Stop()
+{
+    /* Disabled interrupt on compare match A. */
+    TIMSK0 &= ~(1 << OCIE0A);
 }
 
 void libTimer_Reset()

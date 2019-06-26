@@ -1,7 +1,7 @@
 /**
  * @file   libTimer.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2019-06-26 (Last edit)
  * @brief  Module with low level timer functions.
  */
 
@@ -47,6 +47,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * Initialize the timer hardware to trigger an interrupt every 1 ms
  */
 void libTimer_Init(void);
+
+/**
+ * Start the system timer.
+ */
+void libTimer_Start();
+
+/**
+ * Stop the system timer.
+ */
+void libTimer_Stop();
 
 /**
  * Reset the system timer.
