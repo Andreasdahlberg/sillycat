@@ -1,7 +1,7 @@
 /**
  * @file   Timer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2019-06-27 (Last edit)
  * @brief  Module with timer related functions.
  */
 
@@ -26,7 +26,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "libTimer.h"
+#include "driverTimer.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -53,17 +53,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 void Timer_Init(void)
 {
-    libTimer_Init();
+    driverTimer_Init();
 }
 
 void Timer_Reset(void)
 {
-    libTimer_Reset();
+    driverTimer_Reset();
 }
 
 uint32_t Timer_GetMilliseconds(void)
 {
-    return libTimer_GetMilliseconds();
+    return driverTimer_GetMilliseconds();
 }
 
 uint32_t Timer_GetSeconds(void)

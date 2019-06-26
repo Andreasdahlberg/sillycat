@@ -19,7 +19,7 @@ import os
 
 Import(['*'])
 
-DRIVERS = ['MCP79510', 'UART']
+DRIVERS = ['MCP79510', 'UART', 'timer']
 DRIVER_OBJECTS = []
 
 for driver in DRIVERS:

@@ -12,8 +12,7 @@ modules = [
     'event',
     'errorhandler',
     'transceiver',
-    'driver/MCP79510',
-    'driver/UART',
+    'driver',
     'UART',
     'debug'
 ]

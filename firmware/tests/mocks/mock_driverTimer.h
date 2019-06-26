@@ -1,8 +1,8 @@
 /**
- * @file   mock_libTimer.h
+ * @file   mock_driverTimer.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
- * @brief  Mock functions for libTimer module.
+ * @date   2019-06-27 (Last edit)
+ * @brief  Mock functions for timer driver.
  */
 
 /*
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WRAP_LIBTIMER_H_
-#define WRAP_LIBTIMER_H_
+#ifndef WRAP_DRIVERTIMER_H_
+#define WRAP_DRIVERTIMER_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -41,8 +41,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_libTimer_Init(void);
-void __wrap_libTimer_Reset(void);
-uint32_t __wrap_libTimer_GetMilliseconds(void);
+void __wrap_driverTimer_Init(void);
+void __wrap_driverTimer_Start(void);
+void __wrap_driverTimer_Stop(void);
+void __wrap_driverTimer_Reset(void);
+uint32_t __wrap_driverTimer_GetMilliseconds(void);
 
 #endif

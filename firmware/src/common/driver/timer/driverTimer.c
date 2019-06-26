@@ -1,8 +1,8 @@
 /**
- * @file   libTimer.c
+ * @file   driverTimer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-26 (Last edit)
- * @brief  Module with low level timer functions.
+ * @date   2019-06-27 (Last edit)
+ * @brief  Implementation of ATmega328 timer driver.
  */
 
 /*
@@ -29,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include <avr/interrupt.h>
 #include <util/atomic.h>
-#include "libTimer.h"
+#include "driverTimer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -58,7 +58,7 @@ ISR(TIMER0_COMPA_vect)
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libTimer_Init()
+void driverTimer_Init()
 {
     system_timer = 0;
 
@@ -75,24 +75,24 @@ void libTimer_Init()
 #error "Unsupported frequency"
 #endif
 
-    libTimer_Start();
+    driverTimer_Start();
 
     sei();
 }
 
-void libTimer_Start()
+void driverTimer_Start()
 {
     /* Enabled interrupt on compare match A. */
     TIMSK0 |= (1 << OCIE0A);
 }
 
-void libTimer_Stop()
+void driverTimer_Stop()
 {
     /* Disabled interrupt on compare match A. */
     TIMSK0 &= ~(1 << OCIE0A);
 }
 
-void libTimer_Reset()
+void driverTimer_Reset()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
@@ -100,7 +100,7 @@ void libTimer_Reset()
     }
 }
 
-uint32_t libTimer_GetMilliseconds()
+uint32_t driverTimer_GetMilliseconds()
 {
     uint32_t current_timer;
 

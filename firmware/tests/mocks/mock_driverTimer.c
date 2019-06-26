@@ -1,8 +1,8 @@
 /**
- * @file   libTimer.h
+ * @file   mock_driverTimer.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-26 (Last edit)
- * @brief  Module with low level timer functions.
+ * @date   2018-09-22 (Last edit)
+ * @brief  Mock functions for timer driver.
  */
 
 /*
@@ -22,14 +22,17 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LIBTIMER_H_
-#define LIBTIMER_H_
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdarg.h>
+#include <stddef.h>
+#include <setjmp.h>
+#include <cmocka.h>
+#include <stdio.h>
 #include <stdint.h>
+#include "mock_driverTimer.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -40,34 +43,46 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-//FUNCTION PROTOTYPES
+//VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-/**
- * Initialize the timer hardware to trigger an interrupt every 1 ms
- */
-void libTimer_Init(void);
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTION PROTOTYPES
+//////////////////////////////////////////////////////////////////////////
 
-/**
- * Start the system timer.
- */
-void libTimer_Start();
+//////////////////////////////////////////////////////////////////////////
+//INTERUPT SERVICE ROUTINES
+//////////////////////////////////////////////////////////////////////////
 
-/**
- * Stop the system timer.
- */
-void libTimer_Stop();
+//////////////////////////////////////////////////////////////////////////
+//FUNCTIONS
+//////////////////////////////////////////////////////////////////////////
 
-/**
- * Reset the system timer.
- */
-void libTimer_Reset(void);
+void __wrap_driverTimer_Init(void)
+{
+    function_called();
+}
 
-/**
- *  Get the current time(ms).
- *
- * @return The current system time in milliseconds.
- */
-uint32_t libTimer_GetMilliseconds(void);
+void __wrap_driverTimer_Start(void)
+{
+    function_called();
+}
 
-#endif
+void __wrap_driverTimer_Stop(void)
+{
+    function_called();
+}
+
+void __wrap_driverTimer_Reset(void)
+{
+    function_called();
+}
+
+uint32_t __wrap_driverTimer_GetMilliseconds(void)
+{
+    return mock_type(uint32_t);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//LOCAL FUNCTIONS
+//////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,8 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/common',
-    '#src/common/debug'
+    '#src/common/debug',
+    '#src/common/driver/timer'
 ])
 
 SOURCE = Glob('*.c')
