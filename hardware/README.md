@@ -31,3 +31,17 @@
 [OSHPark PCB](https://oshpark.com/shared_projects/RTkTkiwv)
 
 ## Node Unit
+
+## Gerbers
+[NI Ultiboard](https://en.wikipedia.org/wiki/NI_Ultiboard) is used to generate the gerber files.
+
+1. [Remove alignment points](https://docs.oshpark.com/design-tools/ni-ultiboard/removing-alignment-points/)
+1. Click on File->Export and select the *Exports* tab
+1. Check the Gerber RS-274X option and select the following layers:
+	* Copper(all)
+	* Board Outline
+	* Silkscreen Top
+	* Silkscreen Bottom
+	* Solder Mask Top
+	* Solder Mask Bottom
+	* Drill(all)
