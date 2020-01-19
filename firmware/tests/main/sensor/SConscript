@@ -28,8 +28,8 @@ env.Append(CPPPATH=[
     ])
 
 env.Append(LINKFLAGS=[
-    '-Wl,--wrap=libDS3234_WriteToSRAM',
-    '-Wl,--wrap=libDS3234_ReadFromSRAM',
+    '-Wl,--wrap=driverMCP79510_WriteToSRAM',
+    '-Wl,--wrap=driverMCP79510_ReadFromSRAM',
     '-Wl,--wrap=CRC_16'
     ])
 

@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2020-01-19 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -34,10 +34,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "libSPI.h"
-#include "libDS3234.h"
 #include "libRFM69.h"
 #include "libUI.h"
 
+#include "Board.h"
+#include "RTC.h"
 #include "ADC.h"
 #include "Sensor.h"
 #include "Interface.h"
@@ -102,7 +103,7 @@ int main(void)
 
     wdt_disable();
 
-    libDS3234_InitHW();
+    Board_Init();
     libRFM69_InitHW();
 
     libDebug_Init();
@@ -113,7 +114,7 @@ int main(void)
     ADC_Init();
     Timer_Init();
     libSPI_Init(1);
-    libDS3234_Init();
+    RTC_Init();
     Sensor_Init();
     driverNTC_Init();
     driverMCUTemperature_Init();

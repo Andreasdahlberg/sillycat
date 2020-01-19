@@ -34,6 +34,7 @@ mock_env.Append(CPPPATH=[
     '#src/common/transceiver',
     '#src/common/driver/UART',
     '#src/common/driver/timer',
+    '#src/common/driver/MCP79510',
     '#src/utility/FIFO',
     '#src/utility/Filter'
     ])

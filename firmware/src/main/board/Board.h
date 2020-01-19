@@ -1,8 +1,8 @@
 /**
- * @file   mock_libDS3234.h
+ * @file   Board.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-11 (Last edit)
- * @brief  Mock functions for the DS3234 driver.
+ * @date   2020-01-19 (Last edit)
+ * @brief  Board support package for the main unit.
  */
 
 /*
@@ -22,14 +22,12 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WRAP_NAME_H_
-#define WRAP_NAME_H_
+#ifndef BOARD_H_
+#define BOARD_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
-
-#include <stdbool.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -43,7 +41,28 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-bool __wrap_libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length);
-bool __wrap_libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length);
+/**
+ * Initialize low level board hardware.
+ */
+void Board_Init(void);
+
+/**
+ * Initialize the pins required for the RTC.
+ */
+void Board_RTC_Init(void);
+
+/**
+ * Prepare a RTC SPI transfer.
+ *
+ * Set the correct SPI-mode and select the RTC on the SPI-bus.
+ */
+void Board_RTC_SPIPreCallback(void);
+
+/**
+ * Clean up of a RTC SPI transfer.
+ *
+ * Release the RTC in the SPI-bus.
+ */
+void Board_RTC_SPIPostCallback(void);
 
 #endif
