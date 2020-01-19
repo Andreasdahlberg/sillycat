@@ -1,8 +1,8 @@
 /**
- * @file   mock_libDS3234.c
+ * @file   Board.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-12 (Last edit)
- * @brief  Mock functions for the DS3234 driver.
+ * @date   2020-01-19 (Last edit)
+ * @brief  Board support package for the main unit.
  */
 
 /*
@@ -26,29 +26,30 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
-#include <cmocka.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include "mock_libDS3234.h"
+#include "common.h"
+#include <avr/io.h>
+#include "libSPI.h"
+#include "Board.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define RTC_DDR     DDRC
+#define RTC_PORT    PORTC
+#define RTC_SS      DDC0
+#define RTC_SPIMODE 0
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-//VARIABLES
+//LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-//LOCAL FUNCTION PROTOTYPES
+//VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,14 +60,27 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-bool __wrap_libDS3234_WriteToSRAM(uint8_t address, uint8_t *data, uint8_t length)
+void Board_Init(void)
 {
-    function_called();
+    Board_RTC_Init();
 }
 
-bool __wrap_libDS3234_ReadFromSRAM(uint8_t address, uint8_t *data, uint8_t length)
+void Board_RTC_Init(void)
 {
-    memset(data, 0, length);
+    /* Set SS as output and pull high to release device. */
+    RTC_DDR |= (1 << RTC_SS);
+    RTC_PORT |= (1 << RTC_SS);
+}
+
+void Board_RTC_SPIPreCallback(void)
+{
+    libSPI_SetMode(RTC_SPIMODE);
+    RTC_PORT &= ~(1 << RTC_SS);
+}
+
+void Board_RTC_SPIPostCallback(void)
+{
+    RTC_PORT |= (1 << RTC_SS);
 }
 
 //////////////////////////////////////////////////////////////////////////

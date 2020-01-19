@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-06 (Last edit)
+ * @date   2020-01-19 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -33,7 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Sensor.h"
 #include "CRC.h"
 #include "libDebug.h"
-#include "libDS3234.h"
+#include "driverMCP79510.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -203,7 +203,7 @@ static void WriteValuesToSRAM(const struct sensor_t *self)
     stats.valid = self->statistics.valid;
 
     UpdateCRC(&stats);
-    libDS3234_WriteToSRAM(address, (uint8_t *)&stats, sizeof(stats));
+    driverMCP79510_WriteToSRAM(address, &stats, sizeof(stats));
 }
 
 static void ReadValuesFromSRAM(struct sensor_t *self)
@@ -211,7 +211,7 @@ static void ReadValuesFromSRAM(struct sensor_t *self)
     uint8_t address = sizeof(struct sensor_statistics_t) * self->id;
     struct sensor_statistics_t stats;
 
-    libDS3234_ReadFromSRAM(address, (uint8_t *)&stats, sizeof(stats));
+    driverMCP79510_ReadFromSRAM(address, &stats, sizeof(stats));
 
     if (IsCRCValid(&stats))
     {

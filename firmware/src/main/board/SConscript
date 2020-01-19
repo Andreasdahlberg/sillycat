@@ -22,15 +22,9 @@ Import(['*'])
 SOURCE = Glob('*.c')
 
 env.Append(CPPPATH=[
-    Dir('.').abspath,
-    '#src/common',
-    '#src/common/event',
-    '#src/common/debug',
-    '#src/common/driver/MCP79510'
+    '#src/common'
 ])
 
 OBJECTS = env.Object(source=SOURCE)
 
 Return('OBJECTS')
-
-
