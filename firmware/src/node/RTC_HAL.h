@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2020-01-19 (Last edit)
  * @brief  RTC HAL.
  */
 
@@ -39,7 +39,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_IsAlarmsSupported() true
 
 #define RTC_InitHW()
-#define RTC_Init()      driverMCP79510_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback)
+#define RTC_Init()          driverMCP79510_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback)
+#define RTC_Is24HourMode()  driverMCP79510_Is24HourMode()
 
 #define RTC_GetYear(year)           driverMCP79510_GetYear(year)
 #define RTC_GetMonth(month)         driverMCP79510_GetMonth(month)
@@ -48,7 +49,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_GetMinutes(minutes)     driverMCP79510_GetMinute(minutes)
 #define RTC_GetSeconds(seconds)     driverMCP79510_GetSecond(seconds)
 #define RTC_GetDay(day)             driverMCP79510_GetDay(day)
-#define RTC_GetHourMode(hour_mode)  //TODO: Fix this!
 
 #define RTC_SetMinutes(minutes) driverMCP79510_SetMinute(minutes)
 #define RTC_SetSeconds(seconds) driverMCP79510_SetSecond(seconds)
