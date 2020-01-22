@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-27 (Last edit)
+ * @date   2020-01-22 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -102,7 +102,6 @@ int main(void)
 
     //Init hardware early to ensure all CS are disabled.
     Board_Init();
-    libRFM69_InitHW();
     libS25FL1K_InitHW();
     libDebug_Init();
 
