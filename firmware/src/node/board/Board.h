@@ -1,7 +1,7 @@
 /**
  * @file   Board.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2030-01-22 (Last edit)
  * @brief  Board support package for the node unit.
  */
 
@@ -64,5 +64,34 @@ void Board_RTC_SPIPreCallback(void);
  * Release the RTC in the SPI-bus.
  */
 void Board_RTC_SPIPostCallback(void);
+
+/**
+ * Initialize the pins required for the RFM69 transceiver.
+ */
+void Board_RFM69_Init(void);
+
+/**
+ * Prepare a RFM69 SPI transfer.
+ *
+ * Set the correct SPI-mode and select the RFM69 on the SPI-bus.
+ */
+void Board_RFM69_SPIPreCallback(void);
+
+/**
+ * Clean up of a RFM69 SPI transfer.
+ *
+ * Release the RFM69 in the SPI-bus.
+ */
+void Board_RFM69_SPIPostCallback(void);
+
+/**
+ * Pull the RFM69 reset pin high.
+ */
+void Board_RFM69_PullReset(void);
+
+/**
+ * Release the RFM69 reset pin.
+ */
+void Board_RFM69_ReleaseReset(void);
 
 #endif

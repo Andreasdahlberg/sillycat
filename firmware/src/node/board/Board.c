@@ -1,7 +1,7 @@
 /**
  * @file   Board.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2020-01-22 (Last edit)
  * @brief  Board support package for the node unit.
  */
 
@@ -35,11 +35,23 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define RTC_DDR     DDRD
-#define RTC_PORT    PORTD
-#define RTC_MFP     DD3
-#define RTC_SS      DDD4
-#define RTC_SPIMODE 0
+#define RTC_SPI_DDR     DDRD
+#define RTC_SPI_PORT    PORTD
+#define RTC_SPI_MFP     DD3
+#define RTC_SPI_SS      DDD4
+#define RTC_SPI_MODE 0
+
+#define RFM69_SPI_DDR   DDRB
+#define RFM69_SPI_PORT  PORTB
+#define RFM69_SPI_SS    DDB2
+#define RFM69_SPI_MODE  0
+
+#define RFM69_RESET_DDR     DDRC
+#define RFM69_RESET_PORT    PORTC
+#define RFM69_RESET_PIN     DDC0
+
+#define RFM69_IO_DDR    DDRC
+#define RFM69_IO_PIN    DDC2
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -48,6 +60,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+static inline void SetRFM69ResetAsOutput(void);
+static inline void SetRFM69ResetAsInput(void);
+static inline void SetRFM69ResetHigh(void);
+static inline void SetRFM69ResetLow(void);
+static inline void SetRFM69IOAsInput(void);
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -64,30 +82,87 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void Board_Init(void)
 {
     Board_RTC_Init();
+    Board_RFM69_Init();
 }
 
 void Board_RTC_Init(void)
 {
     /* Set SS as output and pull high to release device. */
-    RTC_DDR |= (1 << RTC_SS);
-    RTC_PORT |= (1 << RTC_SS);
-
-    /* Set MFP as input with an pull-up active. */
-    RTC_DDR &= ~(1 << RTC_MFP);
-    RTC_PORT |= (1 << RTC_MFP);
+    RTC_SPI_DDR |= (1 << RTC_SPI_SS);
+    RTC_SPI_PORT |= (1 << RTC_SPI_SS);
 }
 
 void Board_RTC_SPIPreCallback(void)
 {
-    libSPI_SetMode(RTC_SPIMODE);
-    RTC_PORT &= ~(1 << RTC_SS);
+    libSPI_SetMode(RTC_SPI_MODE);
+    RTC_SPI_PORT &= ~(1 << RTC_SPI_SS);
 }
 
 void Board_RTC_SPIPostCallback(void)
 {
-    RTC_PORT |= (1 << RTC_SS);
+    RTC_SPI_PORT |= (1 << RTC_SPI_SS);
+}
+
+void Board_RFM69_Init(void)
+{
+    /* Set SS as output and pull high to release device. */
+    RFM69_SPI_DDR |= (1 << RFM69_SPI_SS);
+    RFM69_SPI_PORT |= (1 << RFM69_SPI_SS);
+
+    SetRFM69ResetAsInput();
+    SetRFM69ResetLow();
+
+    SetRFM69IOAsInput();
+}
+
+void Board_RFM69_SPIPreCallback(void)
+{
+    libSPI_SetMode(RFM69_SPI_MODE);
+    RFM69_SPI_PORT &= ~(1 << RFM69_SPI_SS);
+}
+
+void Board_RFM69_SPIPostCallback(void)
+{
+    RFM69_SPI_PORT |= (1 << RFM69_SPI_SS);
+}
+
+void Board_RFM69_PullReset(void)
+{
+    SetRFM69ResetHigh();
+    SetRFM69ResetAsOutput();
+}
+
+void Board_RFM69_ReleaseReset(void)
+{
+    SetRFM69ResetAsInput();
+    SetRFM69ResetLow();
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static inline void SetRFM69ResetAsOutput(void)
+{
+    RFM69_RESET_DDR |= (1 << RFM69_RESET_PIN);
+}
+
+static inline void SetRFM69ResetAsInput(void)
+{
+    RFM69_RESET_DDR &= ~(1 << RFM69_RESET_PIN);
+}
+
+static inline void SetRFM69ResetHigh(void)
+{
+    RFM69_RESET_PORT |= (1 << RFM69_RESET_PIN);
+}
+
+static inline void SetRFM69ResetLow(void)
+{
+    RFM69_RESET_PORT &= ~(1 << RFM69_RESET_PIN);
+}
+
+static inline void SetRFM69IOAsInput(void)
+{
+    RFM69_IO_DDR &= ~(1 << RFM69_IO_PIN);
+}

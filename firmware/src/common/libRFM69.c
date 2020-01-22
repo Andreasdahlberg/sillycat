@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-26 (Last edit)
+ * @date   2020-01-22 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -28,7 +28,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
 
 #include <limits.h>
@@ -38,8 +37,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 #include "libDebug.h"
 #include "RFM69Registers.h"
-#include "RFM69_HAL.h"
 
+#include "Board.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,8 +91,6 @@ static uint32_t reset_time_ms;
 //////////////////////////////////////////////////////////////////////////
 
 static bool IsBitSetInRegister(uint8_t address, uint8_t bit);
-static void PreCallback(void);
-static void PostCallback(void);
 static uint32_t CalculateRxBw(uint8_t mant, uint8_t exp);
 
 //////////////////////////////////////////////////////////////////////////
@@ -112,25 +109,6 @@ void libRFM69_Init(void)
 
     //TODO: Remove
     _delay_ms(15);
-    return;
-}
-
-///
-/// @brief Init required IO-pins. This function should be called as
-///        early as possible in a systems with several SPI-devices.
-///
-/// @param  None
-/// @return None
-///
-void libRFM69_InitHW(void)
-{
-    InitReset();
-
-    InitCS();
-    ReleaseCS();
-
-    InitIO();
-
     return;
 }
 
@@ -156,12 +134,11 @@ void libRFM69_Update(void)
 ///
 void libRFM69_Reset(void)
 {
-    PullReset();
+    Board_RFM69_PullReset();
     _delay_us(RESET_TIMING_US);
-    ReleaseReset();
+    Board_RFM69_ReleaseReset();
 
     reset_time_ms = Timer_GetMilliseconds();
-    return;
 }
 
 ///
@@ -1478,39 +1455,21 @@ void libRFM69_WriteRegister(uint8_t address, uint8_t register_data)
 {
     sc_assert(address <= REG_TESTAFC);
 
-    libSPI_WriteByte(address | WRITE_REG, &PreCallback, NULL);
-    libSPI_WriteByte(register_data, NULL, &PostCallback);
-
-    return;
+    libSPI_WriteByte(address | WRITE_REG, &Board_RFM69_SPIPreCallback, NULL);
+    libSPI_WriteByte(register_data, NULL, &Board_RFM69_SPIPostCallback);
 }
 
 void libRFM69_ReadRegister(uint8_t address, uint8_t *register_data)
 {
     sc_assert(address <= REG_TESTAFC);
 
-    libSPI_WriteByte(address & READ_REG, &PreCallback, NULL);
-    libSPI_ReadByte(register_data, NULL, &PostCallback);
-
-    return;
+    libSPI_WriteByte(address & READ_REG, &Board_RFM69_SPIPreCallback, NULL);
+    libSPI_ReadByte(register_data, NULL, &Board_RFM69_SPIPostCallback);
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-static void PreCallback(void)
-{
-    libSPI_SetMode(SPIMODE);
-
-    PullCS(); //Select device
-    return;
-}
-
-static void PostCallback(void)
-{
-    ReleaseCS(); //Release device
-    return;
-}
 
 ///
 /// @brief Check if a bit is set in a register. If something fails this
