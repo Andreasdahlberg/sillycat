@@ -44,6 +44,7 @@ env.Append(CPPPATH=[
     '#src/main/board',
     '#src/common',
     '#src/common/ADC',
+    '#src/common/board',
     '#src/common/timer',
     '#src/common/driver/MCP79510',
     'encoder',
