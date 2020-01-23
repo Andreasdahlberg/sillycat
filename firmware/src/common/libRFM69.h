@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-22 (Last edit)
+ * @date   2020-01-23 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -159,7 +159,7 @@ typedef enum
 //////////////////////////////////////////////////////////////////////////
 
 void libRFM69_Init(void);
-void libRFM69_Update(void);
+void libRFM69_Update(void) __attribute__((noreturn));
 void libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 void libRFM69_SetAESKey(const uint8_t *aes_key);
@@ -194,7 +194,7 @@ void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
 uint8_t libRFM69_ReadFromFIFO(uint8_t *data, uint8_t max_length);
 void libRFM69_EnableSyncWordGeneration(bool enabled);
 void libRFM69_EnableListenMode(bool enabled);
-void libRFM69_CalibrateRCOscillator(void);
+void libRFM69_CalibrateRCOscillator(void) __attribute__((noreturn));
 libRFM69_mode_type libRFM69_GetMode(void);
 uint32_t libRFM69_GetBitrate(void);
 uint8_t libRFM69_GetChipVersion(void);
