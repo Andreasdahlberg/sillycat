@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-22 (Last edit)
+ * @date   2020-01-23 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -109,7 +109,6 @@ void libRFM69_Init(void)
 
     //TODO: Remove
     _delay_ms(15);
-    return;
 }
 
 ///
@@ -121,7 +120,6 @@ void libRFM69_Init(void)
 void libRFM69_Update(void)
 {
     sc_assert_fail();
-    return;
 }
 
 ///
@@ -207,7 +205,6 @@ void libRFM69_EnableCRCAutoClear(bool enable)
     libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
     register_content = (register_content & 0xF7) | ((uint8_t)!enable << 3);
     libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
-    return;
 }
 
 ///
@@ -223,7 +220,6 @@ void libRFM69_EnableCRC(bool enable)
     libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
     register_content = (register_content & 0xEF) | ((uint8_t)enable << 4);
     libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
-    return;
 }
 
 ///
@@ -277,7 +273,6 @@ void libRFM69_ClearFIFO(void)
 {
     INFO("Clear FIFO");
     libRFM69_WriteRegister(REG_IRQFLAGS2, (1 << REG_IRQFLAGS2_BIT_FIFOOVERRUN));
-    return;
 }
 
 ///
@@ -301,8 +296,6 @@ void libRFM69_SetMode(libRFM69_mode_type mode)
     libRFM69_ReadRegister(REG_OPMODE, &register_content);
     register_content = (register_content & ~REG_OPMODE_MODE_MASK) | (mode << 2);
     libRFM69_WriteRegister(REG_OPMODE, register_content);
-
-    return;
 }
 
 bool libRFM69_WaitForModeReady(void)
@@ -373,7 +366,6 @@ bool libRFM69_IsRxTimeoutFlagSet(void)
 void libRFM69_SetRSSIThreshold(int8_t threshold)
 {
     libRFM69_WriteRegister(REG_RSSITHRESH, (uint8_t)(threshold * -1) << 1);
-    return;
 }
 
 ///
@@ -402,8 +394,6 @@ void libRFM69_SetCarrierFrequency(uint32_t frequency)
     libRFM69_WriteRegister(REG_FRFMSB, (frequency_value >> 16) & 0xFF);
     libRFM69_WriteRegister(REG_FRFMID, (frequency_value >> 8) & 0xFF);
     libRFM69_WriteRegister(REG_FRFLSB, frequency_value & 0xFF);
-
-    return;
 }
 
 void libRFM69_EnableListenMode(bool enable)
@@ -413,8 +403,6 @@ void libRFM69_EnableListenMode(bool enable)
     libRFM69_ReadRegister(REG_OPMODE, &register_content);
     register_content = (register_content & 0xBF) | (uint8_t)enable;
     libRFM69_WriteRegister(REG_OPMODE, register_content);
-
-    return;
 }
 
 void libRFM69_EnableSequencer(bool enable)
@@ -425,7 +413,6 @@ void libRFM69_EnableSequencer(bool enable)
     register_content = (register_content & 0x7F) | ((uint8_t)!enable << 7);
     libRFM69_WriteRegister(REG_OPMODE, register_content);
 
-    return;
 }
 
 void libRFM69_EnableEncryption(bool enable)
@@ -435,8 +422,6 @@ void libRFM69_EnableEncryption(bool enable)
     libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
     SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
     libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
-
-    return;
 }
 
 ///
@@ -453,8 +438,6 @@ void libRFM69_SetAESKey(const uint8_t *aes_key)
     {
         libRFM69_WriteRegister(REG_AESKEY1 + index, aes_key[index]);
     }
-
-    return;
 }
 
 void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
@@ -466,7 +449,6 @@ void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
            &register_content);
 
     libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
-    return;
 }
 
 void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
@@ -478,7 +460,6 @@ void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
     SetBit(0x07, (bool)start_condition, &register_content);
 
     libRFM69_WriteRegister(REG_FIFOTHRESH, register_content);
-    return;
 }
 
 ///
@@ -495,7 +476,6 @@ void libRFM69_RestartRx(void)
     register_content = (register_content | (1 << 2));
 
     libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
-    return;
 }
 
 void libRFM69_EnableAutoRxRestart(bool enable)
@@ -530,7 +510,6 @@ void libRFM69_SetPacketRxDelay(uint8_t val)
     register_content = (register_content & 0x0F) | (val << 4);
 
     libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
-    return;
 }
 
 ///
@@ -569,7 +548,6 @@ void libRFM69_GetTemperature(int8_t *temperature)
     libRFM69_SetMode(active_mode);
     libRFM69_WaitForModeReady();
 
-    return;
 }
 
 void libRFM69_SetBitRate(uint32_t bit_rate)
@@ -578,8 +556,6 @@ void libRFM69_SetBitRate(uint32_t bit_rate)
 
     libRFM69_WriteRegister(REG_BITRATEMSB, (uint8_t)(bit_rate_value >> 8));
     libRFM69_WriteRegister(REG_BITRATELSB, (uint8_t)(bit_rate_value));
-
-    return;
 }
 
 uint32_t libRFM69_GetBitRate(void)
@@ -621,7 +597,6 @@ void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering)
                        (filtering << 1);
 
     libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
-    return;
 }
 
 ///
@@ -633,7 +608,6 @@ void libRFM69_SetAddressFiltering(libRFM69_address_filtering_type filtering)
 void libRFM69_SetNodeAddress(uint8_t node_address)
 {
     libRFM69_WriteRegister(REG_NODEADRS, node_address);
-    return;
 }
 
 ///
@@ -648,7 +622,6 @@ void libRFM69_SetNodeAddress(uint8_t node_address)
 void libRFM69_SetBroadcastAddress(uint8_t broadcast_address)
 {
     libRFM69_WriteRegister(REG_BROADCASTADRS, broadcast_address);
-    return;
 }
 
 ///
@@ -672,7 +645,6 @@ void libRFM69_SetDataMode(libRFM69_data_mode_type data_mode)
                        (data_mode << 5);
 
     libRFM69_WriteRegister(REG_DATAMODUL, register_content);
-    return;
 }
 
 ///
@@ -691,7 +663,6 @@ void libRFM69_SetModulationType(libRFM69_modulation_type_type modulation_type)
                        (modulation_type << 3);
 
     libRFM69_WriteRegister(REG_DATAMODUL, register_content);
-    return;
 }
 
 libRFM69_modulation_type_type libRFM69_GetModulationType(void)
@@ -736,7 +707,6 @@ void libRFM69_SetModulationShaping(uint8_t modulation_shaping)
                        | modulation_shaping;
 
     libRFM69_WriteRegister(REG_DATAMODUL, register_content);
-    return;
 }
 
 ///
@@ -758,8 +728,6 @@ void libRFM69_SetFrequencyDeviation(uint16_t frequency_deviation)
 
     libRFM69_WriteRegister(REG_FDEVMSB, ((frequency_deviation_value >> 8) & 0xFF));
     libRFM69_WriteRegister(REG_FDEVLSB, (frequency_deviation_value & 0xFF));
-
-    return;
 }
 
 ///
@@ -781,7 +749,6 @@ void libRFM69_SetPowerAmplifierMode(uint8_t mode)
     register_content |= (mode << 5);
 
     libRFM69_WriteRegister(REG_PALEVEL, register_content);
-    return;
 }
 
 ///
@@ -802,7 +769,6 @@ void libRFM69_SetPowerLevel(uint8_t power_level)
     register_content |= power_level;
 
     libRFM69_WriteRegister(REG_PALEVEL, register_content);
-    return;
 }
 
 ///
@@ -853,8 +819,6 @@ void libRFM69_EnableHighPowerSetting(bool enable)
         libRFM69_WriteRegister(REG_TESTPA1, 0x55);
         libRFM69_WriteRegister(REG_TESTPA2, 0x70);
     }
-
-    return;
 }
 
 ///
@@ -931,7 +895,6 @@ void libRFM69_EnableOCP(bool enabled)
     SetBit(4, enabled, &register_content);
 
     libRFM69_WriteRegister(REG_OCP, register_content);
-    return;
 }
 
 ///
@@ -1003,7 +966,6 @@ bool libRFM69_ClearFIFOOverrun(void)
 void libRFM69_CalibrateRCOscillator(void)
 {
     sc_assert_fail(); //Not implemented yet
-    return;
 }
 
 ///
@@ -1023,8 +985,6 @@ void libRFM69_SetSyncWordSize(uint8_t size)
 
     register_content |= ((size - 1) << 3);
     libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
-
-    return;
 }
 
 ///
@@ -1037,7 +997,6 @@ void libRFM69_SetPreambleLength(uint16_t length)
 {
     libRFM69_WriteRegister(REG_PREAMBLEMSB, (length >> 8));
     libRFM69_WriteRegister(REG_PREAMBLELSB, (length & 0x00FF));
-    return;
 }
 
 ///
@@ -1188,7 +1147,6 @@ void libRFM69_DumpRegisterValues(void)
 
     libRFM69_ReadRegister(REG_TESTAFC, &register_content);
     DEBUG("REG ADDR: 0x%02x	REG VALUE: 0x%02x\r\n", REG_TESTAFC, register_content);
-    return;
 }
 #endif
 
@@ -1205,8 +1163,6 @@ void libRFM69_EnableSyncWordGeneration(bool enabled)
     libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
     SetBit(7, enabled, &register_content);
     libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
-
-    return;
 }
 
 ///
@@ -1223,8 +1179,6 @@ void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
     libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
     SetBit(6, (bool)fill_condition, &register_content);
     libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
-
-    return;
 }
 
 ///
@@ -1311,8 +1265,6 @@ void libRFM69_EnableAFCLowBeta(bool enabled)
     libRFM69_ReadRegister(REG_AFCCTRL, &register_content);
     SetBit(5, enabled, &register_content);
     libRFM69_WriteRegister(REG_AFCCTRL, register_content);
-
-    return;
 }
 
 ///
@@ -1351,7 +1303,6 @@ void libRFM69_EnableContinuousDAGC(bool enabled)
     }
 
     libRFM69_WriteRegister(REG_TESTDAGC, register_content);
-    return;
 }
 
 ///
