@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
+ * @date   2020-01-26 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -28,10 +28,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include <avr/wdt.h>
-#include <avr/io.h>
-
 #include "common.h"
+#include <avr/io.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -123,17 +121,6 @@ bool IsBitSet(uint8_t bit_index, const uint8_t *data)
 {
     sc_assert(bit_index < 8);
     return (bool)(*data & (1 << bit_index));
-}
-
-void SoftReset(void)
-{
-    wdt_enable(WDTO_15MS);
-    while (1)
-    {
-        /**
-         * Wait for the watchdog to reset the device.
-         */
-    }
 }
 
 bool IsGlobalInteruptEnabled(void)

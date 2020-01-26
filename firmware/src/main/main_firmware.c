@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-22 (Last edit)
+ * @date   2020-01-26 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -177,7 +177,7 @@ int main(void)
     }
 
     CRITICAL("Main loop exit");
-    SoftReset();
+    Board_SoftReset();
 }
 
 void CheckHealth(void)

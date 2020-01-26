@@ -1,7 +1,7 @@
 /**
  * @file   commonBoard.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-23 (Last edit)
+ * @date   2020-01-26 (Last edit)
  * @brief  Common board support package.
  */
 
@@ -93,5 +93,10 @@ void Board_RFM69_PullReset(void) __attribute__((weak));
  * Release the RFM69 reset pin.
  */
 void Board_RFM69_ReleaseReset(void) __attribute__((weak));
+
+/**
+ * Perform a soft reset of the main MCU.
+ */
+void Board_SoftReset(void) __attribute__((weak, noreturn));
 
 #endif
