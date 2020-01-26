@@ -1,7 +1,7 @@
 /**
  * @file   commonBoard.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-23 (Last edit)
+ * @date   2020-01-26 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -28,6 +28,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.h"
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include "libSPI.h"
 #include "Board.h"
 #include "commonBoard.h"
@@ -116,6 +117,17 @@ void Board_RFM69_ReleaseReset(void)
 {
     SetRFM69ResetAsInput();
     SetRFM69ResetLow();
+}
+
+void Board_SoftReset(void)
+{
+    wdt_enable(WDTO_15MS);
+    while (1)
+    {
+        /**
+         * Wait for the watchdog to reset the device.
+         */
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
