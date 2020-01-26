@@ -228,6 +228,7 @@ modules = [
     os.path.join('common', 'errorhandler'),
     os.path.join('common', 'transceiver'),
     os.path.join('common', 'UART'),
+    os.path.join('common', 'driver', 'MCP79510')
 ]
 
 tests = []

@@ -14,22 +14,26 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 import os
 
 Import(['*'])
 
-SOURCE = Glob('*.c')
-
 env.Append(CPPPATH=[
     '#src/common',
-    '#src/common/debug',
-    '#src/common/event',
-    '#src/common/timer'
+    '#src/common/driver/MCP79510'
+    ])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=BCDToDecimal',
+    '-Wl,--wrap=DecimalToBCD',
+    '-Wl,--wrap=SetBit',
+    '-Wl,--wrap=IsBitSet',
+    '-Wl,--wrap=libSPI_WriteByte',
+    '-Wl,--wrap=libSPI_ReadByte',
 ])
 
+SOURCE = Glob('*.c')
 OBJECTS = env.Object(source=SOURCE)
 
 Return('OBJECTS')
-
-
