@@ -41,8 +41,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define SUPPLY_VOLTAGE_mV 3300
-
 //Valid if sample_window >> sample_freq
 #define CALCULATE_ALPHA(sample_freq, sample_window) ((uint32_t)131070 / ((uint32_t)sample_window / (uint32_t)sample_freq + 1))
 
