@@ -1,7 +1,7 @@
 /**
  * @file   driverMCUTemperature.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-24 (Last edit)
+ * @date   2020-01-26 (Last edit)
  * @brief  MCU temperature driver
  *
  * Driver for the internal MCU temperature sensor.
@@ -28,12 +28,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
-
 #include "ADC.h"
 #include "Sensor.h"
 #include "Timer.h"
+#include "Board.h"
 #include "libDebug.h"
 #include "driverMCUTemperature_Calibration.h"
 #include "driverMCUTemperature.h"
