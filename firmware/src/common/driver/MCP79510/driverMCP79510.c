@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -28,6 +28,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.h"
 #include "libDebug.h"
+#include "Bit.h"
 #include "driverMCP79510.h"
 #include "driverMCP79510Registers.h"
 
@@ -215,7 +216,7 @@ void driverMCP79510_GetHour(uint8_t *hour_p)
     register_content = ReadRegister(REG_TC_HOUR);
 
     //Check if 24-hour mode is used.
-    if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+    if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
     {
         register_content &= 0x3F;
     }
@@ -238,7 +239,7 @@ bool driverMCP79510_SetHour(uint8_t hour)
         uint8_t new_content;
 
         //Check if 24-hour mode is used.
-        if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+        if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
         {
             new_content = (register_content & 0xC0) | DecimalToBCD(hour);
         }
@@ -269,7 +270,7 @@ bool driverMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
         uint8_t new_content;
 
         //Check if 24-hour mode is used.
-        if (!IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content))
+        if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
         {
             new_content = (register_content & 0xC0) | DecimalToBCD(hour);
         }
@@ -411,7 +412,7 @@ bool driverMCP79510_Is24HourMode(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_HOUR);
-    return !IsBitSet(REG_TC_HOUR_MODE_BIT, &register_content);
+    return !Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content);
 }
 
 void driverMCP79510_EnableOscillator(bool enabled)
@@ -436,7 +437,7 @@ bool driverMCP79510_IsLeapYear(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_MONTH);
-    return IsBitSet(REG_TC_MONTH_LP_BIT, &register_content);
+    return Bit_Get(REG_TC_MONTH_LP_BIT, &register_content);
 }
 
 void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
@@ -444,15 +445,7 @@ void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
     sc_assert(alarm_index < 2);
 
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
-
-    if (enable == true)
-    {
-        SetBitD(register_data, (REG_TC_CONTROL_ALM0_BIT + alarm_index));
-    }
-    else
-    {
-        ClearBit(register_data, (REG_TC_CONTROL_ALM0_BIT + alarm_index));
-    }
+    Bit_Set(REG_TC_CONTROL_ALM0_BIT + alarm_index, enable, &register_data);
 
     WriteRegister(REG_TC_CONTROL, register_data);
 }
@@ -461,7 +454,7 @@ void driverMCP79510_EnableSquareWave(bool enable)
 {
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
 
-    SetBit(REG_TC_CONTROL_SQWE_BIT, enable, &register_data);
+    Bit_Set(REG_TC_CONTROL_SQWE_BIT, enable, &register_data);
     WriteRegister(REG_TC_CONTROL, register_data);
 
 }
@@ -471,7 +464,7 @@ bool driverMCP79510_IsOscillatorRunning(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_DAY);
-    return IsBitSet(REG_TC_DAY_OSCON_BIT, &register_content);
+    return Bit_Get(REG_TC_DAY_OSCON_BIT, &register_content);
 }
 
 void driverMCP79510_ClearBatterySwitchFlag(void)
@@ -479,7 +472,7 @@ void driverMCP79510_ClearBatterySwitchFlag(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_DAY);
-    ClearBit(register_content, REG_TC_DAY_VBAT_BIT);
+    Bit_Set(REG_TC_DAY_VBAT_BIT, false, &register_content);
 
     WriteRegister(REG_TC_DAY, register_content);
 }
@@ -495,7 +488,7 @@ void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)
     uint8_t register_content;
     register_content = ReadRegister(register_address);
 
-    ClearBit(register_content, REG_ALARM_DAY_ALM0IF_BIT);
+    Bit_Set(REG_ALARM_DAY_ALM0IF_BIT, false, &register_content);
     WriteRegister(register_address, register_content);
 }
 

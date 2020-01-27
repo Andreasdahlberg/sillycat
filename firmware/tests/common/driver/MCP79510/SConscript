@@ -27,13 +27,12 @@ env.Append(CPPPATH=[
 env.Append(LINKFLAGS=[
     '-Wl,--wrap=BCDToDecimal',
     '-Wl,--wrap=DecimalToBCD',
-    '-Wl,--wrap=SetBit',
-    '-Wl,--wrap=IsBitSet',
     '-Wl,--wrap=libSPI_WriteByte',
     '-Wl,--wrap=libSPI_ReadByte',
 ])
 
 SOURCE = Glob('*.c')
-OBJECTS = env.Object(source=SOURCE)
+objects = env.Object(source=SOURCE)
+objects.append(SConscript('#src/utility/Bit/SConscript', exports={'env': env}))
 
-Return('OBJECTS')
+Return('objects')

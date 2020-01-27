@@ -1,8 +1,8 @@
 /**
- * @file   test_driverMCP79510.h
+ * @file   test_Bit.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
  * @date   2020-01-27 (Last edit)
- * @brief  Test suite for the MCP79510 driver.
+ * @brief  Test suite for the Bit utility.
  */
 
 /*
@@ -22,8 +22,8 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEST_DRIVERMCP79510_H_
-#define TEST_DRIVERMCP79510_H_
+#ifndef TEST_BIT_H_
+#define TEST_BIT_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
@@ -40,8 +40,5 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
-
-uint8_t __wrap_BCDToDecimal(uint8_t bcd_data);
-uint16_t __wrap_DecimalToBCD(uint8_t decimal_data);
 
 #endif

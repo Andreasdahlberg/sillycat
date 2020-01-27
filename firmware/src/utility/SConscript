@@ -19,7 +19,7 @@ import os
 
 Import(['*'])
 
-modules = ['CRC', 'FIFO', 'List', 'Filter']
+modules = ['CRC', 'FIFO', 'List', 'Filter', 'Bit']
 module_objects = []
 
 for module in modules:

@@ -44,9 +44,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //Valid if sample_window >> sample_freq
 #define CALCULATE_ALPHA(sample_freq, sample_window) ((uint32_t)131070 / ((uint32_t)sample_window / (uint32_t)sample_freq + 1))
 
-#define SetBitD(data, bit) data |= (1 << bit)
-#define ClearBit(data, bit) data &= ~(1 << bit)
-
 #define UNUSED(var) (void)var
 
 #define ElementsIn(array) \
@@ -63,14 +60,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef enum function_status
-{
-    ERROR = 0,
-    SUCCESS,
-    BUSY,
-    TIMEOUT
-} function_status;
-
 struct div_t
 {
     int32_t quotient;
@@ -82,8 +71,6 @@ struct div_t
 //////////////////////////////////////////////////////////////////////////
 
 struct div_t Divide(int32_t numerator, int32_t denominator);
-void SetBit(uint8_t bit_index, bool state, uint8_t *data);
-bool IsBitSet(uint8_t bit_index, const uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
 uint16_t DecimalToBCD(uint8_t decimal_data);
 

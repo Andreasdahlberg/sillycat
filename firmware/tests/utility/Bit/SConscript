@@ -14,23 +14,17 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 import os
 
 Import(['*'])
 
-SOURCE = Glob('*.c')
+unit_env = env.Clone()
+unit_env.Append(CPPPATH=[
+    '#src/utility/Bit'
+    ])
 
-env.Append(CPPPATH=[
-    '#src/common',
-    '#src/common/debug',
-    '#src/common/event',
-    '#src/common/timer',
-    '#src/utility/Bit',
-])
+source = Glob('*.c')
+objects = unit_env.Object(source=source)
 
-OBJECTS = env.Object(source=SOURCE)
-
-Return('OBJECTS')
-
-
+Return('objects')

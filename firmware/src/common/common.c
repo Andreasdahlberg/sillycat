@@ -29,7 +29,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include "common.h"
-#include <avr/io.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -92,27 +91,6 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
     while (decimal_data > 0);
 
     return data;
-}
-
-void SetBit(uint8_t bit_index, bool state, uint8_t *data)
-{
-    sc_assert(bit_index < 8);
-
-    if (state == true)
-    {
-        *data |= (1 << bit_index);
-    }
-    else
-    {
-        *data &= ~(1 << bit_index);
-    }
-    return;
-}
-
-bool IsBitSet(uint8_t bit_index, const uint8_t *data)
-{
-    sc_assert(bit_index < 8);
-    return (bool)(*data & (1 << bit_index));
 }
 
 //////////////////////////////////////////////////////////////////////////

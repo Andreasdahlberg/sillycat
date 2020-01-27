@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-26 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -195,25 +195,4 @@ uint16_t __wrap_DecimalToBCD(uint8_t decimal_data)
     while (decimal_data > 0);
 
     return data;
-}
-
-void __wrap_SetBit(uint8_t bit_index, bool state, uint8_t *data)
-{
-    assert_true(bit_index < 8);
-
-    if (state == true)
-    {
-        *data |= (1 << bit_index);
-    }
-    else
-    {
-        *data &= ~(1 << bit_index);
-    }
-    return;
-}
-
-bool __wrap_IsBitSet(uint8_t bit_index, const uint8_t *data)
-{
-    assert_true(bit_index < 8);
-    return (bool)(*data & (1 << bit_index));
 }
