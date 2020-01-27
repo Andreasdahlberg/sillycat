@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-19 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  RTC HAL.
  */
 
