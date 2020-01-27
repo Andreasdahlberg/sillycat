@@ -23,10 +23,11 @@ SOURCE = Glob('*.c')
 
 env.Append(CPPPATH=[
     '#src/common',
+    '#src/common/debug',
+    '#src/common/driver/MCP79510',
+    '#src/common/event',
     '#src/common/time',
     '#src/common/timer',
-    '#src/common/event',
-    '#src/common/debug',
     '#src/main/sensor'
 ])
 
