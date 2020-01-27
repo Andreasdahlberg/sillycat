@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-26 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -28,7 +28,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
 
 #include <avr/io.h>
@@ -178,8 +177,8 @@ int main(void)
 
         if (IsTimeForSleep() == true)
         {
-            DEBUG("Unused stack: %u\r\n", StackCount());
-            sc_assert(StackCount() > 0);
+            DEBUG("Unused stack: %u\r\n", Board_StackCount());
+            sc_assert(Board_StackCount() > 0);
             NotifyAndEnterSleep();
         }
     }

@@ -37,6 +37,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
+#define STACK_CANARY 0xc5
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -49,10 +51,15 @@ static inline void SetRFM69ResetAsOutput(void);
 static inline void SetRFM69ResetAsInput(void);
 static inline void SetRFM69ResetHigh(void);
 static inline void SetRFM69ResetLow(void);
+static void StackPaint(void) __attribute__ ((naked)) __attribute__ ((
+            section (".init1"))) __attribute__((used));
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
+
+extern uint8_t _end;
+extern uint8_t __stack;
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -135,6 +142,20 @@ bool Board_IsGlobalInterruptEnabled(void)
     return ((SREG & (1 << 7)) > 0);
 }
 
+uint16_t Board_StackCount(void)
+{
+    const uint8_t *p = &_end;
+    uint16_t c = 0;
+
+    while(*p == STACK_CANARY && p <= &__stack)
+    {
+        ++p;
+        ++c;
+    }
+
+    return c;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -157,4 +178,45 @@ static inline void SetRFM69ResetHigh(void)
 static inline void SetRFM69ResetLow(void)
 {
     RFM69_RESET_PORT &= ~(1 << RFM69_RESET_PIN);
+}
+
+///
+/// @brief Fill the stack space with a known pattern.
+///
+/// Fill the stack space with a known pattern.
+/// This fills all stack bytes with the 'canary' pattern to allow stack usage
+/// to be later estimated.  This runs in the .init1 section, before normal
+/// stack initialization and unfortunately before __zero_reg__ has been
+/// setup.  The C code is therefore replaced with inline assembly to ensure
+/// the zero reg is not used by compiled code.
+///
+/// @author Michael C McTernan, Michael.McTernan.2001@cs.bris.ac.uk
+///
+/// @param  None
+/// @return None
+///
+static void StackPaint(void)
+{
+#if 0
+    uint8_t *p = &_end;
+
+    while(p <= &__stack)
+    {
+        *p = STACK_CANARY;
+        ++p;
+    }
+#else
+    __asm volatile ("    ldi r30,lo8(_end)\n"
+                    "    ldi r31,hi8(_end)\n"
+                    "    ldi r24,lo8(0xc5)\n" /* STACK_CANARY = 0xc5 */
+                    "    ldi r25,hi8(__stack)\n"
+                    "    rjmp .cmp\n"
+                    ".loop:\n"
+                    "    st Z+,r24\n"
+                    ".cmp:\n"
+                    "    cpi r30,lo8(__stack)\n"
+                    "    cpc r31,r25\n"
+                    "    brlo .loop\n"
+                    "    breq .loop"::);
+#endif
 }

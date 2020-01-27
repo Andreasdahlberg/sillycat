@@ -86,6 +86,5 @@ void SetBit(uint8_t bit_index, bool state, uint8_t *data);
 bool IsBitSet(uint8_t bit_index, const uint8_t *data);
 uint8_t BCDToDecimal(uint8_t bcd_data);
 uint16_t DecimalToBCD(uint8_t decimal_data);
-uint16_t StackCount(void);
 
 #endif
