@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-23 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -39,6 +39,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "RFM69Registers.h"
 
 #include "Board.h"
+#include "Bit.h"
 #include "Timer.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -420,7 +421,7 @@ void libRFM69_EnableEncryption(bool enable)
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_PACKETCONFIG2, &register_content);
-    SetBit(PACKETCONFIG2_BIT_AESON, enable, &register_content);
+    Bit_Set(PACKETCONFIG2_BIT_AESON, enable, &register_content);
     libRFM69_WriteRegister(REG_PACKETCONFIG2, register_content);
 }
 
@@ -445,7 +446,7 @@ void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
-    SetBit(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
+    Bit_Set(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
            &register_content);
 
     libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
@@ -457,7 +458,7 @@ void libRFM69_SetTXStartCondition(libRFM69_tx_start_condition_type
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_FIFOTHRESH, &register_content);
-    SetBit(0x07, (bool)start_condition, &register_content);
+    Bit_Set(0x07, (bool)start_condition, &register_content);
 
     libRFM69_WriteRegister(REG_FIFOTHRESH, register_content);
 }
@@ -892,7 +893,7 @@ void libRFM69_EnableOCP(bool enabled)
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_OCP, &register_content);
-    SetBit(4, enabled, &register_content);
+    Bit_Set(4, enabled, &register_content);
 
     libRFM69_WriteRegister(REG_OCP, register_content);
 }
@@ -941,11 +942,11 @@ bool libRFM69_ClearFIFOOverrun(void)
     libRFM69_ReadRegister(REG_IRQFLAGS2, &register_content);
 
     bool status;
-    status = IsBitSet(REG_IRQFLAGS2_BIT_FIFOOVERRUN, &register_content);
+    status = Bit_Get(REG_IRQFLAGS2_BIT_FIFOOVERRUN, &register_content);
 
     if (status)
     {
-        SetBit(REG_IRQFLAGS2_BIT_FIFOOVERRUN, true, &register_content);
+        Bit_Set(REG_IRQFLAGS2_BIT_FIFOOVERRUN, true, &register_content);
         libRFM69_WriteRegister(REG_IRQFLAGS2, register_content);
     }
     return status;
@@ -1161,7 +1162,7 @@ void libRFM69_EnableSyncWordGeneration(bool enabled)
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
-    SetBit(7, enabled, &register_content);
+    Bit_Set(7, enabled, &register_content);
     libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
 }
 
@@ -1177,7 +1178,7 @@ void libRFM69_SetFIFOFillCondition(libRFM69_fifo_fill_condition_type
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_SYNCCONFIG, &register_content);
-    SetBit(6, (bool)fill_condition, &register_content);
+    Bit_Set(6, (bool)fill_condition, &register_content);
     libRFM69_WriteRegister(REG_SYNCCONFIG, register_content);
 }
 
@@ -1247,7 +1248,7 @@ void libRFM69_SetLNAInputImpedance(libRFM69_lna_zin_type impedance)
 
     uint8_t register_content;
     libRFM69_ReadRegister(REG_LNA, &register_content);
-    SetBit(7, impedance, &register_content);
+    Bit_Set(7, impedance, &register_content);
     libRFM69_WriteRegister(REG_LNA, register_content);
 }
 
@@ -1263,7 +1264,7 @@ void libRFM69_EnableAFCLowBeta(bool enabled)
     uint8_t register_content;
 
     libRFM69_ReadRegister(REG_AFCCTRL, &register_content);
-    SetBit(5, enabled, &register_content);
+    Bit_Set(5, enabled, &register_content);
     libRFM69_WriteRegister(REG_AFCCTRL, register_content);
 }
 
