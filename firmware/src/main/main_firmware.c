@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-26 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -26,7 +26,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
 
 #include <avr/io.h>
@@ -185,7 +184,7 @@ void CheckHealth(void)
     static bool memory_low_flag = false;
     static bool high_mcu_temp_flag = false;
 
-    uint16_t unused_memory = StackCount();
+    uint16_t unused_memory = Board_StackCount();
     if (!memory_low_flag && unused_memory < LOW_STACK_LIMIT)
     {
         ErrorHandler_LogError(LOW_STACK, unused_memory);

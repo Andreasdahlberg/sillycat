@@ -108,4 +108,16 @@ void Board_SoftReset(void) __attribute__((weak, noreturn));
  */
 bool Board_IsGlobalInterruptEnabled(void) __attribute__((weak));
 
+/**
+ * Count unused stack space.
+ *
+ * This examines the stack space, and determines how many bytes have never
+ * been overwritten.
+ *
+ * @author Michael C McTernan, Michael.McTernan.2001@cs.bris.ac.uk
+ *
+ * @return  Number of bytes likely to have never been used by the stack.
+ */
+uint16_t Board_StackCount(void);
+
 #endif
