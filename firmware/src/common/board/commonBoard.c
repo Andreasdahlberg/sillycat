@@ -1,7 +1,7 @@
 /**
  * @file   commonBoard.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-26 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -128,6 +128,11 @@ void Board_SoftReset(void)
          * Wait for the watchdog to reset the device.
          */
     }
+}
+
+bool Board_IsGlobalInterruptEnabled(void)
+{
+    return ((SREG & (1 << 7)) > 0);
 }
 
 //////////////////////////////////////////////////////////////////////////
