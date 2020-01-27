@@ -1,7 +1,7 @@
 /**
  * @file   commonBoard.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-26 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Common board support package.
  */
 
@@ -100,5 +100,12 @@ void Board_RFM69_ReleaseReset(void) __attribute__((weak));
  * Perform a soft reset of the main MCU.
  */
 void Board_SoftReset(void) __attribute__((weak, noreturn));
+
+/**
+ * Check if global interrupts are enabled.
+ *
+ * @return  True if enabled, otherwise false.
+ */
+bool Board_IsGlobalInterruptEnabled(void) __attribute__((weak));
 
 #endif

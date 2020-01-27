@@ -1,7 +1,7 @@
 /**
  * @file   libPower.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-25 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Implementation of low level power functions.
  *
  * Detailed description of file.
@@ -28,8 +28,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
+#include "Board.h"
 
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
@@ -95,7 +95,7 @@ void libPower_Sleep(void)
      * IMPORTANT: This function does not catch cases where interrupts are
      * disabled inside an interrupt vector.
      */
-    if (IsGlobalInteruptEnabled() == false)
+    if (Board_IsGlobalInterruptEnabled() == false)
     {
         sc_assert_fail();
         return;

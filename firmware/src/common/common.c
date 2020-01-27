@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-26 (Last edit)
+ * @date   2020-01-27 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -121,11 +121,6 @@ bool IsBitSet(uint8_t bit_index, const uint8_t *data)
 {
     sc_assert(bit_index < 8);
     return (bool)(*data & (1 << bit_index));
-}
-
-bool IsGlobalInteruptEnabled(void)
-{
-    return ((SREG & (1 << 7)) > 0);
 }
 
 ///
