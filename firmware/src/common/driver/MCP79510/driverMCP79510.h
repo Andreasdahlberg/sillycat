@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-13 (Last edit)
+ * @date   2020-03-05 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -29,6 +29,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stddef.h>
+#include "stdint.h"
+#include "stdbool.h"
 #include "libSPI.h"
 
 //////////////////////////////////////////////////////////////////////////
