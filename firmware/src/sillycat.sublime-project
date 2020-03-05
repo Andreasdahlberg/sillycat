@@ -27,7 +27,8 @@
                 "use_only_additional_options": true,
                 "additional_options_file": "${project_path}/../.astylerc"
             },
-        }
+        },
+        "SublimeLinter.linters.clangtidy.compile_commands": "${project_path}"
     },
     "build_systems":
     [
