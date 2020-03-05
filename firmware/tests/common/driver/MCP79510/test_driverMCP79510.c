@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-03-05 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -30,12 +30,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdbool.h>
 
 #include "test_driverMCP79510.h"
 #include "driverMCP79510.h"
 #include "driverMCP79510Registers.h"
+#include "common.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -57,6 +57,7 @@ static int Setup(void **state);
 static void StubSPIPreCallback(void);
 static void StubSPIPostCallback(void);
 static void ExpectWriteRegister(uint8_t address);
+static void ExpectWriteValueRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegister(uint8_t address, uint8_t data);
 static void ExpectModifyRegister(uint8_t address);
 static void ExpectEnableSquareWave(void);
@@ -97,6 +98,13 @@ static void ExpectWriteRegister(uint8_t address)
     expect_value(__wrap_libSPI_WriteByte, data, INST_WRITE);
     expect_value(__wrap_libSPI_WriteByte, data, address);
     expect_any(__wrap_libSPI_WriteByte, data);
+}
+
+static void ExpectWriteValueRegister(uint8_t address, uint8_t data)
+{
+    expect_value(__wrap_libSPI_WriteByte, data, INST_WRITE);
+    expect_value(__wrap_libSPI_WriteByte, data, address);
+    expect_value(__wrap_libSPI_WriteByte, data, data);
 }
 
 static void ExpectReadRegister(uint8_t address, uint8_t data)
@@ -151,6 +159,54 @@ static void test_driverMCP79510_Init(void **state)
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
 }
 
+static void test_driverMCP79510_GetHundredthSecond(void **state)
+{
+    const uint8_t expect_values[] = {0, 1, 50, 98, 99};
+
+    for (size_t i = 0; i < ElementsIn(expect_values); ++i)
+    {
+        ExpectReadRegister(REG_TC_SEC_CENT, __wrap_DecimalToBCD(expect_values[i]));
+
+        uint8_t result = 0;
+        driverMCP79510_GetHundredthSecond(&result);
+        assert_int_equal(result, expect_values[i]);
+    }
+}
+
+static void test_driverMCP79510_SetHundredthSecond_Invalid(void **state)
+{
+    assert_false(driverMCP79510_SetHundredthSecond(100));
+    assert_false(driverMCP79510_SetHundredthSecond(UINT8_MAX));
+}
+
+static void test_driverMCP79510_SetHundredthSecond(void **state)
+{
+    const uint8_t values[] = {0, 1, 50, 98, 99};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        ExpectWriteValueRegister(REG_TC_SEC_CENT, __wrap_DecimalToBCD(values[i]));
+        assert_true(driverMCP79510_SetHundredthSecond(values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetAlarmHundredthSecond_Invalid(void **state)
+{
+    assert_false(driverMCP79510_SetAlarmHundredthSecond(100));
+    assert_false(driverMCP79510_SetAlarmHundredthSecond(UINT8_MAX));
+}
+
+static void test_driverMCP79510_SetAlarmHundredthSecond(void **state)
+{
+    const uint8_t values[] = {0, 1, 50, 98, 99};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        ExpectWriteValueRegister(REG_ALARM1_SEC_CENT, __wrap_DecimalToBCD(values[i]));
+        assert_true(driverMCP79510_SetAlarmHundredthSecond(values[i]));
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -161,6 +217,11 @@ int main(int argc, char *argv[])
     {
         cmocka_unit_test(test_driverMCP79510_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverMCP79510_Init),
+        cmocka_unit_test_setup(test_driverMCP79510_GetHundredthSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHundredthSecond_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHundredthSecond, Setup),
     };
 
     if (argc >= 2)
