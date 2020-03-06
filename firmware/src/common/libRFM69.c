@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-02-06 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -447,7 +447,7 @@ void libRFM69_SetPacketFormat(libRFM69_packet_format_type packet_format)
 
     libRFM69_ReadRegister(REG_PACKETCONFIG1, &register_content);
     Bit_Set(PACKETCONFIG1_BIT_PCKFORMAT, (bool)packet_format,
-           &register_content);
+            &register_content);
 
     libRFM69_WriteRegister(REG_PACKETCONFIG1, register_content);
 }
