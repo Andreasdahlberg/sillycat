@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-06 (Last edit)
+ * @date   2020-03-09 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -207,6 +207,74 @@ static void test_driverMCP79510_SetAlarmHundredthSecond(void **state)
     }
 }
 
+static void test_driverMCP79510_SetHour_Invalid(void **state)
+{
+    const uint8_t values[] = {24, 25, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverMCP79510_SetHour(values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetHour(void **state)
+{
+    const uint8_t values_24[] = {0, 1, 12, 22, 23};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        ExpectReadRegister(REG_TC_HOUR, 0x80);
+        ExpectWriteValueRegister(REG_TC_HOUR, 0x80 | __wrap_DecimalToBCD(values_24[i]));
+        assert_true(driverMCP79510_SetHour(values_24[i]));
+    }
+
+    const uint8_t values_12[] = {0, 1, 6, 10, 11};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        ExpectReadRegister(REG_TC_HOUR, 0xE0);
+        ExpectWriteValueRegister(REG_TC_HOUR, 0xE0 | __wrap_DecimalToBCD(values_24[i]));
+        assert_true(driverMCP79510_SetHour(values_24[i]));
+    }
+}
+
+static void test_driverMCP79510_SetAlarmHour_InvalidIndex(void **state)
+{
+    const uint8_t values[] = {2, 3, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        expect_assert_failure(driverMCP79510_SetAlarmHour(0, values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetAlarmHour_InvalidHour(void **state)
+{
+    const uint8_t values[] = {24, 25, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverMCP79510_SetAlarmHour(values[i], 0));
+    }
+}
+
+static void test_driverMCP79510_SetAlarmHour(void **state)
+{
+    const uint8_t values_24[] = {0, 1, 12, 22, 23};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        ExpectReadRegister(REG_ALARM0_HOUR, 0x80);
+        ExpectWriteValueRegister(REG_ALARM0_HOUR, 0x80 | __wrap_DecimalToBCD(values_24[i]));
+        assert_true(driverMCP79510_SetAlarmHour(values_24[i], 0));
+    }
+
+    const uint8_t values_12[] = {0, 1, 6, 10, 11};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        ExpectReadRegister(REG_ALARM1_HOUR, 0xE0);
+        ExpectWriteValueRegister(REG_ALARM1_HOUR, 0xE0 | __wrap_DecimalToBCD(values_24[i]));
+        assert_true(driverMCP79510_SetAlarmHour(values_24[i], 1));
+    }
+}
+
 static void test_driverMCP79510_GetHour_12(void **state)
 {
     const uint8_t values[] = {1, 2, 11, 12};
@@ -358,6 +426,11 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHundredthSecond_Invalid, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHundredthSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetHour_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetHour, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour_InvalidHour, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_Is24HourMode, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_IsLeapYear, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_EnableAlarm_InvalidIndex, Setup),
