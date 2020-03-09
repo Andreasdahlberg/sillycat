@@ -1,7 +1,7 @@
 /**
  * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-06-18 (Last edit)
+ * @date   2020-03-09 (Last edit)
  * @brief  Implementation of UART module.
  */
 
@@ -90,7 +90,7 @@ void UART_Enable(bool enable)
 size_t UART_Write(const void *data_p, size_t length)
 {
     size_t cnt = 0;
-    uint8_t *data_ptr = (uint8_t *)data_p;
+    const uint8_t *data_ptr = (const uint8_t *)data_p;
 
     while (cnt < length)
     {
