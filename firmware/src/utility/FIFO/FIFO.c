@@ -1,8 +1,8 @@
 /**
  * @file   FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
- * @brief  FIFO module.
+ * @date   2020-03-09 (Last edit)
+ * @brief  FIFO-module.
  */
 
 /*
@@ -46,20 +46,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-uint8_t NextPosition(fifo_type *fifo, uint8_t current_position);
+uint8_t NextPosition(const fifo_type *fifo, uint8_t current_position);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-///
-/// @brief Push an item to the FIFO
-///
-/// @param  *fifo Pointer to FIFO.
-/// @param  *item Pointer to item to push.
-/// @return Status of push. false if FIFO is full, otherwise true.
-///
-bool FIFO_Push(fifo_type *fifo, void *item)
+bool FIFO_Push(fifo_type *fifo, const void *item)
 {
     sc_assert(fifo != NULL);
     sc_assert(item != NULL);
@@ -79,19 +72,12 @@ bool FIFO_Push(fifo_type *fifo, void *item)
     return true;
 }
 
-///
-/// @brief Get and remove the first item in the FIFO.
-///
-/// @param  *fifo Pointer to FIFO.
-/// @param  *item Pointer to item where the new item will be stored.
-/// @return Status of pop. false if FIFO is empty, otherwise true
-///
 bool FIFO_Pop(fifo_type *fifo, void *item)
 {
     sc_assert(fifo != NULL);
     sc_assert(item != NULL);
 
-    uint8_t *ptr;
+    const uint8_t *ptr;
 
     if (FIFO_IsEmpty(fifo) == true)
     {
@@ -106,19 +92,12 @@ bool FIFO_Pop(fifo_type *fifo, void *item)
     return true;
 }
 
-///
-/// @brief Get the first item in the FIFO without removing it.
-///
-/// @param  *fifo Pointer to FIFO.
-/// @param  *item Pointer to item where the new item will be stored.
-/// @return Status of pop. false if FIFO is empty, otherwise true
-///
-bool FIFO_Peek(fifo_type *fifo, void *item)
+bool FIFO_Peek(const fifo_type *fifo, void *item)
 {
     sc_assert(fifo != NULL);
     sc_assert(item != NULL);
 
-    uint8_t *ptr;
+    const uint8_t *ptr;
 
     if (FIFO_IsEmpty(fifo) == true)
     {
@@ -130,45 +109,26 @@ bool FIFO_Peek(fifo_type *fifo, void *item)
     return true;
 }
 
-///
-/// @brief Check if FIFO is full.
-///
-/// @param  *fifo Pointer to FIFO.
-/// @return true if FIFO is full, otherwise false.
-///
-bool FIFO_IsFull(fifo_type *fifo)
+bool FIFO_IsFull(const fifo_type *fifo)
 {
     sc_assert(fifo != NULL);
 
     return NextPosition(fifo, fifo->head) == fifo->tail;
 }
 
-///
-/// @brief Check if FIFO is empty.
-///
-/// @param  *fifo Pointer to FIFO.
-/// @return true if FIFO is empty, otherwise false.
-///
-bool FIFO_IsEmpty(fifo_type *fifo)
+bool FIFO_IsEmpty(const fifo_type *fifo)
 {
     sc_assert(fifo != NULL);
 
     return fifo->head == fifo->tail;
 }
 
-///
-/// @brief Reset FIFO.
-///
-/// @param  *fifo Pointer to FIFO.
-/// @return None
-///
 void FIFO_Clear(fifo_type *fifo)
 {
     sc_assert(fifo != NULL);
 
     fifo->head = 0;
     fifo->tail = 0;
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -176,7 +136,7 @@ void FIFO_Clear(fifo_type *fifo)
 //////////////////////////////////////////////////////////////////////////
 
 //TODO: Check typecasts, overflow?
-uint8_t NextPosition(fifo_type *fifo, uint8_t current_position)
+uint8_t NextPosition(const fifo_type *fifo, uint8_t current_position)
 {
     return (uint8_t)((uint16_t)(current_position + fifo->item_size) %
                      (uint16_t)(fifo->size * fifo->item_size));
