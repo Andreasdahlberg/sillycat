@@ -1,7 +1,7 @@
 /**
  * @file   mock_FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-21 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  Mock functions for the FIFO module.
  */
 
@@ -54,31 +54,31 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-bool __wrap_FIFO_IsEmpty(fifo_type *fifo)
+bool __wrap_FIFO_IsEmpty(struct fifo_t *self_p)
 {
     mock_type(bool);
 }
 
-void __wrap_FIFO_Clear(fifo_type *fifo)
+void __wrap_FIFO_Clear(struct fifo_t *self_p)
 {
 }
 
-bool __wrap_FIFO_Pop(fifo_type *fifo, void *item)
-{
-    mock_type(bool);
-}
-
-bool __wrap_FIFO_Peek(fifo_type *fifo, void *item)
+bool __wrap_FIFO_Pop(struct fifo_t *self_p, void *item_p)
 {
     mock_type(bool);
 }
 
-bool __wrap_FIFO_IsFull(fifo_type *fifo)
+bool __wrap_FIFO_Peek(struct fifo_t *self_p, void *item_p)
 {
     mock_type(bool);
 }
 
-bool __wrap_FIFO_Push(fifo_type *fifo, void *item)
+bool __wrap_FIFO_IsFull(struct fifo_t *self_p)
+{
+    mock_type(bool);
+}
+
+bool __wrap_FIFO_Push(struct fifo_t *self_p, void *item_p)
 {
     mock_type(bool);
 }

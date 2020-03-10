@@ -1,7 +1,7 @@
 /**
  * @file   FIFO.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-09 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  FIFO-module
  */
 
@@ -36,20 +36,20 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define FIFO_New(data) (fifo_type){(uint8_t *)data, 0, 0, (sizeof(data) / sizeof(*data)), sizeof(*data)}
+#define FIFO_New(data) (struct fifo_t){(uint8_t *)data, 0, 0, sizeof(data[0]), (sizeof(data) / sizeof(data[0])), 0}
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-typedef struct
-{
-    uint8_t *data;
+struct fifo_t {
+    uint8_t *data_p;
     uint8_t head;
     uint8_t tail;
-    uint8_t size;
-    uint8_t item_size;
-} fifo_type;
+    uint8_t element_size;
+    uint8_t max_number_of_elements;
+    uint8_t number_of_elements;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
@@ -63,7 +63,7 @@ typedef struct
  *
  * @return Status of push. False if FIFO is full, otherwise true.
  */
-bool FIFO_Push(fifo_type *fifo, const void *item);
+bool FIFO_Push(struct fifo_t *self_p, const void *item_p);
 
 /**
  * Get and remove the first item in the FIFO.
@@ -73,7 +73,7 @@ bool FIFO_Push(fifo_type *fifo, const void *item);
  *
  * @return Status of pop. False if FIFO is empty, otherwise true.
  */
-bool FIFO_Pop(fifo_type *fifo, void *item);
+bool FIFO_Pop(struct fifo_t *self_p, void *item_p);
 
 /**
  * Get the first item in the FIFO without removing it.
@@ -83,7 +83,7 @@ bool FIFO_Pop(fifo_type *fifo, void *item);
  *
  * @return Status of peek. False if FIFO is empty, otherwise true.
  */
-bool FIFO_Peek(const fifo_type *fifo, void *item);
+bool FIFO_Peek(const struct fifo_t *self_p, void *item_p);
 
 /**
  * Check if FIFO is full.
@@ -92,7 +92,7 @@ bool FIFO_Peek(const fifo_type *fifo, void *item);
  *
  * @return True if FIFO is full, otherwise false.
  */
-bool FIFO_IsFull(const fifo_type *fifo);
+bool FIFO_IsFull(const struct fifo_t *self_p);
 
 /**
  * Check if FIFO is empty.
@@ -101,13 +101,13 @@ bool FIFO_IsFull(const fifo_type *fifo);
  *
  * @return True if FIFO is empty, otherwise false.
  */
-bool FIFO_IsEmpty(const fifo_type *fifo);
+bool FIFO_IsEmpty(const struct fifo_t *self_p);
 
 /**
  * Reset FIFO.
  *
  * @param fifo Pointer to FIFO.
  */
-void FIFO_Clear(fifo_type *fifo);
+void FIFO_Clear(struct fifo_t *self_p);
 
 #endif

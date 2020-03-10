@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-30 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -97,8 +97,8 @@ static struct module_t module;
 static packet_frame_type tx_packet_buffer[TX_PACKET_FIFO_SIZE];
 static packet_frame_type rx_packet_buffer[RX_PACKET_FIFO_SIZE];
 
-static fifo_type tx_packet_fifo;
-static fifo_type rx_packet_fifo;
+static struct fifo_t tx_packet_fifo;
+static struct fifo_t rx_packet_fifo;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES

@@ -1,7 +1,7 @@
 /**
  * @file   FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-09 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  FIFO-module.
  */
 
@@ -46,98 +46,114 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-uint8_t NextPosition(const fifo_type *fifo, uint8_t current_position);
+static inline void *GetHeadPosition(const struct fifo_t *self_p);
+static inline void *GetTailPosition(const struct fifo_t *self_p);
+static inline void MoveHead(struct fifo_t *self_p);
+static inline void MoveTail(struct fifo_t *self_p);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-bool FIFO_Push(fifo_type *fifo, const void *item)
+bool FIFO_Push(struct fifo_t *self_p, const void *item_p)
 {
-    sc_assert(fifo != NULL);
-    sc_assert(item != NULL);
+    sc_assert(self_p != NULL);
+    sc_assert(item_p != NULL);
 
-    uint8_t *ptr;
-
-    if (FIFO_IsFull(fifo) == true)
+    if (!FIFO_IsFull(self_p))
     {
-        return false;
+        void *position_p = GetHeadPosition(self_p);
+        memcpy(position_p, item_p, self_p->element_size);
+
+        MoveHead(self_p);
+        return true;
     }
 
-    //Move head one item forward
-    fifo->head = NextPosition(fifo, fifo->head);
-    ptr = fifo->data + fifo->head;
-
-    memcpy(ptr, item, fifo->item_size);
-    return true;
+    return false;
 }
 
-bool FIFO_Pop(fifo_type *fifo, void *item)
+bool FIFO_Pop(struct fifo_t *self_p, void *item_p)
 {
-    sc_assert(fifo != NULL);
-    sc_assert(item != NULL);
+    sc_assert(self_p != NULL);
+    sc_assert(item_p != NULL);
 
-    const uint8_t *ptr;
-
-    if (FIFO_IsEmpty(fifo) == true)
+    if (!FIFO_IsEmpty(self_p))
     {
-        return false;
+        const void *position_p = GetTailPosition(self_p);
+        memcpy(item_p, position_p, self_p->element_size);
+
+        MoveTail(self_p);
+        return true;
     }
 
-    //Move tail one item forward
-    fifo->tail = NextPosition(fifo, fifo->tail);
-    ptr = fifo->data + fifo->tail;
-
-    memcpy(item, ptr, fifo->item_size);
-    return true;
+    return false;
 }
 
-bool FIFO_Peek(const fifo_type *fifo, void *item)
+bool FIFO_Peek(const struct fifo_t *self_p, void *item_p)
 {
-    sc_assert(fifo != NULL);
-    sc_assert(item != NULL);
+    sc_assert(self_p != NULL);
+    sc_assert(item_p != NULL);
 
-    const uint8_t *ptr;
-
-    if (FIFO_IsEmpty(fifo) == true)
+    if (!FIFO_IsEmpty(self_p))
     {
-        return false;
+        const void *position_p = GetTailPosition(self_p);
+        memcpy(item_p, position_p, self_p->element_size);
+
+        return true;
     }
-    ptr = fifo->data + NextPosition(fifo, fifo->tail);
 
-    memcpy(item, ptr, fifo->item_size);
-    return true;
+    return false;
 }
 
-bool FIFO_IsFull(const fifo_type *fifo)
+bool FIFO_IsEmpty(const struct fifo_t *self_p)
 {
-    sc_assert(fifo != NULL);
+    sc_assert(self_p != NULL);
 
-    return NextPosition(fifo, fifo->head) == fifo->tail;
+    return self_p->number_of_elements == 0;
 }
 
-bool FIFO_IsEmpty(const fifo_type *fifo)
+bool FIFO_IsFull(const struct fifo_t *self_p)
 {
-    sc_assert(fifo != NULL);
+    sc_assert(self_p != NULL);
 
-    return fifo->head == fifo->tail;
+    return self_p->max_number_of_elements == self_p->number_of_elements;
 }
 
-void FIFO_Clear(fifo_type *fifo)
+void FIFO_Clear(struct fifo_t *self_p)
 {
-    sc_assert(fifo != NULL);
+    sc_assert(self_p != NULL);
 
-    fifo->head = 0;
-    fifo->tail = 0;
+    self_p->head = 0;
+    self_p->tail = 0;
+    self_p->number_of_elements = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-//TODO: Check typecasts, overflow?
-uint8_t NextPosition(const fifo_type *fifo, uint8_t current_position)
+static inline void *GetHeadPosition(const struct fifo_t *self_p)
 {
-    return (uint8_t)((uint16_t)(current_position + fifo->item_size) %
-                     (uint16_t)(fifo->size * fifo->item_size));
+    return self_p->data_p + ((size_t)self_p->head * (size_t)self_p->element_size);
+}
+
+static inline void *GetTailPosition(const struct fifo_t *self_p)
+{
+    return self_p->data_p + ((size_t)self_p->tail * (size_t)self_p->element_size);
+}
+
+static inline void MoveHead(struct fifo_t *self_p)
+{
+    sc_assert(self_p->number_of_elements < UINT8_MAX);
+
+    self_p->head = (self_p->head + 1) % self_p->max_number_of_elements;
+    self_p->number_of_elements += 1;
+}
+
+static inline void MoveTail(struct fifo_t *self_p)
+{
+    sc_assert(self_p->number_of_elements > 0);
+
+    self_p->tail = (self_p->tail + 1) % self_p->max_number_of_elements;
+    self_p->number_of_elements -= 1;
 }
