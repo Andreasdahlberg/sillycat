@@ -1,7 +1,7 @@
 /**
  * @file   UART.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-09 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  Implementation of UART module.
  */
 
@@ -58,8 +58,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 static uint8_t tx_buffer[TX_BUFFER_SIZE];
 static uint8_t rx_buffer[RX_BUFFER_SIZE];
 
-static fifo_type uart_tx_fifo;
-static fifo_type uart_rx_fifo;
+static struct fifo_t uart_tx_fifo;
+static struct fifo_t uart_rx_fifo;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES

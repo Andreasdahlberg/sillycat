@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-30 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -51,7 +51,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 static sensor_data_type reading_buffer[READING_BUFFER_SIZE];
-static fifo_type reading_fifo;
+static struct fifo_t reading_fifo;
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
