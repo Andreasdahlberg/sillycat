@@ -1,7 +1,7 @@
 /**
  * @file   test_FIFO.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2020-03-10 (Last edit)
  * @brief  Test suite for the FIFO module.
  */
 
@@ -52,11 +52,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static void FillBuffer(fifo_type *fifo, size_t number_of_elements)
+static void FillBuffer(struct fifo_t *fifo_p, size_t number_of_elements)
 {
     for (size_t cnt = 0; cnt < number_of_elements; ++cnt)
     {
-        FIFO_Push(fifo, &cnt);
+        FIFO_Push(fifo_p, &cnt);
     }
     return;
 }
@@ -69,19 +69,20 @@ void test_FIFO_New(void **state)
 {
     uint8_t buffer[8];
 
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
-    assert_ptr_equal(fifo.data, buffer);
+    assert_ptr_equal(fifo.data_p, buffer);
     assert_int_equal(fifo.head, 0);
     assert_int_equal(fifo.tail, 0);
-    assert_int_equal(fifo.size, 8);
-    assert_int_equal(fifo.item_size, 1);
+    assert_int_equal(fifo.element_size, 1);
+    assert_int_equal(fifo.max_number_of_elements, 8);
+    assert_int_equal(fifo.number_of_elements, 0);
 }
 
 void test_FIFO_Push_NULL_arguments(void **state)
 {
     uint8_t dummy_item;
-    fifo_type dummy_fifo;
+    struct fifo_t dummy_fifo;
 
     expect_assert_failure(FIFO_Push(NULL, &dummy_item));
     expect_assert_failure(FIFO_Push(&dummy_fifo, NULL));
@@ -93,13 +94,13 @@ void test_FIFO_Push_Empty(void **state)
 {
     uint8_t buffer[8] = {0};
     uint8_t item = 0xAA;
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
     // We expect true when pushing to a empty FIFO.
     assert_true(FIFO_Push(&fifo, &item));
 
     // Make sure the FIFO content is correct.
-    uint8_t expected_buffer_content[8] = {0x00, 0xAA, 0, 0, 0, 0, 0, 0};
+    uint8_t expected_buffer_content[8] = {0xAA, 0, 0, 0, 0, 0, 0, 0};
     assert_memory_equal(expected_buffer_content, buffer,
                         sizeof(expected_buffer_content));
 }
@@ -108,7 +109,7 @@ void test_FIFO_Push_Full(void **state)
 {
     uint8_t buffer[8] = {0};
     uint8_t item = 0xAA;
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
     // Fill the FIFO with numbers 0 to 7.
     FillBuffer(&fifo, sizeof(buffer));
@@ -117,7 +118,7 @@ void test_FIFO_Push_Full(void **state)
     assert_false(FIFO_Push(&fifo, &item));
 
     // Make sure the FIFO content is unchanged.
-    uint8_t expected_buffer_content[8] = {0, 0, 1, 2, 3, 4, 5, 6};
+    uint8_t expected_buffer_content[8] = {0, 1, 2, 3, 4, 5, 6, 7};
     assert_memory_equal(expected_buffer_content, buffer,
                         sizeof(expected_buffer_content));
 }
@@ -125,7 +126,7 @@ void test_FIFO_Push_Full(void **state)
 void test_FIFO_Pop_NULL_arguments(void **state)
 {
     uint8_t dummy_item;
-    fifo_type dummy_fifo;
+    struct fifo_t dummy_fifo;
 
     expect_assert_failure(FIFO_Pop(NULL, &dummy_item));
     expect_assert_failure(FIFO_Pop(&dummy_fifo, NULL));
@@ -136,7 +137,7 @@ void test_FIFO_Pop_Empty(void **state)
 {
     uint8_t buffer[8];
     uint8_t item;
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
     // We expect false when poping from a empty FIFO.
     assert_false(FIFO_Pop(&fifo, &item));
@@ -147,13 +148,13 @@ void test_FIFO_Pop_NonEmpty(void **state)
     uint8_t buffer[8];
     uint8_t item = 0xAA;
 
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FIFO_Push(&fifo, &item);
 
     // Clear item so we know for sure that it is set by FIFO_Pop().
     item = 0x00;
 
-    // We expect true when poping from a non empty FIFO.
+    // We expect true when popping from a non empty FIFO.
     assert_true(FIFO_Pop(&fifo, &item));
 
     // Check if we got the correct value.
@@ -166,7 +167,7 @@ void test_FIFO_Pop_NonEmpty(void **state)
 void test_FIFO_Peek_NULL_arguments(void **state)
 {
     uint8_t dummy_item;
-    fifo_type dummy_fifo;
+    struct fifo_t dummy_fifo;
 
     expect_assert_failure(FIFO_Peek(NULL, &dummy_item));
     expect_assert_failure(FIFO_Peek(&dummy_fifo, NULL));
@@ -177,7 +178,7 @@ void test_FIFO_Peek_Empty(void **state)
 {
     uint8_t buffer[8];
     uint8_t item;
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
     // We expect false when peeking from a empty FIFO.
     assert_false(FIFO_Peek(&fifo, &item));
@@ -188,7 +189,7 @@ void test_FIFO_Peek_NonEmpty(void **state)
     uint8_t buffer[8];
     uint8_t item = 0xAA;
 
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FIFO_Push(&fifo, &item);
 
     // Clear item so we know for sure that it is set by FIFO_Peek().
@@ -212,7 +213,7 @@ void test_FIFO_IsEmpty_NULL(void **state)
 void test_FIFO_IsEmpty_Empty(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
     assert_true(FIFO_IsEmpty(&fifo));
 }
@@ -220,7 +221,7 @@ void test_FIFO_IsEmpty_Empty(void **state)
 void test_FIFO_IsEmpty_Full(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FillBuffer(&fifo, sizeof(buffer));
 
     assert_false(FIFO_IsEmpty(&fifo));
@@ -229,7 +230,7 @@ void test_FIFO_IsEmpty_Full(void **state)
 void test_FIFO_IsEmpty_NotEmpty(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FillBuffer(&fifo, sizeof(buffer) / 2);
 
     assert_false(FIFO_IsEmpty(&fifo));
@@ -243,7 +244,7 @@ void test_FIFO_IsFull_NULL(void **state)
 void test_FIFO_IsFull_Empty(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
 
     assert_false(FIFO_IsFull(&fifo));
 }
@@ -251,7 +252,7 @@ void test_FIFO_IsFull_Empty(void **state)
 void test_FIFO_IsFull_Full(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FillBuffer(&fifo, sizeof(buffer));
 
     assert_true(FIFO_IsFull(&fifo));
@@ -260,7 +261,7 @@ void test_FIFO_IsFull_Full(void **state)
 void test_FIFO_IsFull_NotEmpty(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FillBuffer(&fifo, sizeof(buffer) / 2);
 
     assert_false(FIFO_IsFull(&fifo));
@@ -274,10 +275,35 @@ void test_FIFO_Clear_NULL(void **state)
 void test_FIFO_Clear_Full(void **state)
 {
     uint8_t buffer[8];
-    fifo_type fifo = FIFO_New(buffer);
+    struct fifo_t fifo = FIFO_New(buffer);
     FillBuffer(&fifo, sizeof(buffer));
 
     FIFO_Clear(&fifo);
+    assert_true(FIFO_IsEmpty(&fifo));
+}
+
+void test_FIFO_MaxSize(void **state)
+{
+    struct dummy_item
+    {
+        uint8_t data[UINT8_MAX];
+    };
+    struct dummy_item buffer[UINT8_MAX];
+    struct fifo_t fifo = FIFO_New(buffer);
+
+    for (size_t i = 0; i < UINT8_MAX; ++i)
+    {
+        struct dummy_item item = {i};
+        assert_true(FIFO_Push(&fifo, &item));
+    }
+    assert_true(FIFO_IsFull(&fifo));
+
+    for (size_t i = 0; i < UINT8_MAX; ++i)
+    {
+        struct dummy_item item;
+        assert_true(FIFO_Pop(&fifo, &item));
+        assert_int_equal(i, item.data[0]);
+    }
     assert_true(FIFO_IsEmpty(&fifo));
 }
 
@@ -308,7 +334,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_FIFO_IsFull_Full),
         cmocka_unit_test(test_FIFO_IsFull_NotEmpty),
         cmocka_unit_test(test_FIFO_Clear_NULL),
-        cmocka_unit_test(test_FIFO_Clear_Full)
+        cmocka_unit_test(test_FIFO_Clear_Full),
+        cmocka_unit_test(test_FIFO_MaxSize),
     };
 
     if (argc >= 2)
