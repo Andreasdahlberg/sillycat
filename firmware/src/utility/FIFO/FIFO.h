@@ -1,7 +1,7 @@
 /**
  * @file   FIFO.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-10 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  FIFO-module
  */
 
@@ -42,7 +42,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
-struct fifo_t {
+struct fifo_t
+{
     uint8_t *data_p;
     uint8_t head;
     uint8_t tail;
