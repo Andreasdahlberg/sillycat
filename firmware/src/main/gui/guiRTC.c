@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-30 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -84,7 +84,7 @@ static void DrawUnderLine(void);
 static void DrawSetTimeView(uint16_t context __attribute__ ((unused)));
 static void AdjustTimeForView(struct time_t *time);
 static void SetTimeAction(uint16_t context __attribute__ ((unused)));
-static struct limits_t GetCurrentFieldLimits(size_t field_index, struct time_t *time_p);
+static struct limits_t GetCurrentFieldLimits(size_t field_index, const struct time_t *time_p);
 static void AdjustTimeToLimits(struct time_t *time_p);
 static void IncreaseField(void);
 static void DecreaseField(void);
@@ -227,7 +227,7 @@ static void NextField(void)
 
 static struct limits_t GetCurrentFieldLimits(
     size_t field_index,
-    struct time_t *time_p)
+    const struct time_t *time_p)
 {
     struct limits_t limits;
 

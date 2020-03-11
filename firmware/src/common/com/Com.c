@@ -1,7 +1,7 @@
 /**
  * @file   Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of the Communications module.
  */
 
@@ -65,7 +65,7 @@ static struct module_t module;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static bool HandlePacket(packet_frame_type *packet);
+static bool HandlePacket(const packet_frame_type *packet);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -137,7 +137,7 @@ void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t si
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static bool HandlePacket(packet_frame_type *packet)
+static bool HandlePacket(const packet_frame_type *packet)
 {
     sc_assert(packet != NULL);
 

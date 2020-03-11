@@ -1,7 +1,7 @@
 /**
  * @file   guiNodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of GUI for remote nodes.
  */
 
@@ -88,7 +88,7 @@ static void DrawDetailedNodeView(uint16_t context);
 static void DrawTemperatureMaxMinView(uint16_t context);
 static void DrawHumidityMaxMinView(uint16_t context);
 static void DrawBattery(uint8_t nr_bars);
-static void DrawBatteryIndicator(struct node_t *node_p);
+static void DrawBatteryIndicator(const struct node_t *node_p);
 static void ClearAction(uint16_t context __attribute__ ((unused)));
 static uint8_t ContextToNodeID(uint16_t context);
 
@@ -138,8 +138,8 @@ static void DrawNodeView(uint16_t context)
 
     if (Node_IsActive(node_p))
     {
-        struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
-        struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
+        const struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
+        const struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
 
         if (Sensor_IsValid(temperature_sensor_p) &&
                 Sensor_IsValid(humidity_sensor_p))
@@ -188,7 +188,7 @@ static void DrawNodeView(uint16_t context)
 
 static void DrawDetailedNodeView(uint16_t context)
 {
-    struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
+    const struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
 
     if (node_p != NULL && Node_IsActive(node_p))
     {
@@ -210,7 +210,7 @@ static void DrawTemperatureMaxMinView(uint16_t context)
     struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
     sc_assert(node_p != NULL);
 
-    struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
+    const struct sensor_t *temperature_sensor_p = Node_GetTemperatureSensor(node_p);
 
     if (Sensor_IsStatisticsValid(temperature_sensor_p))
     {
@@ -247,7 +247,7 @@ static void DrawHumidityMaxMinView(uint16_t context)
     struct node_t *node_p = Nodes_GetNodeFromID(ContextToNodeID(context));
     sc_assert(node_p != NULL);
 
-    struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
+    const struct sensor_t *humidity_sensor_p = Node_GetHumiditySensor(node_p);
 
     if (Sensor_IsStatisticsValid(humidity_sensor_p))
     {
@@ -295,7 +295,7 @@ static void DrawBattery(uint8_t nr_bars)
     }
 }
 
-static void DrawBatteryIndicator(struct node_t *node_p)
+static void DrawBatteryIndicator(const struct node_t *node_p)
 {
     if (Node_IsBatteryCharging(node_p))
     {
