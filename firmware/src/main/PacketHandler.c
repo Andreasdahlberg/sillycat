@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-26 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -58,7 +58,7 @@ static void SendAck(uint8_t target);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-bool PacketHandler_HandleReadingPacket(packet_frame_type *packet_p)
+bool PacketHandler_HandleReadingPacket(const packet_frame_type *packet_p)
 {
     sc_assert(packet_p != NULL);
 

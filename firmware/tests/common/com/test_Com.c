@@ -1,7 +1,7 @@
 /**
  * @file   test_Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Test suite for the Communications module.
  */
 
@@ -74,13 +74,13 @@ static int Setup(void **state)
     return 0;
 }
 
-static bool FakePacketHandlerOne(packet_frame_type *packet_p)
+static bool FakePacketHandlerOne(const packet_frame_type *packet_p)
 {
     assert_non_null(packet_p);
     check_expected(packet_p->content.type);
 }
 
-static bool FakePacketHandlerTwo(packet_frame_type *packet_p)
+static bool FakePacketHandlerTwo(const packet_frame_type *packet_p)
 {
     assert_non_null(packet_p);
     check_expected(packet_p->content.type);

@@ -1,7 +1,7 @@
 /**
  * @file   List.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-25 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of a single linked list.
  */
 
@@ -75,7 +75,7 @@ void List_Append(struct list_t *self_p, struct list_node_t *node_p);
  * @param self_p Pointer to list.
  * @param node_p Pointer to node.
  */
-void List_Remove(struct list_t *self_p, struct list_node_t *node_p);
+void List_Remove(struct list_t *self_p, const struct list_node_t *node_p);
 
 /**
  * Get length of the list
@@ -84,7 +84,7 @@ void List_Remove(struct list_t *self_p, struct list_node_t *node_p);
  *
  * @return Length of the list.
  */
-uint32_t List_GetLength(struct list_t *self_p);
+uint32_t List_GetLength(const struct list_t *self_p);
 
 /**
  * Iterate over all nodes and call a function on each one.
@@ -93,6 +93,6 @@ uint32_t List_GetLength(struct list_t *self_p);
  * @param function_p Pointer to function with pointer to node and index as
  *                   arguments.
  */
-void List_Iterate(struct list_t *self_p, list_fp function_p);
+void List_Iterate(const struct list_t *self_p, list_fp function_p);
 
 #endif

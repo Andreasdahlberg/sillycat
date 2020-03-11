@@ -1,7 +1,7 @@
 /**
  * @file   Node.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -29,6 +29,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "Sensor.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -84,7 +87,7 @@ void Node_ReportActivity(struct node_t *self_p);
  *
  * @return True if active, otherwise false.
  */
-bool Node_IsActive(struct node_t *self_p);
+bool Node_IsActive(const struct node_t *self_p);
 
 /**
  * Get a pointer to the temperature sensor struct associated with the
@@ -113,7 +116,7 @@ struct sensor_t *Node_GetHumiditySensor(struct node_t *self_p);
  *
  * @return True if charging is required, otherwise false.
  */
-bool Node_IsBatteryOk(struct node_t *self_p);
+bool Node_IsBatteryOk(const struct node_t *self_p);
 
 /**
  * Get the battery voltage.
@@ -122,7 +125,7 @@ bool Node_IsBatteryOk(struct node_t *self_p);
  *
  * @return Battery voltage in mV.
  */
-uint16_t Node_GetBatteryVoltage(struct node_t *self_p);
+uint16_t Node_GetBatteryVoltage(const struct node_t *self_p);
 
 /**
  * Get the battery temperature.
@@ -131,7 +134,7 @@ uint16_t Node_GetBatteryVoltage(struct node_t *self_p);
  *
  * @return Battery temperature in Celsius.
  */
-int16_t Node_GetBatteryTemperature(struct node_t *self_p);
+int16_t Node_GetBatteryTemperature(const struct node_t *self_p);
 
 /**
  * Check if the battery is charging.
@@ -140,7 +143,7 @@ int16_t Node_GetBatteryTemperature(struct node_t *self_p);
  *
  * @return True if charging, otherwise false.
  */
-bool Node_IsBatteryCharging(struct node_t *self_p);
+bool Node_IsBatteryCharging(const struct node_t *self_p);
 
 /**
  * Check if the battery charger is connected.
@@ -149,7 +152,7 @@ bool Node_IsBatteryCharging(struct node_t *self_p);
  *
  * @return True if charger is connected, otherwise false.
  */
-bool Node_IsBatteryChargerConnected(struct node_t *self_p);
+bool Node_IsBatteryChargerConnected(const struct node_t *self_p);
 
 /**
  * Get the signal strength.
@@ -158,7 +161,7 @@ bool Node_IsBatteryChargerConnected(struct node_t *self_p);
  *
  * @return Signal strength in dBm.
  */
-int8_t Node_GetRSSI(struct node_t *self_p);
+int8_t Node_GetRSSI(const struct node_t *self_p);
 
 /**
  * Set the signal strength.
@@ -175,7 +178,7 @@ void Node_SetRSSI(struct node_t *self_p, int8_t rssi);
  *
  * @return Node ID.
  */
-uint8_t Node_GetID(struct node_t *self_p);
+uint8_t Node_GetID(const struct node_t *self_p);
 
 /**
  * Update the node with data from a remote node.
@@ -184,6 +187,6 @@ uint8_t Node_GetID(struct node_t *self_p);
  * @param data_p Pointer to new node data.
  * @param length Length of the node data.
  */
-void Node_Update(struct node_t *self_p, void *data_p, size_t length);
+void Node_Update(struct node_t *self_p, const void *data_p, size_t length);
 
 #endif

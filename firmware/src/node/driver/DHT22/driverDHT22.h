@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-08 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -24,6 +24,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef DRIVERDHT22_H_
 #define DRIVERDHT22_H_
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
+#include <stdbool.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

@@ -1,7 +1,7 @@
 /**
  * @file   node_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of main
  *
  * Detailed description of file.
@@ -86,7 +86,7 @@ static void NotifyAndEnterSleep(void);
 static bool IsTimeForSleep(void);
 static void RHTAvailable(const event_t *event __attribute__ ((unused)));
 static void CriticalBatteryVoltageHandler(const event_t *event __attribute__ ((unused)));
-static bool TimePacketHandler(packet_frame_type *packet);
+static bool TimePacketHandler(const packet_frame_type *packet);
 static void FillPacket(struct packet_t *packet_p);
 
 //////////////////////////////////////////////////////////////////////////
@@ -186,7 +186,7 @@ int main(void)
     Board_SoftReset();
 }
 
-static bool TimePacketHandler(packet_frame_type *packet)
+static bool TimePacketHandler(const packet_frame_type *packet)
 {
     sc_assert(packet != NULL);
 

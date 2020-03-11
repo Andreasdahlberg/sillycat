@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -199,7 +199,7 @@ void Interface_AddView(struct view *new_view)
 /// @param  *view Pointer to view to remove
 /// @return None
 ///
-void Interface_RemoveView(struct view *view)
+void Interface_RemoveView(const struct view *view)
 {
     if (view != NULL)
     {

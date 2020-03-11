@@ -1,7 +1,7 @@
 /**
  * @file   CRC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-02-11 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of functions to calculate CRC.
  *
  * Detailed description of file.
@@ -59,7 +59,7 @@ uint16_t CRC_16(const void *data, size_t length)
     sc_assert(data != NULL);
 
     uint16_t crc = CRC_INIT_VALUE;
-    const uint8_t *ptr = (uint8_t *)data;
+    const uint8_t *ptr = (const uint8_t *)data;
 
     size_t byte_idx;
     for (byte_idx = 0; byte_idx < length; ++byte_idx)

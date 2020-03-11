@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-04-06 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -46,6 +46,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @return True if packet was handled correctly, otherwise false.
  */
-bool PacketHandler_HandleReadingPacket(packet_frame_type *packet_p);
+bool PacketHandler_HandleReadingPacket(const packet_frame_type *packet_p);
 
 #endif

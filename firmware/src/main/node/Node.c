@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-26 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -90,7 +90,7 @@ void Node_ReportActivity(struct node_t *self_p)
     self_p->last_active = Timer_GetMilliseconds();
 }
 
-bool Node_IsActive(struct node_t *self_p)
+bool Node_IsActive(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
@@ -112,42 +112,42 @@ struct sensor_t *Node_GetHumiditySensor(struct node_t *self_p)
     return &self_p->sensor.humidity;
 }
 
-bool Node_IsBatteryOk(struct node_t *self_p)
+bool Node_IsBatteryOk(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     return self_p->battery.voltage > BATTERY_LOW_VOLTAGE_MV;
 }
 
-uint16_t Node_GetBatteryVoltage(struct node_t *self_p)
+uint16_t Node_GetBatteryVoltage(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     return self_p->battery.voltage;
 }
 
-int16_t Node_GetBatteryTemperature(struct node_t *self_p)
+int16_t Node_GetBatteryTemperature(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     return self_p->battery.temperature;
 }
 
-bool Node_IsBatteryCharging(struct node_t *self_p)
+bool Node_IsBatteryCharging(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     return self_p->battery.charging;
 }
 
-bool Node_IsBatteryChargerConnected(struct node_t *self_p)
+bool Node_IsBatteryChargerConnected(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     return self_p->battery.connected;
 }
 
-int8_t Node_GetRSSI(struct node_t *self_p)
+int8_t Node_GetRSSI(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
@@ -161,14 +161,14 @@ void Node_SetRSSI(struct node_t *self_p, int8_t rssi)
     self_p->rssi = rssi;
 }
 
-uint8_t Node_GetID(struct node_t *self_p)
+uint8_t Node_GetID(const struct node_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     return self_p->id;
 }
 
-void Node_Update(struct node_t *self_p, void *data_p, size_t length)
+void Node_Update(struct node_t *self_p, const void *data_p, size_t length)
 {
     sc_assert(self_p != NULL);
     sc_assert(data_p != NULL);

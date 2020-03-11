@@ -1,7 +1,7 @@
 /**
  * @file   Com.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of the Communications module.
  */
 
@@ -29,6 +29,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
 #include "Transceiver.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -48,7 +51,7 @@ typedef enum
     COM_PACKET_NR_TYPES
 } com_packet_type_t;
 
-typedef bool (*com_packet_handler_t)(packet_frame_type *packet);
+typedef bool (*com_packet_handler_t)(const packet_frame_type *packet);
 typedef void (*com_sent_callback_t)(bool status);
 
 //////////////////////////////////////////////////////////////////////////

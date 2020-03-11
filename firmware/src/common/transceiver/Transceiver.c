@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-10 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -162,7 +162,7 @@ void Transceiver_Init(void)
     libRFM69_SetPowerAmplifierMode(RFM_PWR_3_4);
     libRFM69_EnableHighPowerSetting(false);
     libRFM69_SetPowerLevel(28);
-    libRFM69_SetAESKey((uint8_t *)Config_GetAESKey());
+    libRFM69_SetAESKey((const uint8_t *)Config_GetAESKey());
 
     tx_packet_fifo = FIFO_New(tx_packet_buffer);
     rx_packet_fifo = FIFO_New(rx_packet_buffer);

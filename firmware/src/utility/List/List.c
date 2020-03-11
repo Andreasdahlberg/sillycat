@@ -1,7 +1,7 @@
 /**
  * @file   List.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-25 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  Implementation of a single linked list.
  */
 
@@ -73,7 +73,7 @@ void List_Append(struct list_t *self_p, struct list_node_t *node_p)
     node_p->next = NULL;
 }
 
-void List_Remove(struct list_t *self_p, struct list_node_t *node_p)
+void List_Remove(struct list_t *self_p, const struct list_node_t *node_p)
 {
     sc_assert(self_p != NULL);
     sc_assert(node_p != NULL);
@@ -102,12 +102,12 @@ void List_Remove(struct list_t *self_p, struct list_node_t *node_p)
     }
 }
 
-uint32_t List_GetLength(struct list_t *self_p)
+uint32_t List_GetLength(const struct list_t *self_p)
 {
     sc_assert(self_p != NULL);
 
     uint32_t node_count = 0;
-    struct list_node_t *current_p;
+    const struct list_node_t *current_p;
     current_p = self_p->root;
 
     while (current_p != NULL)
@@ -119,7 +119,7 @@ uint32_t List_GetLength(struct list_t *self_p)
     return node_count;
 }
 
-void List_Iterate(struct list_t *self_p, list_fp function_p)
+void List_Iterate(const struct list_t *self_p, list_fp function_p)
 {
     sc_assert(self_p != NULL);
     sc_assert(function_p != NULL);

@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-26 (Last edit)
+ * @date   2020-03-11 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -97,7 +97,7 @@ struct module_t module;
 static void InitHardware(void);
 static void DecodeTimings(void);
 static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional);
-static bool IsDataValid(uint8_t *data);
+static bool IsDataValid(const uint8_t *data);
 static dht_state_t ReadingStateMachine(void);
 static void InterruptHandler(uint16_t value);
 
@@ -294,7 +294,7 @@ static void DecodeTimings(void)
     }
 }
 
-static bool IsDataValid(uint8_t *data)
+static bool IsDataValid(const uint8_t *data)
 {
     return (data[4] == ((data[0] + data[1] + data[2] + data[3]) & 0xFF));
 }
