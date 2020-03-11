@@ -82,10 +82,10 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)));
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
 static void DrawUnderLine(void);
 static void DrawSetTimeView(uint16_t context __attribute__ ((unused)));
-static void AdjustTimeForView(struct time_t *time);
+static void AdjustTimeForView(struct time_t *time_p);
 static void SetTimeAction(uint16_t context __attribute__ ((unused)));
 static struct limits_t GetCurrentFieldLimits(size_t field_index, const struct time_t *time_p);
-static void AdjustTimeToLimits(struct time_t *time_p);
+static void AdjustTimeToLimits(const struct time_t *time_p);
 static void IncreaseField(void);
 static void DecreaseField(void);
 
@@ -266,7 +266,7 @@ static struct limits_t GetCurrentFieldLimits(
     return limits;
 }
 
-static void AdjustTimeToLimits(struct time_t *time_p)
+static void AdjustTimeToLimits(const struct time_t *time_p)
 {
     for (size_t i = 0; i < sizeof(*time_p); ++i)
     {
