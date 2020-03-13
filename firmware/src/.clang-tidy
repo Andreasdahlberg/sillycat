@@ -1,0 +1,16 @@
+Checks:
+  '-*,
+  readability-identifier-naming,
+  readability-magic-numbers,
+  readability-braces-around-statements,
+  readability-non-const-parameter,
+  bugprone-assert-side-effect'
+
+CheckOptions:
+  - { key: readability-identifier-naming.VariableCase,           value: lower_case }
+  - { key: readability-identifier-naming.GlobalConstantCase,     value: UPPER_CASE }
+  - { key: readability-identifier-naming.StructCase,             value: lower_case }
+  - { key: readability-identifier-naming.StructSuffix,           value: _t }
+  - { key: readability-identifier-naming.PointerParameterCase,   value: lower_case }
+  - { key: readability-identifier-naming.PointerParameterSuffix, value: _p }
+  - { key: bugprone-assert-side-effect.AssertMacros,             value: sc_assert }
