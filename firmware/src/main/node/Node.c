@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2020-03-13 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -38,6 +38,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
+
+#define SEC_IN_MS 1000
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -214,5 +216,5 @@ void Node_Update(struct node_t *self_p, const void *data_p, size_t length)
 
 static inline uint32_t InactivityTimeoutTime(void)
 {
-    return Config_GetReportInterval() * 1000;
+    return Config_GetReportInterval() * SEC_IN_MS;
 }
