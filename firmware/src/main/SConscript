@@ -30,6 +30,7 @@ DIRECTORIES = [
     'nodes',
     'node',
     'board',
+    'packethandler',
     '../utility',
     '../common'
 ]
@@ -55,7 +56,8 @@ env.Append(CPPPATH=[
     'fonts',
     'interface',
     'nodes',
-    'node'
+    'node',
+    'packethandler'
 ])
 
 source = Glob('*.c')
