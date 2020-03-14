@@ -1,0 +1,23 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/main/packethandler',
+])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=Nodes_GetNodeFromID',
+    '-Wl,--wrap=Node_ReportActivity',
+    '-Wl,--wrap=Node_SetRSSI',
+    '-Wl,--wrap=Node_Update',
+    '-Wl,--wrap=Node_GetID',
+    '-Wl,--wrap=RTC_GetCurrentTime',
+    '-Wl,--wrap=Com_Send',
+    '-Wl,--wrap=ErrorHandler_LogError'
+])
+
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')

@@ -1,7 +1,7 @@
 /**
  * @file   PacketHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-13 (Last edit)
+ * @date   2020-03-14 (Last edit)
  * @brief  Implementation of a node packet handler.
  */
 
@@ -99,6 +99,4 @@ static void SendAck(uint8_t target)
         ErrorHandler_LogError(RTC_FAIL, 0);
         ERROR("Failed to get timestamp.");
     }
-
-    return;
 }

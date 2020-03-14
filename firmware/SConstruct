@@ -219,6 +219,7 @@ modules = [
     os.path.join('main', 'sensor'),
     os.path.join('main', 'node'),
     os.path.join('main', 'nodes'),
+    os.path.join('main', 'packethandler'),
     os.path.join('main', 'driver', 'MCUTemperature'),
     os.path.join('main', 'driver', 'NTC'),
     os.path.join('common', 'time'),
