@@ -1,7 +1,7 @@
 /**
  * @file   mock_Nodes.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-13 (Last edit)
+ * @date   2020-03-14 (Last edit)
  * @brief  Mock functions for the nodes module.
  */
 
@@ -65,6 +65,7 @@ void __wrap_Nodes_Add(struct node_t *node_p)
 
 struct node_t *__wrap_Nodes_GetNodeFromID(uint8_t id)
 {
+    check_expected(id);
     mock_type(struct node_t *);
 }
 

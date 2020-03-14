@@ -1,7 +1,7 @@
 /**
  * @file   mock_Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-08 (Last edit)
+ * @date   2020-03-14 (Last edit)
  * @brief  Mock functions for the node module.
  */
 
@@ -60,6 +60,7 @@ void __wrap_Node_Init(struct node_t *self_p, uint8_t id)
 
 void __wrap_Node_ReportActivity(struct node_t *self_p)
 {
+    function_called();
 }
 
 bool __wrap_Node_IsActive(struct node_t *self_p)
@@ -109,6 +110,7 @@ int8_t __wrap_Node_GetRSSI(struct node_t *self_p)
 
 void __wrap_Node_SetRSSI(struct node_t *self_p, int8_t rssi)
 {
+    check_expected(rssi);
 }
 
 uint8_t __wrap_Node_GetID(struct node_t *self_p)
@@ -118,6 +120,7 @@ uint8_t __wrap_Node_GetID(struct node_t *self_p)
 
 void __wrap_Node_Update(struct node_t *self_p, void *data_p, size_t length)
 {
+    function_called();
 }
 
 //////////////////////////////////////////////////////////////////////////
