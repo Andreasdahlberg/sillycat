@@ -1,7 +1,7 @@
 /**
  * @file   Power.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-30 (Last edit)
+ * @date   2020-03-15 (Last edit)
  * @brief  Implementation of the power management module.
  */
 
@@ -31,7 +31,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libPower.h"
 #include "driverCharger.h"
 #include "Power.h"
-#include "Event.h"
 #include "Battery.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -71,14 +70,11 @@ static void BatteryMonitoringSM(void);
 void Power_Init(void)
 {
     battery_state = POWER_NORMAL;
-
-    return;
 }
 
 void Power_Update(void)
 {
     BatteryMonitoringSM();
-    return;
 }
 
 void Power_WakeUp(const event_t *event_p __attribute__ ((unused)))
@@ -88,7 +84,6 @@ void Power_WakeUp(const event_t *event_p __attribute__ ((unused)))
     DEBUG("Battery voltage: %u\r\n", driverCharger_GetBatteryVoltage());
     DEBUG("Charger connected: %u\r\n", (uint8_t)driverCharger_IsConnected());
     DEBUG("Charging: %u\r\n", (uint8_t)driverCharger_IsCharging());
-    return;
 }
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
@@ -173,8 +168,6 @@ static void BatteryMonitoringSM(void)
         default:
             sc_assert_fail();
     }
-
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
