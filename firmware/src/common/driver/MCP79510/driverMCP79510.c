@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-03-19 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -504,7 +504,7 @@ bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
 
         for (uint8_t i = 0; i < length; ++i)
         {
-            const uint8_t *tmp_p = (uint8_t *)data_p;
+            const uint8_t *tmp_p = (const uint8_t *)data_p;
             libSPI_WriteByte(tmp_p[i], NULL, NULL);
         }
         module.PostSPI();

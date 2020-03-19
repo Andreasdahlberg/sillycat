@@ -1,7 +1,7 @@
 /**
  * @file   guiSensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-02 (Last edit)
+ * @date   2020-03-19 (Last edit)
  * @brief  Implementation of guiSensor
  *
  * Detailed description of file.
@@ -104,7 +104,7 @@ void guiSensor_Init(void)
 
 void DrawDetailsView(uint16_t context)
 {
-    struct sensor_view_t *view_p = GetViewPointerFromContext(context);
+    const struct sensor_view_t *view_p = GetViewPointerFromContext(context);
 
     int16_t max_scaled;
     int16_t min_scaled;
@@ -138,7 +138,7 @@ void DrawOverviewView(uint16_t context)
      */
     libUI_Print("%u", 1, 12, context + 1);
 
-    struct sensor_view_t *view_p = GetViewPointerFromContext(context);
+    const struct sensor_view_t *view_p = GetViewPointerFromContext(context);
     int16_t temperature_scaled;
 
     if (Sensor_GetValue(view_p->sensor_p, &temperature_scaled))
@@ -157,7 +157,7 @@ void DrawOverviewView(uint16_t context)
 
 void ClearAction(uint16_t context)
 {
-    struct sensor_view_t *view_p = GetViewPointerFromContext(context);
+    const struct sensor_view_t *view_p = GetViewPointerFromContext(context);
 
     Sensor_Reset(view_p->sensor_p);
     Interface_Refresh();
