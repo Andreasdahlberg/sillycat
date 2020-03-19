@@ -69,6 +69,7 @@ void __wrap_Event_Init(void)
 
 void __wrap_Event_Trigger(const event_t *event_p)
 {
+    check_expected(event_p);
 }
 
 event_id_t __wrap_Event_GetId(const event_t *event_p)

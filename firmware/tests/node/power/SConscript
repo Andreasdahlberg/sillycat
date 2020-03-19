@@ -1,0 +1,24 @@
+import os
+
+Import(['*'])
+
+env.Append(CPPPATH=[
+    '#src/node',
+    '#src/node/power',
+    '#src/common/debug',
+    '#src/common/event',
+    '#src/common/timer'
+])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=Event_Trigger',
+    '-Wl,--wrap=Timer_GetMilliseconds',
+    '-Wl,--wrap=driverCharger_GetBatteryVoltage',
+    '-Wl,--wrap=driverCharger_IsCharging',
+    '-Wl,--wrap=driverCharger_IsConnected'
+])
+
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
