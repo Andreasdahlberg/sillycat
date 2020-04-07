@@ -49,6 +49,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RFM69_RESET_PORT    PORTC
 #define RFM69_RESET_PIN     DDC0
 
+#define PEC11_DDR           DDRB
+#define PEC11_PINR          PINB
+#define PEC11_PORT          PORTB
+#define PEC11_LATCH_PIN     DDB0
+#define PEC11_DATA_PIN      DDB1
+#define PEC11_BUTTON_PIN    DDB7
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////

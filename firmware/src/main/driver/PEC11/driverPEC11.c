@@ -33,17 +33,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "libDebug.h"
 #include "Timer.h"
+#include "Board.h"
 #include "driverPEC11.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define INPUT_DDR   DDRB
-#define INPUT_PINR  PINB
-#define LATCH_PIN   DDB0
-#define DATA_PIN    DDB1
-#define BUTTON_PIN  DDB7
 
 #define PUSH_TIME_MS 1000
 
@@ -201,15 +196,13 @@ static void InitializePins(void)
      * Set latch, data and button pins as inputs and enable internal
      * pull-up for the button pin.
      */
-    INPUT_DDR &= ~(1 << LATCH_PIN | 1 << DATA_PIN | 1 << BUTTON_PIN);
-    PORTB |= (1 << BUTTON_PIN);
-
+    PEC11_DDR &= ~(1 << PEC11_LATCH_PIN | 1 << PEC11_DATA_PIN | 1 << PEC11_BUTTON_PIN);
+    PEC11_PORT |= (1 << PEC11_BUTTON_PIN);
 
     /**
      * TODO: Add delay here, the filtering caps takes time to charge
      * so the pin change interrupt is triggered.
      */
-
 
     /**
      * Enable pin change interrupts on the latch pin so that the
@@ -240,17 +233,17 @@ static bool PopSignal(volatile uint8_t *signal_p)
 
 static inline bool GetButtonState(void)
 {
-    return (INPUT_PINR & (1 << BUTTON_PIN)) == 0;
+    return (PEC11_PINR & (1 << PEC11_BUTTON_PIN)) == 0;
 }
 
 static inline bool GetLatchState(void)
 {
-    return (INPUT_PINR & (1 << LATCH_PIN)) != 0;
+    return (PEC11_PINR & (1 << PEC11_LATCH_PIN)) != 0;
 }
 
 static inline bool GetDirectionState(void)
 {
-    return (INPUT_PINR & (1 << DATA_PIN)) != 0;
+    return (PEC11_PINR & (1 << PEC11_DATA_PIN)) != 0;
 }
 
 static inline bool IsFallingEdge(bool state)
