@@ -193,11 +193,9 @@ bool driverPEC11_PopExtendedPush(void)
 static void InitializePins(void)
 {
     /**
-     * Set latch, data and button pins as inputs and enable internal
-     * pull-up for the button pin.
+     * Set latch, data and button pins as inputs.
      */
     PEC11_DDR &= ~(1 << PEC11_LATCH_PIN | 1 << PEC11_DATA_PIN | 1 << PEC11_BUTTON_PIN);
-    PEC11_PORT |= (1 << PEC11_BUTTON_PIN);
 
     /**
      * TODO: Add delay here, the filtering caps takes time to charge
