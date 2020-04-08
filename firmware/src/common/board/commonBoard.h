@@ -1,7 +1,7 @@
 /**
  * @file   commonBoard.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-04-08 (Last edit)
  * @brief  Common board support package.
  */
 
@@ -28,6 +28,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
+#include <stdbool.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES

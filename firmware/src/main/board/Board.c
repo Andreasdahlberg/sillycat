@@ -1,7 +1,7 @@
 /**
  * @file   Board.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-23 (Last edit)
+ * @date   2020-04-08 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -26,9 +26,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "common.h"
 #include <avr/io.h>
-#include "libSPI.h"
 #include "Board.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -43,6 +41,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
+static inline void SetPEC11PinsAsInputs(void);
+static inline void EnablePinChangeInterrupts(void);
+
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
@@ -55,6 +56,40 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
+void Board_Init(void)
+{
+    Board_RTC_Init();
+    Board_RFM69_Init();
+    Board_PEC11_Init();
+}
+
+void Board_PEC11_Init(void)
+{
+    SetPEC11PinsAsInputs();
+
+    /**
+     * TODO: Add delay here, the filtering caps takes time to charge
+     * so the pin change interrupt is triggered.
+     */
+
+    EnablePinChangeInterrupts();
+}
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
+
+static inline void SetPEC11PinsAsInputs(void)
+{
+    PEC11_DDR &= ~(1 << PEC11_LATCH_PIN | 1 << PEC11_DATA_PIN | 1 << PEC11_BUTTON_PIN);
+}
+
+static inline void EnablePinChangeInterrupts(void)
+{
+    /**
+     * Enable pin change interrupts on the latch pin so that the
+     * data pin can be decoded when the latch pin changes.
+     */
+    PCMSK0 |= (1 << PCINT0) | (1 << PCINT6);
+    PCICR |= (1 << PCIE0);
+}

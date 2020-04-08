@@ -1,7 +1,7 @@
 /**
  * @file   driverPEC11.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-13 (Last edit)
+ * @date   2020-04-08 (Last edit)
  * @brief  Driver for Bourns PEC11 series rotary encoder with push button.
  */
 
@@ -45,7 +45,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * Initialize the driver and the required inputs.
+ * Initialize the driver.
  */
 void driverPEC11_Init(void);
 

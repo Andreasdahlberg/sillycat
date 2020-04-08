@@ -1,7 +1,7 @@
 /**
  * @file   driverPEC11.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-07 (Last edit)
+ * @date   2020-04-08 (Last edit)
  * @brief  Driver for Bourns PEC11 series rotary encoder with push button.
  */
 
@@ -75,7 +75,6 @@ static struct module_t module;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void InitializePins(void);
 static bool PopSignal(volatile uint8_t *signal_p);
 static inline bool GetLatchState(void);
 static inline bool GetDirectionState(void);
@@ -152,8 +151,6 @@ void driverPEC11_Init(void)
 {
     module = (struct module_t) { {0}, {0}};
 
-    InitializePins();
-
     INFO("PEC11 driver initialized");
 }
 
@@ -189,26 +186,6 @@ bool driverPEC11_PopExtendedPush(void)
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
-
-static void InitializePins(void)
-{
-    /**
-     * Set latch, data and button pins as inputs.
-     */
-    PEC11_DDR &= ~(1 << PEC11_LATCH_PIN | 1 << PEC11_DATA_PIN | 1 << PEC11_BUTTON_PIN);
-
-    /**
-     * TODO: Add delay here, the filtering caps takes time to charge
-     * so the pin change interrupt is triggered.
-     */
-
-    /**
-     * Enable pin change interrupts on the latch pin so that the
-     * data pin can be decoded when the latch pin changes.
-     */
-    PCMSK0 |= (1 << PCINT0) | (1 << PCINT6);
-    PCICR |= (1 << PCIE0);
-}
 
 static bool PopSignal(volatile uint8_t *signal_p)
 {

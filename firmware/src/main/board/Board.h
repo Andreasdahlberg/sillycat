@@ -1,7 +1,7 @@
 /**
  * @file   Board.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-07 (Last edit)
+ * @date   2020-04-08 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -63,5 +63,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
+
+/**
+ * Initialize low level board hardware.
+ */
+void Board_Init(void);
+
+/**
+ * Initialize the pins required for the PEC11 rotary encoder.
+ */
+void Board_PEC11_Init(void);
 
 #endif
