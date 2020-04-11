@@ -1,7 +1,7 @@
 /**
  * @file   driverPEC11.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-08 (Last edit)
+ * @date   2020-04-11 (Last edit)
  * @brief  Driver for Bourns PEC11 series rotary encoder with push button.
  */
 
@@ -149,7 +149,15 @@ ISR(PCINT0_vect)
 
 void driverPEC11_Init(void)
 {
-    module = (struct module_t) { {0}, {0}};
+    module = (struct module_t)
+    {
+        .signals = {0},
+         .states =
+        {
+            .latch = GetLatchState(),
+            .button = GetButtonState()
+        }
+    };
 
     INFO("PEC11 driver initialized");
 }

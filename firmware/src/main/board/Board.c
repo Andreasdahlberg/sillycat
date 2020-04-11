@@ -1,7 +1,7 @@
 /**
  * @file   Board.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-08 (Last edit)
+ * @date   2020-04-11 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -27,6 +27,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include <avr/io.h>
+#include <util/delay.h>
 #include "Board.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -37,12 +38,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+#define FILTER_CAP_TC 2
+
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
 static inline void SetPEC11PinsAsInputs(void);
 static inline void EnablePinChangeInterrupts(void);
+static inline void WaitForFilteringCaps(void);
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -66,12 +70,7 @@ void Board_Init(void)
 void Board_PEC11_Init(void)
 {
     SetPEC11PinsAsInputs();
-
-    /**
-     * TODO: Add delay here, the filtering caps takes time to charge
-     * so the pin change interrupt is triggered.
-     */
-
+    WaitForFilteringCaps();
     EnablePinChangeInterrupts();
 }
 
@@ -92,4 +91,9 @@ static inline void EnablePinChangeInterrupts(void)
      */
     PCMSK0 |= (1 << PCINT0) | (1 << PCINT6);
     PCICR |= (1 << PCIE0);
+}
+
+static inline void WaitForFilteringCaps(void)
+{
+    _delay_ms(FILTER_CAP_TC);
 }
