@@ -152,7 +152,7 @@ void driverPEC11_Init(void)
     module = (struct module_t)
     {
         .signals = {0},
-         .states =
+        .states =
         {
             .latch = GetLatchState(),
             .button = GetButtonState()
