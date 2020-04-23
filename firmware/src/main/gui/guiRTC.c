@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2020-04-23 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -40,7 +40,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define UTC_OFFSET_MIN 60
-#define DST_OFFSET_MIN 60
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -200,11 +199,6 @@ static void AdjustTimeForView(struct time_t *time_p)
      * Always add offset since time is stored as UTC,
      */
     Time_AddMinutes(time_p, UTC_OFFSET_MIN);
-
-    if (Time_IsDaylightSavingActive(time_p))
-    {
-        Time_AddMinutes(time_p, DST_OFFSET_MIN);
-    }
 }
 
 static void NextField(void)
