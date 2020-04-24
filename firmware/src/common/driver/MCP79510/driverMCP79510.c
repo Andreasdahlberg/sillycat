@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-19 (Last edit)
+ * @date   2020-04-24 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -92,6 +92,8 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
          * Wait for the oscillator to start.
          */
     }
+
+    driverMCP79510_EnableExternalBattery(true);
 
     INFO("MCP79510 initialized");
 }
@@ -467,6 +469,22 @@ bool driverMCP79510_IsOscillatorRunning(void)
     return Bit_Get(REG_TC_DAY_OSCON_BIT, &register_content);
 }
 
+void driverMCP79510_EnableExternalBattery(bool enable)
+{
+    uint8_t register_data = ReadRegister(REG_TC_DAY);
+
+    Bit_Set(REG_TC_DAY_VBATEN_BIT, enable, &register_data);
+    WriteRegister(REG_TC_DAY, register_data);
+}
+
+bool driverMCP79510_IsExternalBatteryEnabled(void)
+{
+    uint8_t register_content;
+
+    register_content = ReadRegister(REG_TC_DAY);
+    return Bit_Get(REG_TC_DAY_VBATEN_BIT, &register_content);
+}
+
 void driverMCP79510_ClearBatterySwitchFlag(void)
 {
     uint8_t register_content;
@@ -475,6 +493,14 @@ void driverMCP79510_ClearBatterySwitchFlag(void)
     Bit_Set(REG_TC_DAY_VBAT_BIT, false, &register_content);
 
     WriteRegister(REG_TC_DAY, register_content);
+}
+
+bool driverMCP79510_GetBatterySwitchFlag(void)
+{
+    uint8_t register_content;
+
+    register_content = ReadRegister(REG_TC_DAY);
+    return Bit_Get(REG_TC_DAY_VBAT_BIT, &register_content);
 }
 
 void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)

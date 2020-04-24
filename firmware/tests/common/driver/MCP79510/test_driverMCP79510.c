@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-09 (Last edit)
+ * @date   2020-04-24 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -63,6 +63,7 @@ static void ExpectModifyRegister(uint8_t address);
 static void ExpectEnableSquareWave(void);
 static void ExpectEnableOscillator(void);
 static void ExpectIsOscillatorRunning(void);
+static void ExpectEnableExternalBattery(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -77,6 +78,7 @@ static int Setup(void **state)
     ExpectEnableSquareWave();
     ExpectEnableOscillator();
     ExpectIsOscillatorRunning();
+    ExpectEnableExternalBattery();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
 
@@ -139,6 +141,12 @@ static void ExpectIsOscillatorRunning(void)
     ExpectReadRegister(REG_TC_DAY, 0xFF);
 }
 
+static void ExpectEnableExternalBattery(void)
+{
+    ExpectReadRegister(REG_TC_DAY, 0x00);
+    ExpectWriteRegister(REG_TC_DAY);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
@@ -155,6 +163,7 @@ static void test_driverMCP79510_Init(void **state)
     ExpectEnableSquareWave();
     ExpectEnableOscillator();
     ExpectIsOscillatorRunning();
+    ExpectEnableExternalBattery();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
 }
@@ -374,6 +383,47 @@ static void test_driverMCP79510_EnableAlarm(void **state)
     driverMCP79510_EnableAlarm(false, 1);
 }
 
+static void test_driverMCP79510_IsExternalBatteryEnabled(void **state)
+{
+    ExpectReadRegister(REG_TC_DAY, 0x00);
+    assert_false(driverMCP79510_IsExternalBatteryEnabled());
+
+    ExpectReadRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_VBATEN_BIT));
+    assert_false(driverMCP79510_IsExternalBatteryEnabled());
+
+    ExpectReadRegister(REG_TC_DAY, 0xFF);
+    assert_true(driverMCP79510_IsExternalBatteryEnabled());
+
+    ExpectReadRegister(REG_TC_DAY, (1 << REG_TC_DAY_VBATEN_BIT));
+    assert_true(driverMCP79510_IsExternalBatteryEnabled());
+}
+
+static void test_driverMCP79510_EnableExternalBattery(void **state)
+{
+    ExpectReadRegister(REG_TC_DAY, 0x00);
+    ExpectWriteValueRegister(REG_TC_DAY, (1 << REG_TC_DAY_VBATEN_BIT));
+    driverMCP79510_EnableExternalBattery(true);
+
+    ExpectReadRegister(REG_TC_DAY, 0xFF);
+    ExpectWriteValueRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_VBATEN_BIT));
+    driverMCP79510_EnableExternalBattery(false);
+}
+
+static void test_driverMCP79510_GetBatterySwitchFlag(void **state)
+{
+    ExpectReadRegister(REG_TC_DAY, 0x00);
+    assert_false(driverMCP79510_GetBatterySwitchFlag());
+
+    ExpectReadRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_VBAT_BIT));
+    assert_false(driverMCP79510_GetBatterySwitchFlag());
+
+    ExpectReadRegister(REG_TC_DAY, 0xFF);
+    assert_true(driverMCP79510_GetBatterySwitchFlag());
+
+    ExpectReadRegister(REG_TC_DAY, (1 << REG_TC_DAY_VBAT_BIT));
+    assert_true(driverMCP79510_GetBatterySwitchFlag());
+}
+
 static void test_driverMCP79510_ClearBatterySwitchFlag(void **state)
 {
     ExpectReadRegister(REG_TC_DAY, 0xFF);
@@ -435,6 +485,9 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_IsLeapYear, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_EnableAlarm_InvalidIndex, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_EnableAlarm, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_IsExternalBatteryEnabled, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_EnableExternalBattery, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetBatterySwitchFlag, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_ClearBatterySwitchFlag, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_ClearAlarmFlag_InvalidIndex, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_ClearAlarmFlag, Setup),

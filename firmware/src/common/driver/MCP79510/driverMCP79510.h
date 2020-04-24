@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-05 (Last edit)
+ * @date   2020-04-24 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -289,6 +289,24 @@ void driverMCP79510_EnableSquareWave(bool enable);
 bool driverMCP79510_IsOscillatorRunning(void);
 
 /**
+ * Enable external battery switchover.
+ *
+ * If enabled, the internal circuitry is connected to the VBAT pin. If not
+ * enabled then the VBAT pin is disconnected and the only current drain on the
+ * external battery is the VBAT pin leakage.
+ *
+ * @param enable True for enabled, otherwise false.
+ */
+void driverMCP79510_EnableExternalBattery(bool enable);
+
+/**
+ * Check if the external battery switchover is enable.
+ *
+ * See 'driverMCP79510_EnableExternalBattery' for more details.
+ */
+bool driverMCP79510_IsExternalBatteryEnabled(void);
+
+/**
  * Clear the external battery switched flag.
  *
  * This flag is set by hardware when the VCC fails and the VBAT is used to
@@ -296,6 +314,13 @@ bool driverMCP79510_IsOscillatorRunning(void);
  * software.
  */
 void driverMCP79510_ClearBatterySwitchFlag(void);
+
+/**
+ * Get the external battery switched flag.
+ *
+ * See 'driverMCP79510_ClearBatterySwitchFlag' for more details.
+ */
+bool driverMCP79510_GetBatterySwitchFlag(void);
 
 /**
  * Clear the alarm flag.
