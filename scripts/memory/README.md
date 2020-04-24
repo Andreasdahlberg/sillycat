@@ -22,24 +22,24 @@ Config is a script used for configuration of both node and main devices.
 ### Usage
 Load the configuration from the device into a configuration file:
 ```bash
-$ ./config load <PORT> <FILENAME>
+$ ./config.py load <PORT> <FILENAME>
 ```
 
 Print configuration values from the supplied configuration file:
 ```bash
-$ ./config get <FILENAME> version address
+$ ./config.py get <FILENAME> version address
 version=1
 address=170
 ```
 
 Set a configuration value in the configuration file:
 ```bash
-$ ./config set <FILENAME> address 128
+$ ./config.py set <FILENAME> address 128
 ```
 
 Save the configuration file to device:
 ```bash
-$ ./config save <PORT> <FILENAME>
+$ ./config.py save <PORT> <FILENAME>
 ```
 
 ## Hardware Requirements
