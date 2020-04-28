@@ -45,3 +45,6 @@
 	* Solder Mask Top
 	* Solder Mask Bottom
 	* Drill(all)
+1. Check the NC drill and select the following options:
+	* Imperial
+	* Coordinate format 2.4
