@@ -34,13 +34,13 @@ The following steps are required
     $ sudo apt install python3-setuptools
     $ git clone https://github.com/rougier/freetype-py.git freetype-py
     $ cd freetype-py
-    $ python3 setup.py install
+    $ sudo python3 setup.py install
     ```
 
 ### Building
 ```bash
 $ cd firmware
-$ scons build-main-firmware build-node-firmware
+$ scons build-main-release build-node-release
 ```
 
 ### Testing
