@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-05-01 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -193,16 +193,15 @@ void CheckHealth(void)
     }
 
     int16_t temperature;
-    struct sensor_t *temperature_sensor = driverMCUTemperature_GetSensor();
+    const struct sensor_t *temperature_sensor = driverMCUTemperature_GetSensor();
 
-    if (Sensor_GetValue(temperature_sensor, &temperature))
+    if (Sensor_GetValue(temperature_sensor, &temperature) &&
+            !high_mcu_temp_flag &&
+            (temperature > HICH_MCU_TEMP_LIMIT))
     {
-        if (!high_mcu_temp_flag && temperature > HICH_MCU_TEMP_LIMIT)
-        {
-            ErrorHandler_LogError(HIGH_MCU_TEMPERATURE, (int8_t)temperature);
-            high_mcu_temp_flag = true;
-            WARNING("High MCU temperature: %d", temperature);
-        }
+        ErrorHandler_LogError(HIGH_MCU_TEMPERATURE, (int8_t)temperature);
+        high_mcu_temp_flag = true;
+        WARNING("High MCU temperature: %d", temperature);
     }
 
     sc_assert(unused_memory > 0);
