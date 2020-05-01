@@ -4,6 +4,7 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/main/packethandler',
+    '#tests/mocks/'
 ])
 
 env.Append(LINKFLAGS=[

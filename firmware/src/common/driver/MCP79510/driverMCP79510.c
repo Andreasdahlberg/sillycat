@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-24 (Last edit)
+ * @date   2020-05-01 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -92,8 +92,6 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
          * Wait for the oscillator to start.
          */
     }
-
-    driverMCP79510_EnableExternalBattery(true);
 
     INFO("MCP79510 initialized");
 }

@@ -1,7 +1,7 @@
 /**
  * @file   Board.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-08 (Last edit)
+ * @date   2020-05-01 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -39,6 +39,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_SPI_PORT    PORTB
 #define RTC_SPI_SS      DDB2
 #define RTC_SPI_MODE    0
+
+#define RTC_EXTERNAL_BATTERY true
 
 #define RFM69_SPI_DDR   DDRB
 #define RFM69_SPI_PORT  PORTB

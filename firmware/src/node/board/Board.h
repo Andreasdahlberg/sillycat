@@ -1,7 +1,7 @@
 /**
  * @file   Board.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-23 (Last edit)
+ * @date   2020-05-01 (Last edit)
  * @brief  Board support package for the node unit.
  */
 
@@ -40,6 +40,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_SPI_MFP     DD3
 #define RTC_SPI_SS      DDD4
 #define RTC_SPI_MODE 0
+
+#define RTC_EXTERNAL_BATTERY false
 
 #define RFM69_SPI_DDR   DDRB
 #define RFM69_SPI_PORT  PORTB

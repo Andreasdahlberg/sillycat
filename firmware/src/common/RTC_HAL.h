@@ -1,7 +1,7 @@
 /**
  * @file   RTC_HAL.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-05-01 (Last edit)
  * @brief  RTC HAL.
  */
 
@@ -30,6 +30,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include "driverMCP79510.h"
+#include "Board.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -39,7 +40,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define RTC_IsAlarmsSupported() true
 
 #define RTC_InitHW()
-#define RTC_Init()          driverMCP79510_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback)
+#define RTC_Init()          driverMCP79510_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback); driverMCP79510_EnableExternalBattery(RTC_EXTERNAL_BATTERY)
 #define RTC_Is24HourMode()  driverMCP79510_Is24HourMode()
 
 #define RTC_GetYear(year)           driverMCP79510_GetYear(year)

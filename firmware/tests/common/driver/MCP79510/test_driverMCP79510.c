@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-24 (Last edit)
+ * @date   2020-05-01 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -63,7 +63,6 @@ static void ExpectModifyRegister(uint8_t address);
 static void ExpectEnableSquareWave(void);
 static void ExpectEnableOscillator(void);
 static void ExpectIsOscillatorRunning(void);
-static void ExpectEnableExternalBattery(void);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -78,7 +77,6 @@ static int Setup(void **state)
     ExpectEnableSquareWave();
     ExpectEnableOscillator();
     ExpectIsOscillatorRunning();
-    ExpectEnableExternalBattery();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
 
@@ -141,12 +139,6 @@ static void ExpectIsOscillatorRunning(void)
     ExpectReadRegister(REG_TC_DAY, 0xFF);
 }
 
-static void ExpectEnableExternalBattery(void)
-{
-    ExpectReadRegister(REG_TC_DAY, 0x00);
-    ExpectWriteRegister(REG_TC_DAY);
-}
-
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
@@ -163,7 +155,6 @@ static void test_driverMCP79510_Init(void **state)
     ExpectEnableSquareWave();
     ExpectEnableOscillator();
     ExpectIsOscillatorRunning();
-    ExpectEnableExternalBattery();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
 }
