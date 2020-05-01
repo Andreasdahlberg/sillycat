@@ -50,6 +50,10 @@
 # Sublime files
 *.sublime-workspace
 
+# Coverage
+*.gcda
+*.gcno
+
 # Misc
 *.ms14 (Security copy)
 compile_commands.json
@@ -57,3 +61,4 @@ compile_commands.json
 *.orig
 *.log
 *@*.ewnet
+*.eep
