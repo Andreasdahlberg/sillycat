@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-24 (Last edit)
+ * @date   2020-05-11 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -234,7 +234,7 @@ bool driverMCP79510_SetYear(uint8_t year);
 /**
  * Enable/disable 24-hour mode.
  *
- Enable/disable the MCP79510 on-board oscillator.
+ * @param enabled True for enable, otherwise false.
  */
 void driverMCP79510_Enable24HourMode(bool enabled);
 
