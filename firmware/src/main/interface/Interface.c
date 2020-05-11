@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2020-05-11 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -79,6 +79,7 @@ void Interface_Init(void)
 {
     libDisplay_Init();
     libDisplay_On();
+    libDisplay_Rotate(true);
 
     refresh_flag = true;
     activity_timer = 0;
