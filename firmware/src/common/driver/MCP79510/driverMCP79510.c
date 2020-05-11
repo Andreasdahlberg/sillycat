@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-01 (Last edit)
+ * @date   2020-05-11 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -77,6 +77,7 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
                          libSPI_callback_type post_fp
                         )
 {
+
     sc_assert(pre_fp != NULL);
     sc_assert(post_fp != NULL);
 
@@ -437,7 +438,7 @@ bool driverMCP79510_IsLeapYear(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_MONTH);
-    return Bit_Get(REG_TC_MONTH_LP_BIT, &register_content);
+    return Bit_Get(REG_TC_MONTH_LPYR_BIT, &register_content);
 }
 
 void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
@@ -445,7 +446,7 @@ void driverMCP79510_EnableAlarm(bool enable, uint8_t alarm_index)
     sc_assert(alarm_index < 2);
 
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
-    Bit_Set(REG_TC_CONTROL_ALM0_BIT + alarm_index, enable, &register_data);
+    Bit_Set(REG_TC_CONTROL_ALM0EN_BIT + alarm_index, enable, &register_data);
 
     WriteRegister(REG_TC_CONTROL, register_data);
 }
@@ -454,7 +455,7 @@ void driverMCP79510_EnableSquareWave(bool enable)
 {
     uint8_t register_data = ReadRegister(REG_TC_CONTROL);
 
-    Bit_Set(REG_TC_CONTROL_SQWE_BIT, enable, &register_data);
+    Bit_Set(REG_TC_CONTROL_SQWEN_BIT, enable, &register_data);
     WriteRegister(REG_TC_CONTROL, register_data);
 
 }
@@ -464,7 +465,7 @@ bool driverMCP79510_IsOscillatorRunning(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_DAY);
-    return Bit_Get(REG_TC_DAY_OSCON_BIT, &register_content);
+    return Bit_Get(REG_TC_DAY_OSCRUN_BIT, &register_content);
 }
 
 void driverMCP79510_EnableExternalBattery(bool enable)
@@ -488,7 +489,7 @@ void driverMCP79510_ClearBatterySwitchFlag(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_DAY);
-    Bit_Set(REG_TC_DAY_VBAT_BIT, false, &register_content);
+    Bit_Set(REG_TC_DAY_PWRFAIL_BIT, false, &register_content);
 
     WriteRegister(REG_TC_DAY, register_content);
 }
@@ -498,7 +499,7 @@ bool driverMCP79510_GetBatterySwitchFlag(void)
     uint8_t register_content;
 
     register_content = ReadRegister(REG_TC_DAY);
-    return Bit_Get(REG_TC_DAY_VBAT_BIT, &register_content);
+    return Bit_Get(REG_TC_DAY_PWRFAIL_BIT, &register_content);
 }
 
 void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)

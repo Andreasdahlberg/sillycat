@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-01 (Last edit)
+ * @date   2020-05-11 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -337,13 +337,13 @@ static void test_driverMCP79510_IsLeapYear(void **state)
     ExpectReadRegister(REG_TC_MONTH, 0x00);
     assert_false(driverMCP79510_IsLeapYear());
 
-    ExpectReadRegister(REG_TC_MONTH, ~(1 << REG_TC_MONTH_LP_BIT));
+    ExpectReadRegister(REG_TC_MONTH, ~(1 << REG_TC_MONTH_LPYR_BIT));
     assert_false(driverMCP79510_IsLeapYear());
 
     ExpectReadRegister(REG_TC_MONTH, 0xFF);
     assert_true(driverMCP79510_IsLeapYear());
 
-    ExpectReadRegister(REG_TC_MONTH, (1 << REG_TC_MONTH_LP_BIT));
+    ExpectReadRegister(REG_TC_MONTH, (1 << REG_TC_MONTH_LPYR_BIT));
     assert_true(driverMCP79510_IsLeapYear());
 }
 
@@ -357,20 +357,20 @@ static void test_driverMCP79510_EnableAlarm_InvalidIndex(void **state)
 static void test_driverMCP79510_EnableAlarm(void **state)
 {
     ExpectReadRegister(REG_TC_CONTROL, 0x00);
-    ExpectWriteValueRegister(REG_TC_CONTROL, (1 << REG_TC_CONTROL_ALM0_BIT));
+    ExpectWriteValueRegister(REG_TC_CONTROL, (1 << REG_TC_CONTROL_ALM0EN_BIT));
     driverMCP79510_EnableAlarm(true, 0);
 
     ExpectReadRegister(REG_TC_CONTROL, 0x00);
-    ExpectWriteValueRegister(REG_TC_CONTROL, (1 << (REG_TC_CONTROL_ALM0_BIT + 1)));
+    ExpectWriteValueRegister(REG_TC_CONTROL, (1 << (REG_TC_CONTROL_ALM0EN_BIT + 1)));
     driverMCP79510_EnableAlarm(true, 1);
 
 
     ExpectReadRegister(REG_TC_CONTROL, 0xFF);
-    ExpectWriteValueRegister(REG_TC_CONTROL, ~(1 << REG_TC_CONTROL_ALM0_BIT));
+    ExpectWriteValueRegister(REG_TC_CONTROL, ~(1 << REG_TC_CONTROL_ALM0EN_BIT));
     driverMCP79510_EnableAlarm(false, 0);
 
     ExpectReadRegister(REG_TC_CONTROL, 0xFF);
-    ExpectWriteValueRegister(REG_TC_CONTROL, ~(1 << (REG_TC_CONTROL_ALM0_BIT + 1)));
+    ExpectWriteValueRegister(REG_TC_CONTROL, ~(1 << (REG_TC_CONTROL_ALM0EN_BIT + 1)));
     driverMCP79510_EnableAlarm(false, 1);
 }
 
@@ -405,20 +405,20 @@ static void test_driverMCP79510_GetBatterySwitchFlag(void **state)
     ExpectReadRegister(REG_TC_DAY, 0x00);
     assert_false(driverMCP79510_GetBatterySwitchFlag());
 
-    ExpectReadRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_VBAT_BIT));
+    ExpectReadRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_PWRFAIL_BIT));
     assert_false(driverMCP79510_GetBatterySwitchFlag());
 
     ExpectReadRegister(REG_TC_DAY, 0xFF);
     assert_true(driverMCP79510_GetBatterySwitchFlag());
 
-    ExpectReadRegister(REG_TC_DAY, (1 << REG_TC_DAY_VBAT_BIT));
+    ExpectReadRegister(REG_TC_DAY, (1 << REG_TC_DAY_PWRFAIL_BIT));
     assert_true(driverMCP79510_GetBatterySwitchFlag());
 }
 
 static void test_driverMCP79510_ClearBatterySwitchFlag(void **state)
 {
     ExpectReadRegister(REG_TC_DAY, 0xFF);
-    ExpectWriteValueRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_VBAT_BIT));
+    ExpectWriteValueRegister(REG_TC_DAY, ~(1 << REG_TC_DAY_PWRFAIL_BIT));
     driverMCP79510_ClearBatterySwitchFlag();
 
     ExpectReadRegister(REG_TC_DAY, 0x00);

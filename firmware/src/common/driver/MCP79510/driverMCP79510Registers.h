@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510Registers.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-06 (Last edit)
+ * @date   2020-05-11 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -53,7 +53,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REG_TC_MONTH        0x06    //Month
 #define REG_TC_YEAR         0x07    //Year
 #define REG_TC_CONTROL      0x08    //Control register
-#define REG_TC_CALIBRATION  0x09    //Calibration
+#define REG_TC_TRIMVAL      0x09
 
 //Alarm 0 Registers
 #define REG_ALARM0_SEC      0x0C
@@ -90,21 +90,21 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REG_TC_HOUR_MODE_BIT 0x06
 #define REG_TC_HOUR_AMPM_BIT 0x05
 
-#define REG_TC_MONTH_LP_BIT 0x05
+#define REG_TC_MONTH_LPYR_BIT 0x05
 
-#define REG_TC_DAY_OSCON_BIT    0x05
-#define REG_TC_DAY_VBAT_BIT     0x04
+#define REG_TC_DAY_OSCRUN_BIT   0x05
+#define REG_TC_DAY_PWRFAIL_BIT  0x04
 #define REG_TC_DAY_VBATEN_BIT   0x03
 
 #define REG_TC_CONTROL_EXTOSC_BIT   0x03
-#define REG_TC_CONTROL_ALM0_BIT     0x04
-#define REG_TC_CONTROL_ALM1_BIT     0x05
-#define REG_TC_CONTROL_SQWE_BIT     0x06
+#define REG_TC_CONTROL_ALM0EN_BIT   0x04
+#define REG_TC_CONTROL_ALM1EN_BIT   0x05
+#define REG_TC_CONTROL_SQWEN_BIT    0x06
 #define REG_TC_CONTROL_OUT_BIT      0x07
 
 #define REG_ALARM_DAY_ALM0IF_BIT    0x03
-#define REG_ALARM_DAY_ALM0C0_BIT    0x04
-#define REG_ALARM_DAY_ALM0C1_BIT    0x05
-#define REG_ALARM_DAY_ALM0C2_BIT    0x06
+#define REG_ALARM_DAY_ALM0MSK0_BIT  0x04
+#define REG_ALARM_DAY_ALM0MSK1_BIT  0x05
+#define REG_ALARM_DAY_ALM0MSK2_BIT  0x06
 
 #endif
