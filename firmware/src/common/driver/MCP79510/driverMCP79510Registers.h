@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510Registers.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-11 (Last edit)
+ * @date   2020-05-12 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -53,7 +53,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define REG_TC_MONTH        0x06    //Month
 #define REG_TC_YEAR         0x07    //Year
 #define REG_TC_CONTROL      0x08    //Control register
-#define REG_TC_TRIMVAL      0x09
+#define REG_TC_OSCTRIM      0x09
 
 //Alarm 0 Registers
 #define REG_ALARM0_SEC      0x0C
@@ -87,8 +87,9 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define REG_TC_SEC_OSC_BIT 0x07
 
-#define REG_TC_HOUR_MODE_BIT 0x06
-#define REG_TC_HOUR_AMPM_BIT 0x05
+#define REG_TC_HOUR_TRIMSIGN_BIT    0x07
+#define REG_TC_HOUR_MODE_BIT        0x06
+#define REG_TC_HOUR_AMPM_BIT        0x05
 
 #define REG_TC_MONTH_LPYR_BIT 0x05
 

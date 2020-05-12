@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-11 (Last edit)
+ * @date   2020-05-12 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -25,6 +25,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
+
+#include <stdlib.h>
 
 #include "common.h"
 #include "libDebug.h"
@@ -77,7 +79,6 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
                          libSPI_callback_type post_fp
                         )
 {
-
     sc_assert(pre_fp != NULL);
     sc_assert(post_fp != NULL);
 
@@ -466,6 +467,19 @@ bool driverMCP79510_IsOscillatorRunning(void)
 
     register_content = ReadRegister(REG_TC_DAY);
     return Bit_Get(REG_TC_DAY_OSCRUN_BIT, &register_content);
+}
+
+void driverMCP79510_SetOscillatorTrimming(int16_t trim_value)
+{
+    const uint8_t reg_trim_value = abs(trim_value) > UINT8_MAX ? UINT8_MAX : abs(trim_value);
+    WriteRegister(REG_TC_OSCTRIM, reg_trim_value);
+
+    uint8_t register_content;
+    register_content = ReadRegister(REG_TC_HOUR);
+
+    const bool is_unsigned = trim_value >= 0;
+    Bit_Set(REG_TC_HOUR_TRIMSIGN_BIT, is_unsigned, &register_content);
+    WriteRegister(REG_TC_HOUR, register_content);
 }
 
 void driverMCP79510_EnableExternalBattery(bool enable)

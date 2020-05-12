@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-11 (Last edit)
+ * @date   2020-05-12 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -27,6 +27,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
@@ -452,6 +453,48 @@ static void test_driverMCP79510_ClearAlarmFlag(void **state)
     driverMCP79510_ClearAlarmFlag(1);
 }
 
+static void test_driverMCP79510_SetOscillatorTrimming_Negative(void **state)
+{
+    const int16_t values[] = {INT16_MIN, -256, -255, -254, -2, -1};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        if (values[i] < -UINT8_MAX)
+        {
+            ExpectWriteValueRegister(REG_TC_OSCTRIM, UINT8_MAX);
+        }
+        else
+        {
+            ExpectWriteValueRegister(REG_TC_OSCTRIM, abs(values[i]));
+        }
+
+        ExpectReadRegister(REG_TC_HOUR, 0xFF);
+        ExpectWriteValueRegister(REG_TC_HOUR, (uint8_t)~(1 << REG_TC_HOUR_TRIMSIGN_BIT));
+        driverMCP79510_SetOscillatorTrimming(values[i]);
+    }
+}
+
+static void test_driverMCP79510_SetOscillatorTrimming_Positive(void **state)
+{
+    const int16_t values[] = {0, 1, 255, 256, INT16_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        if (values[i] > UINT8_MAX)
+        {
+            ExpectWriteValueRegister(REG_TC_OSCTRIM, UINT8_MAX);
+        }
+        else
+        {
+            ExpectWriteValueRegister(REG_TC_OSCTRIM, values[i]);
+        }
+
+        ExpectReadRegister(REG_TC_HOUR, 0x00);
+        ExpectWriteValueRegister(REG_TC_HOUR, (uint8_t)(1 << REG_TC_HOUR_TRIMSIGN_BIT));
+        driverMCP79510_SetOscillatorTrimming(values[i]);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -484,6 +527,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_ClearAlarmFlag, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_GetHour_12, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_GetHour_24, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetOscillatorTrimming_Negative, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetOscillatorTrimming_Positive, Setup),
     };
 
     if (argc >= 2)

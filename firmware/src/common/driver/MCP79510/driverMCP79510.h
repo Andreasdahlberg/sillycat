@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-11 (Last edit)
+ * @date   2020-05-12 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -287,6 +287,19 @@ void driverMCP79510_EnableSquareWave(bool enable);
  * @return True if running, otherwise false.
  */
 bool driverMCP79510_IsOscillatorRunning(void);
+
+/**
+ * Set oscillator trimming value.
+ *
+ * Digital trimming can be used to correct for inaccuracies of the external
+ * crystal or clock source, up to roughly ±259 ppm.
+ *
+ * @param trim_value Each step in the trim value equates to adding or
+ *                   subtracting two clock pulses from the 32.768 kHz clock
+ *                   signal. Allowed range is -255 to 255, outside of this
+ *                   interval the min/max is set instead.
+ */
+void driverMCP79510_SetOscillatorTrimming(int16_t trim_value);
 
 /**
  * Enable external battery switchover.
