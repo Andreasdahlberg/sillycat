@@ -87,6 +87,7 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
 
     driverMCP79510_EnableSquareWave(false);
     driverMCP79510_EnableOscillator(true);
+    driverMCP79510_SetOscillatorTrimming(0);
 
     while(!driverMCP79510_IsOscillatorRunning())
     {

@@ -63,6 +63,7 @@ static void ExpectReadRegister(uint8_t address, uint8_t data);
 static void ExpectModifyRegister(uint8_t address);
 static void ExpectEnableSquareWave(void);
 static void ExpectEnableOscillator(void);
+static void ExpectSetOscillatorTrimming(void);
 static void ExpectIsOscillatorRunning(void);
 
 //////////////////////////////////////////////////////////////////////////
@@ -77,6 +78,7 @@ static int Setup(void **state)
 {
     ExpectEnableSquareWave();
     ExpectEnableOscillator();
+    ExpectSetOscillatorTrimming();
     ExpectIsOscillatorRunning();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
@@ -133,6 +135,13 @@ static void ExpectEnableOscillator(void)
     ExpectWriteRegister(REG_TC_SEC);
 }
 
+static void ExpectSetOscillatorTrimming(void)
+{
+    ExpectWriteValueRegister(REG_TC_OSCTRIM, 0);
+    ExpectReadRegister(REG_TC_HOUR, 0);
+    ExpectWriteRegister(REG_TC_HOUR);
+}
+
 static void ExpectIsOscillatorRunning(void)
 {
     ExpectReadRegister(REG_TC_DAY, 0x00);
@@ -155,6 +164,7 @@ static void test_driverMCP79510_Init(void **state)
 {
     ExpectEnableSquareWave();
     ExpectEnableOscillator();
+    ExpectSetOscillatorTrimming();
     ExpectIsOscillatorRunning();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
