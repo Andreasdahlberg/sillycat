@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2020-05-18 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -210,9 +210,7 @@ bool Transceiver_SendPacket(uint8_t target, const packet_content_type *content_p
         packet.header.target = target;
         packet.header.source = Config_GetAddress();
         packet.header.rssi = 0;
-        packet.header.total_size = sizeof(packet_header_type) + 8 +
-                                   content_p->size; //TODO: sizeof or define!
-
+        packet.header.total_size = sizeof(packet_header_type) + offsetof(packet_content_type, data) + content_p->size;
         packet.content.timestamp = content_p->timestamp;
         packet.content.type = content_p->type;
         packet.content.size = content_p->size;
