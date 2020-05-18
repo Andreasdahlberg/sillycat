@@ -1,7 +1,7 @@
 /**
  * @file   Config.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-03-22 (Last edit)
+ * @date   2020-05-18 (Last edit)
  * @brief  Implementation of a module handling storage and validation of
  *         configuration data.
  */
@@ -31,6 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include <stdbool.h>
+#include <stdint.h>
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
