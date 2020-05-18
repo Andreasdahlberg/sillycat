@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-12 (Last edit)
+ * @date   2020-05-18 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -239,11 +239,11 @@ static void test_driverMCP79510_SetHour(void **state)
     }
 
     const uint8_t values_12[] = {0, 1, 6, 10, 11};
-    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    for (size_t i = 0; i < ElementsIn(values_12); ++i)
     {
         ExpectReadRegister(REG_TC_HOUR, 0xE0);
-        ExpectWriteValueRegister(REG_TC_HOUR, 0xE0 | __wrap_DecimalToBCD(values_24[i]));
-        assert_true(driverMCP79510_SetHour(values_24[i]));
+        ExpectWriteValueRegister(REG_TC_HOUR, 0xE0 | __wrap_DecimalToBCD(values_12[i]));
+        assert_true(driverMCP79510_SetHour(values_12[i]));
     }
 }
 
@@ -278,11 +278,11 @@ static void test_driverMCP79510_SetAlarmHour(void **state)
     }
 
     const uint8_t values_12[] = {0, 1, 6, 10, 11};
-    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    for (size_t i = 0; i < ElementsIn(values_12); ++i)
     {
         ExpectReadRegister(REG_ALARM1_HOUR, 0xE0);
-        ExpectWriteValueRegister(REG_ALARM1_HOUR, 0xE0 | __wrap_DecimalToBCD(values_24[i]));
-        assert_true(driverMCP79510_SetAlarmHour(values_24[i], 1));
+        ExpectWriteValueRegister(REG_ALARM1_HOUR, 0xE0 | __wrap_DecimalToBCD(values_12[i]));
+        assert_true(driverMCP79510_SetAlarmHour(values_12[i], 1));
     }
 }
 
