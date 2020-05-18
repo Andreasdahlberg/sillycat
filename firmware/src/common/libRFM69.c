@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-02-06 (Last edit)
+ * @date   2020-05-18 (Last edit)
  * @brief  Implementation of RFM69HW-library.
  *
  * Detailed description of file.
@@ -60,6 +60,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #define WAIT_TIMEOUT_MS 10
 #define POR_TIME_MS 10
+#define RESET_TIME_MS 5
 #define RESET_TIMING_US 110
 
 #define TEMPERATURE_CALIBRATION_OFFSET (-90)
@@ -106,10 +107,12 @@ static uint32_t CalculateRxBw(uint8_t mant, uint8_t exp);
 ///
 void libRFM69_Init(void)
 {
-    libRFM69_Reset();
+    _delay_ms(POR_TIME_MS);
 
-    //TODO: Remove
-    _delay_ms(15);
+    libRFM69_Reset();
+    while(!libRFM69_IsResetDone())
+    {
+    }
 }
 
 ///
@@ -126,7 +129,7 @@ void libRFM69_Update(void)
 ///
 /// @brief Reset the RFM69 module.
 ///
-/// Use libRFM69_IsPowerUpDone() to check if the module is ready to use again.
+/// Use libRFM69_IsResetDone() to check if the module is ready to use again.
 ///
 /// @param  None
 /// @return None
@@ -141,14 +144,14 @@ void libRFM69_Reset(void)
 }
 
 ///
-/// @brief Check if RFM69HW module is ready to use after power on/reset.
+/// @brief Check if RFM69HW module is ready to use after reset.
 ///
 /// @param  None
 /// @return None
 ///
-bool libRFM69_IsPowerUpDone(void)
+bool libRFM69_IsResetDone(void)
 {
-    return (Timer_TimeDifference(reset_time_ms) > POR_TIME_MS);
+    return (Timer_TimeDifference(reset_time_ms) > RESET_TIME_MS);
 }
 
 bool libRFM69_IsFIFOFull(void)

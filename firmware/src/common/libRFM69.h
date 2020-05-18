@@ -1,7 +1,7 @@
 /**
  * @file   libRFM69.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-23 (Last edit)
+ * @date   2020-05-18 (Last edit)
  * @brief  Header of RFM69HW-library.
  *
  * Detailed description of file.
@@ -164,7 +164,7 @@ void libRFM69_SetMode(libRFM69_mode_type mode);
 void libRFM69_EnableEncryption(bool enable);
 void libRFM69_SetAESKey(const uint8_t *aes_key);
 bool libRFM69_IsModeReady(void);
-bool libRFM69_IsPowerUpDone(void);
+bool libRFM69_IsResetDone(void);
 bool libRFM69_WaitForModeReady(void);
 void libRFM69_Reset(void);
 void libRFM69_SetCarrierFrequency(uint32_t frequency);
