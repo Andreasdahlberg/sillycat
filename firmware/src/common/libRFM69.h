@@ -128,18 +128,6 @@ typedef enum
     RFM_DCC_FREQ_0125,
 } libRFM69_dcc_freq_type;
 
-#ifndef NODE_ADDRESS
-#define NODE_ADDRESS 0xAA
-#endif
-
-#ifndef BROADCAST_ADDRESS
-#define BROADCAST_ADDRESS 0xFF
-#endif
-
-#ifdef  NETWORK_MASTER
-#define NETWORK_ID NODE_ADDRESS
-#endif
-
 #define RFM_PWR_1   0x04 //PA0 output on pin RFIO
 #define RFM_PWR_2   0x02 //PA1 enabled on pin PA_BOOST
 #define RFM_PWR_3_4 0x03//PA1 and PA2 combined on pin PA_BOOST /PA1+PA2 on PA_BOOST with high output power +20dBm
