@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-01 (Last edit)
+ * @date   2020-05-18 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -88,6 +88,7 @@ void CheckHealth(void);
 void assert_fail_handler(const char *file,
                          int line_number,
                          const char *expression);
+void handle_corrupt_config(void);
 
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
@@ -116,17 +117,14 @@ int main(void)
     driverNTC_Init();
     driverMCUTemperature_Init();
 
+    Interface_Init();
     if (!Config_Load())
     {
-        CRITICAL("Corrupt device configuration");
-        ErrorHandler_LogError(CORRUPT_CONFIG, 0);
-        ErrorHandler_PointOfNoReturn();
+        handle_corrupt_config();
     }
-
     Transceiver_Init();
     Com_Init();
     Encoder_Init();
-    Interface_Init();
     //NOTE: The first gui init called will be the root view.
     guiRTC_Init();
     guiSensor_Init();
@@ -218,4 +216,16 @@ void assert_fail_handler(const char *file,
     libUI_Print("Assert: %i", 2, UI_DOUBLE_ROW_FIRST, line_number);
     libUI_Print_P(file_name, 2, UI_DOUBLE_ROW_SECOND);
     libUI_Update();
+}
+
+void handle_corrupt_config(void)
+{
+    CRITICAL("Corrupt device configuration");
+    ErrorHandler_LogError(CORRUPT_CONFIG, 0);
+
+    libUI_Print("Corrupt config", 0, UI_DOUBLE_ROW_FIRST);
+    libUI_Print("V:0x%02X, E:0x%02X", 0, UI_DOUBLE_ROW_SECOND, Config_GetVersion(), CORRUPT_CONFIG);
+    libUI_Update();
+
+    ErrorHandler_PointOfNoReturn();
 }
