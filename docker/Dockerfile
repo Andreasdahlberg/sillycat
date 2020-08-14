@@ -20,7 +20,8 @@ RUN apt-get install -y \
     astyle \
     wget \
     unzip \
-    gcovr
+    gcovr \
+    openjdk-11-jdk
 
 # Install cmocka
 RUN git clone git://git.cryptomilk.org/projects/cmocka.git && \
