@@ -1,5 +1,7 @@
 dist: focal
 language: c
+jdk:
+  - oraclejdk11
 git:
   depth: false
 services:
