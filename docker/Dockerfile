@@ -24,7 +24,7 @@ RUN apt-get install -y \
     openjdk-11-jdk
 
 # Install cmocka
-RUN git clone git://git.cryptomilk.org/projects/cmocka.git && \
+RUN git clone https://git.cryptomilk.org/projects/cmocka.git && \
     mkdir cmocka/build && \
     cd cmocka/build && \
     cmake -DCMAKE_INSTALL_PREFIX=/usr .. && \
