@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-23 (Last edit)
+ * @date   2020-09-13 (Last edit)
  * @brief  Header of Sensor module
  *
  * Detailed description of file.
@@ -26,6 +26,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef SENSOR_H_
 #define SENSOR_H_
+
+//////////////////////////////////////////////////////////////////////////
+//INCLUDES
+//////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
+#include <stdbool.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
