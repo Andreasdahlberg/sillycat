@@ -1,7 +1,7 @@
 /**
  * @file   test_Node.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-05-26 (Last edit)
+ * @date   2020-09-18 (Last edit)
  * @brief  Test suite for the node module.
  */
 
@@ -120,6 +120,26 @@ static void test_Node_IsActive(void **state)
 static void test_Node_ReportActivity_NULL(void **state)
 {
     expect_assert_failure(Node_ReportActivity(NULL));
+}
+
+static void test_Node_GetLastActivity_NULL(void **state)
+{
+    expect_assert_failure(Node_GetLastActivity(NULL));
+}
+
+static void test_Node_GetLastActivity(void **state)
+{
+    assert_int_equal(Node_GetLastActivity(&dummy_node), 0);
+
+    uint32_t data[] = {0, 1, 1000, UINT32_MAX};
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i)
+    {
+        const uint32_t timestamp = data[i];
+
+        will_return(__wrap_Timer_GetMilliseconds, timestamp);
+        Node_ReportActivity(&dummy_node);
+        assert_int_equal(Node_GetLastActivity(&dummy_node), timestamp);
+    }
 }
 
 static void test_Node_GetTemperatureSensor_NULL(void **state)
@@ -361,6 +381,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_Node_IsActive_NotConnected, Setup),
         cmocka_unit_test_setup(test_Node_IsActive, Setup),
         cmocka_unit_test_setup(test_Node_ReportActivity_NULL, Setup),
+        cmocka_unit_test_setup(test_Node_GetLastActivity_NULL, Setup),
+        cmocka_unit_test_setup(test_Node_GetLastActivity, Setup),
         cmocka_unit_test_setup(test_Node_GetTemperatureSensor_NULL, Setup),
         cmocka_unit_test_setup(test_Node_GetTemperatureSensor, Setup),
         cmocka_unit_test_setup(test_Node_GetHumiditySensor_NULL, Setup),

@@ -1,7 +1,7 @@
 /**
  * @file   Node.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-13 (Last edit)
+ * @date   2020-09-18 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -90,6 +90,13 @@ void Node_ReportActivity(struct node_t *self_p)
 
     self_p->connected = true;
     self_p->last_active = Timer_GetMilliseconds();
+}
+
+uint32_t Node_GetLastActivity(const struct node_t *self_p)
+{
+    sc_assert(self_p != NULL);
+
+    return self_p->last_active;
 }
 
 bool Node_IsActive(const struct node_t *self_p)

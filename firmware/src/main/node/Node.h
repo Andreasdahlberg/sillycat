@@ -1,7 +1,7 @@
 /**
  * @file   Node.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2020-09-18 (Last edit)
  * @brief  Implementation of remote node abstraction layer.
  */
 
@@ -76,6 +76,15 @@ void Node_Init(struct node_t *self_p, uint8_t id);
  * @param self_p Pointer to node struct.
  */
 void Node_ReportActivity(struct node_t *self_p);
+
+/**
+ * Get the time of the last node activity.
+ *
+ * @param self_p Pointer to the node struct.
+ *
+ * @return Time(ms since start) of the last node activity.
+ */
+uint32_t Node_GetLastActivity(const struct node_t *self_p);
 
 /**
  * Check if the supplied node is active.
