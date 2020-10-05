@@ -1,7 +1,7 @@
 /**
  * @file   driverADC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2017-07-28 (Last edit)
+ * @date   2020-10-05 (Last edit)
  * @brief  Implementation of low a level ADC driver.
  *
  * Detailed description of file.
@@ -77,7 +77,7 @@ ISR(ADC_vect)
 
         if (module.channel->callback != NULL)
         {
-            module.channel->callback(module.index);
+            module.channel->callback((uint8_t)module.index);
         }
     }
 }
@@ -112,7 +112,6 @@ void driverADC_Init(void)
 
     // Set the reference voltage to AREF.
     ADMUX = 0x00;
-    return;
 }
 
 ///
@@ -134,7 +133,6 @@ void driverADC_InitChannel(struct adc_channel_t *channel,
 
     channel->index = index;
     channel->callback = callback;
-    return;
 }
 
 ///
@@ -160,7 +158,6 @@ void driverADC_Convert(struct adc_channel_t *channel, uint16_t *samples, size_t 
     SelectChannel(channel->index);
     EnableADC();
     StartConversion();
-    return;
 }
 
 ///
@@ -172,10 +169,10 @@ void driverADC_Convert(struct adc_channel_t *channel, uint16_t *samples, size_t 
 ///
 void driverADC_Wait(void)
 {
-    while ((ADCSRA & (1 << ADEN)))
+    while (ADCSRA & (1 << ADEN))
     {
+        /* Wait for conversion to finish. */
     }
-    return;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -185,13 +182,11 @@ void driverADC_Wait(void)
 static inline void EnableADC(void)
 {
     ADCSRA |= (1 << ADEN);
-    return;
 }
 
 static inline void StartConversion(void)
 {
     ADCSRA |= (1 << ADSC);
-    return;
 }
 
 static inline void SelectChannel(uint8_t index)
@@ -205,5 +200,4 @@ static inline void SelectChannel(uint8_t index)
     //Set new channel
     new_admux |= index;
     ADMUX = new_admux;
-    return;
 }
