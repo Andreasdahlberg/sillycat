@@ -1,7 +1,7 @@
 /**
  * @file   Event.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-21 (Last edit)
+ * @date   2020-10-05 (Last edit)
  * @brief  Implementation of Event module
  */
 
@@ -85,8 +85,7 @@ void Event_Trigger(const event_t *event_p)
 {
     sc_assert(event_p != NULL);
 
-    uint8_t index;
-    for (index = 0; index < module.number_of_listeners; ++index)
+    for (uint8_t index = 0; index < module.number_of_listeners; ++index)
     {
         if (module.listeners[index].id == event_p->id ||
                 module.listeners[index].id == EVENT_ALL)

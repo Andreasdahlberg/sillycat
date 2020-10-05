@@ -1,7 +1,7 @@
 /**
  * @file   libNHD223.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-11-26 (Last edit)
+ * @date   2020-10-05 (Last edit)
  * @brief  NHD2.23 graphic OLED display driver.
  */
 
@@ -189,14 +189,11 @@ static void InitHardware(void)
 
 static void ClearDisplay(void)
 {
-    uint8_t page;
-    uint8_t column;
-
-    for (page = 0; page < 4; ++page)
+    for (uint8_t page = 0; page < 4; ++page)
     {
         libNHD223_SetPageAddress(page);
 
-        for(column = 0; column < 128; ++column)
+        for(uint8_t column = 0; column < 128; ++column)
         {
             libNHD223_WriteData(0x00);
         }

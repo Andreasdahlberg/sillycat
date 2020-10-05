@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2020-10-05 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -115,7 +115,7 @@ void driverDHT22_Init(void)
     module = (__typeof__(module))
     {
         .state = DHT_POWERUP,
-        .initialization_time = Timer_GetMilliseconds(),
+         .initialization_time = Timer_GetMilliseconds(),
     };
 
     INFO("DHT22 RHT sensor initialized");
@@ -262,15 +262,13 @@ static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional)
 
 static void DecodeTimings(void)
 {
-    uint8_t bit_index;
-    uint8_t byte_index;
     uint8_t index;
-    uint8_t data[5] = {0, 0, 0, 0, 0};
+    uint8_t data[] = {0, 0, 0, 0, 0};
     uint16_t prev = module.pulse_timings[TIMINGS_INDEX_OFFSET - 1];
 
-    for (byte_index = 0; byte_index < 5; ++byte_index)
+    for (uint8_t byte_index = 0; byte_index < ElementsIn(data); ++byte_index)
     {
-        for (bit_index = 0; bit_index < 8; ++bit_index)
+        for (uint8_t bit_index = 0; bit_index < 8; ++bit_index)
         {
             index = (byte_index << 3) + bit_index + TIMINGS_INDEX_OFFSET;
             if (module.pulse_timings[index] - prev > LOW_HIGH_LIMIT)
