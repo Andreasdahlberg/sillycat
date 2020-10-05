@@ -115,7 +115,7 @@ void driverDHT22_Init(void)
     module = (__typeof__(module))
     {
         .state = DHT_POWERUP,
-         .initialization_time = Timer_GetMilliseconds(),
+        .initialization_time = Timer_GetMilliseconds(),
     };
 
     INFO("DHT22 RHT sensor initialized");
