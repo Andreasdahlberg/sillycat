@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-18 (Last edit)
+ * @date   2020-10-21 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -28,6 +28,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>

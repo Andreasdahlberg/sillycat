@@ -1,7 +1,7 @@
 /**
  * @file   test_Bit.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2020-10-27 (Last edit)
  * @brief  Test suite for the Bit utility.
  */
 
@@ -28,6 +28,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <cmocka.h>
 

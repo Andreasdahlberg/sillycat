@@ -1,7 +1,7 @@
 /**
  * @file   mock_Com.c
  * @Author Andreas Dahlberg
- * @date   2020-03-14
+ * @date   2020-10-21
  * @brief  Mock functions for the Communications module.
  */
 
@@ -28,10 +28,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
-#include <stdint.h>
 
 #include "mock_Com.h"
 

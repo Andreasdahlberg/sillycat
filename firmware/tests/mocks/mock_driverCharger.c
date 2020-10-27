@@ -1,7 +1,7 @@
 /**
  * @file   mock_driverCharger.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-15 (Last edit)
+ * @date   2020-10-21 (Last edit)
  * @brief  Mock functions for the charger driver.
  */
 
@@ -28,10 +28,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
-#include <stdint.h>
 
 #include "mock_driverCharger.h"
 

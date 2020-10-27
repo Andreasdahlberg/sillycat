@@ -1,7 +1,7 @@
 /**
  * @file   mock_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-19 (Last edit)
+ * @date   2020-10-21 (Last edit)
  * @brief  Mock functions for the MCP79510 driver.
  */
 
@@ -28,10 +28,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 #include "mock_driverMCP79510.h"
 
