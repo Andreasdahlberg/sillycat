@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-12 (Last edit)
+ * @date   2021-01-10 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -201,24 +201,27 @@ bool driverMCP79510_SetDate(uint8_t date);
  * @return True if the value was set, otherwise false.
  */
 bool driverMCP79510_SetAlarmDate(uint8_t date, uint8_t alarm_index);
+
 /**
  * Get month.
  *
  * @param day_p Pointer to variable where the result will be stored.
  */
 void driverMCP79510_GetMonth(uint8_t *month_p);
+
 /**
- * Set hour
+ * Set month
  *
- * @param hour Hour.
+ * @param month Month.
  *
  * @return True if the value was set, otherwise false.
  */
 bool driverMCP79510_SetMonth(uint8_t month);
+
 /**
  * Get year.
  *
- * @param day_p Pointer to variable where the result will be stored.
+ * @param year_p Pointer to variable where the result will be stored.
  */
 void driverMCP79510_GetYear(uint8_t *year_p);
 
@@ -376,7 +379,7 @@ bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length);
 /**
  * Clear SRAM.
  *
- * Clear SRAM by reseting all locations to 0x00.
+ * Clear the entire SRAM by reseting all locations to 0x00.
  */
 void driverMCP79510_ClearSRAM(void);
 
