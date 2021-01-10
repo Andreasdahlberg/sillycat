@@ -27,7 +27,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include "common.h"
-#include <avr/io.h>
 #include "libDebug.h"
 #include "Bit.h"
 #include "driverDS3234.h"
