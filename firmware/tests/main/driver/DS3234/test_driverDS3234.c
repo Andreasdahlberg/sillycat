@@ -34,8 +34,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "test_driverDS3234.h"
 #include "driverDS3234.h"
 #include "driverDS3234Registers.h"
+#include "common.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -59,8 +61,9 @@ static void StubSPIPostCallback(void);
 static void ExpectWriteRegister(uint8_t address);
 static void ExpectWriteValueRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegister(uint8_t address, uint8_t data);
-static void ExpectModifyRegister(uint8_t address);
+static void ExpectModifyRegister(uint8_t address, uint8_t data);
 static void ExpectResetControlRegister(void);
+static void Set24HourMode(bool enabled);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -106,15 +109,21 @@ static void ExpectReadRegister(uint8_t address, uint8_t data)
     will_return(__wrap_libSPI_ReadByte, data);
 }
 
-static void ExpectModifyRegister(uint8_t address)
+static void ExpectModifyRegister(uint8_t address, uint8_t data)
 {
-    ExpectReadRegister(address, 0);
-    ExpectWriteRegister(address);
+    ExpectReadRegister(address,  0x0);
+    ExpectWriteValueRegister(address, data);
 }
 
 static void ExpectResetControlRegister(void)
 {
     ExpectWriteValueRegister(REG_CONTROL, 0x1C);
+}
+
+static void Set24HourMode(bool enabled)
+{
+    ExpectReadRegister(REG_HOUR, 0x00);
+    will_return(__wrap_Bit_Get, !enabled);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -134,6 +143,205 @@ static void test_driverDS3234_Init(void **state)
     driverDS3234_Init(StubSPIPreCallback, StubSPIPostCallback);
 }
 
+static void test_driverDS3234_GetYear(void **state)
+{
+    const uint8_t values[] = {0, 1, 50, 98, 99};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        ExpectReadRegister(REG_YEAR, __wrap_DecimalToBCD(values[i]));
+
+        uint8_t result;
+        driverDS3234_GetYear(&result);
+        assert_int_equal(result, values[i]);
+    }
+}
+
+static void test_driverDS3234_SetYear_InvalidYear(void **state)
+{
+    const uint8_t values[] = {100, 101, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverDS3234_SetYear(values[i]));
+    }
+}
+
+static void test_driverDS3234_SetYear(void **state)
+{
+    const uint8_t values[] = {0, 1, 50, 98, 99};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t year = values[i];
+        ExpectWriteValueRegister(REG_YEAR, __wrap_DecimalToBCD(year));
+        assert_true(driverDS3234_SetYear(year));
+    }
+}
+
+static void test_driverDS3234_GetMonth(void **state)
+{
+    const uint8_t values[] = {1, 2, 6, 11, 12};
+    const uint8_t century_bit = (1 << 7);
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        ExpectReadRegister(REG_MONTH_CENTURY, century_bit | __wrap_DecimalToBCD(values[i]));
+
+        uint8_t result;
+        driverDS3234_GetMonth(&result);
+        assert_int_equal(result, values[i]);
+    }
+}
+
+static void test_driverDS3234_SetMonth_InvalidMonth(void **state)
+{
+    const uint8_t values[] = {0, 13, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverDS3234_SetMonth(values[i]));
+    }
+}
+
+static void test_driverDS3234_SetMonth(void **state)
+{
+    const uint8_t values[] = {1, 2, 6, 11, 12};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t month = values[i];
+        ExpectModifyRegister(REG_MONTH_CENTURY, __wrap_DecimalToBCD(month));
+        assert_true(driverDS3234_SetMonth(month));
+    }
+}
+
+static void test_driverDS3234_GetDate(void **state)
+{
+    const uint8_t values[] = {1, 2, 15, 30, 31};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t date = values[i];
+        ExpectReadRegister(REG_DATE, __wrap_DecimalToBCD(date));
+
+        uint8_t result;
+        driverDS3234_GetDate(&result);
+        assert_int_equal(result, date);
+    }
+}
+
+static void test_driverDS3234_SetDate_InvalidDate(void **state)
+{
+    const uint8_t values[] = {0, 32, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverDS3234_SetDate(values[i]));
+    }
+}
+
+static void test_driverDS3234_SetDate(void **state)
+{
+    const uint8_t values[] = {1, 2, 15, 30, 31};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t date = values[i];
+        ExpectWriteValueRegister(REG_DATE, __wrap_DecimalToBCD(date));
+        assert_true(driverDS3234_SetDate(date));
+    }
+}
+
+static void test_driverDS3234_GetDay(void **state)
+{
+    const uint8_t values[] = {1, 2, 4, 6, 7};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t day = values[i];
+        ExpectReadRegister(REG_DAY, __wrap_DecimalToBCD(day));
+
+        uint8_t result;
+        driverDS3234_GetDay(&result);
+        assert_int_equal(result, day);
+    }
+}
+
+static void test_driverDS3234_SetDay_InvalidDay(void **state)
+{
+    const uint8_t values[] = {0, 8, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverDS3234_SetDay(values[i]));
+    }
+}
+
+static void test_driverDS3234_SetDay(void **state)
+{
+    const uint8_t values[] = {1, 2, 4, 6, 7};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t day = values[i];
+        ExpectWriteValueRegister(REG_DAY, __wrap_DecimalToBCD(day));
+        assert_true(driverDS3234_SetDay(day));
+    }
+}
+
+static void test_driverDS3234_GetHour(void **state)
+{
+    const uint8_t values[] = {0, 1, 12, 22, 23};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t value = values[i];
+        ExpectReadRegister(REG_HOUR, __wrap_DecimalToBCD(value));
+
+        uint8_t result;
+        driverDS3234_GetHour(&result);
+        assert_int_equal(result, value);
+    }
+}
+
+static void test_driverDS3234_SetHour_InvalidHour(void **state)
+{
+    const uint8_t values_12[] = {0, 13, UINT8_MAX};
+    for (size_t i = 0; i < ElementsIn(values_12); ++i)
+    {
+        Set24HourMode(false);
+        assert_false(driverDS3234_SetHour(values_12[i]));
+    }
+
+    const uint8_t values_24[] = {24, UINT8_MAX};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        Set24HourMode(true);
+        assert_false(driverDS3234_SetHour(values_24[i]));
+    }
+}
+
+static void test_driverDS3234_SetHour(void **state)
+{
+    const uint8_t values_12[] = {1, 2, 6, 11, 12};
+    for (size_t i = 0; i < ElementsIn(values_12); ++i)
+    {
+        Set24HourMode(false);
+        ExpectWriteValueRegister(REG_HOUR, __wrap_DecimalToBCD(values_12[i]));
+        assert_true(driverDS3234_SetHour(values_12[i]));
+    }
+
+    const uint8_t values_24[] = {0, 1, 12, 22, 23};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        Set24HourMode(true);
+        ExpectWriteValueRegister(REG_HOUR, __wrap_DecimalToBCD(values_24[i]));
+        assert_true(driverDS3234_SetHour(values_24[i]));
+    }
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -144,6 +352,21 @@ int main(int argc, char *argv[])
     {
         cmocka_unit_test(test_driverDS3234_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverDS3234_Init),
+        cmocka_unit_test_setup(test_driverDS3234_GetYear, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetYear_InvalidYear, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetYear, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_GetMonth, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetMonth_InvalidMonth, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetMonth, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_GetDate, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetDate_InvalidDate, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetDate, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_GetDay, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetDay_InvalidDay, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetDay, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_GetHour, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetHour_InvalidHour, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetHour, Setup)
     };
 
     if (argc >= 2)
