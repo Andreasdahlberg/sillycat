@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-10 (Last edit)
+ * @date   2021-01-11 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -347,7 +347,7 @@ bool driverDS3234_WriteToSRAM(uint8_t address, const void *data_p, size_t length
         for (size_t i = 0; i < length; ++i)
         {
             //SRAM address is auto incremented after each write
-            WriteRegister(REG_SRAM_DATA, ((uint8_t *)data_p)[i]);
+            WriteRegister(REG_SRAM_DATA, ((const uint8_t *)data_p)[i]);
         }
         status = true;
     }
@@ -426,7 +426,7 @@ static void SetBit(uint8_t register_address, uint8_t bit_index)
 static void GetDecimalRegisterValue(uint8_t address, uint8_t *value_p)
 {
     uint8_t register_data = ReadRegister(address);
-    *value_p = (uint8_t)BCDToDecimal(register_data);
+    *value_p = BCDToDecimal(register_data);
 }
 
 static void SetDecimalRegisterValue(uint8_t address, uint8_t value)
@@ -440,7 +440,7 @@ static void SetDecimalRegisterValue(uint8_t address, uint8_t value)
 
 static inline bool IsSRAMParametersValid(uint8_t address, size_t length)
 {
-    return (uint16_t)address + (uint16_t)length <= SRAM_SIZE;
+    return (size_t)address + length <= SRAM_SIZE;
 }
 
 #ifdef DEBUG_ENABLE
