@@ -473,6 +473,62 @@ static void test_driverDS3234_EnableAlarm(void **state)
     }
 }
 
+static void test_driverDS3234_ClearAlarmFlag_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverDS3234_ClearAlarmFlag(2));
+    expect_assert_failure(driverDS3234_ClearAlarmFlag(UINT8_MAX));
+}
+
+static void test_driverDS3234_ClearAlarmFlag(void **state)
+{
+    const uint8_t max_index = 1;
+    for (uint8_t i = 0; i <= max_index; ++i)
+    {
+        uint8_t expected_register_data = ~(1 << i);
+        ExpectModifyRegister(REG_CONTROL_STATUS, 0xFF, expected_register_data);
+        driverDS3234_ClearAlarmFlag(i);
+    }
+}
+
+static void test_driverDS3234_SetAlarmDate_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverDS3234_SetAlarmDate(1, 2));
+    expect_assert_failure(driverDS3234_SetAlarmDate(UINT8_MAX, UINT8_MAX));
+}
+
+static void test_driverDS3234_SetAlarmDate_InvalidDate(void **state)
+{
+    const uint8_t values[] = {0, 32, UINT8_MAX};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t date = values[i];
+            assert_false(driverDS3234_SetAlarmDate(date, alarm_index));
+        }
+    }
+}
+
+static void test_driverDS3234_SetAlarmDate(void **state)
+{
+    const uint8_t values[] = {1, 2, 15, 30, 31};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        const uint8_t register_address = (alarm_index == 0) ? REG_ALARM_1_DAY_DATE : REG_ALARM_2_DAY_DATE;
+
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t date = values[i];
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(date));
+            assert_true(driverDS3234_SetAlarmDate(date, alarm_index));
+        }
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -508,6 +564,11 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverDS3234_Enable24HourMode, Setup),
         cmocka_unit_test_setup(test_driverDS3234_EnableAlarm_InvalidIndex, Setup),
         cmocka_unit_test_setup(test_driverDS3234_EnableAlarm, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_ClearAlarmFlag_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_ClearAlarmFlag, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmDate_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmDate_InvalidDate, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmDate, Setup),
     };
 
     if (argc >= 2)
