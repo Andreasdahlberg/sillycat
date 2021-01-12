@@ -56,12 +56,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_Bit_Set(uint8_t bit_index, bool state, uint8_t *data)
+void __wrap_Bit_Set(uint8_t bit_index, bool state, uint8_t *data_p)
 {
 }
 
-bool __wrap_Bit_Get(uint8_t bit_index, const uint8_t *data)
+bool __wrap_Bit_Get(uint8_t bit_index, const uint8_t *data_p)
 {
+    assert_non_null(data_p);
+
+    check_expected(*data_p);
     mock_type(bool);
 }
 
