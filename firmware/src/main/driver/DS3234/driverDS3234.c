@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-11 (Last edit)
+ * @date   2021-01-12 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -111,10 +111,10 @@ void driverDS3234_GetYear(uint8_t *year_p)
 
 bool driverDS3234_SetYear(uint8_t year)
 {
-    const uint8_t max_year = 100;
+    const uint8_t max_year = 99;
     bool status = false;
 
-    if (year < max_year)
+    if (year <= max_year)
     {
         SetDecimalRegisterValue(REG_YEAR, year);
         status = true;
@@ -282,6 +282,8 @@ void driverDS3234_ClearAlarmFlag(uint8_t alarm_index)
 
 bool driverDS3234_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 {
+    sc_assert(alarm_index < 2);
+
     const uint8_t register_address = (alarm_index == 0) ? REG_ALARM_1_DAY_DATE : REG_ALARM_2_DAY_DATE;
     const uint8_t max_date = 31;
     bool status = false;
@@ -296,6 +298,8 @@ bool driverDS3234_SetAlarmDate(uint8_t date, uint8_t alarm_index)
 
 bool driverDS3234_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 {
+    sc_assert(alarm_index < 2);
+
     const uint8_t register_address = (alarm_index == 0) ? REG_ALARM_1_HOURS : REG_ALARM_2_HOURS;
     const bool is_24_hour_mode = driverDS3234_Is24HourMode();
     const uint8_t min_hour = is_24_hour_mode ? 0 : 1;
@@ -312,6 +316,8 @@ bool driverDS3234_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 
 bool driverDS3234_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
 {
+    sc_assert(alarm_index < 2);
+
     const uint8_t register_address = (alarm_index == 0) ? REG_ALARM_1_MINUTES : REG_ALARM_2_MINUTES;
     const uint8_t max_minute = 59;
     bool status = false;
