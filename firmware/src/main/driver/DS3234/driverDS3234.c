@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-12 (Last edit)
+ * @date   2021-01-13 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -450,7 +450,7 @@ static void SetDecimalRegisterValue(uint8_t address, uint8_t value)
 
 static inline bool IsSRAMParametersValid(uint8_t address, size_t length)
 {
-    return (size_t)address + length <= SRAM_SIZE;
+    return length <= SRAM_SIZE && (size_t)address + length <= SRAM_SIZE;
 }
 
 #ifdef DEBUG_ENABLE
