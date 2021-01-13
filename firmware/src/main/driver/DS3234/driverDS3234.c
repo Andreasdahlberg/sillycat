@@ -345,6 +345,8 @@ bool driverDS3234_SetAlarmSecond(uint8_t second)
 
 bool driverDS3234_WriteToSRAM(uint8_t address, const void *data_p, size_t length)
 {
+    sc_assert(data_p != NULL);
+
     bool status = false;
 
     if (IsSRAMParametersValid(address, length))
@@ -362,6 +364,8 @@ bool driverDS3234_WriteToSRAM(uint8_t address, const void *data_p, size_t length
 
 bool driverDS3234_ReadFromSRAM(uint8_t address, void *data_p, size_t length)
 {
+    sc_assert(data_p != NULL);
+
     bool status = false;
 
     if (IsSRAMParametersValid(address, length))
