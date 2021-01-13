@@ -1,7 +1,7 @@
 /**
  * @file   test_driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-12 (Last edit)
+ * @date   2021-01-13 (Last edit)
  * @brief  Test suite for the DS3234 RTC driver.
  */
 
@@ -33,6 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmocka.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "test_driverDS3234.h"
 #include "driverDS3234.h"
@@ -529,6 +530,254 @@ static void test_driverDS3234_SetAlarmDate(void **state)
     }
 }
 
+static void test_driverDS3234_SetAlarmHour_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverDS3234_SetAlarmHour(0, 2));
+    expect_assert_failure(driverDS3234_SetAlarmHour(UINT8_MAX, UINT8_MAX));
+}
+
+static void test_driverDS3234_SetAlarmHour_InvalidHour(void **state)
+{
+    const uint8_t max_alarm_index = 1;
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        /* 12 hour mode */
+        const uint8_t values_12[] = {0, 13, UINT8_MAX};
+        for (size_t i = 0; i < ElementsIn(values_12); ++i)
+        {
+            Set24HourMode(false);
+            assert_false(driverDS3234_SetAlarmHour(values_12[i], alarm_index));
+        }
+
+        /* 24 hour mode */
+        const uint8_t values_24[] = {24, UINT8_MAX};
+        for (size_t i = 0; i < ElementsIn(values_24); ++i)
+        {
+            Set24HourMode(true);
+            assert_false(driverDS3234_SetAlarmHour(values_24[i], alarm_index));
+        }
+    }
+}
+
+static void test_driverDS3234_SetAlarmHour(void **state)
+{
+    const uint8_t max_alarm_index = 1;
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        const uint8_t register_address = (alarm_index == 0) ? REG_ALARM_1_HOURS : REG_ALARM_2_HOURS;
+
+        /* 12 hour mode */
+        const uint8_t values_12[] = {1, 2, 6, 11, 12};
+        for (size_t i = 0; i < ElementsIn(values_12); ++i)
+        {
+            Set24HourMode(false);
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(values_12[i]));
+            assert_true(driverDS3234_SetAlarmHour(values_12[i], alarm_index));
+        }
+
+        /* 24 hour mode */
+        const uint8_t values_24[] = {0, 1, 12, 22, 23};
+        for (size_t i = 0; i < ElementsIn(values_24); ++i)
+        {
+            Set24HourMode(true);
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(values_24[i]));
+            assert_true(driverDS3234_SetAlarmHour(values_24[i], alarm_index));
+        }
+    }
+}
+
+static void test_driverDS3234_SetAlarmMinute_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverDS3234_SetAlarmMinute(0, 2));
+    expect_assert_failure(driverDS3234_SetAlarmMinute(UINT8_MAX, UINT8_MAX));
+}
+
+static void test_driverDS3234_SetAlarmMinute_InvalidMinute(void **state)
+{
+    const uint8_t values[] = {60, UINT8_MAX};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t minute = values[i];
+            assert_false(driverDS3234_SetAlarmMinute(minute, alarm_index));
+        }
+    }
+}
+
+static void test_driverDS3234_SetAlarmMinute(void **state)
+{
+    const uint8_t values[] = {0, 1, 30, 58, 59};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        const uint8_t register_address = (alarm_index == 0) ? REG_ALARM_1_MINUTES : REG_ALARM_2_MINUTES;
+
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t minute = values[i];
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(minute));
+            assert_true(driverDS3234_SetAlarmMinute(minute, alarm_index));
+        }
+    }
+}
+
+static void test_driverDS3234_SetAlarmSecond_InvalidSecond(void **state)
+{
+    const uint8_t values[] = {60, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t second = values[i];
+        assert_false(driverDS3234_SetAlarmSecond(second));
+    }
+
+}
+
+static void test_driverDS3234_SetAlarmSecond(void **state)
+{
+    const uint8_t values[] = {0, 1, 30, 58, 59};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t second = values[i];
+        ExpectWriteValueRegister(REG_ALARM_1_SECONDS, __wrap_DecimalToBCD(second));
+        assert_true(driverDS3234_SetAlarmSecond(second));
+    }
+}
+
+static void test_driverDS3234_WriteToSRAM_InvalidParameters(void **state)
+{
+    /* data_p */
+    expect_assert_failure(driverDS3234_WriteToSRAM(0, NULL, 0));
+
+    /* address and length */
+    const uint16_t sram_size = 256;
+    const uint8_t data[sram_size];
+    assert_false(driverDS3234_WriteToSRAM(0x00, &data, sram_size + 1));
+    assert_false(driverDS3234_WriteToSRAM(UINT8_MAX, &data, 2));
+    assert_false(driverDS3234_WriteToSRAM(0x81, &data, 128));
+    assert_false(driverDS3234_WriteToSRAM(UINT8_MAX, &data, SIZE_MAX));
+}
+
+static void test_driverDS3234_WriteToSRAM(void **state)
+{
+    const uint16_t sram_size = 256;
+    uint8_t data[sram_size];
+
+    for (size_t i = 0; i < sram_size; ++i)
+    {
+        data[i] = i;
+    }
+
+    /* Write zero bytes. */
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, 0x00);
+    assert_true(driverDS3234_WriteToSRAM(0x00, &data, 0));
+
+    /* Write one byte at the last available address. */
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, 0xFF);
+    ExpectWriteValueRegister(REG_SRAM_DATA, 0);
+    assert_true(driverDS3234_WriteToSRAM(0xFF, &data, 1));
+
+    /* Write to the entire SRAM in one call. */
+    uint8_t address = 0x00;
+    size_t length = sram_size;
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        ExpectWriteValueRegister(REG_SRAM_DATA, i);
+    }
+    assert_true(driverDS3234_WriteToSRAM(address, &data, length));
+
+    /* Write in the middle of the SRAM. */
+    address = 0x80;
+    length = 32;
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        ExpectWriteValueRegister(REG_SRAM_DATA, i);
+    }
+    assert_true(driverDS3234_WriteToSRAM(address, &data, length));
+}
+
+static void test_driverDS3234_ReadFromSRAM_InvalidParameters(void **state)
+{
+    /* data_p */
+    expect_assert_failure(driverDS3234_ReadFromSRAM(0, NULL, 0));
+
+    /* address and length */
+    const uint16_t sram_size = 256;
+    uint8_t data[sram_size];
+    assert_false(driverDS3234_ReadFromSRAM(0, &data, sram_size + 1));
+    assert_false(driverDS3234_ReadFromSRAM(UINT8_MAX, &data, 2));
+    assert_false(driverDS3234_ReadFromSRAM(129, &data, 128));
+    assert_false(driverDS3234_ReadFromSRAM(UINT8_MAX, &data, SIZE_MAX));
+}
+
+static void test_driverDS3234_ReadFromSRAM(void **state)
+{
+    /* address and length */
+    const uint16_t sram_size = 256;
+    uint8_t data[sram_size];
+
+    /* Read zero bytes. */
+    uint8_t address = 0x00;
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, address);
+    assert_true(driverDS3234_ReadFromSRAM(address, &data, 0));
+
+    /* Read one byte at the last available address. */
+    address = 0xFF;
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, address);
+    ExpectReadRegister(REG_SRAM_DATA, 0xAA);
+    assert_true(driverDS3234_ReadFromSRAM(address, &data, 1));
+    assert_int_equal(data[0], 0xAA);
+
+    /* Read the entire SRAM in one call. */
+    address = 0x00;
+    size_t length = sram_size;
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        ExpectReadRegister(REG_SRAM_DATA, i);
+    }
+    assert_true(driverDS3234_ReadFromSRAM(address, &data, length));
+    for (size_t i = 0; i < length; ++i)
+    {
+        assert_int_equal(data[i], i);
+    }
+
+    memset(&data, 0, sizeof(data));
+
+    /* Read from the middle of the SRAM. */
+    address = 0x80;
+    length = 32;
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        ExpectReadRegister(REG_SRAM_DATA, i);
+    }
+    assert_true(driverDS3234_ReadFromSRAM(address, &data, length));
+    for (size_t i = 0; i < length; ++i)
+    {
+        assert_int_equal(data[i], i);
+    }
+}
+
+static void test_driverDS3234_ClearSRAM(void **state)
+{
+    const uint16_t sram_size = 256;
+
+    ExpectWriteValueRegister(REG_SRAM_ADDRESS, 0x00);
+    for (size_t i = 0; i < sram_size; ++i)
+    {
+        ExpectWriteValueRegister(REG_SRAM_DATA, 0);
+    }
+    driverDS3234_ClearSRAM();
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -569,6 +818,19 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverDS3234_SetAlarmDate_InvalidIndex, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetAlarmDate_InvalidDate, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetAlarmDate, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmHour_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmHour_InvalidHour, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmHour, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmMinute_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmMinute_InvalidMinute, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmMinute, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmSecond_InvalidSecond, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAlarmSecond, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_WriteToSRAM_InvalidParameters, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_WriteToSRAM, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_ReadFromSRAM_InvalidParameters, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_ReadFromSRAM, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_ClearSRAM, Setup),
     };
 
     if (argc >= 2)
