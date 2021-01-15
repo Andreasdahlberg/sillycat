@@ -1,10 +1,8 @@
 FROM ubuntu:20.04
 
-RUN apt-get -y update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && apt-get -y install tzdata
 
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
-
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     gcc-avr \
     binutils-avr \
