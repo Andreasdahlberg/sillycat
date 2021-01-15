@@ -21,7 +21,7 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/common',
-    '#src/common/driver/MCP79510'
+    '#src/node/driver/MCP79510'
     ])
 
 env.Append(LINKFLAGS=[

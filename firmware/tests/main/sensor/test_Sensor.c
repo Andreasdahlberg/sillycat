@@ -1,7 +1,7 @@
 /**
  * @file   test_Sensor.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-21 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Test suite for the sensor module.
  */
 
@@ -168,10 +168,10 @@ static void test_Sensor_Register_CRCError(void **state)
     Sensor_Register(GetMockSensor(0));
 
     /**
-     * The current implementation of the 'driverMCP79510_ReadFromSRAM()' mock
-     * returns all zeros. But these values are not used if an CRC occurred.
-     * Therefore we can expect min and max to be set to their reset values
-     * instead of zero.
+     * The current implementation of the 'driverNVM_Read' mock returns all
+     * zeros. But these values are not used if an CRC occurred. Therefore
+     * we can expect min and max to be set to their reset values instead of
+     * zero.
      */
     int16_t value;
     assert_false(Sensor_GetMaxValue(GetMockSensor(0), &value));
@@ -200,7 +200,7 @@ static void test_Sensor_Update(void **state)
     Sensor_Update();
 
     expect_function_call(BasicMockUpdate);
-    expect_function_call(__wrap_driverMCP79510_WriteToSRAM);
+    expect_function_call(__wrap_driverNVM_Write);
     SetSensorValidFlag(GetMockSensor(1), true);
     Sensor_Update();
 }
@@ -212,7 +212,7 @@ static void test_Sensor_Update_Statistics(void **state)
      * Trigger a CRC error so that the values from SRAM are not used.
      */
     will_return_maybe(__wrap_CRC_16, 1);
-    ignore_function_calls(__wrap_driverMCP79510_WriteToSRAM);
+    ignore_function_calls(__wrap_driverNVM_Write);
 
     GetMockSensor(0)->Update = MockUpdate;
     Sensor_Register(GetMockSensor(0));
@@ -402,7 +402,7 @@ static void test_Sensor_GetMinValue_Value(void **state)
 static void test_Sensor_Reset(void **state)
 {
     will_return_maybe(__wrap_CRC_16, 0);
-    expect_function_call_any(__wrap_driverMCP79510_WriteToSRAM);
+    expect_function_call_any(__wrap_driverNVM_Write);
 
     SetSensorValidFlag(GetMockSensor(0), true);
     SetSensorStatisticsValidFlag(GetMockSensor(0), true);

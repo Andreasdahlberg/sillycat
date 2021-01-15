@@ -26,7 +26,8 @@ DIRECTORIES = [
     'board',
     'power',
     'driver/DHT22',
-    'driver/InputCapture'
+    'driver/InputCapture',
+    'driver/MCP79510'
 ]
 
 #Import all exported variables
@@ -38,11 +39,11 @@ env.Append(CPPPATH=[
     '#src/node/board',
     '#src/node/power',
     '#src/node/driver/DHT22',
+    '#src/node/driver/MCP79510'
     '#src/common',
     '#src/common/ADC',
     '#src/common/board',
     '#src/common/timer',
-    '#src/common/driver/MCP79510'
 ])
 
 source = Glob('*.c')
