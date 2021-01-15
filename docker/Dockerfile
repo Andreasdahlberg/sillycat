@@ -7,9 +7,9 @@ RUN apt-get update && apt-get install -y \
     gcc-avr \
     binutils-avr \
     avr-libc \
-    scons \
     python3 \
     python3-setuptools \
+    python3-pip \
     git \
     cmake \
     libfreetype6 \
@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
     unzip \
     gcovr \
     openjdk-11-jdk
+
+#Install SCons
+RUN python3 -m pip install scons
 
 # Install cmocka
 RUN git clone https://git.cryptomilk.org/projects/cmocka.git && \
