@@ -26,7 +26,7 @@ env.Append(CPPPATH=[
     '#src/common',
     '#src/common/event',
     '#src/common/debug',
-    '#src/common/driver/MCP79510'
+    '#src/common/driver/NVM'
 ])
 
 OBJECTS = env.Object(source=SOURCE)

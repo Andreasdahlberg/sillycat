@@ -1,8 +1,8 @@
 /**
- * @file   Board.h
+ * @file   mock_driverNVM.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-10 (Last edit)
- * @brief  Board support package for the main unit.
+ * @date   2020-01-19 (Last edit)
+ * @brief  Mock functions for the NVM driver.
  */
 
 /*
@@ -22,41 +22,19 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BOARD_H_
-#define BOARD_H_
+#ifndef WRAP_DRIVERNVM_H_
+#define WRAP_DRIVERNVM_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#include "commonBoard.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
-
-#define RTC_SPI_DDR     DDRB
-#define RTC_SPI_PORT    PORTB
-#define RTC_SPI_SS      DDB2
-#define RTC_SPI_MODE    1
-
-#define RTC_EXTERNAL_BATTERY true
-
-#define RFM69_SPI_DDR   DDRB
-#define RFM69_SPI_PORT  PORTB
-#define RFM69_SPI_SS    DDB6
-#define RFM69_SPI_MODE  0
-
-#define RFM69_RESET_DDR     DDRC
-#define RFM69_RESET_PORT    PORTC
-#define RFM69_RESET_PIN     DDC0
-
-#define PEC11_DDR           DDRB
-#define PEC11_PINR          PINB
-#define PEC11_PORT          PORTB
-#define PEC11_LATCH_PIN     DDB0
-#define PEC11_DATA_PIN      DDB1
-#define PEC11_BUTTON_PIN    DDB7
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -66,14 +44,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-/**
- * Initialize low level board hardware.
- */
-void Board_Init(void);
-
-/**
- * Initialize the pins required for the PEC11 rotary encoder.
- */
-void Board_PEC11_Init(void);
+bool __wrap_driverNVM_Write(size_t address, const void *data_p, size_t length);
+bool __wrap_driverNVM_Read(size_t address, void *data_p, size_t length);
 
 #endif

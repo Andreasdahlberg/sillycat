@@ -1,7 +1,7 @@
 /**
  * @file   libDebug.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-20 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Implementation of Debug-library.
  *
  * Detailed description of file.
@@ -97,7 +97,7 @@ void libDebug_Print_P(const char *text, ...)
     //Make sure that the output always is null terminated.
     buffer[OUT_BUFFER_SIZE - 1] = '\n';
 
-    UART_Write((uint8_t *)buffer, strlen(buffer));
+    UART_Write((uint8_t *)buffer, strnlen(buffer, sizeof(buffer)));
     va_end(args);
     return;
 }

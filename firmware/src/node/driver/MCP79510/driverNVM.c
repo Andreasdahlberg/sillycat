@@ -1,8 +1,8 @@
 /**
- * @file   RTC.c
+ * @file   driverNVM.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-16 (Last edit)
- * @brief  Implementation of RTC interface
+ * @date   2021-01-14 (Last edit)
+ * @brief  NVM driver interface.
  */
 
 /*
@@ -27,8 +27,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #include "common.h"
-#include "driverRTC.h"
-#include "RTC.h"
+#include "driverMCP79510.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -50,66 +49,18 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void RTC_Init(void)
+bool driverNVM_Write(size_t address, const void *data_p, size_t length)
 {
-    driverRTC_Init();
+    sc_assert(address <= UINT8_MAX);
+    sc_assert(length <= UINT8_MAX);
+    return driverMCP79510_WriteToSRAM((uint8_t)address, data_p, (uint8_t)length);
 }
 
-bool RTC_GetTimeStamp(uint32_t *timestamp_p)
+bool driverNVM_Read(size_t address, void *data_p, size_t length)
 {
-    sc_assert(timestamp_p != NULL);
-    struct time_t time;
-
-    if (RTC_GetCurrentTime(&time) == true)
-    {
-        *timestamp_p = Time_ConvertToTimestamp(&time);
-        return true;
-    }
-    return false;
-}
-
-bool RTC_GetCurrentTime(struct time_t *time_p)
-{
-    sc_assert(time_p != NULL);
-
-    driverRTC_GetYear(&time_p->year);
-    driverRTC_GetMonth(&time_p->month);
-    driverRTC_GetDate(&time_p->date);
-    driverRTC_GetHour(&time_p->hour);
-    driverRTC_GetMinute(&time_p->minute);
-    driverRTC_GetSecond(&time_p->second);
-    return true;
-}
-
-bool RTC_SetCurrentTime(const struct time_t *time_p)
-{
-    sc_assert(time_p != NULL);
-
-    return driverRTC_SetYear(time_p->year) &&
-           driverRTC_SetMonth(time_p->month) &&
-           driverRTC_SetDate(time_p->date) &&
-           driverRTC_SetHour(time_p->hour) &&
-           driverRTC_SetMinute(time_p->minute) &&
-           driverRTC_SetSecond(time_p->second);
-}
-
-bool RTC_SetAlarmTime(const struct time_t *time_p)
-{
-    sc_assert(time_p != NULL);
-
-    return driverRTC_SetAlarmHour(time_p->hour) &&
-           driverRTC_SetAlarmMinute(time_p->minute) &&
-           driverRTC_SetAlarmSecond(time_p->second);
-}
-
-void RTC_EnableAlarm(bool enable)
-{
-    driverRTC_EnableAlarm(enable);
-}
-
-void RTC_ClearAlarm(void)
-{
-    driverRTC_ClearAlarmFlag();
+    sc_assert(address <= UINT8_MAX);
+    sc_assert(length <= UINT8_MAX);
+    return driverMCP79510_ReadFromSRAM((uint8_t)address, data_p, (uint8_t)length);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,7 @@
 /**
  * @file   RTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2021-01-14 (Last edit)
  * @brief  Implementation of RTC interface
  */
 
@@ -29,17 +29,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define RTC_HAL
-
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-#ifdef RTC_HAL
-#include "RTC_HAL.h"
-#endif
-
 #include <stdbool.h>
+#include <stdint.h>
 #include "Time.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -50,7 +45,10 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-#ifdef RTC_HAL
+/**
+ * Initialize the RTC.
+ */
+void RTC_Init(void);
 
 /**
  * Get the number of seconds since midnight, January 1 2000, UTC.
@@ -87,6 +85,16 @@ bool RTC_SetCurrentTime(const struct time_t *time_p);
  * @return True if new alarm time was set successfully, otherwise false.
  */
 bool RTC_SetAlarmTime(const struct time_t *time_p);
-#endif
+
+/**
+ * Enable the alarm.
+ * @param enable
+ */
+void RTC_EnableAlarm(bool enable);
+
+/**
+ * Clear the alarm.
+ */
+void RTC_ClearAlarm(void);
 
 #endif

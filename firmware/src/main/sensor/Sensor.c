@@ -1,7 +1,7 @@
 /**
  * @file   Sensor.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-19 (Last edit)
+ * @date   2021-01-14 (Last edit)
  * @brief  Implementation of Sensor module
  *
  * Detailed description of file.
@@ -28,12 +28,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
-//NOTE: Include before all other headers
 #include "common.h"
 #include "Sensor.h"
 #include "CRC.h"
 #include "libDebug.h"
-#include "driverMCP79510.h"
+#include "driverNVM.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -70,8 +69,8 @@ static struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 static void SetSensorValues(struct sensor_t *self, int16_t value);
-static void WriteValuesToSRAM(const struct sensor_t *self);
-static void ReadValuesFromSRAM(struct sensor_t *self);
+static void WriteValuesToNVM(const struct sensor_t *self);
+static void ReadValuesFromNVM(struct sensor_t *self);
 static void ResetValues(struct sensor_t *self);
 static bool IsCRCValid(const struct sensor_statistics_t *statistics);
 static void UpdateCRC(struct sensor_statistics_t *statistics);
@@ -99,7 +98,7 @@ void Sensor_Update(void)
         if (Sensor_IsValid(module.sensors[i]))
         {
             SetSensorValues(module.sensors[i], module.sensors[i]->value);
-            WriteValuesToSRAM(module.sensors[i]);
+            WriteValuesToNVM(module.sensors[i]);
         }
     }
 }
@@ -112,11 +111,11 @@ void Sensor_Register(struct sensor_t *self)
     module.sensors[module.number_of_sensors] = self;
 
     // Assign a unique ID to the sensor so it's values can be located in
-    // SRAM later on.
+    // NVM later on.
     self->id = module.number_of_sensors;
 
     ResetValues(module.sensors[module.number_of_sensors]);
-    ReadValuesFromSRAM(module.sensors[module.number_of_sensors]);
+    ReadValuesFromNVM(module.sensors[module.number_of_sensors]);
 
     ++module.number_of_sensors;
 }
@@ -167,7 +166,7 @@ void Sensor_Reset(struct sensor_t *self)
     sc_assert(self != NULL);
 
     ResetValues(self);
-    WriteValuesToSRAM(self);
+    WriteValuesToNVM(self);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -193,7 +192,7 @@ static void SetSensorValues(struct sensor_t *self, int16_t value)
     self->statistics.valid = true;
 }
 
-static void WriteValuesToSRAM(const struct sensor_t *self)
+static void WriteValuesToNVM(const struct sensor_t *self)
 {
     uint8_t address = sizeof(struct sensor_statistics_t) * self->id;
 
@@ -203,15 +202,15 @@ static void WriteValuesToSRAM(const struct sensor_t *self)
     stats.valid = self->statistics.valid;
 
     UpdateCRC(&stats);
-    driverMCP79510_WriteToSRAM(address, &stats, sizeof(stats));
+    driverNVM_Write(address, &stats, sizeof(stats));
 }
 
-static void ReadValuesFromSRAM(struct sensor_t *self)
+static void ReadValuesFromNVM(struct sensor_t *self)
 {
     uint8_t address = sizeof(struct sensor_statistics_t) * self->id;
     struct sensor_statistics_t stats;
 
-    driverMCP79510_ReadFromSRAM(address, &stats, sizeof(stats));
+    driverNVM_Read(address, &stats, sizeof(stats));
 
     if (IsCRCValid(&stats))
     {

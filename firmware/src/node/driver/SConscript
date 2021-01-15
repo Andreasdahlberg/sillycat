@@ -19,7 +19,7 @@ import os
 
 Import(['*'])
 
-DRIVERS = ['DHT22', 'InputCapture']
+DRIVERS = ['DHT22', 'InputCapture', 'MCP79510']
 DRIVER_OBJECTS = []
 
 for driver in DRIVERS:
