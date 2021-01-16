@@ -1,7 +1,7 @@
 /**
  * @file   common.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Header of common functions
  *
  * Detailed description of file.
@@ -72,6 +72,6 @@ struct div_t
 
 struct div_t Divide(int32_t numerator, int32_t denominator);
 uint8_t BCDToDecimal(uint8_t bcd_data);
-uint16_t DecimalToBCD(uint8_t decimal_data);
+uint8_t DecimalToBCD(uint8_t decimal_data);
 
 #endif

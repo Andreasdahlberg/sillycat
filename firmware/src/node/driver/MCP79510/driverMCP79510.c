@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-12 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 

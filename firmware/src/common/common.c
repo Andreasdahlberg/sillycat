@@ -1,7 +1,7 @@
 /**
  * @file   common.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-01-27 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Implementation of common functions
  *
  * Detailed description of file.
@@ -77,7 +77,7 @@ uint8_t BCDToDecimal(uint8_t bcd_data)
     return data;
 }
 
-uint16_t DecimalToBCD(uint8_t decimal_data)
+uint8_t DecimalToBCD(uint8_t decimal_data)
 {
     uint16_t data = 0;
     uint8_t shift = 0;
@@ -90,7 +90,7 @@ uint16_t DecimalToBCD(uint8_t decimal_data)
     }
     while (decimal_data > 0);
 
-    return data;
+    return (uint8_t)data;
 }
 
 //////////////////////////////////////////////////////////////////////////

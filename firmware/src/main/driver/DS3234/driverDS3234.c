@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-13 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -137,7 +137,7 @@ bool driverDS3234_SetMonth(uint8_t month)
     if (month > 0 && month < max_month)
     {
         uint8_t register_data = ReadRegister(REG_MONTH_CENTURY);
-        register_data = ((register_data & 0x80) | (uint8_t)DecimalToBCD(month));
+        register_data = ((register_data & 0x80) | DecimalToBCD(month));
 
         WriteRegister(REG_MONTH_CENTURY, register_data);
         status = true;
@@ -444,7 +444,7 @@ static void SetDecimalRegisterValue(uint8_t address, uint8_t value)
     /* Only values less then 100 is accepted since a byte can only hold two-digits of BCD data. */
     sc_assert(value < 100);
 
-    uint8_t register_data = (uint8_t)DecimalToBCD(value);
+    uint8_t register_data = DecimalToBCD(value);
     WriteRegister(address, register_data);
 }
 
