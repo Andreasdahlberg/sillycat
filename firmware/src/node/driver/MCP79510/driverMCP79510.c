@@ -472,7 +472,7 @@ bool driverMCP79510_IsOscillatorRunning(void)
 
 void driverMCP79510_SetOscillatorTrimming(int16_t trim_value)
 {
-    const uint8_t reg_trim_value = abs(trim_value) > UINT8_MAX ? UINT8_MAX : abs(trim_value);
+    const uint8_t reg_trim_value = abs(trim_value) > UINT8_MAX ? UINT8_MAX : (uint8_t)abs(trim_value);
     WriteRegister(REG_TC_OSCTRIM, reg_trim_value);
 
     uint8_t register_content;
