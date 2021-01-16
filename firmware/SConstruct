@@ -80,7 +80,7 @@ avr_cppdefines = {
 }
 
 common_env = Environment(
-    tools=['avr', 'font'],
+    tools=['avr', 'font', 'compilation_db'],
     CC = 'avr-gcc',
     variables = mcu_vars,
     CCFLAGS = avr_ccflags,
@@ -88,7 +88,7 @@ common_env = Environment(
 )
 
 test_env = Environment(
-    tools=['default', 'coverage'],
+    tools=['default', 'coverage', 'compilation_db'],
     CC='gcc',
     CCFLAGS=['-g', '-O0', '-std=c11'],
     CPPDEFINES='UNIT_TESTING',
@@ -160,6 +160,12 @@ for target in TARGETS:
         Help(size_help_text)
 
         Help('\n')
+
+
+Help('Utils:\n')
+compdb = common_env.CompilationDatabase()
+Alias('compdb', compdb)
+Help('    compdb: Generate a compilation database.\n')
 
 def add_test(module_under_test, mocks):
     unit_env = test_env.Clone()
@@ -243,3 +249,4 @@ test_env.Alias('build-tests', tests)
 test_env.Coverage(source=tests, target='coverage')
 
 env.Command("format", None, get_astyle_command())
+Help('    format: Format all source files.\n')

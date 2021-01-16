@@ -1,17 +1,15 @@
 FROM ubuntu:20.04
 
-RUN apt-get -y update
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && apt-get -y install tzdata
 
-RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
-
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     gcc-avr \
     binutils-avr \
     avr-libc \
-    scons \
     python3 \
     python3-setuptools \
+    python3-pip \
     git \
     cmake \
     libfreetype6 \
@@ -22,6 +20,9 @@ RUN apt-get install -y \
     unzip \
     gcovr \
     openjdk-11-jdk
+
+#Install SCons
+RUN python3 -m pip install scons
 
 # Install cmocka
 RUN git clone https://git.cryptomilk.org/projects/cmocka.git && \
@@ -43,12 +44,14 @@ RUN wget http://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip && \
     rm build-wrapper-linux-x86.zip
 
 # Download SonarScanner and install
-RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip && \
-    unzip sonar-scanner-cli-3.3.0.1492-linux.zip && \
-    rm sonar-scanner-cli-3.3.0.1492-linux.zip && \
-    mv sonar-scanner-3.3.0.1492-linux /usr/lib/sonar-scanner && \
+RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.4.0.2170-linux.zip && \
+    unzip sonar-scanner-cli-4.4.0.2170-linux.zip && \
+    rm sonar-scanner-cli-4.4.0.2170-linux.zip && \
+    mv sonar-scanner-4.4.0.2170-linux /usr/lib/sonar-scanner && \
     ln -s /usr/lib/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
 ENV SONAR_RUNNER_HOME=/usr/lib/sonar-scanner
 
 COPY sonar-scanner.properties /usr/lib/sonar-scanner/conf/sonar-scanner.properties
+
+
