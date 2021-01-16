@@ -1,7 +1,7 @@
 /**
  * @file   test_driverDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-10 (Last edit)
+ * @date   2021-01-16 (Last edit)
  * @brief  Test suite for the DS3234 RTC driver.
  */
 
@@ -44,6 +44,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 uint8_t __wrap_BCDToDecimal(uint8_t bcd_data);
-uint16_t __wrap_DecimalToBCD(uint8_t decimal_data);
+uint8_t __wrap_DecimalToBCD(uint8_t decimal_data);
 
 #endif
