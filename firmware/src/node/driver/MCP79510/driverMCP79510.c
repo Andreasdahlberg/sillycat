@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-16 (Last edit)
+ * @date   2021-01-17 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -233,25 +233,18 @@ void driverMCP79510_GetHour(uint8_t *hour_p)
 
 bool driverMCP79510_SetHour(uint8_t hour)
 {
+    const bool is_24_hour_mode = driverMCP79510_Is24HourMode();
+    const uint8_t min_hour = is_24_hour_mode ? 0 : 1;
+    const uint8_t max_hour = is_24_hour_mode ? 23 : 12;
     bool status = false;
 
-    //TODO: check after hour mode is known?
-    if (hour < 24)
+    if (hour >= min_hour && hour <= max_hour)
     {
+        const uint8_t clear_mask = is_24_hour_mode ? 0xC0 : 0xE0;
         uint8_t register_content = ReadRegister(REG_TC_HOUR);
-        uint8_t new_content;
 
-        //Check if 24-hour mode is used.
-        if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
-        {
-            new_content = (register_content & 0xC0) | DecimalToBCD(hour);
-        }
-        else
-        {
-            new_content = (register_content & 0xE0) | DecimalToBCD(hour);
-        }
-
-        WriteRegister(REG_TC_HOUR, new_content);
+        register_content = (register_content & clear_mask) | DecimalToBCD(hour);
+        WriteRegister(REG_TC_HOUR, register_content);
         status = true;
     }
 
@@ -262,29 +255,22 @@ bool driverMCP79510_SetAlarmHour(uint8_t hour, uint8_t alarm_index)
 {
     sc_assert(alarm_index < 2);
 
+    const bool is_24_hour_mode = driverMCP79510_Is24HourMode();
+    const uint8_t min_hour = is_24_hour_mode ? 0 : 1;
+    const uint8_t max_hour = is_24_hour_mode ? 23 : 12;
     bool status = false;
 
-    //TODO: check after hour mode is known?
-    if (hour < 24)
+    if (hour >= min_hour && hour <= max_hour)
     {
-        uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_HOUR :
-                                   REG_ALARM1_HOUR;
+        const uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_HOUR : REG_ALARM1_HOUR;
+        const uint8_t clear_mask = is_24_hour_mode ? 0xC0 : 0xE0;
         uint8_t register_content = ReadRegister(register_address);
-        uint8_t new_content;
 
-        //Check if 24-hour mode is used.
-        if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
-        {
-            new_content = (register_content & 0xC0) | DecimalToBCD(hour);
-        }
-        else
-        {
-            new_content = (register_content & 0xE0) | DecimalToBCD(hour);
-        }
-
-        WriteRegister(register_address, new_content);
+        register_content = (register_content & clear_mask) | DecimalToBCD(hour);
+        WriteRegister(register_address, register_content);
         status = true;
     }
+
     return status;
 }
 

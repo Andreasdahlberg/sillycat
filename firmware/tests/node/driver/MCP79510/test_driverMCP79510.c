@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-16 (Last edit)
+ * @date   2021-01-17 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -66,6 +66,7 @@ static void ExpectEnableSquareWave(void);
 static void ExpectEnableOscillator(void);
 static void ExpectSetOscillatorTrimming(void);
 static void ExpectIsOscillatorRunning(void);
+static void Set24HourMode(bool enabled);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -150,6 +151,12 @@ static void ExpectIsOscillatorRunning(void)
     ExpectReadRegister(REG_TC_DAY, 0xFF);
 }
 
+static void Set24HourMode(bool enabled)
+{
+    const uint8_t register_data = ((!(uint8_t)enabled) << REG_TC_HOUR_MODE_BIT);
+    ExpectReadRegister(REG_TC_HOUR, register_data);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
@@ -221,30 +228,39 @@ static void test_driverMCP79510_SetAlarmHundredthSecond(void **state)
 
 static void test_driverMCP79510_SetHour_Invalid(void **state)
 {
-    const uint8_t values[] = {24, 25, UINT8_MAX};
-
-    for (size_t i = 0; i < ElementsIn(values); ++i)
+    const uint8_t values_12[] = {0, 13, UINT8_MAX};
+    for (size_t i = 0; i < ElementsIn(values_12); ++i)
     {
-        assert_false(driverMCP79510_SetHour(values[i]));
+        Set24HourMode(false);
+        assert_false(driverMCP79510_SetHour(values_12[i]));
+    }
+
+    const uint8_t values_24[] = {24, UINT8_MAX};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        Set24HourMode(true);
+        assert_false(driverMCP79510_SetHour(values_24[i]));
     }
 }
 
 static void test_driverMCP79510_SetHour(void **state)
 {
-    const uint8_t values_24[] = {0, 1, 12, 22, 23};
-    for (size_t i = 0; i < ElementsIn(values_24); ++i)
-    {
-        ExpectReadRegister(REG_TC_HOUR, 0x80);
-        ExpectWriteValueRegister(REG_TC_HOUR, 0x80 | __wrap_DecimalToBCD(values_24[i]));
-        assert_true(driverMCP79510_SetHour(values_24[i]));
-    }
-
-    const uint8_t values_12[] = {0, 1, 6, 10, 11};
+    const uint8_t values_12[] = {1, 2, 6, 11, 12};
     for (size_t i = 0; i < ElementsIn(values_12); ++i)
     {
+        Set24HourMode(false);
         ExpectReadRegister(REG_TC_HOUR, 0xE0);
         ExpectWriteValueRegister(REG_TC_HOUR, 0xE0 | __wrap_DecimalToBCD(values_12[i]));
         assert_true(driverMCP79510_SetHour(values_12[i]));
+    }
+
+    const uint8_t values_24[] = {0, 1, 12, 22, 23};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        Set24HourMode(true);
+        ExpectReadRegister(REG_TC_HOUR, 0x80);
+        ExpectWriteValueRegister(REG_TC_HOUR, 0x80 | __wrap_DecimalToBCD(values_24[i]));
+        assert_true(driverMCP79510_SetHour(values_24[i]));
     }
 }
 
@@ -260,30 +276,49 @@ static void test_driverMCP79510_SetAlarmHour_InvalidIndex(void **state)
 
 static void test_driverMCP79510_SetAlarmHour_InvalidHour(void **state)
 {
-    const uint8_t values[] = {24, 25, UINT8_MAX};
-
-    for (size_t i = 0; i < ElementsIn(values); ++i)
+    const uint8_t max_alarm_index = 1;
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
     {
-        assert_false(driverMCP79510_SetAlarmHour(values[i], 0));
+        const uint8_t values_12[] = {0, 13, UINT8_MAX};
+        for (size_t i = 0; i < ElementsIn(values_12); ++i)
+        {
+            Set24HourMode(false);
+            assert_false(driverMCP79510_SetAlarmHour(values_12[i], alarm_index));
+        }
+
+        const uint8_t values_24[] = {24, UINT8_MAX};
+        for (size_t i = 0; i < ElementsIn(values_24); ++i)
+        {
+            Set24HourMode(true);
+            assert_false(driverMCP79510_SetAlarmHour(values_24[i], alarm_index));
+        }
     }
 }
 
 static void test_driverMCP79510_SetAlarmHour(void **state)
 {
-    const uint8_t values_24[] = {0, 1, 12, 22, 23};
-    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    const uint8_t max_alarm_index = 1;
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
     {
-        ExpectReadRegister(REG_ALARM0_HOUR, 0x80);
-        ExpectWriteValueRegister(REG_ALARM0_HOUR, 0x80 | __wrap_DecimalToBCD(values_24[i]));
-        assert_true(driverMCP79510_SetAlarmHour(values_24[i], 0));
-    }
+        const uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_HOUR : REG_ALARM1_HOUR;
 
-    const uint8_t values_12[] = {0, 1, 6, 10, 11};
-    for (size_t i = 0; i < ElementsIn(values_12); ++i)
-    {
-        ExpectReadRegister(REG_ALARM1_HOUR, 0xE0);
-        ExpectWriteValueRegister(REG_ALARM1_HOUR, 0xE0 | __wrap_DecimalToBCD(values_12[i]));
-        assert_true(driverMCP79510_SetAlarmHour(values_12[i], 1));
+        const uint8_t values_12[] = {1, 2, 6, 11, 12};
+        for (size_t i = 0; i < ElementsIn(values_12); ++i)
+        {
+            Set24HourMode(false);
+            ExpectReadRegister(register_address, 0xE0);
+            ExpectWriteValueRegister(register_address, 0xE0 | __wrap_DecimalToBCD(values_12[i]));
+            assert_true(driverMCP79510_SetAlarmHour(values_12[i], alarm_index));
+        }
+
+        const uint8_t values_24[] = {0, 1, 12, 22, 23};
+        for (size_t i = 0; i < ElementsIn(values_24); ++i)
+        {
+            Set24HourMode(true);
+            ExpectReadRegister(register_address, 0x80);
+            ExpectWriteValueRegister(register_address, 0x80 | __wrap_DecimalToBCD(values_24[i]));
+            assert_true(driverMCP79510_SetAlarmHour(values_24[i], alarm_index));
+        }
     }
 }
 
