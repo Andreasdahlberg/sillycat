@@ -567,16 +567,16 @@ void driverMCP79510_ClearSRAM(void)
     libSPI_WriteByte(0x00, NULL, module.PostSPI); //Dummy byte
 }
 
-void driverMCP79510_GetEUI(uint8_t *eui, size_t length)
+void driverMCP79510_GetEUI(uint8_t *eui_p, size_t length)
 {
     sc_assert(length <= EUI_MAX_SIZE);
 
     libSPI_WriteByte(INST_IDREAD, module.PreSPI, NULL);
-    libSPI_WriteByte(EUI_MAX_SIZE - length, NULL, NULL);
+    libSPI_WriteByte((uint8_t)(EUI_MAX_SIZE - length), NULL, NULL);
 
     for (uint8_t i = 0; i < length; ++i)
     {
-        libSPI_ReadByte(&eui[i], NULL, NULL);
+        libSPI_ReadByte(&eui_p[i], NULL, NULL);
     }
 
     module.PostSPI();
