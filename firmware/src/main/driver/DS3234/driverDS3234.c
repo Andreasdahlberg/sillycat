@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-16 (Last edit)
+ * @date   2021-01-17 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -66,6 +66,7 @@ static void SetBit(uint8_t register_address, uint8_t bit_index);
 static void GetDecimalRegisterValue(uint8_t address, uint8_t *value_p);
 static void SetDecimalRegisterValue(uint8_t address, uint8_t value);
 static inline bool IsSRAMParametersValid(uint8_t address, size_t length);
+static inline void SetDefaultAlarmMask(void);
 
 #ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void) __attribute__((unused));
@@ -264,7 +265,7 @@ void driverDS3234_EnableAlarm(bool enable, uint8_t alarm_index)
 
     if (enable == true)
     {
-        WriteRegister(REG_ALARM_1_DAY_DATE, 0x80); //TODO: What is this?
+        SetDefaultAlarmMask();
         SetBit(REG_CONTROL, alarm_index);
     }
     else
@@ -451,6 +452,12 @@ static void SetDecimalRegisterValue(uint8_t address, uint8_t value)
 static inline bool IsSRAMParametersValid(uint8_t address, size_t length)
 {
     return length <= SRAM_SIZE && (size_t)address + length <= SRAM_SIZE;
+}
+
+static inline void SetDefaultAlarmMask(void)
+{
+    /* Alarm when hours, minutes, and seconds match */
+    WriteRegister(REG_ALARM_1_DAY_DATE, 0x80);
 }
 
 #ifdef DEBUG_ENABLE
