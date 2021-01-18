@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-17 (Last edit)
+ * @date   2021-01-18 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -223,6 +223,165 @@ static void test_driverMCP79510_SetAlarmHundredthSecond(void **state)
     {
         ExpectWriteValueRegister(REG_ALARM1_SEC_CENT, __wrap_DecimalToBCD(values[i]));
         assert_true(driverMCP79510_SetAlarmHundredthSecond(values[i]));
+    }
+}
+
+static void test_driverMCP79510_GetSecond(void **state)
+{
+    const uint8_t expect_values[] = {0, 1, 30, 58, 59};
+
+    for (size_t i = 0; i < ElementsIn(expect_values); ++i)
+    {
+        const uint8_t oscillator_enabled = (1 << REG_TC_SEC_OSC_BIT);
+        ExpectReadRegister(REG_TC_SEC, oscillator_enabled | __wrap_DecimalToBCD(expect_values[i]));
+
+        uint8_t result = 0;
+        driverMCP79510_GetSecond(&result);
+        assert_int_equal(result, expect_values[i]);
+    }
+}
+
+static void test_driverMCP79510_SetSecond_Invalid(void **state)
+{
+    const uint8_t values[] = {60, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverMCP79510_SetSecond(values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetSecond(void **state)
+{
+    const uint8_t values[] = {0, 1, 30, 58, 59};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t value = values[i];
+
+        ExpectReadRegister(REG_TC_SEC, 0x00);
+        ExpectWriteValueRegister(REG_TC_SEC, __wrap_DecimalToBCD(value));
+        assert_true(driverMCP79510_SetSecond(value));
+    }
+
+    /* Check if the oscillator bit is handled correctly. */
+    const uint8_t oscillator_enabled = (1 << REG_TC_SEC_OSC_BIT);
+    ExpectReadRegister(REG_TC_SEC, oscillator_enabled);
+    ExpectWriteValueRegister(REG_TC_SEC, oscillator_enabled | __wrap_DecimalToBCD(values[1]));
+    assert_true(driverMCP79510_SetSecond(values[1]));
+}
+
+static void test_driverMCP79510_SetAlarmSecond_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverMCP79510_SetAlarmSeconds(0, 2));
+    expect_assert_failure(driverMCP79510_SetAlarmSeconds(UINT8_MAX, UINT8_MAX));
+}
+
+static void test_driverMCP79510_SetAlarmSecond_InvalidSecond(void **state)
+{
+    const uint8_t values[] = {60, UINT8_MAX};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t second = values[i];
+            assert_false(driverMCP79510_SetAlarmSeconds(second, alarm_index));
+        }
+    }
+}
+
+static void test_driverMCP79510_SetAlarmSecond(void **state)
+{
+    const uint8_t values[] = {0, 1, 30, 58, 59};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_SEC : REG_ALARM1_SEC;
+            const uint8_t value = values[i];
+
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(value));
+            assert_true(driverMCP79510_SetAlarmSeconds(value, alarm_index));
+        }
+    }
+}
+
+static void test_driverMCP79510_GetMinute(void **state)
+{
+    const uint8_t expect_values[] = {0, 1, 30, 58, 59};
+
+    for (size_t i = 0; i < ElementsIn(expect_values); ++i)
+    {
+        ExpectReadRegister(REG_TC_MIN, __wrap_DecimalToBCD(expect_values[i]));
+
+        uint8_t result = 0;
+        driverMCP79510_GetMinute(&result);
+        assert_int_equal(result, expect_values[i]);
+    }
+}
+
+static void test_driverMCP79510_SetMinute_Invalid(void **state)
+{
+    const uint8_t values[] = {60, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverMCP79510_SetMinute(values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetMinute(void **state)
+{
+    const uint8_t values[] = {0, 1, 30, 58, 59};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t value = values[i];
+
+        ExpectWriteValueRegister(REG_TC_MIN, __wrap_DecimalToBCD(value));
+        assert_true(driverMCP79510_SetMinute(value));
+    }
+}
+
+static void test_driverMCP79510_SetAlarmMinute_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverMCP79510_SetAlarmMinute(0, 2));
+    expect_assert_failure(driverMCP79510_SetAlarmMinute(UINT8_MAX, UINT8_MAX));
+}
+
+static void test_driverMCP79510_SetAlarmMinute_InvalidMinute(void **state)
+{
+    const uint8_t values[] = {60, UINT8_MAX};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            assert_false(driverMCP79510_SetAlarmMinute(values[i], alarm_index));
+        }
+    }
+}
+
+static void test_driverMCP79510_SetAlarmMinute(void **state)
+{
+    const uint8_t values[] = {0, 1, 30, 58, 59};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_MIN : REG_ALARM1_MIN;
+            const uint8_t value = values[i];
+
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(value));
+            assert_true(driverMCP79510_SetAlarmMinute(value, alarm_index));
+        }
     }
 }
 
@@ -556,6 +715,18 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHundredthSecond_Invalid, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHundredthSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetSecond_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmSecond_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmSecond_InvalidSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmSecond, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetMinute, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetMinute_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetMinute, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmMinute_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmMinute_InvalidMinute, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmMinute, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetHour_Invalid, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetHour, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour_InvalidIndex, Setup),
