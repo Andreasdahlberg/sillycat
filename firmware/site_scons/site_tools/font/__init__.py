@@ -24,7 +24,7 @@ __author__ = 'andreas.dahlberg90@gmail.com (Andreas Dahlberg)'
 __version__ = '0.1.0'
 
 
-class FontGeneratorNotFound(SCons.Warnings.Warning):
+class FontGeneratorNotFound(SCons.Warnings.SConsWarning):
     pass
 
 
