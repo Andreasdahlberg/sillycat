@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-18 (Last edit)
+ * @date   2021-01-19 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -523,6 +523,125 @@ static void test_driverMCP79510_GetHour_24(void **state)
     }
 }
 
+static void test_driverMCP79510_GetDay(void **state)
+{
+    const uint8_t expect_values[] = {1, 2, 4, 6, 7};
+
+    for (size_t i = 0; i < ElementsIn(expect_values); ++i)
+    {
+        const uint8_t flags = (1 << REG_TC_DAY_OSCRUN_BIT) |
+                              (1 << REG_TC_DAY_PWRFAIL_BIT) |
+                              (1 << REG_TC_DAY_VBATEN_BIT);
+
+        ExpectReadRegister(REG_TC_DAY, flags | __wrap_DecimalToBCD(expect_values[i]));
+
+        uint8_t result = 0;
+        driverMCP79510_GetDay(&result);
+        assert_int_equal(result, expect_values[i]);
+    }
+}
+
+static void test_driverMCP79510_SetDay_Invalid(void **state)
+{
+    const uint8_t values[] = {0, 8, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverMCP79510_SetDay(values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetDay(void **state)
+{
+    const uint8_t values[] = {1, 2, 4, 6, 7};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t value = values[i];
+        const uint8_t flags = (1 << REG_TC_DAY_OSCRUN_BIT) | (1 << REG_TC_DAY_VBATEN_BIT);
+
+        ExpectReadRegister(REG_TC_DAY, flags | i);
+
+        ExpectWriteValueRegister(REG_TC_DAY, flags | __wrap_DecimalToBCD(value));
+        assert_true(driverMCP79510_SetDay(value));
+    }
+}
+
+static void test_driverMCP79510_GetDate(void **state)
+{
+    const uint8_t expect_values[] = {1, 2, 15, 30, 31};
+
+    for (size_t i = 0; i < ElementsIn(expect_values); ++i)
+    {
+        ExpectReadRegister(REG_TC_DATE, __wrap_DecimalToBCD(expect_values[i]));
+
+        uint8_t result = 0;
+        driverMCP79510_GetDate(&result);
+        assert_int_equal(result, expect_values[i]);
+    }
+}
+
+static void test_driverMCP79510_SetDate_Invalid(void **state)
+{
+    const uint8_t values[] = {0, 32, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        assert_false(driverMCP79510_SetDate(values[i]));
+    }
+}
+
+static void test_driverMCP79510_SetDate(void **state)
+{
+    const uint8_t values[] = {1, 2, 15, 30, 31};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        const uint8_t value = values[i];
+
+        ExpectWriteValueRegister(REG_TC_DATE, __wrap_DecimalToBCD(value));
+        assert_true(driverMCP79510_SetDate(value));
+    }
+}
+
+static void test_driverMCP79510_SetAlarmDate_InvalidIndex(void **state)
+{
+    expect_assert_failure(driverMCP79510_SetAlarmDate(0, 2));
+    expect_assert_failure(driverMCP79510_SetAlarmDate(UINT8_MAX, UINT8_MAX));
+}
+
+static void test_driverMCP79510_SetAlarmDate_InvalidDate(void **state)
+{
+    const uint8_t values[] = {0, 32, UINT8_MAX};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            assert_false(driverMCP79510_SetAlarmDate(values[i], alarm_index));
+        }
+    }
+}
+
+static void test_driverMCP79510_SetAlarmDate(void **state)
+{
+    const uint8_t values[] = {1, 2, 15, 30, 31};
+    const uint8_t max_alarm_index = 1;
+
+    for (uint8_t alarm_index = 0; alarm_index <= max_alarm_index; ++alarm_index)
+    {
+        for (size_t i = 0; i < ElementsIn(values); ++i)
+        {
+            const uint8_t register_address = (alarm_index == 0) ? REG_ALARM0_DATE : REG_ALARM1_DATE;
+            const uint8_t value = values[i];
+
+            ExpectWriteValueRegister(register_address, __wrap_DecimalToBCD(value));
+            assert_true(driverMCP79510_SetAlarmDate(value, alarm_index));
+        }
+    }
+}
+
 static void test_driverMCP79510_Is24HourMode(void **state)
 {
     ExpectReadRegister(REG_TC_HOUR, 0x00);
@@ -732,6 +851,15 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour_InvalidIndex, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour_InvalidHour, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetAlarmHour, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetDay, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetDay_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetDay, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetDate, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetDate_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetDate, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmDate_InvalidIndex, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmDate_InvalidDate, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetAlarmDate, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_Is24HourMode, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_IsLeapYear, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_EnableAlarm_InvalidIndex, Setup),
