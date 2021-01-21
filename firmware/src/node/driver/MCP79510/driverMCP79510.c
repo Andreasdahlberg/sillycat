@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-17 (Last edit)
+ * @date   2021-01-21 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -141,14 +141,16 @@ void driverMCP79510_GetSecond(uint8_t *sec_p)
 
 bool driverMCP79510_SetSecond(uint8_t sec)
 {
+    const uint8_t max_second = 59;
     bool status = false;
 
-    if (sec < 60)
+    if (sec <= max_second)
     {
         uint8_t register_content;
         register_content = ReadRegister(REG_TC_SEC);
 
-        WriteRegister(REG_TC_SEC, DecimalToBCD(sec) | (register_content & 0x80));
+        const uint8_t oscillator_mask = (1 << REG_TC_SEC_OSC_BIT);
+        WriteRegister(REG_TC_SEC, DecimalToBCD(sec) | (register_content & oscillator_mask));
 
         status = true;
     }
@@ -340,7 +342,7 @@ void driverMCP79510_GetMonth(uint8_t *month_p)
 {
     uint8_t register_content;
     register_content = ReadRegister(REG_TC_MONTH);
-    register_content &= 0x1F;
+    register_content &= ~(1 << REG_TC_MONTH_LPYR_BIT);
 
     *month_p = BCDToDecimal(register_content);
 }
@@ -351,10 +353,8 @@ bool driverMCP79510_SetMonth(uint8_t month)
 
     if (month > 0 && month < 13)
     {
-        uint8_t register_content;
-        register_content = ReadRegister(REG_TC_MONTH);
-
-        WriteRegister(REG_TC_MONTH, DecimalToBCD(month) | (register_content & 0xE0));
+        uint8_t register_content = ReadRegister(REG_TC_MONTH);
+        WriteRegister(REG_TC_MONTH, DecimalToBCD(month) | (register_content & (1 << REG_TC_MONTH_LPYR_BIT)));
         status = true;
     }
 
@@ -521,6 +521,7 @@ void driverMCP79510_ClearAlarmFlag(uint8_t alarm_index)
 bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
                                 uint8_t length)
 {
+    sc_assert(data_p != NULL);
     bool status = false;
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
@@ -541,6 +542,7 @@ bool driverMCP79510_WriteToSRAM(uint8_t address, const void *data_p,
 
 bool driverMCP79510_ReadFromSRAM(uint8_t address, void *data_p, uint8_t length)
 {
+    sc_assert(data_p != NULL);
     bool status = false;
 
     if ((uint16_t)address + (uint16_t)length <= SRAM_SIZE)
@@ -569,6 +571,7 @@ void driverMCP79510_ClearSRAM(void)
 
 void driverMCP79510_GetEUI(uint8_t *eui_p, size_t length)
 {
+    sc_assert(eui_p != NULL);
     sc_assert(length <= EUI_MAX_SIZE);
 
     libSPI_WriteByte(INST_IDREAD, module.PreSPI, NULL);
