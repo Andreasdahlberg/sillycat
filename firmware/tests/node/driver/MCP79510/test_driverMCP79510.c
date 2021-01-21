@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-20 (Last edit)
+ * @date   2021-01-21 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -33,6 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmocka.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "test_driverMCP79510.h"
 #include "driverMCP79510.h"
@@ -62,6 +63,8 @@ static void ExpectWriteRegister(uint8_t address);
 static void ExpectWriteValueRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegister(uint8_t address, uint8_t data);
 static void ExpectModifyRegister(uint8_t address);
+static void ExpectWriteSRAM(uint8_t address);
+static void ExpectReadSRAM(uint8_t address);
 static void ExpectEnableSquareWave(void);
 static void ExpectEnableOscillator(void);
 static void ExpectSetOscillatorTrimming(void);
@@ -123,6 +126,18 @@ static void ExpectModifyRegister(uint8_t address)
 {
     ExpectReadRegister(address, 0);
     ExpectWriteRegister(address);
+}
+
+static void ExpectWriteSRAM(uint8_t address)
+{
+    expect_value(__wrap_libSPI_WriteByte, data, INST_WRITE);
+    expect_value(__wrap_libSPI_WriteByte, data, SRAM_ADDRESS + address);
+}
+
+static void ExpectReadSRAM(uint8_t address)
+{
+    expect_value(__wrap_libSPI_WriteByte, data, INST_READ);
+    expect_value(__wrap_libSPI_WriteByte, data, SRAM_ADDRESS + address);
 }
 
 static void ExpectEnableSquareWave(void)
@@ -934,6 +949,176 @@ static void test_driverMCP79510_SetOscillatorTrimming_Positive(void **state)
     }
 }
 
+static void test_driverMCP79510_WriteToSRAM_InvalidParameters(void **state)
+{
+    /* data_p */
+    expect_assert_failure(driverMCP79510_WriteToSRAM(0, NULL, 0));
+
+    /* address and length */
+    const uint16_t sram_size = 64;
+    const uint8_t data[sram_size];
+    assert_false(driverMCP79510_WriteToSRAM(0x00, &data, sram_size + 1));
+    assert_false(driverMCP79510_WriteToSRAM(UINT8_MAX, &data, 2));
+    assert_false(driverMCP79510_WriteToSRAM(0x21, &data, 32));
+    assert_false(driverMCP79510_WriteToSRAM(UINT8_MAX, &data, UINT8_MAX));
+}
+
+static void test_driverMCP79510_WriteToSRAM(void **state)
+{
+    const uint16_t sram_size = 64;
+    uint8_t data[sram_size];
+
+    for (size_t i = 0; i < sram_size; ++i)
+    {
+        data[i] = i;
+    }
+
+    /* Write zero bytes. */
+    uint8_t address = 0x00;
+    ExpectWriteSRAM(address);
+    assert_true(driverMCP79510_WriteToSRAM(0x00, &data, 0));
+
+    /* Write one byte at the last available address. */
+    address = 0x3F;
+    ExpectWriteSRAM(address);
+    expect_value(__wrap_libSPI_WriteByte, data, data[0]);
+    assert_true(driverMCP79510_WriteToSRAM(0x3F, &data, 1));
+
+    /* Write to the entire SRAM in one call. */
+    address = 0x00;
+    size_t length = sram_size;
+    ExpectWriteSRAM(address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        expect_value(__wrap_libSPI_WriteByte, data, i);
+    }
+    assert_true(driverMCP79510_WriteToSRAM(address, &data, length));
+
+    /* Write in the middle of the SRAM. */
+    address = 0x20;
+    length = 16;
+    ExpectWriteSRAM(address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        expect_value(__wrap_libSPI_WriteByte, data, i);
+    }
+    assert_true(driverMCP79510_WriteToSRAM(address, &data, length));
+}
+
+static void test_driverMCP79510_ReadFromSRAM_InvalidParameters(void **state)
+{
+    /* data_p */
+    expect_assert_failure(driverMCP79510_ReadFromSRAM(0, NULL, 0));
+
+    /* address and length */
+    const uint16_t sram_size = 64;
+    uint8_t data[sram_size];
+    assert_false(driverMCP79510_ReadFromSRAM(0, &data, sram_size + 1));
+    assert_false(driverMCP79510_ReadFromSRAM(UINT8_MAX, &data, 2));
+    assert_false(driverMCP79510_ReadFromSRAM(0x21, &data, 32));
+    assert_false(driverMCP79510_ReadFromSRAM(UINT8_MAX, &data, UINT8_MAX));
+}
+
+static void test_driverMCP79510_ReadFromSRAM(void **state)
+{
+    /* address and length */
+    const uint16_t sram_size = 64;
+    uint8_t data[sram_size];
+
+    /* Read zero bytes. */
+    uint8_t address = 0x00;
+    ExpectReadSRAM(address);
+    assert_true(driverMCP79510_ReadFromSRAM(address, &data, 0));
+
+    /* Read one byte at the last available address. */
+    ExpectReadSRAM(address);
+    will_return(__wrap_libSPI_ReadByte, 0xAA);
+
+    assert_true(driverMCP79510_ReadFromSRAM(address, &data, 1));
+    assert_int_equal(data[0], 0xAA);
+
+    /* Read the entire SRAM in one call. */
+    address = 0x00;
+    size_t length = sram_size;
+    ExpectReadSRAM(address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        will_return(__wrap_libSPI_ReadByte, i);
+    }
+    assert_true(driverMCP79510_ReadFromSRAM(address, &data, length));
+    for (size_t i = 0; i < length; ++i)
+    {
+        assert_int_equal(data[i], i);
+    }
+
+    memset(&data, 0, sizeof(data));
+
+    /* Read from the middle of the SRAM. */
+    address = 0x20;
+    length = 16;
+    ExpectReadSRAM(address);
+    for (size_t i = 0; i < length; ++i)
+    {
+        will_return(__wrap_libSPI_ReadByte, i);
+    }
+    assert_true(driverMCP79510_ReadFromSRAM(address, &data, length));
+    for (size_t i = 0; i < length; ++i)
+    {
+        assert_int_equal(data[i], i);
+    }
+}
+
+static void test_driverMCP79510_ClearSRAM(void **state)
+{
+    expect_value(__wrap_libSPI_WriteByte, data, INST_CLRRAM);
+    expect_any(__wrap_libSPI_WriteByte, data);
+    driverMCP79510_ClearSRAM();
+}
+
+static void test_driverMCP79510_GetEUI_InvalidParameters(void **state)
+{
+    uint8_t eui;
+    expect_assert_failure(driverMCP79510_GetEUI(NULL, 8));
+    expect_assert_failure(driverMCP79510_GetEUI(&eui, 9));
+    expect_assert_failure(driverMCP79510_GetEUI(&eui, SIZE_MAX));
+}
+
+
+static void test_driverMCP79510_GetEUI(void **state)
+{
+    uint8_t eui[8];
+
+    /* Read EUI-48 (6 bytes). */
+    size_t length = 6;
+    expect_value(__wrap_libSPI_WriteByte, data, INST_IDREAD);
+    expect_value(__wrap_libSPI_WriteByte, data, 0x02);
+    for (size_t i = 0; i < length; ++i)
+    {
+        will_return(__wrap_libSPI_ReadByte, i);
+    }
+    driverMCP79510_GetEUI(eui, length);
+    for (size_t i = 0; i < length; ++i)
+    {
+        assert_int_equal(eui[i], i);
+    }
+
+    memset(&eui, 0, sizeof(eui));
+
+    /* Read EUI-64 (8 bytes). */
+    length = 8;
+    expect_value(__wrap_libSPI_WriteByte, data, INST_IDREAD);
+    expect_value(__wrap_libSPI_WriteByte, data, 0x00);
+    for (size_t i = 0; i < length; ++i)
+    {
+        will_return(__wrap_libSPI_ReadByte, i);
+    }
+    driverMCP79510_GetEUI(eui, length);
+    for (size_t i = 0; i < length; ++i)
+    {
+        assert_int_equal(eui[i], i);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -997,6 +1182,13 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_GetHour_24, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetOscillatorTrimming_Negative, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetOscillatorTrimming_Positive, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_WriteToSRAM_InvalidParameters, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_WriteToSRAM, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_ReadFromSRAM_InvalidParameters, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_ReadFromSRAM, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_ClearSRAM, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetEUI_InvalidParameters, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_GetEUI, Setup),
     };
 
     if (argc >= 2)
