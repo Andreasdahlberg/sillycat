@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-21 (Last edit)
+ * @date   2021-01-22 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -38,6 +38,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "test_driverMCP79510.h"
 #include "driverMCP79510.h"
 #include "driverMCP79510Registers.h"
+#include "driverNVM.h"
 #include "common.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -1119,6 +1120,47 @@ static void test_driverMCP79510_GetEUI(void **state)
     }
 }
 
+static void test_driverNVM_Write_InvalidParamters(void **state)
+{
+    uint8_t data;
+    expect_assert_failure(driverNVM_Write(UINT8_MAX + 1, &data, 1));
+    expect_assert_failure(driverNVM_Write(0, &data, UINT8_MAX + 1));
+    expect_assert_failure(driverNVM_Write(UINT8_MAX + 1, &data, UINT8_MAX + 1));
+
+    assert_false(driverNVM_Write(UINT8_MAX, &data, UINT8_MAX));
+}
+
+static void test_driverNVM_Write(void **state)
+{
+    uint8_t data = 0xAA;
+    uint8_t address = 0x00;
+
+    ExpectWriteSRAM(address);
+    expect_value(__wrap_libSPI_WriteByte, data, data);
+    assert_true(driverMCP79510_WriteToSRAM(address, &data, sizeof(data)));
+}
+
+static void test_driverNVM_Read_InvalidParamters(void **state)
+{
+    uint8_t data;
+    expect_assert_failure(driverNVM_Read(UINT8_MAX + 1, &data, 1));
+    expect_assert_failure(driverNVM_Read(0, &data, UINT8_MAX + 1));
+    expect_assert_failure(driverNVM_Read(UINT8_MAX + 1, &data, UINT8_MAX + 1));
+
+    assert_false(driverNVM_Read(UINT8_MAX, &data, UINT8_MAX));
+}
+
+static void test_driverNVM_Read(void **state)
+{
+    uint8_t data;
+    uint8_t address = 0x00;
+
+    ExpectReadSRAM(address);
+    will_return(__wrap_libSPI_ReadByte, 0xAA);
+    assert_true(driverNVM_Read(address, &data, sizeof(data)));
+    assert_int_equal(data, 0xAA);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -1189,6 +1231,10 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverMCP79510_ClearSRAM, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_GetEUI_InvalidParameters, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_GetEUI, Setup),
+        cmocka_unit_test(test_driverNVM_Write_InvalidParamters),
+        cmocka_unit_test(test_driverNVM_Write),
+        cmocka_unit_test(test_driverNVM_Read_InvalidParamters),
+        cmocka_unit_test(test_driverNVM_Read),
     };
 
     if (argc >= 2)
