@@ -21,6 +21,7 @@ Import(['*'])
 
 env.Append(CPPPATH=[
     '#src/common',
+    '#src/common/driver/NVM',
     '#src/node/driver/MCP79510'
     ])
 
