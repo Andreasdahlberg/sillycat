@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-10 (Last edit)
+ * @date   2021-01-23 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -61,9 +61,11 @@ void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p);
  * This function does not start a new temperature conversion so the temperature is
  * only updated once every 64 seconds(default TCXO sample rate).
  *
- * @param temperature_p Pointer to variable where the result will be stored.
+ * @param temperature_p Pointer to variable where the temperature will be stored. The
+ *                      temperature is scaled by 100, e.g. 2550 is equal to 25.5 degrees
+ *                      Celsius.
  */
-void driverDS3234_GetTemperature(uint16_t *temperature_p);
+void driverDS3234_GetTemperature(int16_t *temperature_p);
 
 /**
  * Get the current year.
