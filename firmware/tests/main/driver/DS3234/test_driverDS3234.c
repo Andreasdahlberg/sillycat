@@ -1,7 +1,7 @@
 /**
  * @file   test_driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-16 (Last edit)
+ * @date   2021-01-23 (Last edit)
  * @brief  Test suite for the DS3234 RTC driver.
  */
 
@@ -145,6 +145,37 @@ static void test_driverDS3234_Init(void **state)
 {
     ExpectResetControlRegister();
     driverDS3234_Init(StubSPIPreCallback, StubSPIPostCallback);
+}
+
+static void test_driverDS3234_GetTemperature(void **state)
+{
+    struct test_data_t
+    {
+        uint8_t msb;
+        uint8_t lsb;
+        int16_t expected_value;
+    } ;
+
+    const struct test_data_t data[] =
+    {
+        {.msb = 0x00, .lsb = 0x00, .expected_value = 0},
+        {.msb = 0x19, .lsb = 0x00, .expected_value = 2500},
+        {.msb = 0x19, .lsb = 0x40, .expected_value = 2525},
+        {.msb = 0xE7, .lsb = 0x00, .expected_value = -2500},
+        {.msb = 0xE7, .lsb = 0x40, .expected_value = -2525},
+        {.msb = 0x7F, .lsb = 0xC0, .expected_value = 12775},    /* Max temperature */
+        {.msb = 0x80, .lsb = 0xC0, .expected_value = -12875}    /* Min temperature */
+    };
+
+    for (size_t i = 0; i < ElementsIn(data); ++i)
+    {
+        ExpectReadRegister(REG_TEMP_MSB, data[i].msb);
+        ExpectReadRegister(REG_TEMP_LSB, data[i].lsb);
+
+        int16_t temperature;
+        driverDS3234_GetTemperature(&temperature);
+        assert_int_equal(temperature, data[i].expected_value);
+    }
 }
 
 static void test_driverDS3234_GetYear(void **state)
@@ -634,7 +665,6 @@ static void test_driverDS3234_SetAlarmSecond_InvalidSecond(void **state)
         const uint8_t second = values[i];
         assert_false(driverDS3234_SetAlarmSecond(second));
     }
-
 }
 
 static void test_driverDS3234_SetAlarmSecond(void **state)
@@ -788,6 +818,7 @@ int main(int argc, char *argv[])
     {
         cmocka_unit_test(test_driverDS3234_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverDS3234_Init),
+        cmocka_unit_test_setup(test_driverDS3234_GetTemperature, Setup),
         cmocka_unit_test_setup(test_driverDS3234_GetYear, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetYear_InvalidYear, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetYear, Setup),

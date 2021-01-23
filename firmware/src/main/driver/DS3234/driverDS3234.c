@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-17 (Last edit)
+ * @date   2021-01-23 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -67,6 +67,7 @@ static void GetDecimalRegisterValue(uint8_t address, uint8_t *value_p);
 static void SetDecimalRegisterValue(uint8_t address, uint8_t value);
 static inline bool IsSRAMParametersValid(uint8_t address, size_t length);
 static inline void SetDefaultAlarmMask(void);
+static inline bool IsNegative(int16_t value);
 
 #ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void) __attribute__((unused));
@@ -91,18 +92,16 @@ void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p)
     INFO("DS3234 initialized");
 }
 
-void driverDS3234_GetTemperature(uint16_t *temperature_p)
+void driverDS3234_GetTemperature(int16_t *temperature_p)
 {
-    const uint16_t scaling_factor = 100;
-    uint16_t data;
+    const int16_t scaling_factor = 100;
+    const int8_t msb = (int8_t)ReadRegister(REG_TEMP_MSB);
+    *temperature_p = (int16_t)msb * scaling_factor;
 
-    data = ReadRegister(REG_TEMP_MSB);
-    *temperature_p = data * scaling_factor;
-
-    data = ReadRegister(REG_TEMP_LSB);
-    *temperature_p += (data >> 6);
-
-    //TODO: Verify if this works, sign?
+    const uint8_t fractional_resolution = 25;
+    const uint8_t lsb = ReadRegister(REG_TEMP_LSB);
+    const int8_t fractional_part = (int8_t)((lsb >> 6) * fractional_resolution);
+    *temperature_p += IsNegative(*temperature_p) ? fractional_part * -1 : fractional_part;
 }
 
 void driverDS3234_GetYear(uint8_t *year_p)
@@ -458,6 +457,11 @@ static inline void SetDefaultAlarmMask(void)
 {
     /* Alarm when hours, minutes, and seconds match */
     WriteRegister(REG_ALARM_1_DAY_DATE, 0x80);
+}
+
+static inline bool IsNegative(int16_t value)
+{
+    return value < 0;
 }
 
 #ifdef DEBUG_ENABLE
