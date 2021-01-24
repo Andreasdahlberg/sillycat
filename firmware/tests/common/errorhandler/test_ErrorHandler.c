@@ -1,7 +1,7 @@
 /**
  * @file   test_ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-21 (Last edit)
+ * @date   2021-01-24 (Last edit)
  * @brief  Test suite for the error handler module.
  */
 
@@ -106,7 +106,7 @@ static const struct error_message_t *get_error_message_by_index(uint8_t index)
     return NULL;
 }
 
-static const struct error_message_t *get_error_message_by_id(uint8_t id)
+static const struct error_message_t *get_error_message_by_id(uint32_t id)
 {
     assert_int_not_equal(id, 0);
 
@@ -260,6 +260,30 @@ static void test_ErrorHandler_LogError_LogWrapAround(void **state)
                         error_information_offset + number_of_errors - 1);
 }
 
+static void test_ErrorHandler_LogError_VeryLongLog(void **state)
+{
+    const size_t number_of_errors = 8;
+
+    /**
+     * Since it's unpractical to run 'ErrorHandler_LogError()' 4294967295 times we need to
+     * cheat by inserting a high id directly into the error message memory and re-init
+     * the ErrorHandler.
+     */
+    struct error_message_t *error_message_p = (struct error_message_t *)error_log_p;
+    error_message_p->id = UINT32_MAX - number_of_errors;
+    ErrorHandler_Init();
+
+    const uint8_t error_code_offset = 0;
+    const uint8_t error_information_offset = 0;
+    log_errors(number_of_errors, error_code_offset, error_information_offset);
+
+    for (size_t i = 0; i < number_of_errors; ++i)
+    {
+        const struct error_message_t *message_p = get_error_message_by_id(UINT32_MAX - i);
+        assert_non_null(message_p);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -297,7 +321,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_ErrorHandler_Init_LogWrapAround, Setup),
         cmocka_unit_test_setup(test_ErrorHandler_AssertFailAndHandler, Setup),
         cmocka_unit_test_setup(test_ErrorHandler_LogError, Setup),
-        cmocka_unit_test_setup(test_ErrorHandler_LogError_LogWrapAround, Setup)
+        cmocka_unit_test_setup(test_ErrorHandler_LogError_LogWrapAround, Setup),
+        cmocka_unit_test_setup(test_ErrorHandler_LogError_VeryLongLog, Setup)
 
     };
 

@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
+ * @date   2021-01-24 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -56,7 +56,7 @@ struct error_message_type
 struct module_t
 {
     uint8_t current_index;
-    uint8_t current_id;
+    uint32_t current_id;
     error_handler_assert_fail_t assert_fail_handler_p;
 };
 
