@@ -1,7 +1,7 @@
 /**
  * @file   Transceiver.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-31 (Last edit)
+ * @date   2021-01-24 (Last edit)
  * @brief  Implementation of the Transceiver interface.
  */
 
@@ -37,6 +37,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define CONTENT_DATA_SIZE 20
+_Static_assert(CONTENT_DATA_SIZE <= UINT8_MAX, "Invalid packet data size!");
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS

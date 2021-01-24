@@ -1,7 +1,7 @@
 /**
  * @file   Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-03-11 (Last edit)
+ * @date   2021-01-24 (Last edit)
  * @brief  Implementation of the Communications module.
  */
 
@@ -101,6 +101,7 @@ void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t si
     sc_assert(target != 0);
     sc_assert(packet_type < ElementsIn(module.packet_handlers));
     sc_assert(data_p != NULL);
+    sc_assert(size <= CONTENT_DATA_SIZE);
 
     struct time_t timestamp;
     if (!RTC_GetCurrentTime(&timestamp))
@@ -117,7 +118,7 @@ void Com_Send(uint8_t target, uint8_t packet_type, const void *data_p, size_t si
     // Construct the package.
     packet_content_type packet;
     packet.type = packet_type;
-    packet.size = size;
+    packet.size = (uint8_t)size;
     packet.timestamp = timestamp;
     memcpy(packet.data, data_p, packet.size);
 

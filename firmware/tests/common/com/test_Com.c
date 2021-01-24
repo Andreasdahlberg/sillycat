@@ -1,7 +1,7 @@
 /**
  * @file   test_Com.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-21 (Last edit)
+ * @date   2021-04-24 (Last edit)
  * @brief  Test suite for the Communications module.
  */
 
@@ -200,6 +200,13 @@ static void test_Com_Send_InvalidArguments(void **state)
                                    packet_type,
                                    NULL,
                                    sizeof(fake_data)
+                                  ));
+
+    /* Invalid data size. */
+    expect_assert_failure(Com_Send(target,
+                                   packet_type,
+                                   &fake_data,
+                                   CONTENT_DATA_SIZE + 1
                                   ));
 }
 
