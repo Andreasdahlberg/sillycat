@@ -1,7 +1,7 @@
 /**
  * @file   Board.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-11 (Last edit)
+ * @date   2021-01-25 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -47,6 +47,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 static inline void SetPEC11PinsAsInputs(void);
 static inline void EnablePinChangeInterrupts(void);
 static inline void WaitForFilteringCaps(void);
+static inline void SetNHD223ControlPinsAsOutputs(void);
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
@@ -65,6 +66,7 @@ void Board_Init(void)
     Board_RTC_Init();
     Board_RFM69_Init();
     Board_PEC11_Init();
+    Board_NHD223_Init();
 }
 
 void Board_PEC11_Init(void)
@@ -72,6 +74,81 @@ void Board_PEC11_Init(void)
     SetPEC11PinsAsInputs();
     WaitForFilteringCaps();
     EnablePinChangeInterrupts();
+}
+
+void Board_NHD223_Init(void)
+{
+    Board_NHD223_SetDataPinsAsOutputs();
+    SetNHD223ControlPinsAsOutputs();
+}
+
+void Board_NHD223_SetDataPinsAsOutputs(void)
+{
+    /* Configure data pins as outputs and pull low. */
+    const uint8_t output_pin_mask = 0xFF;
+    NHD223_DATA_DDR = output_pin_mask;
+    NHD223_DATA_PORT = 0x00;
+}
+
+void Board_NHD223_SetDataPinsAsInputs(void)
+{
+    /* Configure data pins as inputs.*/
+    NHD223_DATA_DDR = 0x00;
+}
+
+void Board_NHD223_SetDataPins(uint8_t data)
+{
+    NHD223_DATA_PORT = data;
+}
+
+void Board_NHD223_SetRegSelectLow(void)
+{
+    NHD223_CTRL_PORT &= ~(1 << NHD223_REGSELECT_PIN);
+}
+
+void Board_NHD223_SetRegSelectHigh(void)
+{
+    NHD223_CTRL_PORT |= (1 << NHD223_REGSELECT_PIN);
+}
+
+void Board_NHD223_SetEnableLow(void)
+{
+    NHD223_CTRL_PORT &= ~(1 << NHD223_ENABLE_PIN);
+}
+
+void Board_NHD223_SetEnableHigh(void)
+{
+    NHD223_CTRL_PORT |= (1 << NHD223_ENABLE_PIN);
+}
+
+void Board_NHD223_SetResetLow(void)
+{
+    NHD223_CTRL_PORT &= ~(1 << NHD223_RESET_PIN);
+}
+
+void Board_NHD223_SetResetHigh(void)
+{
+    NHD223_CTRL_PORT |= (1 << NHD223_RESET_PIN);
+}
+
+void Board_NHD223_SetChipSelectLow(void)
+{
+    NHD223_CTRL_PORT |= (1 << NHD223_CHIPSELECT_PIN);
+}
+
+void Board_NHD223_SetChipSelectHigh(void)
+{
+    NHD223_CTRL_PORT &= ~(1 << NHD223_CHIPSELECT_PIN);
+}
+
+void Board_NHD223_SetReadWriteLow(void)
+{
+    NHD223_CTRL_PORT &= ~(1 << NHD223_READWRITE_PIN);
+}
+
+void Board_NHD223_SetReadWriteHigh(void)
+{
+    NHD223_CTRL_PORT |= (1 << NHD223_READWRITE_PIN);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,4 +173,14 @@ static inline void EnablePinChangeInterrupts(void)
 static inline void WaitForFilteringCaps(void)
 {
     _delay_ms(FILTER_CAP_TC);
+}
+
+static inline void SetNHD223ControlPinsAsOutputs(void)
+{
+    /* Configure control pins as outputs. */
+    NHD223_CTRL_DDR |= ((1 << NHD223_ENABLE_PIN) |
+                        (1 << NHD223_RESET_PIN) |
+                        (1 << NHD223_READWRITE_PIN) |
+                        (1 << NHD223_REGSELECT_PIN) |
+                        (1 << NHD223_CHIPSELECT_PIN));
 }

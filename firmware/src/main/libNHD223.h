@@ -1,8 +1,8 @@
 /**
  * @file   libNHD223.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-16 (Last edit)
- * @brief  NHD2.23 graphic OLED display driver.
+ * @date   2021-01-25 (Last edit)
+ * @brief  NHD2.23(SSD1305) graphic OLED display driver.
  */
 
 /*
@@ -29,6 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdint.h>
 #include "SSD1305_Commands.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -106,12 +107,5 @@ void libNHD223_SetColumnAddress(uint8_t address);
  * @param end_address   Address to ending column.
  */
 void libNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address);
-
-/**
- * Read data from the display memory.
- *
- * @param data_p Pointer to byte where the result will be stored.
- */
-void libNHD223_ReadByte(uint8_t *data_p);
 
 #endif
