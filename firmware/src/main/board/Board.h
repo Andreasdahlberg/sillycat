@@ -1,7 +1,7 @@
 /**
  * @file   Board.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-10 (Last edit)
+ * @date   2021-01-25 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -58,6 +58,16 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define PEC11_DATA_PIN      DDB1
 #define PEC11_BUTTON_PIN    DDB7
 
+#define NHD223_DATA_DDR        DDRD
+#define NHD223_DATA_PORT       PORTD
+#define NHD223_CTRL_DDR        DDRC
+#define NHD223_CTRL_PORT       PORTC
+#define NHD223_ENABLE_PIN      DDC1
+#define NHD223_RESET_PIN       DDC2
+#define NHD223_READWRITE_PIN   DDC3
+#define NHD223_REGSELECT_PIN   DDC4
+#define NHD223_CHIPSELECT_PIN  DDC5
+
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -75,5 +85,24 @@ void Board_Init(void);
  * Initialize the pins required for the PEC11 rotary encoder.
  */
 void Board_PEC11_Init(void);
+
+/**
+ * Initialize the pins required for the NHD223 OLED display.
+ */
+void Board_NHD223_Init(void);
+
+void Board_NHD223_SetDataPinsAsOutputs(void);
+void Board_NHD223_SetDataPinsAsInputs(void);
+void Board_NHD223_SetDataPins(uint8_t data);
+void Board_NHD223_SetRegSelectLow(void);
+void Board_NHD223_SetRegSelectHigh(void);
+void Board_NHD223_SetEnableLow(void);
+void Board_NHD223_SetEnableHigh(void);
+void Board_NHD223_SetResetLow(void);
+void Board_NHD223_SetResetHigh(void);
+void Board_NHD223_SetChipSelectLow(void);
+void Board_NHD223_SetChipSelectHigh(void);
+void Board_NHD223_SetReadWriteLow(void);
+void Board_NHD223_SetReadWriteHigh(void);
 
 #endif
