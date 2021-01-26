@@ -94,9 +94,9 @@ void driverNHD223_WriteData(uint8_t data)
 void driverNHD223_ResetDisplay(void)
 {
     /* According to the SSD1305 datasheet, the minimum reset pulse width is 3 µs. */
-    const uint8_t reset_delay_us = 5;
+    const uint8_t reset_pulse_width_us = 5;
     PullReset();
-    _delay_us(reset_delay_us);
+    _delay_us(reset_pulse_width_us);
     ReleaseReset();
 }
 
