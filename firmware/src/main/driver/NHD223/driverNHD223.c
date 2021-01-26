@@ -204,11 +204,11 @@ static void WriteByte(uint8_t data)
 
 static void ClearDisplay(void)
 {
-    for (uint8_t page = 0; page < 4; ++page)
+    for (uint8_t page = 0; page < NHD223_NUMBER_OF_PAGES; ++page)
     {
         driverNHD223_SetPageAddress(page);
 
-        for(uint8_t column = 0; column < 128; ++column)
+        for(uint8_t column = 0; column < NHD223_NUMBER_OF_COLUMNS; ++column)
         {
             driverNHD223_WriteData(0x00);
         }
