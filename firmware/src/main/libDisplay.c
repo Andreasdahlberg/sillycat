@@ -1,7 +1,7 @@
 /**
  * @file   libDisplay.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-10-16 (Last edit)
+ * @date   2021-01-26 (Last edit)
  * @brief  Implementation of display-library.
  */
 
@@ -29,7 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include <string.h>
 #include "libDisplay.h"
-#include "libNHD223.h"
+#include "driverNHD223.h"
 #include "UART.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -72,10 +72,10 @@ void libDisplay_Init(void)
     //Do not init display hardware when debug is active, the debug
     //UART is using the same pins.
 #ifndef DEBUG_ENABLE
-    libNHD223_Init();
-    libNHD223_SetHorizontalAddressingMode();
-    libNHD223_SetColumnAddressRange(0, VRAM_COLUMNS - 1);
-    libNHD223_SetPageAddressRange(0, VRAM_PAGES - 1);
+    driverNHD223_Init();
+    driverNHD223_SetHorizontalAddressingMode();
+    driverNHD223_SetColumnAddressRange(0, VRAM_COLUMNS - 1);
+    driverNHD223_SetPageAddressRange(0, VRAM_PAGES - 1);
 #endif
 
     module.rotated = false;
@@ -85,14 +85,14 @@ void libDisplay_Init(void)
 void libDisplay_On(void)
 {
 #ifndef DEBUG_ENABLE
-    libNHD223_WriteCommand(SSD1305_DISPLAYON);
+    driverNHD223_WriteCommand(SSD1305_DISPLAYON);
 #endif
 }
 
 void libDisplay_Off(void)
 {
 #ifndef DEBUG_ENABLE
-    libNHD223_WriteCommand(SSD1305_DISPLAYOFF);
+    driverNHD223_WriteCommand(SSD1305_DISPLAYOFF);
 #endif
 }
 
@@ -114,7 +114,7 @@ void libDisplay_Flush(void)
     {
         for (uint8_t column = 0; column < VRAM_COLUMNS; ++column)
         {
-            libNHD223_WriteData(module.VRAM[page][column]);
+            driverNHD223_WriteData(module.VRAM[page][column]);
         }
     }
 #else
@@ -125,7 +125,7 @@ void libDisplay_Flush(void)
 void libDisplay_Reset(void)
 {
 #ifndef DEBUG_ENABLE
-    libNHD223_ResetDisplay();
+    driverNHD223_ResetDisplay();
 #endif
     libDisplay_Clear();
 }
@@ -133,8 +133,8 @@ void libDisplay_Reset(void)
 void libDisplay_SetBrightness(uint8_t brightness)
 {
 #ifndef DEBUG_ENABLE
-    libNHD223_WriteCommand(0x81);
-    libNHD223_WriteCommand(brightness);
+    driverNHD223_WriteCommand(0x81);
+    driverNHD223_WriteCommand(brightness);
 #else
     UNUSED(brightness);
 #endif

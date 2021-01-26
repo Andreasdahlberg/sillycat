@@ -1,7 +1,7 @@
 /**
- * @file   libNHD223.c
+ * @file   driverNHD223.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-25 (Last edit)
+ * @date   2021-01-26 (Last edit)
  * @brief  NHD2.23(SSD1305) graphic OLED display driver.
  */
 
@@ -31,7 +31,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "libSPI.h"
 #include "libDebug.h"
 #include "Board.h"
-#include "libNHD223.h"
+#include "driverNHD223.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -68,30 +68,30 @@ static void ClearDisplay(void);
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libNHD223_Init(void)
+void driverNHD223_Init(void)
 {
-    libNHD223_ResetDisplay();
+    driverNHD223_ResetDisplay();
     ClearDisplay();
-    libNHD223_ResetDisplay();
+    driverNHD223_ResetDisplay();
     ReleaseDevice();
     DisableDataLatch();
 }
 
-void libNHD223_WriteCommand(uint8_t command)
+void driverNHD223_WriteCommand(uint8_t command)
 {
     SetWriteMode();
     SetCommandMode();
     WriteByte(command);
 }
 
-void libNHD223_WriteData(uint8_t data)
+void driverNHD223_WriteData(uint8_t data)
 {
     SetWriteMode();
     SetDataMode();
     WriteByte(data);
 }
 
-void libNHD223_ResetDisplay(void)
+void driverNHD223_ResetDisplay(void)
 {
     /* According to the SSD1305 datasheet, the minimum reset pulse width is 3 µs. */
     const uint8_t reset_delay_us = 5;
@@ -100,42 +100,42 @@ void libNHD223_ResetDisplay(void)
     ReleaseReset();
 }
 
-void libNHD223_SetHorizontalAddressingMode(void)
+void driverNHD223_SetHorizontalAddressingMode(void)
 {
-    libNHD223_WriteCommand(SSD1305_ADDRESSINGMODE);
-    libNHD223_WriteCommand(SSD1305_HORIZONTALADDRESSINGMODE);
+    driverNHD223_WriteCommand(SSD1305_ADDRESSINGMODE);
+    driverNHD223_WriteCommand(SSD1305_HORIZONTALADDRESSINGMODE);
 }
 
-void libNHD223_SetPageAddress(uint8_t address)
+void driverNHD223_SetPageAddress(uint8_t address)
 {
     sc_assert(address < MAX_PAGES);
 
-    libNHD223_WriteCommand(SSD1305_SET_PAGE | address);
+    driverNHD223_WriteCommand(SSD1305_SET_PAGE | address);
 }
 
-void libNHD223_SetPageAddressRange(uint8_t start_address, uint8_t end_address)
+void driverNHD223_SetPageAddressRange(uint8_t start_address, uint8_t end_address)
 {
     sc_assert(start_address <= end_address);
 
-    libNHD223_WriteCommand(SSD1305_SETSTARTPAGE);
-    libNHD223_WriteCommand(start_address);
-    libNHD223_WriteCommand(end_address);
+    driverNHD223_WriteCommand(SSD1305_SETSTARTPAGE);
+    driverNHD223_WriteCommand(start_address);
+    driverNHD223_WriteCommand(end_address);
 }
 
-void libNHD223_SetColumnAddress(uint8_t address)
+void driverNHD223_SetColumnAddress(uint8_t address)
 {
     const uint8_t lower_nibble_mask = 0x0F;
-    libNHD223_WriteCommand(SSD1305_SETLOWCOLUMN | (address & lower_nibble_mask));
-    libNHD223_WriteCommand(SSD1305_SETHIGHCOLUMN | ((address >> 4) & lower_nibble_mask));
+    driverNHD223_WriteCommand(SSD1305_SETLOWCOLUMN | (address & lower_nibble_mask));
+    driverNHD223_WriteCommand(SSD1305_SETHIGHCOLUMN | ((address >> 4) & lower_nibble_mask));
 }
 
-void libNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address)
+void driverNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address)
 {
     sc_assert(start_address <= end_address);
 
-    libNHD223_WriteCommand(SSD1305_SETSTARTCOLUMN);
-    libNHD223_WriteCommand(start_address);
-    libNHD223_WriteCommand(end_address);
+    driverNHD223_WriteCommand(SSD1305_SETSTARTCOLUMN);
+    driverNHD223_WriteCommand(start_address);
+    driverNHD223_WriteCommand(end_address);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -206,11 +206,11 @@ static void ClearDisplay(void)
 {
     for (uint8_t page = 0; page < 4; ++page)
     {
-        libNHD223_SetPageAddress(page);
+        driverNHD223_SetPageAddress(page);
 
         for(uint8_t column = 0; column < 128; ++column)
         {
-            libNHD223_WriteData(0x00);
+            driverNHD223_WriteData(0x00);
         }
     }
 }
