@@ -229,6 +229,7 @@ modules = [
     os.path.join('main', 'driver', 'MCUTemperature'),
     os.path.join('main', 'driver', 'NTC'),
     os.path.join('main', 'driver', 'DS3234'),
+    os.path.join('main', 'driver', 'NHD223'),
     os.path.join('node', 'power'),
     os.path.join('node', 'driver', 'MCP79510'),
     os.path.join('common', 'time'),
