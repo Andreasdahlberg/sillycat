@@ -1,7 +1,7 @@
 /**
  * @file   driverNHD223.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-26 (Last edit)
+ * @date   2021-01-28 (Last edit)
  * @brief  NHD2.23(SSD1305) graphic OLED display driver.
  */
 
@@ -73,8 +73,6 @@ void driverNHD223_Init(void)
     driverNHD223_ResetDisplay();
     ClearDisplay();
     driverNHD223_ResetDisplay();
-    ReleaseDevice();
-    DisableDataLatch();
 }
 
 void driverNHD223_WriteCommand(uint8_t command)
