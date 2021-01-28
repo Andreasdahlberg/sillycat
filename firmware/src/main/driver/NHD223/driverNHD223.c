@@ -37,8 +37,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define MAX_PAGES 8
-
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
@@ -106,7 +104,7 @@ void driverNHD223_SetHorizontalAddressingMode(void)
 
 void driverNHD223_SetPageAddress(uint8_t address)
 {
-    sc_assert(address < MAX_PAGES);
+    sc_assert(address < NHD223_NUMBER_OF_PAGES);
 
     driverNHD223_WriteCommand(SSD1305_SET_PAGE | address);
 }
