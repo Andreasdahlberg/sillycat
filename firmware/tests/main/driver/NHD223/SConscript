@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*
+#
+# This file is part of SillyCat Development Tools.
+#
+# SillyCat Development Tools is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# SillyCat Development Tools is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+
+Import(['*'])
+
+
+env.Append(CPPPATH=[
+    '#src/main/driver/NHD223',
+    '#src/main/board',
+    '#src/main',
+    '#src/common',
+    '#src/common/event',
+    '#src/common/timer',
+    '#tests/mocks'
+    ])
+
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=_delay_us',
+    '-Wl,--wrap=Board_NHD223_SetChipSelectLow',
+    '-Wl,--wrap=Board_NHD223_SetChipSelectHigh',
+    '-Wl,--wrap=Board_NHD223_SetResetLow',
+    '-Wl,--wrap=Board_NHD223_SetResetHigh',
+    '-Wl,--wrap=Board_NHD223_SetEnableHigh',
+    '-Wl,--wrap=Board_NHD223_SetEnableLow',
+    '-Wl,--wrap=Board_NHD223_SetRegSelectLow',
+    '-Wl,--wrap=Board_NHD223_SetRegSelectHigh',
+    '-Wl,--wrap=Board_NHD223_SetReadWriteLow',
+    '-Wl,--wrap=Board_NHD223_SetDataPinsAsOutputs',
+    '-Wl,--wrap=Board_NHD223_SetDataPins'
+])
+
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
+
+Return('OBJECTS')
