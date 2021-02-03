@@ -14,21 +14,23 @@
 
 # You should have received a copy of the GNU General Public License
 # along with SillyCat Development Tools.  If not, see <http://www.gnu.org/licenses/>.
-
+#
 import os
 
 Import(['*'])
 
+SOURCE = Glob('*.c')
+
 env.Append(CPPPATH=[
+    '#src/main/driver/NHD223',
     '#src/common',
     '#src/common/timer',
     '#src/common/event',
-    '#src/common/debug',
-    '#src/main/gui',
-    '#src/main/display'
+    '#src/common/debug'
 ])
 
-SOURCE = Glob('*.c')
 OBJECTS = env.Object(source=SOURCE)
 
 Return('OBJECTS')
+
+

@@ -1,7 +1,7 @@
 /**
  * @file   libUI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-27 (Last edit)
+ * @date   2021-02-03 (Last edit)
  * @brief  Implementation of UI library.
  *
  * The UI library contains functions for drawing simple shapes and for
@@ -34,7 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "libDisplay.h"
+#include "Display.h"
 #include "libUI.h"
 #include "font.h"
 
@@ -66,8 +66,8 @@ static inline void PrintChar(const glyph_info_t *char_ptr, uint8_t x_pos,
 
 void libUI_Update(void)
 {
-    libDisplay_Flush();
-    libDisplay_ClearVRAM();
+    Display_Flush();
+    Display_ClearVRAM();
 }
 
 void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end,
@@ -82,7 +82,7 @@ void libUI_DrawLine(uint8_t x_start, uint8_t y_start, uint8_t x_end,
 
     while (1)
     {
-        libDisplay_SetPixel(x_start, y_start);
+        Display_SetPixel(x_start, y_start);
         if (x_start == x_end && y_start == y_end)
         {
             break;
@@ -120,14 +120,14 @@ void libUI_DrawCircle(uint8_t x_pos, uint8_t y_pos, uint8_t radius)
 
     while (x >= y)
     {
-        libDisplay_SetPixel( x + x_pos,  y + y_pos);
-        libDisplay_SetPixel( y + x_pos,  x + y_pos);
-        libDisplay_SetPixel(-x + x_pos,  y + y_pos);
-        libDisplay_SetPixel(-y + x_pos,  x + y_pos);
-        libDisplay_SetPixel(-x + x_pos, -y + y_pos);
-        libDisplay_SetPixel(-y + x_pos, -x + y_pos);
-        libDisplay_SetPixel( x + x_pos, -y + y_pos);
-        libDisplay_SetPixel( y + x_pos, -x + y_pos);
+        Display_SetPixel( x + x_pos,  y + y_pos);
+        Display_SetPixel( y + x_pos,  x + y_pos);
+        Display_SetPixel(-x + x_pos,  y + y_pos);
+        Display_SetPixel(-y + x_pos,  x + y_pos);
+        Display_SetPixel(-x + x_pos, -y + y_pos);
+        Display_SetPixel(-y + x_pos, -x + y_pos);
+        Display_SetPixel( x + x_pos, -y + y_pos);
+        Display_SetPixel( y + x_pos, -x + y_pos);
         y++;
         if (decisionOver2 <= 0)
         {
@@ -211,7 +211,7 @@ static inline void PrintChar(const glyph_info_t *glyph, uint8_t x_base,
 
             if (IsPixelBitSet(pgm_read_byte(&glyph->data[byte_idx]), bit_idx))
             {
-                libDisplay_SetPixel(
+                Display_SetPixel(
                     x_pos + x_base,
                     y_pos + y_base - glyph->baseline_offset - glyph->height
                 );

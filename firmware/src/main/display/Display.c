@@ -1,8 +1,8 @@
 /**
- * @file   libDisplay.c
+ * @file   Display.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-26 (Last edit)
- * @brief  Implementation of display-library.
+ * @date   2021-02-03 (Last edit)
+ * @brief  Display interface.
  */
 
 /*
@@ -28,17 +28,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "common.h"
 #include <string.h>
-#include "libDisplay.h"
 #include "driverNHD223.h"
 #include "UART.h"
+#include "Display.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define VRAM_PAGES 4
-#define VRAM_COLUMNS 128
-#define VRAM_SIZE (VRAM_PAGES * VRAM_COLUMNS)
+#define VRAM_SIZE (NHD223_NUMBER_OF_PAGES * NHD223_NUMBER_OF_COLUMNS)
 
 #define DISPLAY_HEIGHT 32
 #define DISPLAY_WIDTH 128
@@ -49,7 +47,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 
 struct module_t
 {
-    uint8_t VRAM[VRAM_PAGES][VRAM_COLUMNS];
+    uint8_t VRAM[NHD223_NUMBER_OF_PAGES][NHD223_NUMBER_OF_COLUMNS];
     bool rotated;
 };
 
@@ -67,70 +65,70 @@ static struct module_t module;
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void libDisplay_Init(void)
+void Display_Init(void)
 {
     //Do not init display hardware when debug is active, the debug
     //UART is using the same pins.
 #ifndef DEBUG_ENABLE
     driverNHD223_Init();
     driverNHD223_SetHorizontalAddressingMode();
-    driverNHD223_SetColumnAddressRange(0, VRAM_COLUMNS - 1);
-    driverNHD223_SetPageAddressRange(0, VRAM_PAGES - 1);
+    driverNHD223_SetColumnAddressRange(0, NHD223_NUMBER_OF_COLUMNS - 1);
+    driverNHD223_SetPageAddressRange(0, NHD223_NUMBER_OF_PAGES - 1);
 #endif
 
     module.rotated = false;
-    libDisplay_ClearVRAM();
+    Display_ClearVRAM();
 }
 
-void libDisplay_On(void)
+void Display_On(void)
 {
 #ifndef DEBUG_ENABLE
     driverNHD223_WriteCommand(SSD1305_DISPLAYON);
 #endif
 }
 
-void libDisplay_Off(void)
+void Display_Off(void)
 {
 #ifndef DEBUG_ENABLE
     driverNHD223_WriteCommand(SSD1305_DISPLAYOFF);
 #endif
 }
 
-void libDisplay_Clear(void)
+void Display_Clear(void)
 {
-    libDisplay_ClearVRAM();
-    libDisplay_Flush();
+    Display_ClearVRAM();
+    Display_Flush();
 }
 
-void libDisplay_ClearVRAM()
+void Display_ClearVRAM()
 {
     memset(module.VRAM, 0x00, VRAM_SIZE);
 }
 
-void libDisplay_Flush(void)
+void Display_Flush(void)
 {
 #ifndef DEBUG_ENABLE
-    for (uint8_t page = 0; page < VRAM_PAGES; ++page)
+    for (uint8_t page = 0; page < NHD223_NUMBER_OF_PAGES; ++page)
     {
-        for (uint8_t column = 0; column < VRAM_COLUMNS; ++column)
+        for (uint8_t column = 0; column < NHD223_NUMBER_OF_COLUMNS; ++column)
         {
             driverNHD223_WriteData(module.VRAM[page][column]);
         }
     }
 #else
-    libDisplay_DumpVRAMToUART();
+    Display_DumpVRAMToUART();
 #endif
 }
 
-void libDisplay_Reset(void)
+void Display_Reset(void)
 {
 #ifndef DEBUG_ENABLE
     driverNHD223_ResetDisplay();
 #endif
-    libDisplay_Clear();
+    Display_Clear();
 }
 
-void libDisplay_SetBrightness(uint8_t brightness)
+void Display_SetBrightness(uint8_t brightness)
 {
 #ifndef DEBUG_ENABLE
     driverNHD223_WriteCommand(0x81);
@@ -140,7 +138,7 @@ void libDisplay_SetBrightness(uint8_t brightness)
 #endif
 }
 
-void libDisplay_SetPixel(uint8_t x, uint8_t y)
+void Display_SetPixel(uint8_t x, uint8_t y)
 {
     uint8_t page_index;
     uint8_t page_offset;
@@ -155,29 +153,29 @@ void libDisplay_SetPixel(uint8_t x, uint8_t y)
     page_index = (y >> 3);
     page_offset = (y - (page_index << 3));
 
-    if (page_index < VRAM_PAGES && x < VRAM_COLUMNS)
+    if (page_index < NHD223_NUMBER_OF_PAGES && x < NHD223_NUMBER_OF_COLUMNS)
     {
         module.VRAM[page_index][x] |= (1 << page_offset);
     }
 }
 
-void libDisplay_Rotate(bool state)
+void Display_Rotate(bool state)
 {
     module.rotated = state;
-    libDisplay_ClearVRAM();
+    Display_ClearVRAM();
 }
 
 #ifdef DEBUG_ENABLE
-void libDisplay_DumpVRAMToUART(void)
+void Display_DumpVRAMToUART(void)
 {
     UART_Write("<VRAM>", 6);
-    for (uint8_t page = 0; page < VRAM_PAGES; ++page)
+    for (uint8_t page = 0; page < NHD223_NUMBER_OF_PAGES; ++page)
     {
         uint8_t cnt = 0;
 
-        while (cnt != VRAM_COLUMNS)
+        while (cnt != NHD223_NUMBER_OF_COLUMNS)
         {
-            cnt += UART_Write(&(module.VRAM[page][cnt]), VRAM_COLUMNS - cnt);
+            cnt += UART_Write(&(module.VRAM[page][cnt]), NHD223_NUMBER_OF_COLUMNS - cnt);
         }
     }
     UART_Write("\r\n", 2);

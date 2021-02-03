@@ -28,9 +28,9 @@ env.Append(CPPPATH=[
     ])
 
 env.Append(LINKFLAGS=[
-    '-Wl,--wrap=libDisplay_Init',
-    '-Wl,--wrap=libDisplay_On',
-    '-Wl,--wrap=libDisplay_Rotate',
+    '-Wl,--wrap=Display_Init',
+    '-Wl,--wrap=Display_On',
+    '-Wl,--wrap=Display_Rotate',
     '-Wl,--wrap=Timer_TimeDifference',
     '-Wl,--wrap=Timer_GetMilliseconds',
     '-Wl,--wrap=guiInterface_DrawViewIndicator',
