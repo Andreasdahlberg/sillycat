@@ -241,6 +241,48 @@ static void test_driverNHD223_SetPageAddressRange(void **state)
     driverNHD223_SetPageAddressRange(start_address, end_address);
 }
 
+static void test_driverNHD223_SetColumnAddress_Invalid(void **state)
+{
+    const uint8_t values[] = {NHD223_NUMBER_OF_COLUMNS, UINT8_MAX};
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        expect_assert_failure(driverNHD223_SetColumnAddress(values[i]));
+    }
+}
+
+static void test_driverNHD223_SetColumnAddress(void **state)
+{
+    for (uint8_t column_address = 0; column_address < NHD223_NUMBER_OF_COLUMNS; ++column_address)
+    {
+        ExpectWriteCommand(SSD1305_SETLOWCOLUMN | (column_address & 0x0F));
+        ExpectWriteCommand(SSD1305_SETHIGHCOLUMN | (column_address >> 4));
+        driverNHD223_SetColumnAddress(column_address);
+    }
+}
+
+static void test_driverNHD223_SetColumnAddressRange_Invalid(void **state)
+{
+    expect_assert_failure(driverNHD223_SetColumnAddressRange(2, 1));
+    expect_assert_failure(driverNHD223_SetColumnAddressRange(UINT8_MAX, UINT8_MAX - 1));
+}
+
+static void test_driverNHD223_SetColumnAddressRange(void **state)
+{
+    uint8_t start_address = 0;
+    uint8_t end_address = UINT8_MAX;
+    ExpectWriteCommand(SSD1305_SETSTARTCOLUMN);
+    ExpectWriteCommand(start_address);
+    ExpectWriteCommand(end_address);
+    driverNHD223_SetColumnAddressRange(start_address, end_address);
+
+    start_address = 0;
+    end_address = 0;
+    ExpectWriteCommand(SSD1305_SETSTARTCOLUMN);
+    ExpectWriteCommand(start_address);
+    ExpectWriteCommand(end_address);
+    driverNHD223_SetColumnAddressRange(start_address, end_address);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -258,6 +300,10 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_driverNHD223_SetPageAddress),
         cmocka_unit_test(test_driverNHD223_SetPageAddressRange_Invalid),
         cmocka_unit_test(test_driverNHD223_SetPageAddressRange),
+        cmocka_unit_test(test_driverNHD223_SetColumnAddress_Invalid),
+        cmocka_unit_test(test_driverNHD223_SetColumnAddress),
+        cmocka_unit_test(test_driverNHD223_SetColumnAddressRange_Invalid),
+        cmocka_unit_test(test_driverNHD223_SetColumnAddressRange)
     };
 
     if (argc >= 2)
