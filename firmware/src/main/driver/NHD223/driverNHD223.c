@@ -1,7 +1,7 @@
 /**
  * @file   driverNHD223.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-28 (Last edit)
+ * @date   2021-02-03 (Last edit)
  * @brief  NHD2.23(SSD1305) graphic OLED display driver.
  */
 
@@ -120,9 +120,11 @@ void driverNHD223_SetPageAddressRange(uint8_t start_address, uint8_t end_address
 
 void driverNHD223_SetColumnAddress(uint8_t address)
 {
+    sc_assert(address < NHD223_NUMBER_OF_COLUMNS);
+
     const uint8_t lower_nibble_mask = 0x0F;
     driverNHD223_WriteCommand(SSD1305_SETLOWCOLUMN | (address & lower_nibble_mask));
-    driverNHD223_WriteCommand(SSD1305_SETHIGHCOLUMN | ((address >> 4) & lower_nibble_mask));
+    driverNHD223_WriteCommand(SSD1305_SETHIGHCOLUMN | (address >> 4));
 }
 
 void driverNHD223_SetColumnAddressRange(uint8_t start_address, uint8_t end_address)
