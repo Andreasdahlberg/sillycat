@@ -58,7 +58,6 @@ static inline void DisableDataLatch(void);
 static inline void SetCommandMode(void);
 static inline void SetDataMode(void);
 static inline void SetWriteMode(void);
-static inline void SetReadMode(void);
 static void WriteByte(uint8_t data);
 static void ClearDisplay(void);
 
@@ -184,11 +183,6 @@ static inline void SetWriteMode(void)
 {
     Board_NHD223_SetReadWriteLow();
     Board_NHD223_SetDataPinsAsOutputs();
-}
-
-static inline void SetReadMode(void)
-{
-    Board_NHD223_SetReadWriteHigh();
 }
 
 static void WriteByte(uint8_t data)
