@@ -1,8 +1,8 @@
 /**
- * @file   mock_libDisplay.c
+ * @file   mock_Display.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-21 (Last edit)
- * @brief  Mock functions for libDisplay module.
+ * @date   2021-02-03 (Last edit)
+ * @brief  Mock functions for Display module.
  */
 
 /*
@@ -32,7 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
-#include "mock_libDisplay.h"
+#include "mock_Display.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -58,53 +58,53 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_libDisplay_Init(void)
+void __wrap_Display_Init(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_On(void)
+void __wrap_Display_On(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_Off(void)
+void __wrap_Display_Off(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_Clear(void)
+void __wrap_Display_Clear(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_ClearVRAM(void)
+void __wrap_Display_ClearVRAM(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_Reset(void)
+void __wrap_Display_Reset(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_Flush(void)
+void __wrap_Display_Flush(void)
 {
     function_called();
 }
 
-void __wrap_libDisplay_SetPixel(uint8_t x, uint8_t y)
+void __wrap_Display_SetPixel(uint8_t x, uint8_t y)
 {
     check_expected(x);
     check_expected(y);
 }
 
-void __wrap_libDisplay_SetBrightness(uint8_t brightness)
+void __wrap_Display_SetBrightness(uint8_t brightness)
 {
     check_expected(brightness);
 }
 
-void __wrap_libDisplay_Rotate(bool state)
+void __wrap_Display_Rotate(bool state)
 {
     check_expected(state);
 }

@@ -1,7 +1,7 @@
 /**
  * @file   Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-11 (Last edit)
+ * @date   2021-02-03 (Last edit)
  * @brief  Implementation of Interface functions
  *
  * Detailed description of file.
@@ -32,7 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 
 #include "libDebug.h"
-#include "libDisplay.h"
+#include "Display.h"
 #include "libUI.h"
 
 #include "Interface.h"
@@ -77,9 +77,9 @@ static void DrawViewIndicator(void);
 ///
 void Interface_Init(void)
 {
-    libDisplay_Init();
-    libDisplay_On();
-    libDisplay_Rotate(true);
+    Display_Init();
+    Display_On();
+    Display_Rotate(true);
 
     refresh_flag = true;
     activity_timer = 0;

@@ -1,7 +1,7 @@
 /**
  * @file   test_Interface.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-21 (Last edit)
+ * @date   2021-02-03 (Last edit)
  * @brief  Test suite for the Interface module.
  */
 
@@ -84,9 +84,9 @@ static int Setup(void **state)
 {
     ResetViews();
 
-    expect_function_call(__wrap_libDisplay_Init);
-    expect_function_call(__wrap_libDisplay_On);
-    expect_any(__wrap_libDisplay_Rotate, state);
+    expect_function_call(__wrap_Display_Init);
+    expect_function_call(__wrap_Display_On);
+    expect_any(__wrap_Display_Rotate, state);
 
     Interface_Init();
 
@@ -99,9 +99,9 @@ static int Setup(void **state)
 
 void test_Init(void **state)
 {
-    expect_function_call(__wrap_libDisplay_Init);
-    expect_function_call(__wrap_libDisplay_On);
-    expect_any(__wrap_libDisplay_Rotate, state);
+    expect_function_call(__wrap_Display_Init);
+    expect_function_call(__wrap_Display_On);
+    expect_any(__wrap_Display_Rotate, state);
 
     Interface_Init();
 }

@@ -1,8 +1,8 @@
 /**
- * @file   mock_libDisplay.h
+ * @file   mock_Display.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2018-09-22 (Last edit)
- * @brief  Mock functions for libDisplay module.
+ * @date   2021-02-03 (Last edit)
+ * @brief  Mock functions for Display module.
  */
 
 /*
@@ -22,14 +22,15 @@ You should have received a copy of the GNU General Public License
 along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef WRAP_LIBDISPLAY_H_
-#define WRAP_LIBDISPLAY_H_
+#ifndef WRAP_DISPLAY_H_
+#define WRAP_DISPLAY_H_
 
 //////////////////////////////////////////////////////////////////////////
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
 #include <stdbool.h>
+#include <stdint.h>
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -43,15 +44,15 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void __wrap_libDisplay_Init(void);
-void __wrap_libDisplay_On(void);
-void __wrap_libDisplay_Off(void);
-void __wrap_libDisplay_Clear(void);
-void __wrap_libDisplay_ClearVRAM(void);
-void __wrap_libDisplay_Reset(void);
-void __wrap_libDisplay_Flush(void);
-void __wrap_libDisplay_SetPixel(uint8_t x, uint8_t y);
-void __wrap_libDisplay_SetBrightness(uint8_t brightness);
-void __wrap_libDisplay_Rotate(bool state);
+void __wrap_Display_Init(void);
+void __wrap_Display_On(void);
+void __wrap_Display_Off(void);
+void __wrap_Display_Clear(void);
+void __wrap_Display_ClearVRAM(void);
+void __wrap_Display_Reset(void);
+void __wrap_Display_Flush(void);
+void __wrap_Display_SetPixel(uint8_t x, uint8_t y);
+void __wrap_Display_SetBrightness(uint8_t brightness);
+void __wrap_Display_Rotate(bool state);
 
 #endif

@@ -23,6 +23,7 @@ import os
 DIRECTORIES = [
     'encoder',
     'driver',
+    'display',
     'gui',
     'fonts',
     'interface',
@@ -43,6 +44,7 @@ env.Append(CPPPATH=[
     '#src/utility',
     '#src/main',
     '#src/main/board',
+    '#src/main/display',
     '#src/main/driver/NHD223',
     '#src/common',
     '#src/common/ADC',
