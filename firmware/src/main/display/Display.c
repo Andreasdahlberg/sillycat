@@ -1,7 +1,7 @@
 /**
  * @file   Display.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-03 (Last edit)
+ * @date   2021-02-04 (Last edit)
  * @brief  Display interface.
  */
 
@@ -29,8 +29,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include <string.h>
 #include "driverNHD223.h"
-#include "UART.h"
 #include "Display.h"
+
+#ifdef DEBUG_ENABLE
+#include "UART.h"
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
