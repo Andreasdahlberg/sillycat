@@ -19,13 +19,26 @@ import os
 
 Import(['*'])
 
-modules = ['encoder', 'interface', 'sensor', 'driver', 'nodes', 'packethandler', 'display']
-objects = []
+env.Append(CPPPATH=[
+    '#src/main',
+    '#src/main/display',
+    '#src/common',
+    ])
 
-for module in modules:
-    sconscript_file = os.path.join(module, 'SConscript')
+env.Append(LINKFLAGS=[
+    '-Wl,--wrap=driverNHD223_Init',
+    '-Wl,--wrap=driverNHD223_SetHorizontalAddressingMode',
+    '-Wl,--wrap=driverNHD223_SetColumnAddressRange',
+    '-Wl,--wrap=driverNHD223_SetPageAddressRange',
+    '-Wl,--wrap=driverNHD223_WriteCommand',
+    '-Wl,--wrap=driverNHD223_WriteCommand',
+    '-Wl,--wrap=driverNHD223_WriteData',
+    '-Wl,--wrap=driverNHD223_ResetDisplay',
+    '-Wl,--wrap=driverNHD223_WriteCommand',
+    '-Wl,--wrap=driverNHD223_WriteCommand'
+    ])
 
-    object = SConscript(sconscript_file, exports={'env': env})
-    objects.append(object)
+SOURCE = Glob('*.c')
+OBJECTS = env.Object(source=SOURCE)
 
-Return('objects')
+Return('OBJECTS')
