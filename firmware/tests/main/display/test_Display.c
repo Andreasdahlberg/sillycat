@@ -1,7 +1,7 @@
 /**
  * @file   test_Display.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-04 (Last edit)
+ * @date   2021-02-05 (Last edit)
  * @brief  Test suite for the Display module.
  */
 
@@ -56,9 +56,14 @@ static uint8_t expected_vram[NHD223_NUMBER_OF_PAGES][NHD223_NUMBER_OF_COLUMNS];
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static int Setup(void **state)
+static void ClearExpectedVRAM(void)
 {
     memset(expected_vram, 0x00, sizeof(expected_vram));
+}
+
+static int Setup(void **state)
+{
+    ClearExpectedVRAM();
 
     expect_function_call(__wrap_driverNHD223_Init);
     expect_function_call_any(__wrap_driverNHD223_SetHorizontalAddressingMode);
@@ -161,12 +166,37 @@ static void test_Display_SetPixel(void **state)
     Display_SetPixel(0, 1);
     CheckVRAM();
 
-
     expected_column = 127;
     expected_page = 3;
     expected_value = 0x80;
     expected_vram[expected_page][expected_column] = expected_value;
     Display_SetPixel(127, 31);
+    CheckVRAM();
+}
+
+static void test_Display_Rotate(void **state)
+{
+    /* Check that VRAM is cleared when changing rotation. */
+    Display_SetPixel(0, 0);
+    Display_Rotate(true);
+    CheckVRAM();
+
+    /* Check that the correct pixel is set, lower right corner instead of upper left corner. */
+    uint8_t expected_column = 127;
+    uint8_t expected_page = 3;
+    uint8_t expected_value = 0x80;
+    expected_vram[expected_page][expected_column] = expected_value;
+    Display_SetPixel(0, 0);
+    CheckVRAM();
+
+    /* Rotate back again. */
+    ClearExpectedVRAM();
+    expected_column = 0;
+    expected_page = 0;
+    expected_value = 0x01;
+    expected_vram[expected_page][expected_column] = expected_value;
+    Display_Rotate(false);
+    Display_SetPixel(0, 0);
     CheckVRAM();
 }
 
@@ -184,6 +214,7 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_Display_Flush, Setup),
         cmocka_unit_test_setup(test_Display_SetPixel_InvalidCoordinates, Setup),
         cmocka_unit_test_setup(test_Display_SetPixel, Setup),
+        cmocka_unit_test_setup(test_Display_Rotate, Setup),
     };
 
     if (argc >= 2)
