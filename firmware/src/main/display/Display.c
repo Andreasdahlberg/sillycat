@@ -1,7 +1,7 @@
 /**
  * @file   Display.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-04 (Last edit)
+ * @date   2021-02-06 (Last edit)
  * @brief  Display interface.
  */
 
@@ -154,7 +154,7 @@ void Display_SetPixel(uint8_t x, uint8_t y)
 
     //Shift 3 bits to the right to divide by 8(page height) and floor value
     page_index = (y >> 3);
-    page_offset = (y - (page_index << 3));
+    page_offset = (y - (uint8_t)(page_index << 3));
 
     if (page_index < NHD223_NUMBER_OF_PAGES && x < NHD223_NUMBER_OF_COLUMNS)
     {
