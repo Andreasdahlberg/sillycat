@@ -1,7 +1,7 @@
 /**
  * @file   test_Display.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-05 (Last edit)
+ * @date   2021-02-06 (Last edit)
  * @brief  Test suite for the Display module.
  */
 
@@ -35,6 +35,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <string.h>
 
+#include "common.h"
 #include "driverNHD223.h"
 #include "Display.h"
 
@@ -77,7 +78,7 @@ static int Setup(void **state)
     return 0;
 }
 
-static void CheckVRAM(void)
+static void ExpectFlush(void)
 {
     for (uint8_t page = 0; page < NHD223_NUMBER_OF_PAGES; ++page)
     {
@@ -86,6 +87,11 @@ static void CheckVRAM(void)
             expect_value(__wrap_driverNHD223_WriteData, data, expected_vram[page][column]);
         }
     }
+}
+
+static void CheckVRAM(void)
+{
+    ExpectFlush();
     Display_Flush();
 }
 
@@ -124,6 +130,18 @@ static void test_Display_Off(void **state)
 static void test_Display_Flush(void **state)
 {
     CheckVRAM();
+}
+
+static void test_Display_SetBrightness(void **state)
+{
+    uint8_t values[] = {0, 128, UINT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        expect_value(__wrap_driverNHD223_WriteCommand, command, SSD1305_SETCONTRAST);
+        expect_value(__wrap_driverNHD223_WriteCommand, command, values[i]);
+        Display_SetBrightness(values[i]);
+    }
 }
 
 static void test_Display_SetPixel_InvalidCoordinates(void **state)
@@ -174,6 +192,21 @@ static void test_Display_SetPixel(void **state)
     CheckVRAM();
 }
 
+static void test_Display_Clear(void **state)
+{
+    Display_SetPixel(0, 0);
+    ExpectFlush();
+    Display_Clear();
+}
+
+static void test_Display_Reset(void **state)
+{
+    Display_SetPixel(0, 0);
+    expect_function_call(__wrap_driverNHD223_ResetDisplay);
+    ExpectFlush();
+    Display_Reset();
+}
+
 static void test_Display_Rotate(void **state)
 {
     /* Check that VRAM is cleared when changing rotation. */
@@ -212,8 +245,11 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_Display_On, Setup),
         cmocka_unit_test_setup(test_Display_Off, Setup),
         cmocka_unit_test_setup(test_Display_Flush, Setup),
+        cmocka_unit_test_setup(test_Display_SetBrightness, Setup),
         cmocka_unit_test_setup(test_Display_SetPixel_InvalidCoordinates, Setup),
         cmocka_unit_test_setup(test_Display_SetPixel, Setup),
+        cmocka_unit_test_setup(test_Display_Clear, Setup),
+        cmocka_unit_test_setup(test_Display_Reset, Setup),
         cmocka_unit_test_setup(test_Display_Rotate, Setup),
     };
 
