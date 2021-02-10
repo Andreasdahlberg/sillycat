@@ -116,7 +116,7 @@ void driverMCP79510_GetTime(struct driverRTC_time_t *time_p)
     time_p->day = BCDToDecimal(timekeeping_registers[REG_TC_DAY] & 0x07);
     time_p->date = BCDToDecimal(timekeeping_registers[REG_TC_DATE]);
     time_p->month = BCDToDecimal(timekeeping_registers[REG_TC_MONTH] & ~(1 << REG_TC_MONTH_LPYR_BIT));
-    time_p->year = BCDToDecimal(timekeeping_registers[REG_TC_YEAR]);;
+    time_p->year = BCDToDecimal(timekeeping_registers[REG_TC_YEAR]);
 }
 
 void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p)
