@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-10 (Last edit)
+ * @date   2021-02-10 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -33,6 +33,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "stdint.h"
 #include "stdbool.h"
 #include "libSPI.h"
+#include "driverRTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -52,9 +53,14 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * @param pre_fp  Function for preparing a SPI-transfer.
  * @param post_fp Function for ending a SPI-transfer.
  */
-void driverMCP79510_Init(libSPI_callback_type pre_fp,
-                         libSPI_callback_type post_fp
-                        );
+void driverMCP79510_Init(libSPI_callback_type pre_fp, libSPI_callback_type post_fp);
+
+/**
+ * Get the current time.
+ *
+ * @param time_p Pointer to variable where the result will be stored.
+ */
+void driverMCP79510_GetTime(struct driverRTC_time_t *time_p);
 
 /**
  * Get hundredth of second.

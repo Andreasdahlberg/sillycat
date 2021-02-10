@@ -1,7 +1,7 @@
 /**
  * @file   driverRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-14 (Last edit)
+ * @date   2021-02-10 (Last edit)
  * @brief  RTC driver interface.
  */
 
@@ -29,6 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "common.h"
 #include "Board.h"
 #include "driverMCP79510.h"
+#include "driverRTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -55,6 +56,11 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void driverRTC_Init(void)
 {
     driverMCP79510_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback);
+}
+
+void driverRTC_GetTime(struct driverRTC_time_t *time_p)
+{
+    driverMCP79510_GetTime(time_p);
 }
 
 void driverRTC_GetYear(uint8_t *year_p)

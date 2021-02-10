@@ -27,6 +27,7 @@ env.Append(CPPPATH=[
     '#src/common/event',
     '#src/common/timer',
     '#src/common/board',
+    '#src/common/driver/RTC',
     '#src/utility/Bit',
     '#src/main/board',
 ])
