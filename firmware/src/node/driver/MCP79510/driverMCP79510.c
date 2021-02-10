@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-21 (Last edit)
+ * @date   2021-02-10 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -65,7 +65,9 @@ static struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 static uint8_t ReadRegister(uint8_t address);
+static void ReadRegisters(uint8_t address, void *dst_p, size_t length);
 static void WriteRegister(uint8_t address, uint8_t register_data);
+static uint8_t GetHour(uint8_t register_content);
 
 #ifdef DEBUG_ENABLE
 static void DumpRegisterValues(void) __attribute__((unused));
@@ -97,6 +99,24 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp,
     }
 
     INFO("MCP79510 initialized");
+}
+
+void driverMCP79510_GetTime(struct driverRTC_time_t *time_p)
+{
+    sc_assert(time_p != NULL);
+
+    /* Read all timekeeping registers in one operation to avoid rollover issues. */
+    const uint8_t number_of_timekeeping_registers = REG_TC_YEAR - REG_TC_SEC_CENT + 1;
+    uint8_t timekeeping_registers[number_of_timekeeping_registers];
+    ReadRegisters(REG_TC_SEC_CENT, timekeeping_registers, number_of_timekeeping_registers);
+
+    time_p->second = BCDToDecimal(timekeeping_registers[REG_TC_SEC] & ~(1 << REG_TC_SEC_OSC_BIT));
+    time_p->minute = BCDToDecimal(timekeeping_registers[REG_TC_MIN]);
+    time_p->hour = GetHour(timekeeping_registers[REG_TC_HOUR]);
+    time_p->day = BCDToDecimal(timekeeping_registers[REG_TC_DAY] & 0x07);
+    time_p->date = BCDToDecimal(timekeeping_registers[REG_TC_DATE]);
+    time_p->month = BCDToDecimal(timekeeping_registers[REG_TC_MONTH] & ~(1 << REG_TC_MONTH_LPYR_BIT));
+    time_p->year = BCDToDecimal(timekeeping_registers[REG_TC_YEAR]);;
 }
 
 void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p)
@@ -217,20 +237,8 @@ bool driverMCP79510_SetAlarmMinute(uint8_t minute, uint8_t alarm_index)
 
 void driverMCP79510_GetHour(uint8_t *hour_p)
 {
-    uint8_t register_content;
-    register_content = ReadRegister(REG_TC_HOUR);
-
-    //Check if 24-hour mode is used.
-    if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
-    {
-        register_content &= 0x3F;
-    }
-    else
-    {
-        register_content &= 0x1F;
-    }
-
-    *hour_p = BCDToDecimal(register_content);
+    uint8_t register_content = ReadRegister(REG_TC_HOUR);
+    *hour_p = GetHour(register_content);
 }
 
 bool driverMCP79510_SetHour(uint8_t hour)
@@ -627,4 +635,28 @@ static uint8_t ReadRegister(uint8_t address)
     libSPI_WriteByte(address, NULL, NULL);
     libSPI_ReadByte(&register_data, NULL, module.PostSPI);
     return register_data;
+}
+
+static void ReadRegisters(uint8_t address, void *dst_p, size_t length)
+{
+    sc_assert(address < 0x20);
+
+    libSPI_WriteByte(INST_READ, module.PreSPI, NULL);
+    libSPI_WriteByte(address, NULL, NULL);
+    libSPI_Read(dst_p, length, NULL, module.PostSPI);
+}
+
+static uint8_t GetHour(uint8_t register_content)
+{
+    //Check if 24-hour mode is used.
+    if (!Bit_Get(REG_TC_HOUR_MODE_BIT, &register_content))
+    {
+        register_content &= 0x3F;
+    }
+    else
+    {
+        register_content &= 0x1F;
+    }
+
+    return BCDToDecimal(register_content);
 }
