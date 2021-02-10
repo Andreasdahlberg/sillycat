@@ -1,7 +1,7 @@
 /**
  * @file   driverRTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-14 (Last edit)
+ * @date   2021-02-10 (Last edit)
  * @brief  Virtual RTC driver.
  */
 
@@ -40,6 +40,17 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //TYPE DEFINITIONS
 //////////////////////////////////////////////////////////////////////////
 
+struct driverRTC_time_t
+{
+    uint8_t year;
+    uint8_t month;
+    uint8_t date;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+};
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
@@ -48,6 +59,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * Initialize the RTC.
  */
 void driverRTC_Init(void);
+
+/**
+ * Get the current time.
+ *
+ * @param time_p Pointer to variable where the result will be stored.
+ */
+void driverRTC_GetTime(struct driverRTC_time_t *time_p);
 
 /**
  * Get the current year.
