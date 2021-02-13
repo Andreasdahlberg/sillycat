@@ -31,6 +31,7 @@ env.Append(LINKFLAGS=[
     '-Wl,--wrap=DecimalToBCD',
     '-Wl,--wrap=libSPI_WriteByte',
     '-Wl,--wrap=libSPI_ReadByte',
+    '-Wl,--wrap=libSPI_Read',
     '-Wl,--wrap=Bit_Get',
 ])
 

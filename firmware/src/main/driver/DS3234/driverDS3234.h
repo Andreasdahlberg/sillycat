@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-23 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -34,6 +34,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 #include "libSPI.h"
+#include "driverRTC.h"
 
 //////////////////////////////////////////////////////////////////////////
 //DEFINES
@@ -54,6 +55,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * @param post_p Function for ending a SPI-transfer.
  */
 void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p);
+
+/**
+ * Get the current time.
+ *
+ * @param time_p Pointer to variable where the result will be stored.
+ */
+void driverDS3234_GetTime(struct driverRTC_time_t *time_p);
 
 /**
  * Get the chip-temperature.
