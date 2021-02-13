@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-10 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -61,6 +61,15 @@ void driverMCP79510_Init(libSPI_callback_type pre_fp, libSPI_callback_type post_
  * @param time_p Pointer to variable where the result will be stored.
  */
 void driverMCP79510_GetTime(struct driverRTC_time_t *time_p);
+
+/**
+ * Set the current time.
+ *
+ * @param time_p Pointer to struct with time to set.
+ *
+ * @return True if new time was set successfully, otherwise false.
+ */
+bool driverMCP79510_SetTime(struct driverRTC_time_t *time_p);
 
 /**
  * Get hundredth of second.

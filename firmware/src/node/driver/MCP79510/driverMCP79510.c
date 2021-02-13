@@ -1,7 +1,7 @@
 /**
  * @file   driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-10 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Driver for the MCP79510 RTC.
  */
 
@@ -117,6 +117,29 @@ void driverMCP79510_GetTime(struct driverRTC_time_t *time_p)
     time_p->date = BCDToDecimal(timekeeping_registers[REG_TC_DATE]);
     time_p->month = BCDToDecimal(timekeeping_registers[REG_TC_MONTH] & ~(1 << REG_TC_MONTH_LPYR_BIT));
     time_p->year = BCDToDecimal(timekeeping_registers[REG_TC_YEAR]);
+}
+
+bool driverMCP79510_SetTime(struct driverRTC_time_t *time_p)
+{
+    sc_assert(time_p != NULL);
+
+    driverMCP79510_EnableOscillator(false);
+    while(driverMCP79510_IsOscillatorRunning())
+    {
+        /**
+         * Wait for the oscillator to stop.
+         */
+    }
+
+    bool status = driverMCP79510_SetSecond(time_p->second) &&
+                  driverMCP79510_SetMinute(time_p->minute) &&
+                  driverMCP79510_SetHour(time_p->hour) &&
+                  driverMCP79510_SetDate(time_p->date) &&
+                  driverMCP79510_SetMonth(time_p->month) &&
+                  driverMCP79510_SetYear(time_p->year);
+
+    driverMCP79510_EnableOscillator(true);
+    return status;
 }
 
 void driverMCP79510_GetHundredthSecond(uint8_t *hsec_p)
