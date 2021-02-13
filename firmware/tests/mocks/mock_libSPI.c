@@ -1,7 +1,7 @@
 /**
  * @file   mock_libSPI.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-21 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Mock functions.
  */
 
@@ -32,6 +32,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include <setjmp.h>
 #include <cmocka.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "libSPI.h"
 
@@ -75,6 +76,10 @@ void __wrap_libSPI_ReadByte(uint8_t *data_p, libSPI_callback_type pre_callback, 
 
 void __wrap_libSPI_Read(void *data_p, size_t length, libSPI_callback_type pre_callback, libSPI_callback_type post_callback)
 {
+    uint8_t *mock_data_p = mock_ptr_type(uint8_t *);
+
+    check_expected(length);
+    memcpy(data_p, mock_data_p, length);
 }
 
 void __wrap_libSPI_SetAsMaster(void)
