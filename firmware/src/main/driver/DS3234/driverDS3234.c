@@ -61,6 +61,7 @@ static struct module_t module;
 static inline bool IsRegisterAddressValid(uint8_t address);
 static void WriteRegister(uint8_t address, uint8_t data);
 static uint8_t ReadRegister(uint8_t address);
+static void ReadRegisters(uint8_t address, void *dst_p, size_t length);
 static void ClearBit(uint8_t register_address, uint8_t bit_index);
 static void SetBit(uint8_t register_address, uint8_t bit_index);
 static void GetDecimalRegisterValue(uint8_t address, uint8_t *value_p);
@@ -90,6 +91,27 @@ void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p)
     WriteRegister(REG_CONTROL, 0x1C);
 
     INFO("DS3234 initialized");
+}
+
+void driverDS3234_GetTime(struct driverRTC_time_t *time_p)
+{
+    sc_assert(time_p != NULL);
+
+    /* Read all timekeeping registers in one operation to avoid rollover issues. */
+    const uint8_t start_address = REG_SECONDS;
+    const uint8_t end_address = REG_YEAR;
+    const uint8_t number_of_timekeeping_registers = end_address - start_address + 1;
+    uint8_t timekeeping_registers[number_of_timekeeping_registers];
+    ReadRegisters(start_address, timekeeping_registers, number_of_timekeeping_registers);
+
+    const uint8_t hour_mask = driverDS3234_Is24HourMode() ? HOUR_24_MASK : HOUR_12_MASK;
+    time_p->second = BCDToDecimal(timekeeping_registers[REG_SECONDS]);
+    time_p->minute = BCDToDecimal(timekeeping_registers[REG_MINUTES]);
+    time_p->hour = BCDToDecimal(timekeeping_registers[REG_HOUR] & hour_mask);
+    time_p->day = BCDToDecimal(timekeeping_registers[REG_DAY]);
+    time_p->date = BCDToDecimal(timekeeping_registers[REG_DATE]);
+    time_p->month = BCDToDecimal(timekeeping_registers[REG_MONTH_CENTURY] & MONTH_MASK);
+    time_p->year = BCDToDecimal(timekeeping_registers[REG_YEAR]);
 }
 
 void driverDS3234_GetTemperature(int16_t *temperature_p)
@@ -422,6 +444,14 @@ static uint8_t ReadRegister(uint8_t address)
     libSPI_ReadByte(&data, NULL, module.PostSPI);
 
     return data;
+}
+
+static void ReadRegisters(uint8_t address, void *dst_p, size_t length)
+{
+    sc_assert(IsRegisterAddressValid(address));
+
+    libSPI_WriteByte(address | READ_ADDRESS, module.PreSPI, NULL);
+    libSPI_Read(dst_p, length, NULL, module.PostSPI);
 }
 
 static void ClearBit(uint8_t register_address, uint8_t bit_index)
