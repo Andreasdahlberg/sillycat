@@ -62,9 +62,11 @@ static void StubSPIPostCallback(void);
 static void ExpectWriteRegister(uint8_t address);
 static void ExpectWriteValueRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegister(uint8_t address, uint8_t data);
+static void ExpectReadRegisters(uint8_t address, uint8_t *data_p, size_t length);
 static void ExpectModifyRegister(uint8_t address, uint8_t initial_data, uint8_t new_data);
 static void ExpectResetControlRegister(void);
 static void Set24HourMode(bool enabled);
+static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRTC_time_t *time_p);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -110,6 +112,14 @@ static void ExpectReadRegister(uint8_t address, uint8_t data)
     will_return(__wrap_libSPI_ReadByte, data);
 }
 
+static void ExpectReadRegisters(uint8_t address, uint8_t *data_p, size_t length)
+{
+    expect_value(__wrap_libSPI_WriteByte, data, address | READ_ADDRESS);
+
+    expect_value(__wrap_libSPI_Read, length, length);
+    will_return(__wrap_libSPI_Read, data_p);
+}
+
 static void ExpectModifyRegister(uint8_t address, uint8_t initial_data, uint8_t new_data)
 {
     ExpectReadRegister(address,  initial_data);
@@ -130,6 +140,20 @@ static void Set24HourMode(bool enabled)
     will_return(__wrap_Bit_Get, !enabled);
 }
 
+static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRTC_time_t *time_p)
+{
+    const uint8_t century_bit = (1 << 7);
+    const uint8_t hour_mode_bit = (1 << HOUR_MODE_BIT);
+
+    registers_p[REG_SECONDS] = __wrap_DecimalToBCD(time_p->second);
+    registers_p[REG_MINUTES] = __wrap_DecimalToBCD(time_p->minute);
+    registers_p[REG_HOUR] = hour_mode_bit | __wrap_DecimalToBCD(time_p->hour);
+    registers_p[REG_DAY] = __wrap_DecimalToBCD(time_p->day);
+    registers_p[REG_DATE] = __wrap_DecimalToBCD(time_p->date);
+    registers_p[REG_MONTH_CENTURY] = century_bit | __wrap_DecimalToBCD(time_p->month);
+    registers_p[REG_YEAR]  = __wrap_DecimalToBCD(time_p->year);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
@@ -145,6 +169,53 @@ static void test_driverDS3234_Init(void **state)
 {
     ExpectResetControlRegister();
     driverDS3234_Init(StubSPIPreCallback, StubSPIPostCallback);
+}
+
+static void test_driverDS3234_GetTime(void **state)
+{
+    struct driverRTC_time_t expected_time =
+    {
+        .year = 21,
+        .month = 2,
+        .date = 14,
+        .hour = 23,
+        .minute = 28,
+        .second = 30,
+    };
+
+    uint8_t registers[REG_YEAR - REG_SECONDS + 1] = {0};
+
+    /* 24h mode */
+    FillTimeKeepingRegisters(registers, &expected_time);
+    ExpectReadRegisters(REG_SECONDS, registers, sizeof(registers));
+
+    Set24HourMode(true);
+    struct driverRTC_time_t time;
+    driverRTC_GetTime(&time);
+
+    assert_int_equal(time.year, expected_time.year);
+    assert_int_equal(time.month, expected_time.month);
+    assert_int_equal(time.date, expected_time.date);
+    assert_int_equal(time.day, expected_time.day);
+    assert_int_equal(time.hour, expected_time.hour);
+    assert_int_equal(time.minute, expected_time.minute);
+    assert_int_equal(time.second, expected_time.second);
+
+    /* 12h mode */
+    expected_time.hour = 11;
+    FillTimeKeepingRegisters(registers, &expected_time);
+    ExpectReadRegisters(REG_SECONDS, registers, sizeof(registers));
+
+    Set24HourMode(false);
+    driverRTC_GetTime(&time);
+
+    assert_int_equal(time.year, expected_time.year);
+    assert_int_equal(time.month, expected_time.month);
+    assert_int_equal(time.date, expected_time.date);
+    assert_int_equal(time.day, expected_time.day);
+    assert_int_equal(time.hour, expected_time.hour);
+    assert_int_equal(time.minute, expected_time.minute);
+    assert_int_equal(time.second, expected_time.second);
 }
 
 static void test_driverDS3234_GetTemperature(void **state)
@@ -838,6 +909,7 @@ int main(int argc, char *argv[])
     {
         cmocka_unit_test(test_driverDS3234_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverDS3234_Init),
+        cmocka_unit_test_setup(test_driverDS3234_GetTime, Setup),
         cmocka_unit_test_setup(test_driverDS3234_GetTemperature, Setup),
         cmocka_unit_test_setup(test_driverDS3234_GetYear, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetYear_InvalidYear, Setup),
