@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-16 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Implementation of RTC interface
  */
 
@@ -72,12 +72,14 @@ bool RTC_GetCurrentTime(struct time_t *time_p)
 {
     sc_assert(time_p != NULL);
 
-    driverRTC_GetYear(&time_p->year);
-    driverRTC_GetMonth(&time_p->month);
-    driverRTC_GetDate(&time_p->date);
-    driverRTC_GetHour(&time_p->hour);
-    driverRTC_GetMinute(&time_p->minute);
-    driverRTC_GetSecond(&time_p->second);
+    struct driverRTC_time_t rtc_time;
+    driverRTC_GetTime(&rtc_time);
+    time_p->year = rtc_time.year;
+    time_p->month = rtc_time.month;
+    time_p->date = rtc_time.date;
+    time_p->hour = rtc_time.hour;
+    time_p->minute = rtc_time.minute;
+    time_p->second = rtc_time.second;
     return true;
 }
 
