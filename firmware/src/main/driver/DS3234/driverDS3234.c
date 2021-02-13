@@ -114,6 +114,21 @@ void driverDS3234_GetTime(struct driverRTC_time_t *time_p)
     time_p->year = BCDToDecimal(timekeeping_registers[REG_YEAR]);
 }
 
+bool driverDS3234_SetTime(struct driverRTC_time_t *time_p)
+{
+    sc_assert(time_p != NULL);
+
+    /**
+     * Write seconds first to reset the countdown chain and avoid rollover issues.
+     */
+    return driverDS3234_SetSecond(time_p->second) &&
+           driverDS3234_SetMinute(time_p->minute) &&
+           driverDS3234_SetHour(time_p->hour) &&
+           driverDS3234_SetDate(time_p->date) &&
+           driverDS3234_SetMonth(time_p->month) &&
+           driverDS3234_SetYear(time_p->year);
+}
+
 void driverDS3234_GetTemperature(int16_t *temperature_p)
 {
     const int16_t scaling_factor = 100;
