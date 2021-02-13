@@ -1,7 +1,7 @@
 /**
  * @file   test_driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-23 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Test suite for the DS3234 RTC driver.
  */
 
@@ -327,11 +327,25 @@ static void test_driverDS3234_SetDay(void **state)
 
 static void test_driverDS3234_GetHour(void **state)
 {
-    const uint8_t values[] = {0, 1, 12, 22, 23};
-
-    for (size_t i = 0; i < ElementsIn(values); ++i)
+    const uint8_t values_12[] = {1, 2, 6, 11, 12};
+    for (size_t i = 0; i < ElementsIn(values_12); ++i)
     {
-        const uint8_t value = values[i];
+        Set24HourMode(false);
+
+        const uint8_t value = values_12[i];
+        ExpectReadRegister(REG_HOUR, (1 << HOUR_MODE_BIT) | (1 << HOUR_AM_PM_BIT) | __wrap_DecimalToBCD(value));
+
+        uint8_t result;
+        driverDS3234_GetHour(&result);
+        assert_int_equal(result, value);
+    }
+
+    const uint8_t values_24[] = {0, 1, 12, 22, 23};
+    for (size_t i = 0; i < ElementsIn(values_24); ++i)
+    {
+        Set24HourMode(true);
+
+        const uint8_t value = values_24[i];
         ExpectReadRegister(REG_HOUR, __wrap_DecimalToBCD(value));
 
         uint8_t result;
@@ -362,16 +376,22 @@ static void test_driverDS3234_SetHour(void **state)
     const uint8_t values_12[] = {1, 2, 6, 11, 12};
     for (size_t i = 0; i < ElementsIn(values_12); ++i)
     {
+        const uint8_t initial_register_data = (1 << HOUR_MODE_BIT);
+        const uint8_t new_register_data = (1 << HOUR_MODE_BIT) | __wrap_DecimalToBCD(values_12[i]);
+
         Set24HourMode(false);
-        ExpectWriteValueRegister(REG_HOUR, __wrap_DecimalToBCD(values_12[i]));
+        ExpectModifyRegister(REG_HOUR, initial_register_data, new_register_data);
         assert_true(driverDS3234_SetHour(values_12[i]));
     }
 
     const uint8_t values_24[] = {0, 1, 12, 22, 23};
     for (size_t i = 0; i < ElementsIn(values_24); ++i)
     {
+        const uint8_t initial_register_data = 0x00;
+        const uint8_t new_register_data = __wrap_DecimalToBCD(values_24[i]);
+
         Set24HourMode(true);
-        ExpectWriteValueRegister(REG_HOUR, __wrap_DecimalToBCD(values_24[i]));
+        ExpectModifyRegister(REG_HOUR, initial_register_data, new_register_data);
         assert_true(driverDS3234_SetHour(values_24[i]));
     }
 }

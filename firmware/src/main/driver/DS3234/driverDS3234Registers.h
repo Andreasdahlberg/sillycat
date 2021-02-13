@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234Registers.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-06 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Register definitions for the DS3234 driver.
  */
 
@@ -56,7 +56,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define WRITE_ADDRESS   0x80
 
 #define MONTH_MASK      0x1F
-#define HOUR_MASK       0x1F
+#define HOUR_12_MASK    0x1F
+#define HOUR_24_MASK    0x3F
 
 #define HOUR_MODE_BIT   0x06
 #define HOUR_AM_PM_BIT  0x05

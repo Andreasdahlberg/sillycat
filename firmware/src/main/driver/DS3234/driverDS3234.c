@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-23 (Last edit)
+ * @date   2021-02-13 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -183,7 +183,9 @@ bool driverDS3234_SetDay(uint8_t day)
 
 void driverDS3234_GetHour(uint8_t *hour_p)
 {
-    GetDecimalRegisterValue(REG_HOUR, hour_p);
+    const uint8_t mask = driverDS3234_Is24HourMode() ? HOUR_24_MASK : HOUR_12_MASK;
+    const uint8_t register_data = ReadRegister(REG_HOUR);
+    *hour_p = BCDToDecimal(register_data & mask);
 }
 
 bool driverDS3234_SetHour(uint8_t hour)
@@ -195,7 +197,10 @@ bool driverDS3234_SetHour(uint8_t hour)
     bool status = false;
     if (hour >= min_hour && hour <= max_hour)
     {
-        SetDecimalRegisterValue(REG_HOUR, hour);
+        const uint8_t mask = is_24_hour_mode ? ~HOUR_24_MASK : ~HOUR_12_MASK;
+        uint8_t register_data = (ReadRegister(REG_HOUR) & mask) | DecimalToBCD(hour);
+        WriteRegister(REG_HOUR, register_data);
+
         status = true;
     }
 
