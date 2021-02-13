@@ -119,7 +119,7 @@ void driverMCP79510_GetTime(struct driverRTC_time_t *time_p)
     time_p->year = BCDToDecimal(timekeeping_registers[REG_TC_YEAR]);
 }
 
-bool driverMCP79510_SetTime(struct driverRTC_time_t *time_p)
+bool driverMCP79510_SetTime(const struct driverRTC_time_t *time_p)
 {
     sc_assert(time_p != NULL);
 

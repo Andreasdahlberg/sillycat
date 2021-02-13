@@ -70,7 +70,7 @@ void driverDS3234_GetTime(struct driverRTC_time_t *time_p);
  *
  * @return True if new time was set successfully, otherwise false.
  */
-bool driverDS3234_SetTime(struct driverRTC_time_t *time_p);
+bool driverDS3234_SetTime(const struct driverRTC_time_t *time_p);
 
 /**
  * Get the chip-temperature.

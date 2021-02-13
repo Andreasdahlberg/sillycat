@@ -114,7 +114,7 @@ void driverDS3234_GetTime(struct driverRTC_time_t *time_p)
     time_p->year = BCDToDecimal(timekeeping_registers[REG_YEAR]);
 }
 
-bool driverDS3234_SetTime(struct driverRTC_time_t *time_p)
+bool driverDS3234_SetTime(const struct driverRTC_time_t *time_p)
 {
     sc_assert(time_p != NULL);
 

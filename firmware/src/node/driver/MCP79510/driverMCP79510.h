@@ -69,7 +69,7 @@ void driverMCP79510_GetTime(struct driverRTC_time_t *time_p);
  *
  * @return True if new time was set successfully, otherwise false.
  */
-bool driverMCP79510_SetTime(struct driverRTC_time_t *time_p);
+bool driverMCP79510_SetTime(const struct driverRTC_time_t *time_p);
 
 /**
  * Get hundredth of second.
