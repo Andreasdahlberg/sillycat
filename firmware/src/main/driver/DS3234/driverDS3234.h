@@ -64,6 +64,15 @@ void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p);
 void driverDS3234_GetTime(struct driverRTC_time_t *time_p);
 
 /**
+ * Set the current time.
+ *
+ * @param time_p Pointer to struct with time to set.
+ *
+ * @return True if new time was set successfully, otherwise false.
+ */
+bool driverDS3234_SetTime(struct driverRTC_time_t *time_p);
+
+/**
  * Get the chip-temperature.
  *
  * This function does not start a new temperature conversion so the temperature is
