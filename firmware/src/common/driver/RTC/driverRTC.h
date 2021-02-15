@@ -1,7 +1,7 @@
 /**
  * @file   driverRTC.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-10 (Last edit)
+ * @date   2021-02-15 (Last edit)
  * @brief  Virtual RTC driver.
  */
 
@@ -66,6 +66,15 @@ void driverRTC_Init(void);
  * @param time_p Pointer to variable where the result will be stored.
  */
 void driverRTC_GetTime(struct driverRTC_time_t *time_p);
+
+/**
+ * Set the current time.
+ *
+ * @param time_p Pointer to struct with time to set.
+ *
+ * @return True if the time was set, otherwise false.
+ */
+bool driverRTC_SetTime(const struct driverRTC_time_t *time_p);
 
 /**
  * Get the current year.
