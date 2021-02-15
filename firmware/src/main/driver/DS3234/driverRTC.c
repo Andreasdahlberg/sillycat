@@ -1,7 +1,7 @@
 /**
  * @file   driverRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-13 (Last edit)
+ * @date   2021-02-15 (Last edit)
  * @brief  RTC driver interface.
  */
 
@@ -60,6 +60,11 @@ void driverRTC_Init(void)
 void driverRTC_GetTime(struct driverRTC_time_t *time_p)
 {
     driverDS3234_GetTime(time_p);
+}
+
+bool driverRTC_SetTime(const struct driverRTC_time_t *time_p)
+{
+    return driverDS3234_SetTime(time_p);
 }
 
 void driverRTC_GetYear(uint8_t *year_p)

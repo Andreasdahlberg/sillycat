@@ -1,7 +1,7 @@
 /**
  * @file   RTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-13 (Last edit)
+ * @date   2021-02-15 (Last edit)
  * @brief  Implementation of RTC interface
  */
 
@@ -87,12 +87,14 @@ bool RTC_SetCurrentTime(const struct time_t *time_p)
 {
     sc_assert(time_p != NULL);
 
-    return driverRTC_SetYear(time_p->year) &&
-           driverRTC_SetMonth(time_p->month) &&
-           driverRTC_SetDate(time_p->date) &&
-           driverRTC_SetHour(time_p->hour) &&
-           driverRTC_SetMinute(time_p->minute) &&
-           driverRTC_SetSecond(time_p->second);
+    struct driverRTC_time_t rtc_time;
+    rtc_time.year = time_p->year;
+    rtc_time.month = time_p->month;
+    rtc_time.date = time_p->date;
+    rtc_time.hour = time_p->hour;
+    rtc_time.minute = time_p->minute;
+    rtc_time.second = time_p->second;
+    return driverRTC_SetTime(&rtc_time);
 }
 
 bool RTC_SetAlarmTime(const struct time_t *time_p)
