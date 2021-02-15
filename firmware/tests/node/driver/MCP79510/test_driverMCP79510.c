@@ -1,7 +1,7 @@
 /**
  * @file   test_driverMCP79510.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-22 (Last edit)
+ * @date   2021-02-15 (Last edit)
  * @brief  Test suite for the MCP79510 driver.
  */
 /*
@@ -63,6 +63,7 @@ static void StubSPIPostCallback(void);
 static void ExpectWriteRegister(uint8_t address);
 static void ExpectWriteValueRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegister(uint8_t address, uint8_t data);
+static void ExpectReadRegisters(uint8_t address, uint8_t *data_p, size_t length);
 static void ExpectModifyRegister(uint8_t address);
 static void ExpectWriteSRAM(uint8_t address);
 static void ExpectReadSRAM(uint8_t address);
@@ -71,6 +72,7 @@ static void ExpectEnableOscillator(void);
 static void ExpectSetOscillatorTrimming(void);
 static void ExpectIsOscillatorRunning(void);
 static void Set24HourMode(bool enabled);
+static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRTC_time_t *time_p, bool is_24h_mode);
 
 //////////////////////////////////////////////////////////////////////////
 //INTERUPT SERVICE ROUTINES
@@ -123,6 +125,14 @@ static void ExpectReadRegister(uint8_t address, uint8_t data)
     will_return(__wrap_libSPI_ReadByte, data);
 }
 
+static void ExpectReadRegisters(uint8_t address, uint8_t *data_p, size_t length)
+{
+    expect_value(__wrap_libSPI_WriteByte, data, INST_READ);
+    expect_value(__wrap_libSPI_WriteByte, data, address);
+    expect_value(__wrap_libSPI_Read, length, length);
+    will_return(__wrap_libSPI_Read, data_p);
+}
+
 static void ExpectModifyRegister(uint8_t address)
 {
     ExpectReadRegister(address, 0);
@@ -173,6 +183,21 @@ static void Set24HourMode(bool enabled)
     ExpectReadRegister(REG_TC_HOUR, register_data);
 }
 
+static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRTC_time_t *time_p, bool is_24h_mode)
+{
+    const uint8_t oscillator_bit = (1 << REG_TC_SEC_OSC_BIT);
+    const uint8_t hour_mode_bit = is_24h_mode ?  0 : (1 << REG_TC_HOUR_MODE_BIT);
+    const uint8_t leap_year_bit = (1 << REG_TC_MONTH_LPYR_BIT);
+
+    registers_p[REG_TC_SEC] = oscillator_bit | __wrap_DecimalToBCD(time_p->second);
+    registers_p[REG_TC_MIN] = __wrap_DecimalToBCD(time_p->minute);
+    registers_p[REG_TC_HOUR] = hour_mode_bit | __wrap_DecimalToBCD(time_p->hour);
+    registers_p[REG_TC_DAY] = __wrap_DecimalToBCD(time_p->day);
+    registers_p[REG_TC_DATE] = __wrap_DecimalToBCD(time_p->date);
+    registers_p[REG_TC_MONTH] = leap_year_bit | __wrap_DecimalToBCD(time_p->month);
+    registers_p[REG_TC_YEAR]  = __wrap_DecimalToBCD(time_p->year);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //TESTS
 //////////////////////////////////////////////////////////////////////////
@@ -192,6 +217,51 @@ static void test_driverMCP79510_Init(void **state)
     ExpectIsOscillatorRunning();
 
     driverMCP79510_Init(StubSPIPreCallback, StubSPIPostCallback);
+}
+
+static void test_driverMCP79510_GetTime(void **state)
+{
+    struct driverRTC_time_t expected_time =
+    {
+        .year = 21,
+        .month = 2,
+        .date = 14,
+        .hour = 23,
+        .minute = 28,
+        .second = 30,
+    };
+
+    uint8_t registers[REG_TC_YEAR - REG_TC_SEC_CENT + 1] = {0};
+
+    /* 24h mode */
+    FillTimeKeepingRegisters(registers, &expected_time, true);
+    ExpectReadRegisters(REG_TC_SEC_CENT, registers, sizeof(registers));
+
+    struct driverRTC_time_t time;
+    driverRTC_GetTime(&time);
+
+    assert_int_equal(time.year, expected_time.year);
+    assert_int_equal(time.month, expected_time.month);
+    assert_int_equal(time.date, expected_time.date);
+    assert_int_equal(time.day, expected_time.day);
+    assert_int_equal(time.hour, expected_time.hour);
+    assert_int_equal(time.minute, expected_time.minute);
+    assert_int_equal(time.second, expected_time.second);
+
+    /* 12h mode */
+    expected_time.hour = 11;
+    FillTimeKeepingRegisters(registers, &expected_time, false);
+    ExpectReadRegisters(REG_TC_SEC_CENT, registers, sizeof(registers));
+
+    driverRTC_GetTime(&time);
+
+    assert_int_equal(time.year, expected_time.year);
+    assert_int_equal(time.month, expected_time.month);
+    assert_int_equal(time.date, expected_time.date);
+    assert_int_equal(time.day, expected_time.day);
+    assert_int_equal(time.hour, expected_time.hour);
+    assert_int_equal(time.minute, expected_time.minute);
+    assert_int_equal(time.second, expected_time.second);
 }
 
 static void test_driverMCP79510_GetHundredthSecond(void **state)
@@ -1084,7 +1154,6 @@ static void test_driverMCP79510_GetEUI_InvalidParameters(void **state)
     expect_assert_failure(driverMCP79510_GetEUI(&eui, SIZE_MAX));
 }
 
-
 static void test_driverMCP79510_GetEUI(void **state)
 {
     uint8_t eui[8];
@@ -1171,6 +1240,7 @@ int main(int argc, char *argv[])
     {
         cmocka_unit_test(test_driverMCP79510_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverMCP79510_Init),
+        cmocka_unit_test_setup(test_driverMCP79510_GetTime, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_GetHundredthSecond, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond_Invalid, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond, Setup),
