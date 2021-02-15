@@ -71,6 +71,7 @@ static void ExpectEnableSquareWave(void);
 static void ExpectEnableOscillator(void);
 static void ExpectSetOscillatorTrimming(void);
 static void ExpectIsOscillatorRunning(void);
+static void ExpectIsOscillatorStopped(void);
 static void Set24HourMode(bool enabled);
 static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRTC_time_t *time_p, bool is_24h_mode);
 
@@ -177,6 +178,13 @@ static void ExpectIsOscillatorRunning(void)
     ExpectReadRegister(REG_TC_DAY, 0xFF);
 }
 
+static void ExpectIsOscillatorStopped(void)
+{
+    ExpectReadRegister(REG_TC_DAY, 0xFF);
+    ExpectReadRegister(REG_TC_DAY, 0xFF);
+    ExpectReadRegister(REG_TC_DAY, 0x00);
+}
+
 static void Set24HourMode(bool enabled)
 {
     const uint8_t register_data = ((!(uint8_t)enabled) << REG_TC_HOUR_MODE_BIT);
@@ -262,6 +270,63 @@ static void test_driverMCP79510_GetTime(void **state)
     assert_int_equal(time.hour, expected_time.hour);
     assert_int_equal(time.minute, expected_time.minute);
     assert_int_equal(time.second, expected_time.second);
+}
+
+static void test_driverMCP79510_SetTime_Invalid(void **state)
+{
+    expect_assert_failure(driverRTC_SetTime(NULL));
+
+    struct driverRTC_time_t time =
+    {
+        .year = 21,
+        .month = 2,
+        .date = 14,
+        .hour = 23,
+        .minute = 28,
+        .second = 30,
+    };
+
+    ExpectEnableOscillator();
+    ExpectIsOscillatorStopped();
+
+    ExpectReadRegister(REG_TC_SEC, 0x00);
+    ExpectWriteRegister(REG_TC_SEC);
+    ExpectWriteRegister(REG_TC_MIN);
+    Set24HourMode(false);
+
+    ExpectEnableOscillator();
+
+    assert_false(driverRTC_SetTime(&time));
+}
+
+static void test_driverMCP79510_SetTime(void **state)
+{
+    struct driverRTC_time_t time =
+    {
+        .year = 21,
+        .month = 2,
+        .date = 14,
+        .hour = 23,
+        .minute = 28,
+        .second = 30,
+    };
+    ExpectEnableOscillator();
+    ExpectIsOscillatorStopped();
+
+    ExpectReadRegister(REG_TC_SEC, 0x00);
+    ExpectWriteRegister(REG_TC_SEC);
+    ExpectWriteRegister(REG_TC_MIN);
+    Set24HourMode(true);
+    ExpectReadRegister(REG_TC_HOUR, 0x00);
+    ExpectWriteRegister(REG_TC_HOUR);
+    ExpectWriteRegister(REG_TC_DATE);
+    ExpectReadRegister(REG_TC_MONTH, 0x00);
+    ExpectWriteRegister(REG_TC_MONTH);
+    ExpectWriteRegister(REG_TC_YEAR);
+
+    ExpectEnableOscillator();
+
+    assert_true(driverRTC_SetTime(&time));
 }
 
 static void test_driverMCP79510_GetHundredthSecond(void **state)
@@ -1241,6 +1306,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_driverMCP79510_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverMCP79510_Init),
         cmocka_unit_test_setup(test_driverMCP79510_GetTime, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetTime_Invalid, Setup),
+        cmocka_unit_test_setup(test_driverMCP79510_SetTime, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_GetHundredthSecond, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond_Invalid, Setup),
         cmocka_unit_test_setup(test_driverMCP79510_SetHundredthSecond, Setup),
