@@ -40,6 +40,9 @@ compile_source_message = '{}Compiling {}==> {}$TARGET{}'.format(
 flashing_message = '{}Flashing {}==> {}$SOURCE{}'.format(
     colors['yellow'], colors['end'], colors['blue'], colors['end'])
 
+fuse_message = '{}Setting fuse bits {}==>'.format(
+    colors['yellow'], colors['end'])
+
 linking_message = '{}Linking {}==> {}$TARGET{}'.format(
     colors['purple'], colors['end'], colors['blue'], colors['end'])
 
@@ -163,6 +166,12 @@ for target in TARGETS:
 
 
 Help('Utils:\n')
+
+fuse_cmd = 'avrdude -c {} -p {} -P {} -U efuse:w:0xFD:m -U lfuse:w:0xE2:m -U hfuse:w:0xD1:m -B 3 {}'.format(
+            env['TOOL'], env['MCU'], env['PORT'], flash_quell)
+fuse = Command('init-fuses',  None, Action(fuse_cmd, fuse_message))
+Help('    init-fuses: Set fuse bits to default values.\n')
+
 compdb = common_env.CompilationDatabase()
 Alias('compdb', compdb)
 Help('    compdb: Generate a compilation database.\n')
