@@ -1,7 +1,7 @@
 /**
  * @file   Board.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-25 (Last edit)
+ * @date   2021-03-21 (Last edit)
  * @brief  Board support package for the main unit.
  */
 
@@ -133,12 +133,12 @@ void Board_NHD223_SetResetHigh(void)
 
 void Board_NHD223_SetChipSelectLow(void)
 {
-    NHD223_CTRL_PORT |= (1 << NHD223_CHIPSELECT_PIN);
+    NHD223_CTRL_PORT &= ~(1 << NHD223_CHIPSELECT_PIN);
 }
 
 void Board_NHD223_SetChipSelectHigh(void)
 {
-    NHD223_CTRL_PORT &= ~(1 << NHD223_CHIPSELECT_PIN);
+    NHD223_CTRL_PORT |= (1 << NHD223_CHIPSELECT_PIN);
 }
 
 void Board_NHD223_SetReadWriteLow(void)
