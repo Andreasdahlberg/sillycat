@@ -368,7 +368,6 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
         RTC_GetCurrentTime(&module.set_time.time);
         ConvertTimeToLocal(&module.set_time.time);
 
-        /* TODO: Use 'DrawDetailedTimeView' */
         module.view.details.draw_function = DrawSetTimeView;
         module.set_time.active = true;
         module.set_time.index = 0;
