@@ -1,7 +1,7 @@
 /**
  * @file   driverDHT22.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-10-05 (Last edit)
+ * @date   2021-04-11 (Last edit)
  * @brief  DHT22 RHT sensor driver.
  */
 
@@ -257,7 +257,7 @@ static dht_state_t ReadingStateMachine(void)
 
 static uint16_t ConvertToScaledInteger(uint8_t integral, uint8_t fractional)
 {
-    return (integral << 8) + (fractional);
+    return (integral << 8) + fractional;
 }
 
 static void DecodeTimings(void)

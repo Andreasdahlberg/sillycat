@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-13 (Last edit)
+ * @date   2021-04-11 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -472,14 +472,14 @@ static void ReadRegisters(uint8_t address, void *dst_p, size_t length)
 static void ClearBit(uint8_t register_address, uint8_t bit_index)
 {
     uint8_t register_data = ReadRegister(register_address);
-    register_data &= ~(1 << (bit_index));
+    register_data &= ~(1 << bit_index);
     WriteRegister(register_address, register_data);
 }
 
 static void SetBit(uint8_t register_address, uint8_t bit_index)
 {
     uint8_t register_data = ReadRegister(register_address);
-    register_data |= (1 << (bit_index));
+    register_data |= (1 << bit_index);
     WriteRegister(register_address, register_data);
 }
 
