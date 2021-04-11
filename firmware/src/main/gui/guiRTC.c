@@ -1,7 +1,7 @@
 /**
  * @file   guiRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-04-23 (Last edit)
+ * @date   2021-04-11 (Last edit)
  * @brief  Implementation of GUI for displaying the current time.
  */
 
@@ -39,7 +39,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //DEFINES
 //////////////////////////////////////////////////////////////////////////
 
-#define UTC_OFFSET_MIN 60
+#define UTC_OFFSET_SEC 3600
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -81,7 +81,8 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)));
 static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)));
 static void DrawUnderLine(void);
 static void DrawSetTimeView(uint16_t context __attribute__ ((unused)));
-static void AdjustTimeForView(struct time_t *time_p);
+static void ConvertTimeToLocal(struct time_t *time_p);
+static void ConvertTimeToUTC(struct time_t *time_p);
 static void SetTimeAction(uint16_t context __attribute__ ((unused)));
 static struct limits_t GetCurrentFieldLimits(size_t field_index, const struct time_t *time_p);
 static void AdjustTimeToLimits(const struct time_t *time_p);
@@ -116,7 +117,7 @@ static void DrawClockView(uint16_t context __attribute__ ((unused)))
     struct time_t time;
     RTC_GetCurrentTime(&time);
 
-    AdjustTimeForView(&time);
+    ConvertTimeToLocal(&time);
 
     libUI_Print("%02u:%02u", 45, UI_SINGLE_ROW, time.hour, time.minute);
 }
@@ -126,7 +127,7 @@ static void DrawDetailedTimeView(uint16_t context __attribute__ ((unused)))
     struct time_t time;
     RTC_GetCurrentTime(&time);
 
-    AdjustTimeForView(&time);
+    ConvertTimeToLocal(&time);
 
     libUI_Print("20%02u-%02u-%02u", 25, UI_DOUBLE_ROW_FIRST, time.year, time.month, time.date);
     libUI_Print("%02u:%02u:%02u", 34, UI_DOUBLE_ROW_SECOND, time.hour, time.minute, time.second);
@@ -185,20 +186,24 @@ static void DrawSetTimeView(uint16_t context __attribute__ ((unused)))
     struct time_t time;
     time = module.set_time.time;
 
-    AdjustTimeForView(&time);
-
     libUI_Print("20%02u-%02u-%02u", 25, UI_DOUBLE_ROW_FIRST, time.year, time.month, time.date);
     libUI_Print("%02u:%02u:%02u", 34, UI_DOUBLE_ROW_SECOND, time.hour, time.minute, time.second);
 
     DrawUnderLine();
 }
 
-static void AdjustTimeForView(struct time_t *time_p)
+static void ConvertTimeToLocal(struct time_t *time_p)
 {
-    /**
-     * Always add offset since time is stored as UTC,
-     */
-    Time_AddMinutes(time_p, UTC_OFFSET_MIN);
+    uint32_t timestamp = Time_ConvertToTimestamp(time_p);
+    timestamp += UTC_OFFSET_SEC;
+    *time_p = Time_ConvertFromTimestamp(timestamp);
+}
+
+static void ConvertTimeToUTC(struct time_t *time_p)
+{
+    uint32_t timestamp = Time_ConvertToTimestamp(time_p);
+    timestamp -= timestamp >= UTC_OFFSET_SEC ? UTC_OFFSET_SEC : timestamp;
+    *time_p = Time_ConvertFromTimestamp(timestamp);
 }
 
 static void NextField(void)
@@ -335,6 +340,7 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
          */
         Encoder_SetCallbacks(&module.set_time.callbacks);
 
+        ConvertTimeToUTC(&module.set_time.time);
         RTC_SetCurrentTime(&module.set_time.time);
 
         module.view.details.draw_function = DrawDetailedTimeView;
@@ -360,6 +366,7 @@ static void SetTimeAction(uint16_t context __attribute__ ((unused)))
         Encoder_SetCallbacks(&encoder_callbacks);
 
         RTC_GetCurrentTime(&module.set_time.time);
+        ConvertTimeToLocal(&module.set_time.time);
 
         /* TODO: Use 'DrawDetailedTimeView' */
         module.view.details.draw_function = DrawSetTimeView;
