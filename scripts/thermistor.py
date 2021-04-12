@@ -52,7 +52,7 @@ def create_lookup_table(start, stop, step):
             print('Temperature: {:.1f} °C'.format(kelvin_to_celsius(t)))
             print('Resistance:  {:.2f} Ω'.format(ri))
 
-            lut.append(int(kelvin_to_celsius(t) * 10))
+            lut.append(round(kelvin_to_celsius(t) * 10))
         else:
             lut.append(-1000)
 
