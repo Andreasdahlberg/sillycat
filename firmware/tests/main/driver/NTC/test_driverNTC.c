@@ -127,7 +127,7 @@ static void test_driverNTC_UpdateSampleFrequency(void **state)
 
 static void test_driverNTC_UpdateUninitializedFilter(void **state)
 {
-    const int16_t temperature = 251;
+    const int16_t temperature = 250;
     struct sensor_t *sensor_p = driverNTC_GetSensor(1);
 
     will_return(__wrap_Timer_TimeDifference, UINT32_MAX);
@@ -144,7 +144,7 @@ static void test_driverNTC_UpdateUninitializedFilter(void **state)
 
 static void test_driverNTC_UpdateInitializedFilter(void **state)
 {
-    const int16_t temperature = 251;
+    const int16_t temperature = 250;
     struct sensor_t *sensor_p = driverNTC_GetSensor(1);
 
     will_return(__wrap_Timer_TimeDifference, UINT32_MAX);
