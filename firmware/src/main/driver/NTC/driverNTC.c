@@ -44,6 +44,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define SAMPLE_PERIOD_MS 100
+#define LUT_SIZE 819
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -64,24 +65,23 @@ struct ntc_sensor_t
 struct lookup_table_t
 {
     uint16_t offset;
-    uint16_t temperatures[819];
+    uint16_t temperatures[LUT_SIZE];
 };
 
 //////////////////////////////////////////////////////////////////////////
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-static void Update(struct sensor_t *super);
-static bool GetTemperature(struct ntc_sensor_t *self, int16_t *temperature);
-static bool ADCValueToTemperature(uint16_t adc_value, int16_t *temperature);
+static void Update(struct sensor_t *super_p);
+static bool GetTemperature(struct ntc_sensor_t *self_p, int16_t *temperature_p);
+static bool ADCValueToTemperature(uint16_t adc_value, int16_t *temperature_p);
 static bool IsValid(uint16_t adc_value);
-static int16_t FilterTemperature(struct ntc_sensor_t *self, int16_t temperature);
+static int16_t FilterTemperature(struct ntc_sensor_t *self_p, int16_t temperature);
 
 //////////////////////////////////////////////////////////////////////////
 //VARIABLES
 //////////////////////////////////////////////////////////////////////////
 
-// TODO: Use generated lookup table.
 static const struct lookup_table_t ntc_lut PROGMEM =
 {
     .offset = 120,
@@ -184,43 +184,43 @@ struct sensor_t *driverNTC_GetSensor(size_t id)
 //LOCAL FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
 
-static void Update(struct sensor_t *super)
+static void Update(struct sensor_t *super_p)
 {
-    struct ntc_sensor_t *self = (struct ntc_sensor_t *)super;
+    struct ntc_sensor_t *self_p = (struct ntc_sensor_t *)super_p;
 
-    if (Timer_TimeDifference(self->timer) > SAMPLE_PERIOD_MS)
+    if (Timer_TimeDifference(self_p->timer) > SAMPLE_PERIOD_MS)
     {
         int16_t temperature;
 
-        if (GetTemperature(self, &temperature))
+        if (GetTemperature(self_p, &temperature))
         {
-            self->base.value = FilterTemperature(self, temperature);
-            self->base.valid = true;
+            self_p->base.value = FilterTemperature(self_p, temperature);
+            self_p->base.valid = true;
         }
         else
         {
-            self->base.valid = false;
+            self_p->base.valid = false;
         }
 
-        self->timer = Timer_GetMilliseconds();
+        self_p->timer = Timer_GetMilliseconds();
     }
 }
 
-static bool GetTemperature(struct ntc_sensor_t *self, int16_t *temperature)
+static bool GetTemperature(struct ntc_sensor_t *self_p, int16_t *temperature_p)
 {
     uint16_t adc_value;
 
-    ADC_Convert(&self->adc.channel, &adc_value, 1);
-    return ADCValueToTemperature(adc_value, temperature);
+    ADC_Convert(&self_p->adc.channel, &adc_value, 1);
+    return ADCValueToTemperature(adc_value, temperature_p);
 }
 
-static bool ADCValueToTemperature(uint16_t adc_value, int16_t *temperature)
+static bool ADCValueToTemperature(uint16_t adc_value, int16_t *temperature_p)
 {
     if (IsValid(adc_value))
     {
         const uint16_t offset = pgm_read_word(&ntc_lut.offset);
 
-        *temperature = pgm_read_word(&ntc_lut.temperatures[adc_value - offset]);
+        *temperature_p = pgm_read_word(&ntc_lut.temperatures[adc_value - offset]);
         return true;
     }
     else
@@ -237,16 +237,16 @@ static bool IsValid(uint16_t adc_value)
            (adc_value - offset < ElementsIn(ntc_lut.temperatures));
 }
 
-static int16_t FilterTemperature(struct ntc_sensor_t *self, int16_t temperature)
+static int16_t FilterTemperature(struct ntc_sensor_t *self_p, int16_t temperature)
 {
-    if (Filter_IsInitialized(&self->filter))
+    if (Filter_IsInitialized(&self_p->filter))
     {
-        Filter_Process(&self->filter, temperature);
+        Filter_Process(&self_p->filter, temperature);
     }
     else
     {
-        Filter_Init(&self->filter, temperature, FILTER_ALPHA(0.1));
+        Filter_Init(&self_p->filter, temperature, FILTER_ALPHA(0.1));
     }
 
-    return Filter_Output(&self->filter);
+    return Filter_Output(&self_p->filter);
 }
