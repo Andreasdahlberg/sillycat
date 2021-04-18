@@ -18,6 +18,8 @@ import os
 import subprocess
 import struct
 from datetime import datetime
+from datetime import timezone
+from datetime import timedelta
 from intelhex import IntelHex
 import crcmod
 
@@ -233,7 +235,7 @@ class ErrorMessage(object):
         3: 'LOW_STACK',
         4: 'RTC_FAIL',
         5: 'CORRUPT_CONFIG',
-        75: 'HIGH_MCU_TEMPERATURE'
+        6: 'HIGH_MCU_TEMPERATURE'
     }
 
     def __init__(self, index, timestamp, code, information):
@@ -280,7 +282,7 @@ class ErrorMessage(object):
     @property
     def time(self):
         """Get the time that the error message was saved."""
-        date = datetime.utcfromtimestamp(self._timestamp)
+        date = datetime(2000, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=self._timestamp)
         return date.strftime('%Y-%m-%d %H:%M:%S')
 
     @property
@@ -298,7 +300,7 @@ class ErrorMessage(object):
 class ErrorLog(object):
     """An object representing the device error log."""
 
-    _START_ADDRESS = 0x20
+    _START_ADDRESS = 0x22
     _END_ADDRESS = 0x340
 
     def __init__(self):
