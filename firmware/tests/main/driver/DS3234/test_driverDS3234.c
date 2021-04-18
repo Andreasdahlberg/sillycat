@@ -1,7 +1,7 @@
 /**
  * @file   test_driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-15 (Last edit)
+ * @date   2021-04-18 (Last edit)
  * @brief  Test suite for the DS3234 RTC driver.
  */
 
@@ -64,7 +64,7 @@ static void ExpectWriteValueRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegister(uint8_t address, uint8_t data);
 static void ExpectReadRegisters(uint8_t address, uint8_t *data_p, size_t length);
 static void ExpectModifyRegister(uint8_t address, uint8_t initial_data, uint8_t new_data);
-static void ExpectResetControlRegister(void);
+static void ExpectOscillatorEnabled(void);
 static void Set24HourMode(bool enabled);
 static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRTC_time_t *time_p);
 
@@ -78,7 +78,8 @@ static void FillTimeKeepingRegisters(uint8_t *registers_p, const struct driverRT
 
 static int Setup(void **state)
 {
-    ExpectResetControlRegister();
+    ExpectWriteRegister(REG_AGING_OFFSET);
+    ExpectOscillatorEnabled();
     driverDS3234_Init(StubSPIPreCallback, StubSPIPostCallback);
 
     return 0;
@@ -126,9 +127,9 @@ static void ExpectModifyRegister(uint8_t address, uint8_t initial_data, uint8_t 
     ExpectWriteValueRegister(address, new_data);
 }
 
-static void ExpectResetControlRegister(void)
+static void ExpectOscillatorEnabled(void)
 {
-    ExpectWriteValueRegister(REG_CONTROL, 0x1C);
+    ExpectModifyRegister(REG_CONTROL, (uint8_t)(1 << CONREG_EOSC), 0x00);
 }
 
 static void Set24HourMode(bool enabled)
@@ -167,8 +168,33 @@ static void test_driverDS3234_Init_InvalidCallbacks(void **state)
 
 static void test_driverDS3234_Init(void **state)
 {
-    ExpectResetControlRegister();
+    ExpectWriteRegister(REG_AGING_OFFSET);
+    ExpectOscillatorEnabled();
     driverDS3234_Init(StubSPIPreCallback, StubSPIPostCallback);
+}
+
+static void test_driverDS3234_EnableOscillator(void **state)
+{
+    /* Enable */
+    uint8_t expected_register_data = (uint8_t)~(1 << CONREG_EOSC);
+    ExpectModifyRegister(REG_CONTROL, 0xFF, expected_register_data);
+    driverDS3234_EnableOscillator(true);
+
+    /* Disable */
+    expected_register_data = (uint8_t)(1 << CONREG_EOSC);
+    ExpectModifyRegister(REG_CONTROL, 0x00, expected_register_data);
+    driverDS3234_EnableOscillator(false);
+}
+
+static void test_driverDS3234_SetAgingOffset(void **state)
+{
+    const int8_t values[] = {INT8_MIN, 0, INT8_MAX};
+
+    for (size_t i = 0; i < ElementsIn(values); ++i)
+    {
+        ExpectWriteValueRegister(REG_AGING_OFFSET, (uint8_t)values[i]);
+        driverDS3234_SetAgingOffset(values[i]);
+    }
 }
 
 static void test_driverDS3234_GetTime(void **state)
@@ -955,6 +981,8 @@ int main(int argc, char *argv[])
     {
         cmocka_unit_test(test_driverDS3234_Init_InvalidCallbacks),
         cmocka_unit_test(test_driverDS3234_Init),
+        cmocka_unit_test_setup(test_driverDS3234_EnableOscillator, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_SetAgingOffset, Setup),
         cmocka_unit_test_setup(test_driverDS3234_GetTime, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetTime_Invalid, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetTime, Setup),

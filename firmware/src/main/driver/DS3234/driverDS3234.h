@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-13 (Last edit)
+ * @date   2021-04-18 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -55,6 +55,32 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
  * @param post_p Function for ending a SPI-transfer.
  */
 void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p);
+
+/**
+ * Enable/disable the oscillator.
+ *
+ * If disabled, the oscillator is stopped when the DS3234 switches to battery
+ * power. When the DS3234 is powered by VCC, the oscillator is always on.
+ *
+ * @param enabled Enable/disable the oscillator.
+ */
+void driverDS3234_EnableOscillator(bool enabled);
+
+/**
+ * Set the aging offset.
+ *
+ * The aging offset is a user-provided value to add to or subtract from the oscillator
+ * capacitor array. Positive aging values add capacitance to the array, slowing the
+ * oscillator frequency. Negative values remove capacitance from the array, increasing
+ * the oscillator frequency.
+ *
+ * The offset is added to the capacitance array during a normal temperature conversion,
+ * if the temperature changes from the previous conversion, or during a manual user
+ * conversion.
+ *
+ * @param offset
+ */
+void driverDS3234_SetAgingOffset(int8_t offset);
 
 /**
  * Get the current time.

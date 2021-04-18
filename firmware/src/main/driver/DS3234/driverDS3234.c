@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-04-11 (Last edit)
+ * @date   2021-04-18 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -86,11 +86,27 @@ void driverDS3234_Init(libSPI_callback_type pre_p, libSPI_callback_type post_p)
     module.PreSPI = pre_p;
     module.PostSPI = post_p;
 
-    // Clear control register, this makes sure that the oscillator is running
-    // when power is removed.
-    WriteRegister(REG_CONTROL, 0x1C);
+    driverDS3234_SetAgingOffset(0);
+    driverDS3234_EnableOscillator(true);
 
     INFO("DS3234 initialized");
+}
+
+void driverDS3234_EnableOscillator(bool enabled)
+{
+    if (enabled)
+    {
+        ClearBit(REG_CONTROL, CONREG_EOSC);
+    }
+    else
+    {
+        SetBit(REG_CONTROL, CONREG_EOSC);
+    }
+}
+
+void driverDS3234_SetAgingOffset(int8_t offset)
+{
+    WriteRegister(REG_AGING_OFFSET, offset);
 }
 
 void driverDS3234_GetTime(struct driverRTC_time_t *time_p)
