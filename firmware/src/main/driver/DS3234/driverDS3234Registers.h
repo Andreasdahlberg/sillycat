@@ -71,4 +71,12 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define CONREG_A2IE     0x01
 #define CONREG_A1IE     0x00
 
+#define CONSTATUSREG_OSF        0x07
+#define CONSTATUSREG_BB32KHZ    0x06
+#define CONSTATUSREG_CRATE1     0x05
+#define CONSTATUSREG_CRATE2     0x04
+#define CONSTATUSREG_EN32KHZ    0x03
+#define CONSTATUSREG_BSY        0x02
+#define CONSTATUSREG_A2F        0x01
+#define CONSTATUSREG_A1F        0x00
 #endif
