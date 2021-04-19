@@ -93,6 +93,15 @@ void driverDS3234_SetAgingOffset(int8_t offset);
 void driverDS3234_EnableSquareWaveOutput(bool enabled);
 
 /**
+ * Enable/disable the 32 kHz output.
+ *
+ * When enabled, the 32kHz pin outputs a 32.768kHz square-wave signal.
+ *
+ * @param enabled
+ */
+void driverDS3234_Enable32kHzOutput(bool enabled);
+
+/**
  * Get the current time.
  *
  * @param time_p Pointer to variable where the result will be stored.

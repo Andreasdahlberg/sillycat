@@ -121,6 +121,18 @@ void driverDS3234_EnableSquareWaveOutput(bool enabled)
     }
 }
 
+void driverDS3234_Enable32kHzOutput(bool enabled)
+{
+    if (enabled)
+    {
+        ClearBit(REG_CONTROL_STATUS, CONSTATUSREG_EN32KHZ);
+    }
+    else
+    {
+        SetBit(REG_CONTROL_STATUS, CONSTATUSREG_EN32KHZ);
+    }
+}
+
 void driverDS3234_GetTime(struct driverRTC_time_t *time_p)
 {
     sc_assert(time_p != NULL);

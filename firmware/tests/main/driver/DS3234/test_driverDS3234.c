@@ -210,6 +210,19 @@ static void test_driverDS3234_EnableSquareWaveOutput(void **state)
     driverDS3234_EnableSquareWaveOutput(false);
 }
 
+static void test_driverDS3234_Enable32kHzOutput(void **state)
+{
+    /* Enable */
+    uint8_t expected_register_data = (uint8_t)~(1 << CONSTATUSREG_EN32KHZ);
+    ExpectModifyRegister(REG_CONTROL_STATUS, 0xFF, expected_register_data);
+    driverDS3234_Enable32kHzOutput(true);
+
+    /* Disable */
+    expected_register_data = (uint8_t)(1 << CONSTATUSREG_EN32KHZ);
+    ExpectModifyRegister(REG_CONTROL_STATUS, 0x00, expected_register_data);
+    driverDS3234_Enable32kHzOutput(false);
+}
+
 static void test_driverDS3234_GetTime(void **state)
 {
     struct driverRTC_time_t expected_time =
@@ -997,6 +1010,7 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_driverDS3234_EnableOscillator, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetAgingOffset, Setup),
         cmocka_unit_test_setup(test_driverDS3234_EnableSquareWaveOutput, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_Enable32kHzOutput, Setup),
         cmocka_unit_test_setup(test_driverDS3234_GetTime, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetTime_Invalid, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetTime, Setup),

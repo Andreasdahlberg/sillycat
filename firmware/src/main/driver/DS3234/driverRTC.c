@@ -56,6 +56,7 @@ void driverRTC_Init(void)
 {
     driverDS3234_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback);
     driverDS3234_EnableSquareWaveOutput(false);
+    driverDS3234_Enable32kHzOutput(false);
 }
 
 void driverRTC_GetTime(struct driverRTC_time_t *time_p)
