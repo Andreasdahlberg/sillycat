@@ -1,7 +1,7 @@
 /**
  * @file   test_driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-04-18 (Last edit)
+ * @date   2021-04-19 (Last edit)
  * @brief  Test suite for the DS3234 RTC driver.
  */
 
@@ -195,6 +195,19 @@ static void test_driverDS3234_SetAgingOffset(void **state)
         ExpectWriteValueRegister(REG_AGING_OFFSET, (uint8_t)values[i]);
         driverDS3234_SetAgingOffset(values[i]);
     }
+}
+
+static void test_driverDS3234_EnableSquareWaveOutput(void **state)
+{
+    /* Enable */
+    uint8_t expected_register_data = (uint8_t)~(1 << CONREG_INTCN);
+    ExpectModifyRegister(REG_CONTROL, 0xFF, expected_register_data);
+    driverDS3234_EnableSquareWaveOutput(true);
+
+    /* Disable */
+    expected_register_data = (uint8_t)(1 << CONREG_INTCN);
+    ExpectModifyRegister(REG_CONTROL, 0x00, expected_register_data);
+    driverDS3234_EnableSquareWaveOutput(false);
 }
 
 static void test_driverDS3234_GetTime(void **state)
@@ -983,6 +996,7 @@ int main(int argc, char *argv[])
         cmocka_unit_test(test_driverDS3234_Init),
         cmocka_unit_test_setup(test_driverDS3234_EnableOscillator, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetAgingOffset, Setup),
+        cmocka_unit_test_setup(test_driverDS3234_EnableSquareWaveOutput, Setup),
         cmocka_unit_test_setup(test_driverDS3234_GetTime, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetTime_Invalid, Setup),
         cmocka_unit_test_setup(test_driverDS3234_SetTime, Setup),

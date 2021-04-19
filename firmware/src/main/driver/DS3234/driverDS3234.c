@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-04-18 (Last edit)
+ * @date   2021-04-19 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -107,6 +107,18 @@ void driverDS3234_EnableOscillator(bool enabled)
 void driverDS3234_SetAgingOffset(int8_t offset)
 {
     WriteRegister(REG_AGING_OFFSET, offset);
+}
+
+void driverDS3234_EnableSquareWaveOutput(bool enabled)
+{
+    if (enabled)
+    {
+        ClearBit(REG_CONTROL, CONREG_INTCN);
+    }
+    else
+    {
+        SetBit(REG_CONTROL, CONREG_INTCN);
+    }
 }
 
 void driverDS3234_GetTime(struct driverRTC_time_t *time_p)

@@ -1,7 +1,7 @@
 /**
  * @file   driverRTC.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-15 (Last edit)
+ * @date   2021-04-19 (Last edit)
  * @brief  RTC driver interface.
  */
 
@@ -55,6 +55,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 void driverRTC_Init(void)
 {
     driverDS3234_Init(Board_RTC_SPIPreCallback, Board_RTC_SPIPostCallback);
+    driverDS3234_EnableSquareWaveOutput(false);
 }
 
 void driverRTC_GetTime(struct driverRTC_time_t *time_p)

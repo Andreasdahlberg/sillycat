@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-04-18 (Last edit)
+ * @date   2021-04-19 (Last edit)
  * @brief  Driver for the DS3234 RTC
  */
 
@@ -81,6 +81,16 @@ void driverDS3234_EnableOscillator(bool enabled);
  * @param offset
  */
 void driverDS3234_SetAgingOffset(int8_t offset);
+
+/**
+ * Enable/disable the square wave output.
+ *
+ * By default, the square wave is always disabled when running on battery power even if enabled
+ * by this function.
+ *
+ * @param enabled
+ */
+void driverDS3234_EnableSquareWaveOutput(bool enabled);
 
 /**
  * Get the current time.
