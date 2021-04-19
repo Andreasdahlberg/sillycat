@@ -1,7 +1,7 @@
 /**
  * @file   driverDS3234Registers.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-02-13 (Last edit)
+ * @date   2021-04-19 (Last edit)
  * @brief  Register definitions for the DS3234 driver.
  */
 
@@ -62,13 +62,13 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #define HOUR_MODE_BIT   0x06
 #define HOUR_AM_PM_BIT  0x05
 
-#define CONREG_EOSC     0x08
-#define CONREG_BBSQW    0x07
-#define CONREG_CONV     0x06
-#define CONREG_RS2      0x05
-#define CONREG_RS1      0x04
-#define CONREG_INTCN    0x03
-#define CONREG_A2IE     0x02
-#define CONREG_A1IE     0x01
+#define CONREG_EOSC     0x07
+#define CONREG_BBSQW    0x06
+#define CONREG_CONV     0x05
+#define CONREG_RS2      0x04
+#define CONREG_RS1      0x03
+#define CONREG_INTCN    0x02
+#define CONREG_A2IE     0x01
+#define CONREG_A1IE     0x00
 
 #endif
