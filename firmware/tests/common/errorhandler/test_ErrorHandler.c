@@ -1,7 +1,7 @@
 /**
  * @file   test_ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-24 (Last edit)
+ * @date   2021-04-20 (Last edit)
  * @brief  Test suite for the error handler module.
  */
 
@@ -284,6 +284,23 @@ static void test_ErrorHandler_LogError_VeryLongLog(void **state)
     }
 }
 
+static void test_ErrorHandler_ClearErrorLog(void **state)
+{
+    const uint8_t error_code_offset = 0;
+    const uint8_t error_information_offset = 0;
+    const size_t number_of_errors = 80;
+
+    log_errors(number_of_errors, error_code_offset, error_information_offset);
+    ErrorHandler_ClearErrorLog();
+
+    for (size_t i = 1; i < number_of_errors - 1; ++i)
+    {
+        const struct error_message_t *error_message_p;
+        error_message_p = get_error_message_by_id(i);
+        assert_null(error_message_p);
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //FUNCTIONS
 //////////////////////////////////////////////////////////////////////////
@@ -322,8 +339,8 @@ int main(int argc, char *argv[])
         cmocka_unit_test_setup(test_ErrorHandler_AssertFailAndHandler, Setup),
         cmocka_unit_test_setup(test_ErrorHandler_LogError, Setup),
         cmocka_unit_test_setup(test_ErrorHandler_LogError_LogWrapAround, Setup),
-        cmocka_unit_test_setup(test_ErrorHandler_LogError_VeryLongLog, Setup)
-
+        cmocka_unit_test_setup(test_ErrorHandler_LogError_VeryLongLog, Setup),
+        cmocka_unit_test_setup(test_ErrorHandler_ClearErrorLog, Setup)
     };
 
     if (argc >= 2)

@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-01-24 (Last edit)
+ * @date   2021-04-20 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -132,6 +132,18 @@ void ErrorHandler_LogError(uint8_t code, uint8_t information)
      * this still works!
      */
     ++module.current_id;
+}
+
+void ErrorHandler_ClearErrorLog(void)
+{
+    for (size_t i = 0; i < ElementsIn(error_log); ++i)
+    {
+        const struct error_message_type empty_entry = {0};
+        eeprom_write_block(&empty_entry, &error_log[i], sizeof(empty_entry));
+    }
+
+    /** Re-init to get the new id and index. */
+    ErrorHandler_Init();
 }
 
 void ErrorHandler_AssertFail(const char *__file,

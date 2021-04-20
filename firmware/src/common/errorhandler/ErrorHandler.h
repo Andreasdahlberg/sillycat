@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2019-04-30 (Last edit)
+ * @date   2021-04-20 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -29,6 +29,7 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //INCLUDES
 //////////////////////////////////////////////////////////////////////////
 
+#include <stdint.h>
 #include "sc_assert.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,6 +93,11 @@ void ErrorHandler_SetAssertFailHandler(
  * @param information Additional information to save.
  */
 void ErrorHandler_LogError(uint8_t code, uint8_t information);
+
+/**
+ * Clear all entries in the error log.
+ */
+void ErrorHandler_ClearErrorLog(void);
 
 /**
  * Halt the device and indicate that an fault has occurred.
