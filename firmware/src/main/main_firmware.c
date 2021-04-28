@@ -1,7 +1,7 @@
 /**
  * @file   main_firmware.c
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2020-05-18 (Last edit)
+ * @date   2021-04-28 (Last edit)
  * @brief  Implementation of main
  */
 
@@ -85,9 +85,7 @@ static struct module_t module;
 //////////////////////////////////////////////////////////////////////////
 
 void CheckHealth(void);
-void assert_fail_handler(const char *file,
-                         int line_number,
-                         const char *expression);
+void assert_fail_handler(const char *file_p, int line_number, const char *expression_p);
 void handle_corrupt_config(void);
 
 //////////////////////////////////////////////////////////////////////////
@@ -205,13 +203,10 @@ void CheckHealth(void)
     sc_assert(unused_memory > 0);
 }
 
-void assert_fail_handler(const char *file,
-                         int line_number,
-                         const char *expression
-                        )
+void assert_fail_handler(const char *file_p, int line_number, const char *expression_p)
 {
-    UNUSED(expression);
-    const char *file_name = strrchr_P(file, '/');
+    UNUSED(expression_p);
+    const char *file_name = strrchr_P(file_p, '/');
 
     libUI_Print("Assert: %i", 2, UI_DOUBLE_ROW_FIRST, line_number);
     libUI_Print_P(file_name, 2, UI_DOUBLE_ROW_SECOND);
