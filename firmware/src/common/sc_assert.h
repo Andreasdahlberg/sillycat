@@ -46,8 +46,22 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "ErrorHandler.h"
 #define sc_assert_fail() (ErrorHandler_AssertFail(PSTR(__FILE__), __LINE__, \
     PSTR("sc_assert_fail")))
+
+#if __clang__
+
+#define sc_assert(e) ((e) ? (void)0 : _Pragma("clang diagnostic push") \
+                                      _Pragma("clang diagnostic ignored \"-Wunknown-attributes\"") \
+                                      ErrorHandler_AssertFail(PSTR(__FILE__), \
+                                      __LINE__, PSTR(#e))) \
+                                      _Pragma("clang diagnostic pop") \
+
+#else
 #define sc_assert(e) ((e) ? (void)0 : ErrorHandler_AssertFail(PSTR(__FILE__), \
-    __LINE__, PSTR(#e)))
+                                      __LINE__, PSTR(#e)))
+
+
+#endif
+
 #endif
 #else
 extern void mock_assert(const int result, const char *const expression,
