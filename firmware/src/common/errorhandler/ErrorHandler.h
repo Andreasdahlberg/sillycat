@@ -1,7 +1,7 @@
 /**
  * @file   ErrorHandler.h
  * @Author Andreas Dahlberg (andreas.dahlberg90@gmail.com)
- * @date   2021-04-20 (Last edit)
+ * @date   2021-04-28 (Last edit)
  * @brief  Implementation of ErrorHandler
  */
 
@@ -52,8 +52,7 @@ enum
     ASSFAIL,
     LOW_STACK,
     RTC_FAIL,
-    CORRUPT_CONFIG,
-    HIGH_MCU_TEMPERATURE
+    CORRUPT_CONFIG
 };
 
 typedef void (*error_handler_assert_fail_t)(

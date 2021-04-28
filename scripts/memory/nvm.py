@@ -235,7 +235,6 @@ class ErrorMessage(object):
         3: 'LOW_STACK',
         4: 'RTC_FAIL',
         5: 'CORRUPT_CONFIG',
-        6: 'HIGH_MCU_TEMPERATURE'
     }
 
     def __init__(self, index, timestamp, code, information):
