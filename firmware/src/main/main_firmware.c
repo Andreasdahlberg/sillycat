@@ -191,8 +191,9 @@ void CheckMemoryUsage(void)
 void assert_fail_handler(const char *file_p, int line_number, const char *expression_p)
 {
     UNUSED(expression_p);
-    const char *file_name = strrchr_P(file_p, '/');
+    ErrorHandler_LogError(ASSFAIL, 0);
 
+    const char *file_name = strrchr_P(file_p, '/');
     libUI_Print("Assert: %i", 2, UI_DOUBLE_ROW_FIRST, line_number);
     libUI_Print_P(file_name, 2, UI_DOUBLE_ROW_SECOND);
     libUI_Update();
