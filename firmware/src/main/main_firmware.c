@@ -51,7 +51,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 #include "Encoder.h"
 
 #include "driverNTC.h"
-#include "driverMCUTemperature.h"
 #include "driverPEC11.h"
 
 #include "guiRTC.h"
@@ -63,7 +62,6 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 //////////////////////////////////////////////////////////////////////////
 
 #define LOW_STACK_LIMIT 100 // ~5% left of total memory
-#define HICH_MCU_TEMP_LIMIT 75 // ~10% below max operating temperature
 
 //////////////////////////////////////////////////////////////////////////
 //TYPE DEFINITIONS
@@ -72,6 +70,8 @@ along with SillyCat firmware.  If not, see <http://www.gnu.org/licenses/>.
 struct module_t
 {
     struct node_t nodes[3];
+    uint32_t memory_check_timer;
+    bool memory_low_flag;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ static struct module_t module;
 //LOCAL FUNCTION PROTOTYPES
 //////////////////////////////////////////////////////////////////////////
 
-void CheckHealth(void);
+void CheckMemoryUsage(void);
 void assert_fail_handler(const char *file_p, int line_number, const char *expression_p);
 void handle_corrupt_config(void);
 
@@ -113,7 +113,6 @@ int main(void)
     RTC_Init();
     Sensor_Init();
     driverNTC_Init();
-    driverMCUTemperature_Init();
 
     Interface_Init();
     if (!Config_Load())
@@ -131,7 +130,6 @@ int main(void)
 
     Sensor_Register(driverNTC_GetSensor(0));
     Sensor_Register(driverNTC_GetSensor(1));
-    Sensor_Register(driverMCUTemperature_GetSensor());
 
     for (size_t i = 0; i < ElementsIn(module.nodes); ++i)
     {
@@ -153,7 +151,7 @@ int main(void)
     INFO("Start up done");
     DEBUG("Device address: 0x%02X\r\n", Config_GetAddress());
 
-    uint32_t check_timer = Timer_GetMilliseconds();
+    module.memory_check_timer = Timer_GetMilliseconds();
 
     while (1)
     {
@@ -162,45 +160,32 @@ int main(void)
         Transceiver_Update();
         Com_Update();
         Interface_Update();
-
-        if (Timer_TimeDifference(check_timer) > 1000)
-        {
-            CheckHealth();
-            check_timer = Timer_GetMilliseconds();
-        }
-
+        CheckMemoryUsage();
     }
 
     CRITICAL("Main loop exit");
     Board_SoftReset();
 }
 
-void CheckHealth(void)
+void CheckMemoryUsage(void)
 {
-    static bool memory_low_flag = false;
-    static bool high_mcu_temp_flag = false;
+    const uint32_t check_interval = 1000;
 
-    uint16_t unused_memory = Board_StackCount();
-    if (!memory_low_flag && unused_memory < LOW_STACK_LIMIT)
+    if (Timer_TimeDifference(module.memory_check_timer) > check_interval)
     {
-        ErrorHandler_LogError(LOW_STACK, unused_memory);
-        memory_low_flag = true;
-        WARNING("Low memory: %u", unused_memory);
+        const uint16_t unused_memory = Board_StackCount();
+        DEBUG("Unused memory: %u", unused_memory);
+
+        if (!module.memory_low_flag && unused_memory < LOW_STACK_LIMIT)
+        {
+            ErrorHandler_LogError(LOW_STACK, unused_memory);
+            module.memory_low_flag = true;
+            WARNING("Low memory: %u", unused_memory);
+        }
+
+        sc_assert(unused_memory > 0);
+        module.memory_check_timer = Timer_GetMilliseconds();
     }
-
-    int16_t temperature;
-    const struct sensor_t *temperature_sensor = driverMCUTemperature_GetSensor();
-
-    if (Sensor_GetValue(temperature_sensor, &temperature) &&
-            !high_mcu_temp_flag &&
-            (temperature > HICH_MCU_TEMP_LIMIT))
-    {
-        ErrorHandler_LogError(HIGH_MCU_TEMPERATURE, (int8_t)temperature);
-        high_mcu_temp_flag = true;
-        WARNING("High MCU temperature: %d", temperature);
-    }
-
-    sc_assert(unused_memory > 0);
 }
 
 void assert_fail_handler(const char *file_p, int line_number, const char *expression_p)
