@@ -43,11 +43,42 @@ $ cd firmware
 $ scons build-main-release build-node-release
 ```
 
+### Board bringup
+1. Set fuses
+    ```bash
+    $ scons init-fuses
+    ```
+
+1. Get configuration
+    ```bash
+    $ scripts/memory/config.py load /dev/ttyACM0 conf.eep
+    ```
+
+1. Set configuration values
+    ```bash
+    $ scripts/memory/config.py set conf.eep version 1
+    $ scripts/memory/config.py set conf.eep network_id AABBCCDDEEFF
+    $ scripts/memory/config.py set conf.eep aes_key 1DUMMYKEYFOOBAR1
+    $ scripts/memory/config.py set conf.eep master_address 170
+    $ scripts/memory/config.py set conf.eep address 170
+    $ scripts/memory/config.py set conf.eep broadcast_address 255
+    $ scripts/memory/config.py set conf.eep report_interval 60
+    ```
+    
+    See [Configuration](scripts/memory/README.md#config) for details.
+
+1. Save configuration to device
+    ```bash
+    $ /config.py save /dev/ttyACM0 conf.eep
+    ```
+
+1. Flash firmware
+    ```bash
+    scons flash-main-release
+    ```   
+
 ### Testing
 See [Testing](firmware/tests/README.md)
-
-### Configuration
-See [Configuration](scripts/memory/README.md#config)
 
 ### CI
 See [Docker](docker/README.md)
